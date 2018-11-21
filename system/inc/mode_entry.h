@@ -1,0 +1,26 @@
+/*
+ * mode_entry.h
+ *
+ *  Created on: Feb 26, 2016
+ *      Author: B48683
+ */
+
+#ifndef MODE_ENTRY_H_
+#define MODE_ENTRY_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void PLL_160MHz();
+
+void system160mhz();
+
+void enter_STOP_mode();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MODE_ENTRY_H_ */
+
