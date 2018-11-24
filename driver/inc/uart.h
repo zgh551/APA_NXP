@@ -14,6 +14,21 @@
 extern "C" {
 #endif
 
+typedef enum _ReceiveFrame
+{
+	FirstHead1 = 0,
+	FirstHead2,
+	ID,
+	Data,
+	CheckSum
+}ReceiveFrame;
+
+typedef union _byte2float
+{
+	vuint8_t b[4];
+	float f;
+}Byte2Float;
+
 void FlexLin1_Uart_Init( unsigned int MegaHertz, unsigned int BaudRate );
 void FlexLin1_DMA_TX_Init(void);
 void FlexLin1_DMA_RX_Init(void);

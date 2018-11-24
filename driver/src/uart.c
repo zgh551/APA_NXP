@@ -194,10 +194,3 @@ void TransmitData(uint8_t dat)
 	LINFlexD_1.UARTSR.R = 0x0002;// clear the DTF flag and not the other flags
 }
 
-void FlexLin1_Uart_Isr(void)
-{
-	vuint8_t temp;
-
-	LINFlexD_1.UARTSR.B.DRFRFE = 1;
-	temp = LINFlexD_1.BDRM.B.DATA4;
-}
