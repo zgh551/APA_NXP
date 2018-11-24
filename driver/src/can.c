@@ -46,15 +46,14 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   CAN_0.IMASK1.R = 0x00000100;
 // mail buffer 8 set to receive
   CAN_0.MB[8].CS.B.IDE = 0;      /* MB 8 will look for a standard ID */
-  CAN_0.MB[8].ID.B.ID_STD = 0x555; /* MB 8 will look for ID = 0x555 */
+  CAN_0.MB[8].ID.B.ID_STD = 0x200; /* MB 8 will look for ID = 0x555 */
   CAN_0.MB[8].CS.B.CODE = 4;     /* MB 8 set to RX EMPTY */
-  CAN_0.RXMGMASK.R = 0x1FFFFFFF; /* Global acceptance mask */
+  CAN_0.RXMGMASK.R = 0x1003ffff; /* Global acceptance mask */
   /* set mask registers - all ID bits must match */
   for(i=0;i<64;i++)
   {
       CAN_0.RXIMR[i].R = 0x00;
   }
-
   /* Configure the CAN0_TX pin to transmit. */
   SIUL2.MSCR[PB0].B.SSS = 1; //PTB0 is for CAN0_TX. Select signal source select to CAN0_TX
   SIUL2.MSCR[PB0].B.OBE = 1; //Set pin to output. Enable output buffer
@@ -66,6 +65,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
 
 //  CAN_0.MCR.B.AEN = 1;
   CAN_0.MCR.B.MAXMB = 0x3f;
+//  CAN_0.MCR.B.IRMQ = 1;
   CAN_0.MCR.B.HALT = 0;
   while (CAN_0.MCR.B.FRZACK & CAN_0.MCR.B.NOTRDY) {} /* Wait to clear */
                  /* Good practice: wait for FRZACK on freeze mode entry/exit */
@@ -127,6 +127,8 @@ void ReceiveMsg(void) {
 void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
 {
 	uint8_t	i;
+	while(CAN_0.MB[0].CS.B.CODE != 0x8){}
+
 	CAN_0.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
 	CAN_0.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
 	CAN_0.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
@@ -140,14 +142,4 @@ void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
 }
 
 
-void FlexCAN0_Isr(void)
-{
-	uint32_t temp = 0;      /* temporary and volatile 32bit */
-	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
-	{
-		/* release the internal lock for all Rx MBs
-		 * by reading the TIMER */
-		temp = CAN_0.TIMER.R;
-		CAN_0.IFLAG1.R = 0x00000100;
-	}
-}
+
