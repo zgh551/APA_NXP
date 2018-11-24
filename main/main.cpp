@@ -24,15 +24,12 @@ extern void xcptn_xmpl(void);
 
 void peri_clock_gating(void);
 
-CAN_Packet m_TestPacket;
+Vehicle m_Vehicle_CA;
+vuint8_t cnt;
 
 __attribute__ ((section(".text")))
 int main()
 {
-	uint8_t i;
-	Vehicle m_PathPlanning;
-//	m_PathPlanning.SteeringWheelTargetAngle = 30;
-
     xcptn_xmpl();	/* Configure and Enable Interrupts */
     peri_clock_gating();
     system160mhz();	/* sysclk=160MHz, dividers configured, mode trans*/
@@ -40,7 +37,7 @@ int main()
     FlexCAN0_Init();
 
     // Flex Lin1 Uart
-    FlexLin1_Uart_Init(80,19200);
+    FlexLin1_Uart_Init(80,9600);
 //    FlexLin1_DMA_TX_Init();
 //    FlexLin1_DMA_RX_Init();
 
@@ -55,13 +52,6 @@ int main()
     /*        = 0.8M x 4 / 160M = 3.2/160 = 0.02 sec.  */
     PIT_0.MCR.B.FRZ = 0; //Unfreeze timers
 
-    m_TestPacket.id = 0x123;
-    m_TestPacket.length = 8;
-    for(i=0;i<m_TestPacket.length;i++)
-    {
-    	m_TestPacket.data[i] = i;
-    }
-    DMA_0.TCD[16].CSR.B.START = 1;
     /* Loop forever */
 	for(;;)
 	{
@@ -85,10 +75,33 @@ extern "C" {
 #endif
 void PIT0_isr(void)
 {
-	CAN0_TransmitMsg(m_TestPacket);
-
-	TransmitData(0xaa);
+	m_Vehicle_CA.VehicleContorl();
 	PIT_0.TIMER[0].TFLG.R |= 1;  /* Clear interrupt flag. w1c */
+}
+
+void FlexCAN0_Isr(void)
+{
+	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
+	{
+		cnt = (cnt + 1) % 100;
+		m_Vehicle_CA.VehicleInformation(CAN_0.MB[8].ID.B.ID_STD,CAN_0.MB[8].DATA.B);
+		m_Vehicle_CA.SteeringAngleControlStateMachine();
+		m_Vehicle_CA.SteeringAngleControl(0.02);
+		/* release the internal lock for all Rx MBs
+		 * by reading the TIMER */
+		uint32_t temp = CAN_0.TIMER.R;
+		if(cnt == 0)
+		{
+			m_Vehicle_CA.TerminalControlCommandSend();
+		}
+		CAN_0.IFLAG1.R = 0x00000100;
+	}
+}
+
+void FlexLin1_Uart_Isr(void)
+{
+	LINFlexD_1.UARTSR.B.DRFRFE = 1;
+	m_Vehicle_CA.TerminalControlCommandReceive(LINFlexD_1.BDRM.B.DATA4);
 }
 #ifdef __cplusplus
 }
