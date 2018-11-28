@@ -19,6 +19,7 @@ typedef enum _ReceiveFrame
 	FirstHead1 = 0,
 	FirstHead2,
 	ID,
+	Length,
 	Data,
 	CheckSum
 }ReceiveFrame;
