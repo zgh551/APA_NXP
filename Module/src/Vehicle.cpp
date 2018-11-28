@@ -656,21 +656,21 @@ void Vehicle::VehicleInformation(vuint32_t id,vuint8_t dat[])
 			break;
 
 		case 0x208:// wheel speed
-			_wheel_speed_rear_left_direction = (vuint8_t)(dat[0] >> 5) & 0x03;
-			_wheel_speed_rear_left_valid = (vuint8_t)(  dat[0] >> 7) & 0x01;
-			_wheel_speed_rear_left_data = ((vuint16_t)(((dat[0] & 0x1F) << 8) | dat[1]))*0.05625;
+			_wheel_speed_rear_right_direction = (vuint8_t)(dat[0] >> 5) & 0x03;
+			_wheel_speed_rear_right_valid = (vuint8_t)(  dat[0] >> 7) & 0x01;
+			_wheel_speed_rear_right_data = ((vuint16_t)(((dat[0] & 0x1F) << 8) | dat[1]))*0.05625;
 
-			_wheel_speed_rear_right_direction = (vuint8_t)(dat[2] >> 5) & 0x03;
-			_wheel_speed_rear_right_valid = (vuint8_t)(  dat[2] >> 7) & 0x01;
-			_wheel_speed_rear_right_data = ((vuint16_t)(((dat[2] & 0x1F) << 8) | dat[3]))*0.05625;
+			_wheel_speed_rear_left_direction = (vuint8_t)(dat[2] >> 5) & 0x03;
+			_wheel_speed_rear_left_valid = (vuint8_t)(  dat[2] >> 7) & 0x01;
+			_wheel_speed_rear_left_data = ((vuint16_t)(((dat[2] & 0x1F) << 8) | dat[3]))*0.05625;
 
-			_wheel_speed_front_left_direction = (vuint8_t)(dat[4] >> 5) & 0x03;
-			_wheel_speed_front_left_valid = (vuint8_t)(  dat[4] >> 7) & 0x01;
-			_wheel_speed_front_left_data = ((vuint16_t)(((dat[4] & 0x1F) << 8) | dat[5]))*0.05625;
+			_wheel_speed_front_right_direction = (vuint8_t)(dat[4] >> 5) & 0x03;
+			_wheel_speed_front_right_valid = (vuint8_t)(  dat[4] >> 7) & 0x01;
+			_wheel_speed_front_right_data = ((vuint16_t)(((dat[4] & 0x1F) << 8) | dat[5]))*0.05625;
 
-			_wheel_speed_front_right_direction = (vuint8_t)(dat[6] >> 5) & 0x03;
-			_wheel_speed_front_right_valid = (vuint8_t)(  dat[6] >> 7) & 0x01;
-			_wheel_speed_front_right_data = ((vuint16_t)(((dat[6] & 0x1F) << 8) | dat[7]))*0.05625;
+			_wheel_speed_front_left_direction = (vuint8_t)(dat[6] >> 5) & 0x03;
+			_wheel_speed_front_left_valid = (vuint8_t)(  dat[6] >> 7) & 0x01;
+			_wheel_speed_front_left_data = ((vuint16_t)(((dat[6] & 0x1F) << 8) | dat[7]))*0.05625;
 			break;
 
 		case 0x218://vehicle speed
@@ -716,7 +716,7 @@ void Vehicle::TerminalControlCommandReceive(vuint8_t data)
 		case FirstHead1:
 			if(data == 0xAA)
 			{
-				_check_sum = 0xAA;
+				_check_sum = data;
 				_terminal_frame = FirstHead2;
 			}
 			break;
@@ -733,26 +733,23 @@ void Vehicle::TerminalControlCommandReceive(vuint8_t data)
 			break;
 
 		case ID:
-			if(data == 0x3E)
-			{
-				_frame_cnt = 0;
-				_check_sum += data;
-				_terminal_frame = Data;
-			}
-			else
-			{
-				_terminal_frame = FirstHead1;
-			}
+			_frame_id = data;
+			_check_sum += data;
+			_terminal_frame = Length;
 			break;
+
+		case Length:
+			_frame_length = data;
+			_check_sum += data;
+			_frame_cnt = 0;
+			_terminal_frame = Data;
+		break;
 
 		case Data:
 			_data_buffer[_frame_cnt] = data;
 			_check_sum += data;
-			if(_frame_cnt < 15)
-			{
-				_frame_cnt++;
-			}
-			else
+			_frame_cnt++;
+			if(_frame_cnt >= _frame_length)
 			{
 				_terminal_frame = CheckSum;
 			}
@@ -761,36 +758,40 @@ void Vehicle::TerminalControlCommandReceive(vuint8_t data)
 		case CheckSum:
 			if(_check_sum == data)
 			{
-				_gear_shift_enable = _data_buffer[0] & 0x01;
-				_gear_shift_valid = (_data_buffer[0] >> 1) & 0x01;
-
-				if( (((_data_buffer[0] >> 2) & 0x01) == 0) || (_steering_angle_target_active == 0))
+				if(_frame_id == 0x3E)
 				{
-					_steering_angle_target_active = (_data_buffer[0] >> 2) & 0x01;
+					_gear_shift_enable = _data_buffer[0] & 0x01;
+					_gear_shift_valid = (_data_buffer[0] >> 1) & 0x01;
+
+					if( (((_data_buffer[0] >> 2) & 0x01) == 0) || (_steering_angle_target_active == 0))
+					{
+						_steering_angle_target_active = (_data_buffer[0] >> 2) & 0x01;
+					}
+
+					_torque_enable = (_data_buffer[0] >> 3) & 0x01;
+					_target_deceleration_enable = (_data_buffer[0] >> 4) & 0x01;
+					_target_acceleration_enable = (_data_buffer[0] >> 5) & 0x01;
+
+					_gear_shift = _data_buffer[1];
+
+					_torque = _data_buffer[2];
+
+					_steering_angle_target = (vint16_t)((_data_buffer[5] << 8) | _data_buffer[4]);
+
+					_steering_angle_speed_target = (vuint16_t)((_data_buffer[7] << 8) | _data_buffer[6]);
+
+					for(i = 0;i<4;i++)
+					{
+						_data_temp.b[3-i] = _data_buffer[i + 8];
+					}
+					_target_deceleration_aeb = _data_temp.f;
+					for(i = 0;i<4;i++)
+					{
+						_data_temp.b[3-i] = _data_buffer[i + 12];
+					}
+					_target_acceleration_acc = _data_temp.f;
 				}
-
-				_torque_enable = (_data_buffer[0] >> 3) & 0x01;
-				_target_deceleration_enable = (_data_buffer[0] >> 4) & 0x01;
-				_target_acceleration_enable = (_data_buffer[0] >> 5) & 0x01;
-
-				_gear_shift = _data_buffer[1];
-
-				_torque = _data_buffer[2];
-
-				_steering_angle_target = (vint16_t)((_data_buffer[5] << 8) | _data_buffer[4]);
-
-				_steering_angle_speed_target = (vuint16_t)((_data_buffer[7] << 8) | _data_buffer[6]);
-
-				for(i = 0;i<4;i++)
-				{
-					_data_temp.b[i] = _data_buffer[i + 8];
-				}
-				_target_deceleration_aeb = _data_temp.f;
-				for(i = 0;i<4;i++)
-				{
-					_data_temp.b[i] = _data_buffer[i + 12];
-				}
-				_target_acceleration_acc = _data_temp.f;
+				TerminalControlAckSend();
 			}
 			_terminal_frame = FirstHead1;
 			break;
@@ -803,10 +804,11 @@ void Vehicle::TerminalControlCommandSend(void)
 	_send_data_buffer[0] = 0x7F;
 	_send_data_buffer[1] = 0x80;
 	_send_data_buffer[2] = 0x6F;
-	_send_data_buffer[3] = ((ems_qec_acc << 2) & 0x04) | ((esp_qdc_acc << 1) & 0x02) | _apa_epas_failed;
-	_send_data_buffer[4] = (vuint8_t)(_steering_angle_actual & 0xff);
-	_send_data_buffer[5] = (vuint8_t)((_steering_angle_actual >> 8) & 0xff);
-	_send_data_buffer[6] = 0;
+	_send_data_buffer[3] = 3;
+	_send_data_buffer[4] = ((ems_qec_acc << 2) & 0x04) | ((esp_qdc_acc << 1) & 0x02) | _apa_epas_failed;
+	_send_data_buffer[5] = (vuint8_t)(_steering_angle_actual & 0xff);
+	_send_data_buffer[6] = (vuint8_t)((_steering_angle_actual >> 8) & 0xff);
+
 	check_sum = 0;
 	for(i=0;i<7;i++)
 	{
@@ -814,6 +816,72 @@ void Vehicle::TerminalControlCommandSend(void)
 	}
 	_send_data_buffer[7] = check_sum;
 	for(i=0;i<8;i++)
+	{
+		TransmitData(_send_data_buffer[i]);
+	}
+}
+void Vehicle::TerminalControlSpeedSend(void)
+{
+	vuint8_t i,check_sum;
+	_send_data_buffer[0] = 0x7F;
+	_send_data_buffer[1] = 0x80;
+	_send_data_buffer[2] = 0x6E;
+	_send_data_buffer[3] = 19;
+	_speed_data_temp.f = _vehicle_speed;
+	for(i = 0;i<4;i++)
+	{
+		_send_data_buffer[i + 4] = _speed_data_temp.b[3-i] ;
+	}
+
+	_send_data_buffer[8] = (vuint8_t)(( (vuint16_t)(_wheel_speed_front_left_data*10)    ) & 0xff);
+	_send_data_buffer[9] = (vuint8_t)((((vuint16_t)(_wheel_speed_front_left_data*10))>>8) & 0xff);
+
+	_send_data_buffer[10] = (vuint8_t)(( (vuint16_t)(_wheel_speed_front_right_data*10)    ) & 0xff);
+	_send_data_buffer[11] = (vuint8_t)((((vuint16_t)(_wheel_speed_front_right_data*10))>>8) & 0xff);
+
+	_send_data_buffer[12] = (vuint8_t)(( (vuint16_t)(_wheel_speed_rear_left_data*10)    ) & 0xff);
+	_send_data_buffer[13] = (vuint8_t)((((vuint16_t)(_wheel_speed_rear_left_data*10))>>8) & 0xff);
+
+	_send_data_buffer[14] = (vuint8_t)(( (vuint16_t)(_wheel_speed_rear_right_data*10)    ) & 0xff);
+	_send_data_buffer[15] = (vuint8_t)((((vuint16_t)(_wheel_speed_rear_right_data*10))>>8) & 0xff);
+
+	_send_data_buffer[16] = _wheel_speed_front_left_pulse;
+	_send_data_buffer[17] = _wheel_speed_front_right_pulse;
+	_send_data_buffer[18] = _wheel_speed_rear_left_pulse;
+	_send_data_buffer[19] = _wheel_speed_rear_right_pulse;
+
+	_send_data_buffer[20] = 0;
+	_send_data_buffer[21] = 0;
+	_send_data_buffer[22] = 0;
+
+	check_sum = 0;
+	for(i=0;i<23;i++)
+	{
+		check_sum += _send_data_buffer[i];
+	}
+	_send_data_buffer[23] = check_sum;
+	for(i=0;i<24;i++)
+	{
+		TransmitData(_send_data_buffer[i]);
+	}
+}
+
+void Vehicle::TerminalControlAckSend(void)
+{
+	vuint8_t i,check_sum;
+	_send_data_buffer[0] = 0x7F;
+	_send_data_buffer[1] = 0x80;
+	_send_data_buffer[2] = 0x3E;
+	_send_data_buffer[3] = 1;
+	_send_data_buffer[4] = 0xA5;
+
+	check_sum = 0;
+	for(i=0;i<5;i++)
+	{
+		check_sum += _send_data_buffer[i];
+	}
+	_send_data_buffer[5] = check_sum;
+	for(i=0;i<6;i++)
 	{
 		TransmitData(_send_data_buffer[i]);
 	}

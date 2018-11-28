@@ -184,14 +184,16 @@ public:
 	void TerminalControlCommandReceive(vuint8_t data);
 
 	void TerminalControlCommandSend(void);
+	void TerminalControlAckSend(void);
+	void TerminalControlSpeedSend(void);
 private:
 	/*** State Machine ***/
 	vuint8_t _steering_angle_Control_state;
 	ReceiveFrame _terminal_frame;
-	vuint8_t _data_buffer[16];
-	vuint8_t _send_data_buffer[8];
-	vuint8_t _frame_cnt,_check_sum;
-	Byte2Float _data_temp;
+	vuint8_t _data_buffer[32];
+	vuint8_t _send_data_buffer[32];
+	vuint8_t _frame_id,_frame_length,_frame_cnt,_check_sum;
+	Byte2Float _data_temp,_speed_data_temp;
 	/*** Send to Vehicle Messege ***/
 	/* Roolling Counter */
 	vuint8_t _rolling_counter_torque_AEB;
