@@ -37,7 +37,7 @@ int main()
     FlexCAN0_Init();
 
     // Flex Lin1 Uart
-    FlexLin1_Uart_Init(80,9600);
+    FlexLin1_Uart_Init(80,115200);
 //    FlexLin1_DMA_TX_Init();
 //    FlexLin1_DMA_RX_Init();
 
@@ -83,7 +83,7 @@ void FlexCAN0_Isr(void)
 {
 	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-		cnt = (cnt + 1) % 100;
+		cnt = (cnt + 1) % 5;
 		m_Vehicle_CA.VehicleInformation(CAN_0.MB[8].ID.B.ID_STD,CAN_0.MB[8].DATA.B);
 		m_Vehicle_CA.SteeringAngleControlStateMachine();
 		m_Vehicle_CA.SteeringAngleControl(0.02);
@@ -93,6 +93,7 @@ void FlexCAN0_Isr(void)
 		if(cnt == 0)
 		{
 			m_Vehicle_CA.TerminalControlCommandSend();
+			m_Vehicle_CA.TerminalControlSpeedSend();
 		}
 		CAN_0.IFLAG1.R = 0x00000100;
 	}
