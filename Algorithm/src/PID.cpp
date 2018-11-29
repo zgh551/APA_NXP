@@ -9,6 +9,34 @@
 
 PID::PID() {
 	// TODO Auto-generated constructor stub
+    KP.setContainer(this);
+    KP.getter(&PID::getKP);
+    KP.setter(&PID::setKP);
+
+    KI.setContainer(this);
+    KI.getter(&PID::getKI);
+    KI.setter(&PID::setKI);
+
+    KD.setContainer(this);
+    KD.getter(&PID::getKD);
+    KD.setter(&PID::setKD);
+
+    Desired.setContainer(this);
+    Desired.getter(&PID::getDesired);
+    Desired.setter(&PID::setDesired);
+
+    ILimit.setContainer(this);
+    ILimit.getter(&PID::getILimit);
+    ILimit.setter(&PID::setILimit);
+
+    OutputLimit.setContainer(this);
+    OutputLimit.getter(&PID::getOutputLimit);
+    OutputLimit.setter(&PID::setOutputLimit);
+
+    Dt.setContainer(this);
+    Dt.getter(&PID::getDt);
+    Dt.setter(&PID::setDt);
+
     _desired = 0.0f;      //< set point
     _error = 0.0f;        //< error
     _prevError = 0.0f;    //< previous error
@@ -41,6 +69,78 @@ PID::~PID() {
 	// TODO Auto-generated destructor stub
 }
 
+/****** Property ******/
+/// KP
+float PID::getKP()
+{
+    return _kp;
+}
+void PID::setKP(float value)
+{
+    _kp = value;
+}
+
+/// KI
+float PID::getKI()
+{
+    return _ki;
+}
+void PID::setKI(float value)
+{
+    _ki = value;
+}
+
+/// KD
+float PID::getKD()
+{
+    return _kd;
+}
+void PID::setKD(float value)
+{
+    _kd = value;
+}
+
+/// Desired
+float PID::getDesired()
+{
+    return _desired;
+}
+void PID::setDesired(float value)
+{
+    _desired = value;
+}
+
+/// ILimit
+float PID::getILimit()
+{
+    return _iLimit;
+}
+void PID::setILimit(float value)
+{
+    _iLimit = value;
+}
+
+/// OutputLimit
+float PID::getOutputLimit()
+{
+    return _outputLimit;
+}
+void PID::setOutputLimit(float value)
+{
+    _outputLimit = value;
+}
+
+/// Dt
+float PID::getDt()
+{
+    return _dt;
+}
+void PID::setDt(float value)
+{
+    _dt = value;
+}
+
+/****** Function ******/
 float PID::pidUpdate(float measured)
 {
     float output = 0.0f;
@@ -54,7 +154,22 @@ float PID::pidUpdate(float measured)
     output += _outD;
 
     _integ += _error * _dt;
+    // Constrain the integral (unless the iLimit is zero)
+    if(_iLimit != 0)
+    {
+    	_integ = fmin(_iLimit,fmax(-_iLimit,_integ));
+    }
+    _outI = _ki * _integ;
+    output += _outI;
 
+    // Constrain the total PID output (unless the outputLimit is zero)
+    if(_outputLimit != 0)
+    {
+    	output = fmin(_outputLimit,fmax(-_outputLimit,output));
+    }
+
+    _prevError = _error;
+    return output;
 }
 
 

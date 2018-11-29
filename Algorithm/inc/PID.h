@@ -8,7 +8,8 @@
 #ifndef PID_H_
 #define PID_H_
 
-#include "math.h"
+#include "Property.h"
+#include <math.h>
 //namespace APA {
 
 class PID {
@@ -18,6 +19,41 @@ public:
 	virtual ~PID();
 	float pidUpdate(float measured);
 
+    /*** Variabel Property ***/
+    /* KP */
+    float getKP();
+    void setKP(float value);
+    Property<PID,float,READ_WRITE> KP;
+
+    /* KI */
+    float getKI();
+    void setKI(float value);
+    Property<PID,float,READ_WRITE> KI;
+
+    /* KD */
+    float getKD();
+    void setKD(float value);
+    Property<PID,float,READ_WRITE> KD;
+
+    /* Desired */
+    float getDesired();
+    void setDesired(float value);
+    Property<PID,float,READ_WRITE> Desired;
+
+    /* ILimit */
+    float getILimit();
+    void setILimit(float value);
+    Property<PID,float,READ_WRITE> ILimit;
+
+    /* OutputLimit */
+    float getOutputLimit();
+    void setOutputLimit(float value);
+    Property<PID,float,READ_WRITE> OutputLimit;
+
+    /* Dt */
+    float getDt();
+    void setDt(float value);
+    Property<PID,float,READ_WRITE> Dt;
 private:
     float _desired;      //< set point
     float _error;        //< error
