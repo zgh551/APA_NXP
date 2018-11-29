@@ -100,10 +100,10 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family.1209369645" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family" value="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.sysroot.1960814311" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries.1484024722" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
-								<option id="gnu.c.link.option.libs.560704436" superClass="gnu.c.link.option.libs" valueType="libs">
+								<option id="gnu.c.link.option.libs.560704436" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value=":MPC574xP_AMMCLIB.a"/>
 								</option>
-								<option id="gnu.c.link.option.paths.211285501" superClass="gnu.c.link.option.paths" valueType="libPaths">
+								<option id="gnu.c.link.option.paths.211285501" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/lib/s32ds_ppc&quot;"/>
 								</option>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile.1132939594" superClass="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile"/>
@@ -117,10 +117,10 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family.375504331" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.sysroot.2053279644" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries.1877551688" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
-								<option id="gnu.cpp.link.option.libs.600995136" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.600995136" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value=":MPC574xP_AMMCLIB.a"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.1779287901" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.paths.1779287901" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/lib/s32ds_ppc&quot;"/>
 								</option>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.cpp.linker.inputType.scriptfile.2116805424" superClass="com.freescale.s32ds.cross.gnu.tool.cpp.linker.inputType.scriptfile"/>
@@ -268,10 +268,10 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family.1427286718" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family" value="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.sysroot.1636639996" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries.1871098174" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
-								<option id="gnu.c.link.option.libs.1027448680" superClass="gnu.c.link.option.libs" valueType="libs">
+								<option id="gnu.c.link.option.libs.1027448680" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value=":MPC574xP_AMMCLIB.a"/>
 								</option>
-								<option id="gnu.c.link.option.paths.1603023419" superClass="gnu.c.link.option.paths" valueType="libPaths">
+								<option id="gnu.c.link.option.paths.1603023419" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/lib/s32ds_ppc&quot;"/>
 								</option>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile.961972125" superClass="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile"/>
@@ -285,10 +285,10 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family.355397519" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.sysroot.1882894241" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries.1084310119" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
-								<option id="gnu.cpp.link.option.libs.202411168" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.202411168" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value=":MPC574xP_AMMCLIB.a"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.317686211" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.paths.317686211" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/lib/s32ds_ppc&quot;"/>
 								</option>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.cpp.linker.inputType.scriptfile.1107184304" superClass="com.freescale.s32ds.cross.gnu.tool.cpp.linker.inputType.scriptfile"/>
@@ -444,10 +444,10 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family.1918926712" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family" value="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.sysroot.962748825" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries.1775731690" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
-								<option id="gnu.c.link.option.libs.2021981978" superClass="gnu.c.link.option.libs" valueType="libs">
+								<option id="gnu.c.link.option.libs.2021981978" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value=":MPC574xP_AMMCLIB.a"/>
 								</option>
-								<option id="gnu.c.link.option.paths.1969327328" superClass="gnu.c.link.option.paths" valueType="libPaths">
+								<option id="gnu.c.link.option.paths.1969327328" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/lib/s32ds_ppc&quot;"/>
 								</option>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile.176876241" superClass="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile"/>
@@ -461,10 +461,11 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family.1569548926" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.sysroot.2017040711" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries.1761956896" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.linker.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
-								<option id="gnu.cpp.link.option.libs.873829326" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.873829326" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value=":MPC574xP_AMMCLIB.a"/>
+									<listOptionValue builtIn="false" value="m"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.2046997135" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.paths.2046997135" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/lib/s32ds_ppc&quot;"/>
 								</option>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.cpp.linker.inputType.scriptfile.611155776" superClass="com.freescale.s32ds.cross.gnu.tool.cpp.linker.inputType.scriptfile"/>
