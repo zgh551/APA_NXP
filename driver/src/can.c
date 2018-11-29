@@ -119,16 +119,13 @@ void ReceiveMsg(void) {
   if(RxDATA[0]== 'H')
   {
 	  SIUL2.MSCR[PC11].B.OBE = 1; //PC11 (Red LED) set to output
-
-   }
+  }
 
 }
 
 void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
 {
-	uint8_t	i;
-	while(CAN_0.MB[0].CS.B.CODE != 0x8){}
-
+	vuint8_t i;
 	CAN_0.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
 	CAN_0.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
 	CAN_0.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
@@ -139,6 +136,7 @@ void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
 	CAN_0.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
 	CAN_0.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
 	CAN_0.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
+	while(CAN_0.MB[0].CS.B.CODE != 0x8 ){}
 }
 
 
