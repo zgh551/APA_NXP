@@ -52,6 +52,34 @@ PID::PID() {
 
 PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim) {
 	// TODO Auto-generated constructor stub
+    KP.setContainer(this);
+    KP.getter(&PID::getKP);
+    KP.setter(&PID::setKP);
+
+    KI.setContainer(this);
+    KI.getter(&PID::getKI);
+    KI.setter(&PID::setKI);
+
+    KD.setContainer(this);
+    KD.getter(&PID::getKD);
+    KD.setter(&PID::setKD);
+
+    Desired.setContainer(this);
+    Desired.getter(&PID::getDesired);
+    Desired.setter(&PID::setDesired);
+
+    ILimit.setContainer(this);
+    ILimit.getter(&PID::getILimit);
+    ILimit.setter(&PID::setILimit);
+
+    OutputLimit.setContainer(this);
+    OutputLimit.getter(&PID::getOutputLimit);
+    OutputLimit.setter(&PID::setOutputLimit);
+
+    Dt.setContainer(this);
+    Dt.getter(&PID::getDt);
+    Dt.setter(&PID::setDt);
+
     _desired = 0.0f;      //< set point
     _error = 0.0f;        //< error
     _prevError = 0.0f;    //< previous error
