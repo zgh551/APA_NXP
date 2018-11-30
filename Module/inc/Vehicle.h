@@ -12,11 +12,14 @@
 #include "project.h"
 #include "can.h"
 #include "uart.h"
+#include "PID.h"
 
-class Vehicle {
+class Vehicle : public PID
+{
 public:
 	/*** Function ***/
 	Vehicle();
+	Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim);
 	virtual ~Vehicle();
 
 	/*** Variabel Property ***/
@@ -131,6 +134,9 @@ public:
 	float getVehicleSpeed();
 	Property<Vehicle,float,READ_ONLY> VehicleSpeed;
 
+	float getVehicleSpeedTarget();
+	Property<Vehicle,float,READ_ONLY> VehicleSpeedTarget;
+
 	// wheel pulse
 	vuint8_t getWheelSpeedDirection();
 	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedDirection;
@@ -172,7 +178,11 @@ public:
 	void VehicleContorlStep3();
 	void VehicleContorl();
 
+	// Steeing angle control base on the angle speed
 	void SteeringAngleControl(float dt);
+	// Vehicle Speed Control
+	void VehicleSpeedControl(float pid_output);
+
 	// Steering Angle control state machine
 	void SteeringAngleControlStateMachine();
 
@@ -184,7 +194,7 @@ public:
 	void TerminalControlCommandReceive(vuint8_t data);
 
 	void TerminalControlCommandSend(void);
-	void TerminalControlAckSend(void);
+	void TerminalControlAckSend(vuint8_t id);
 	void TerminalControlSpeedSend(void);
 private:
 	/*** State Machine ***/
@@ -193,6 +203,10 @@ private:
 	vuint8_t _data_buffer[32];
 	vuint8_t _send_data_buffer[32];
 	vuint8_t _frame_id,_frame_length,_frame_cnt,_check_sum;
+	vuint8_t _frame_err_cnt;
+
+	vuint8_t _test_data_buffer[1000];
+	vuint16_t _test_cnt;
 	Byte2Float _data_temp,_speed_data_temp;
 	/*** Send to Vehicle Messege ***/
 	/* Roolling Counter */
@@ -272,6 +286,7 @@ private:
 	// vehicle speed
 	vuint8_t _vehicle_speed_valid;
 	float _vehicle_speed;
+	float _vehicle_speed_target;
 
 	// wheel pulse
 	vuint8_t _wheel_speed_direction;

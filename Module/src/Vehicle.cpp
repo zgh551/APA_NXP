@@ -10,6 +10,9 @@
 Vehicle::Vehicle()
 {
 	_terminal_frame = FirstHead1;
+	_frame_err_cnt = 0;
+
+	_test_cnt = 0;
 	// TODO Auto-generated constructor stub
 	////// ACC //////
 	TargetAccelerationACC.setContainer(this);
@@ -137,9 +140,145 @@ Vehicle::Vehicle()
 	//EMS
 	EMS_QEC_ACC.setContainer(this);
 	EMS_QEC_ACC.getter(&Vehicle::getEMS_QEC_ACC);
+}
 
-//	_steering_angle_target = 0.0;
-//	this->SteeringAngleTarget = 0.0;
+Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):PID(dt,kp,ki,kd,i_lim,out_lim)
+{
+	_terminal_frame = FirstHead1;
+	_frame_err_cnt = 0;
+
+	_test_cnt = 0;
+	// TODO Auto-generated constructor stub
+	////// ACC //////
+	TargetAccelerationACC.setContainer(this);
+	TargetAccelerationACC.getter(&Vehicle::getTargetAccelerationACC);
+	TargetAccelerationACC.setter(&Vehicle::setTargetAccelerationACC);
+
+	TargetAccelerationEnable.setContainer(this);
+	TargetAccelerationEnable.getter(&Vehicle::getTargetAccelerationEnable);
+	TargetAccelerationEnable.setter(&Vehicle::setTargetAccelerationEnable);
+
+	////// AEB //////
+	TargetDecelerationAEB.setContainer(this);
+	TargetDecelerationAEB.getter(&Vehicle::getTargetDecelerationAEB);
+	TargetDecelerationAEB.setter(&Vehicle::setTargetDecelerationAEB);
+
+	TargetDecelerationEnable.setContainer(this);
+	TargetDecelerationEnable.getter(&Vehicle::getTargetDecelerationEnable);
+	TargetDecelerationEnable.setter(&Vehicle::setTargetDecelerationEnable);
+
+	////// Torque //////
+	Torque.setContainer(this);
+	Torque.getter(&Vehicle::getTorque);
+	Torque.setter(&Vehicle::setTorque);
+
+	TorqueEnable.setContainer(this);
+	TorqueEnable.getter(&Vehicle::getTorqueEnable);
+	TorqueEnable.setter(&Vehicle::setTorqueEnable);
+
+	////// Steering Angle //////
+	SteeringAngleTarget.setContainer(this);
+	SteeringAngleTarget.getter(&Vehicle::getSteeringAngleTarget);
+	SteeringAngleTarget.setter(&Vehicle::setSteeringAngleTarget);
+
+	SteeringAngleTargetActive.setContainer(this);
+	SteeringAngleTargetActive.getter(&Vehicle::getSteeringAngleTargetActive);
+	SteeringAngleTargetActive.setter(&Vehicle::setSteeringAngleTargetActive);
+
+	////// Gear //////
+	GearShift.setContainer(this);
+	GearShift.getter(&Vehicle::getGearShift);
+	GearShift.setter(&Vehicle::setGearShift);
+
+	GearShiftEnable.setContainer(this);
+	GearShiftEnable.getter(&Vehicle::getGearShiftEnable);
+	GearShiftEnable.setter(&Vehicle::setGearShiftEnable);
+
+	GearShiftValid.setContainer(this);
+	GearShiftValid.getter(&Vehicle::getGearShiftValid);
+	GearShiftValid.setter(&Vehicle::setGearShiftValid);
+
+	/// Read Only
+	// EPS
+	EPS_Failed.setContainer(this);
+	EPS_Failed.getter(&Vehicle::getEPS_Failed);
+
+	APA_EPAS_Failed.setContainer(this);
+	APA_EPAS_Failed.getter(&Vehicle::getAPA_EPAS_Failed);
+
+	APA_ControlFeedback.setContainer(this);
+	APA_ControlFeedback.getter(&Vehicle::getAPA_ControlFeedback);
+
+	TorqueSensorStatus.setContainer(this);
+	TorqueSensorStatus.getter(&Vehicle::getTorqueSensorStatus);
+
+	SteeringTorque.setContainer(this);
+	SteeringTorque.getter(&Vehicle::getSteeringTorque);
+
+	// Wheel Speed
+	WheelSpeedRearLeftDirection.setContainer(this);
+	WheelSpeedRearLeftDirection.getter(&Vehicle::getWheelSpeedRearLeftDirection);
+
+	WheelSpeedRearLeftValid.setContainer(this);
+	WheelSpeedRearLeftValid.getter(&Vehicle::getWheelSpeedRearLeftValid);
+
+	WheelSpeedRearLeftData.setContainer(this);
+	WheelSpeedRearLeftData.getter(&Vehicle::getWheelSpeedRearLeftData);
+
+	WheelSpeedRearRightDirection.setContainer(this);
+	WheelSpeedRearRightDirection.getter(&Vehicle::getWheelSpeedRearRightDirection);
+
+	WheelSpeedRearRightValid.setContainer(this);
+	WheelSpeedRearRightValid.getter(&Vehicle::getWheelSpeedRearRightValid);
+
+	WheelSpeedRearRightData.setContainer(this);
+	WheelSpeedRearRightData.getter(&Vehicle::getWheelSpeedRearRightData);
+
+	WheelSpeedFrontLeftDirection.setContainer(this);
+	WheelSpeedFrontLeftDirection.getter(&Vehicle::getWheelSpeedFrontLeftDirection);
+
+	WheelSpeedFrontLeftValid.setContainer(this);
+	WheelSpeedFrontLeftValid.getter(&Vehicle::getWheelSpeedFrontLeftValid);
+
+	WheelSpeedFrontLeftData.setContainer(this);
+	WheelSpeedFrontLeftData.getter(&Vehicle::getWheelSpeedFrontLeftData);
+
+	WheelSpeedFrontRightDirection.setContainer(this);
+	WheelSpeedFrontRightDirection.getter(&Vehicle::getWheelSpeedFrontRightDirection);
+
+	WheelSpeedFrontRightValid.setContainer(this);
+	WheelSpeedFrontRightValid.getter(&Vehicle::getWheelSpeedFrontRightValid);
+
+	WheelSpeedFrontRightData.setContainer(this);
+	WheelSpeedFrontRightData.getter(&Vehicle::getWheelSpeedFrontRightData);
+	/////////////vehicle speed
+	VehicleSpeedValid.setContainer(this);
+	VehicleSpeedValid.getter(&Vehicle::getVehicleSpeedValid);
+
+	VehicleSpeed.setContainer(this);
+	VehicleSpeed.getter(&Vehicle::getVehicleSpeed);
+
+	VehicleSpeedTarget.setContainer(this);
+	VehicleSpeedTarget.getter(&Vehicle::getVehicleSpeedTarget);
+
+	// SAS Steering Angle
+	SteeringAngleActual.setContainer(this);
+	SteeringAngleActual.getter(&Vehicle::getSteeringAngleActual);
+
+	SteeringAngleSpeed.setContainer(this);
+	SteeringAngleSpeed.getter(&Vehicle::getSteeringAngleSpeed);
+
+	SteeringAngleValid.setContainer(this);
+	SteeringAngleValid.getter(&Vehicle::getSteeringAngleValid);
+
+	SAS_Failure.setContainer(this);
+	SAS_Failure.getter(&Vehicle::getSAS_Failure);
+	//ESP
+	ESP_QDC_ACC.setContainer(this);
+	ESP_QDC_ACC.getter(&Vehicle::getESP_QDC_ACC);
+	//EMS
+	EMS_QEC_ACC.setContainer(this);
+	EMS_QEC_ACC.getter(&Vehicle::getEMS_QEC_ACC);
 }
 
 Vehicle::~Vehicle() {
@@ -337,7 +476,10 @@ float Vehicle::getVehicleSpeed()
 {
 	return _vehicle_speed;
 }
-
+float Vehicle::getVehicleSpeedTarget()
+{
+	return _vehicle_speed_target;
+}
 // Wheel Pusle
 vuint8_t Vehicle::getWheelSpeedDirection()
 {
@@ -536,6 +678,19 @@ void Vehicle::SteeringAngleControl(float dt)
     }
 }
 
+void Vehicle::VehicleSpeedControl(float pid_output)
+{
+	if(pid_output >= 0)
+	{
+		_target_acceleration_enable = 0;
+	}
+	else
+	{
+		_target_acceleration_enable = 1;
+		_target_acceleration_acc = -pid_output;
+	}
+}
+
 void Vehicle::SteeringAngleControlStateMachine()
 {
 	switch(_steering_angle_Control_state)
@@ -711,6 +866,8 @@ void Vehicle::VehicleInformation(vuint32_t id,vuint8_t dat[])
 void Vehicle::TerminalControlCommandReceive(vuint8_t data)
 {
 	vuint8_t i;
+	_test_data_buffer[_test_cnt] = data;
+	_test_cnt = (_test_cnt + 1)%1000;
 	switch(_terminal_frame)
 	{
 		case FirstHead1:
@@ -791,7 +948,40 @@ void Vehicle::TerminalControlCommandReceive(vuint8_t data)
 					}
 					_target_acceleration_acc = _data_temp.f;
 				}
-				TerminalControlAckSend();
+				else if(_frame_id == 0x3F)
+				{
+					for(i = 0;i<4;i++)
+					{
+						_data_temp.b[3-i] = _data_buffer[i];
+					}
+					KP = _data_temp.f;
+
+					for(i = 0;i<4;i++)
+					{
+						_data_temp.b[3-i] = _data_buffer[i + 4];
+					}
+					this->KI = _data_temp.f;
+
+					for(i = 0;i<4;i++)
+					{
+						_data_temp.b[3-i] = _data_buffer[i + 8];
+					}
+					this->KD = _data_temp.f;
+				}
+				else if(_frame_id == 0x38)
+				{
+					for(i = 0;i<4;i++)
+					{
+						_data_temp.b[3-i] = _data_buffer[i];
+					}
+					_vehicle_speed_target= _data_temp.f;
+				}
+				// ACK Single
+				TerminalControlAckSend(_frame_id);
+			}
+			else
+			{
+				_frame_err_cnt++;
 			}
 			_terminal_frame = FirstHead1;
 			break;
@@ -801,21 +991,35 @@ void Vehicle::TerminalControlCommandReceive(vuint8_t data)
 void Vehicle::TerminalControlCommandSend(void)
 {
 	vuint8_t i,check_sum;
+	Byte2Float data_temp;
+
 	_send_data_buffer[0] = 0x7F;
 	_send_data_buffer[1] = 0x80;
 	_send_data_buffer[2] = 0x6F;
-	_send_data_buffer[3] = 3;
+	_send_data_buffer[3] = 11;
 	_send_data_buffer[4] = ((ems_qec_acc << 2) & 0x04) | ((esp_qdc_acc << 1) & 0x02) | _apa_epas_failed;
-	_send_data_buffer[5] = (vuint8_t)(_steering_angle_actual & 0xff);
-	_send_data_buffer[6] = (vuint8_t)((_steering_angle_actual >> 8) & 0xff);
+	_send_data_buffer[5] = 0;
+
+	_send_data_buffer[6] = (vuint8_t)(_steering_angle_actual & 0xff);
+	_send_data_buffer[7] = (vuint8_t)((_steering_angle_actual >> 8) & 0xff);
+
+	_send_data_buffer[8] = (vuint8_t)(_steering_angle_speed & 0xff);
+	_send_data_buffer[9] = (vuint8_t)((_steering_angle_speed >> 8) & 0xff);
+
+	data_temp.f = _steering_torque;
+	for(i = 0; i < 4; i++)
+	{
+		_send_data_buffer[i + 10] = data_temp.b[3-i] ;
+	}
+	_send_data_buffer[13] = 0;
 
 	check_sum = 0;
-	for(i=0;i<7;i++)
+	for(i=0;i<15;i++)
 	{
 		check_sum += _send_data_buffer[i];
 	}
-	_send_data_buffer[7] = check_sum;
-	for(i=0;i<8;i++)
+	_send_data_buffer[15] = check_sum;
+	for(i=0;i<16;i++)
 	{
 		TransmitData(_send_data_buffer[i]);
 	}
@@ -850,7 +1054,7 @@ void Vehicle::TerminalControlSpeedSend(void)
 	_send_data_buffer[18] = _wheel_speed_rear_left_pulse;
 	_send_data_buffer[19] = _wheel_speed_rear_right_pulse;
 
-	_send_data_buffer[20] = 0;
+	_send_data_buffer[20] = _wheel_speed_direction;
 	_send_data_buffer[21] = 0;
 	_send_data_buffer[22] = 0;
 
@@ -866,12 +1070,12 @@ void Vehicle::TerminalControlSpeedSend(void)
 	}
 }
 
-void Vehicle::TerminalControlAckSend(void)
+void Vehicle::TerminalControlAckSend(vuint8_t id)
 {
 	vuint8_t i,check_sum;
 	_send_data_buffer[0] = 0x7F;
 	_send_data_buffer[1] = 0x80;
-	_send_data_buffer[2] = 0x3E;
+	_send_data_buffer[2] = id;
 	_send_data_buffer[3] = 1;
 	_send_data_buffer[4] = 0xA5;
 
