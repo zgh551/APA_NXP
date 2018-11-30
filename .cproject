@@ -511,6 +511,7 @@
 							<tool id="com.freescale.s32ds.cross.gnu.e200.tool.spt.preprocessor.380876492" name="SPT Preprocessor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.spt.preprocessor"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.982150830" name="MPC5744P.h" rcbsApplicability="disable" resourcePath="system/inc/MPC5744P.h" toolsToInvoke=""/>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.Project_Settings/Debugger/APA_Debug.launch" name="APA_Debug.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/APA_Debug.launch" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Algorithm"/>
