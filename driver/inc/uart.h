@@ -30,7 +30,8 @@ typedef union _byte2float
 	float f;
 }Byte2Float;
 
-void FlexLin1_Uart_Init( unsigned int MegaHertz, unsigned int BaudRate );
+void FlexLin1_Uart_Buffer_Init( unsigned int MegaHertz, unsigned int BaudRate );
+void FlexLin1_Uart_FIFO_Init( unsigned int MegaHertz, unsigned int BaudRate );
 void FlexLin1_DMA_TX_Init(void);
 void FlexLin1_DMA_RX_Init(void);
 void TransmitData(uint8_t d);
