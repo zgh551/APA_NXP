@@ -10,17 +10,17 @@
 
 PathPlanning::PathPlanning()
 {
-//	SteeringWheelTargetAngle.setContainer(this);
-//	SteeringWheelTargetAngle.setter(&PathPlanning::setSteeringWheelTargetAngle);
-//	SteeringWheelTargetAngle.getter(&PathPlanning::getSteeringWheelTargetAngle);
+	SteeringWheelTargetAngle.setContainer(this);
+	SteeringWheelTargetAngle.setter(&PathPlanning::setSteeringWheelTargetAngle);
+	SteeringWheelTargetAngle.getter(&PathPlanning::getSteeringWheelTargetAngle);
 }
 
-//int PathPlanning::getSteeringWheelTargetAngle()
-//{
-//	return _steering_wheel_target_angle;
-//}
-//
-//void PathPlanning::setSteeringWheelTargetAngle(int value)
-//{
-//	_steering_wheel_target_angle = value;
-//}
+int PathPlanning::getSteeringWheelTargetAngle()
+{
+	return _steering_wheel_target_angle;
+}
+
+void PathPlanning::setSteeringWheelTargetAngle(int value)
+{
+	_steering_wheel_target_angle = value;
+}

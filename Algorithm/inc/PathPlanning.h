@@ -17,9 +17,9 @@ int _steering_wheel_target_angle;
 public:
 PathPlanning();
 
-//int getSteeringWheelTargetAngle();
-//void setSteeringWheelTargetAngle(int value);
-//Property<PathPlanning,int,READ_WRITE> SteeringWheelTargetAngle;
+int getSteeringWheelTargetAngle();
+void setSteeringWheelTargetAngle(int value);
+Property<PathPlanning,int,READ_WRITE> SteeringWheelTargetAngle;
 };
 
 
