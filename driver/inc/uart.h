@@ -26,9 +26,16 @@ typedef enum _ReceiveFrame
 
 typedef union _byte2float
 {
-	vuint8_t b[4];
+	uint8_t b[4];
 	float f;
 }Byte2Float;
+
+typedef union _Byte2Int
+{
+	uint8_t b[2];
+	uint16_t u16;
+	int16_t  i16;
+}Byte2Int;
 
 void FlexLin1_Uart_Buffer_Init( unsigned int MegaHertz, unsigned int BaudRate );
 void FlexLin1_Uart_FIFO_Init( unsigned int MegaHertz, unsigned int BaudRate );
