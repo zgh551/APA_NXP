@@ -25,7 +25,7 @@
 void PIT0_init(uint32_t LDVAL) {
 	PIT_0.TIMER[0].LDVAL.R = LDVAL; /* Load # PIT clocks to count */
 	PIT_0.TIMER[0].TCTRL.B.TIE = 1; /* Enable interrupt */
-//	INTC_0.PSR[226].R = 0x800A;
+	INTC_0.PSR[226].R = 0x800A;
 	PIT_0.TIMER[0].TCTRL.B.TEN = 1; /* enable channel */
 }
 
