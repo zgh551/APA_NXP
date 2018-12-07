@@ -3,8 +3,9 @@
  *
  */
 #include <math.h>
+//#include "SystemWork.h"
 #include "PathPlanning.h"
-#include "Vehicle.h"
+#include "Terminal.h"
 #include "mode_entry.h"
 #include "can.h"
 #include "pit.h"
@@ -24,11 +25,12 @@ extern void xcptn_xmpl(void);
 
 void peri_clock_gating(void);
 
-Vehicle m_Vehicle_CA = Vehicle(0.02,1,0,1,3,5);
+Terminal m_Terminal_CA = Terminal(0.02,4,0.1,0,0.3,0.5,0.1);
+
 vuint8_t cnt;
 bool TerminalSendFlag = false;
-
 float temp;
+
 __attribute__ ((section(".text")))
 int main()
 {
@@ -39,7 +41,7 @@ int main()
     FlexCAN0_Init();
 
     // Flex Lin1 Uart
-    FlexLin1_Uart_Buffer_Init(80,115200);
+    FlexLin1_Uart_Buffer_Init(80,38400);
 //    FlexLin1_Uart_FIFO_Init(80,115200);
 
 
@@ -57,12 +59,18 @@ int main()
     /* Loop forever */
 	for(;;)
 	{
-		if(TerminalSendFlag)
-		{
-			m_Vehicle_CA.TerminalControlCommandSend();
-			m_Vehicle_CA.TerminalControlSpeedSend();
-			TerminalSendFlag = false;
-		}
+//		if(TerminalSendFlag)
+//		{
+//			m_Terminal_CA.TerminalControlCommandSend();
+//			m_Terminal_CA.TerminalControlSpeedSend();
+//			m_Terminal_CA.TerminalSystemStateSend();
+//			TerminalSendFlag = false;
+//		}
+//		if(m_Terminal_CA.AckValid == 0x5A)
+//		{
+//			m_Terminal_CA.TerminalControlAckSend();
+//			m_Terminal_CA.AckValid = 0;
+//		}
 	}
 }
 
@@ -82,8 +90,8 @@ extern "C" {
 #endif
 void PIT0_isr(void)
 {
+	m_Terminal_CA.SystemWorkState();
 	cnt = (cnt + 1) % 5;
-	m_Vehicle_CA.VehicleContorl();
 	if(cnt == 0)
 	{
 		TerminalSendFlag = true;
@@ -95,10 +103,7 @@ void FlexCAN0_Isr(void)
 {
 	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-
-		m_Vehicle_CA.VehicleInformation(CAN_0.MB[8].ID.B.ID_STD,CAN_0.MB[8].DATA.B);
-		m_Vehicle_CA.SteeringAngleControlStateMachine();
-		m_Vehicle_CA.SteeringAngleControl(0.02);
+		m_Terminal_CA.VehicleInformation(CAN_0.MB[8].ID.B.ID_STD,CAN_0.MB[8].DATA.B);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_0.TIMER.R;
@@ -108,7 +113,7 @@ void FlexCAN0_Isr(void)
 
 void FlexLin1_Uart_Isr(void)
 {
-	m_Vehicle_CA.TerminalControlCommandReceive(LINFlexD_1.BDRM.B.DATA4);
+	m_Terminal_CA.TerminalControlCommandReceive(LINFlexD_1.BDRM.B.DATA4);
 	LINFlexD_1.UARTSR.B.DRFRFE = 1;
 }
 #ifdef __cplusplus
