@@ -14,164 +14,19 @@
 #include "uart.h"
 #include "PID.h"
 
+#define V_KM_H 0.05625
+#define V_M_S 0.015625
+
 class Vehicle : public PID
 {
 public:
 	/*** Function ***/
 	Vehicle();
 	Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim);
+	Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold);
 	virtual ~Vehicle();
 
-	/*** Variabel Property ***/
-	/* ACC */
-	float getTargetAccelerationACC();
-	void setTargetAccelerationACC(float value);
-	Property<Vehicle,float,READ_WRITE> TargetAccelerationACC;
-
-	vuint8_t getTargetAccelerationEnable();
-	void setTargetAccelerationEnable(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> TargetAccelerationEnable;
-
-	/* AEB */
-	float getTargetDecelerationAEB();
-	void setTargetDecelerationAEB(float value);
-	Property<Vehicle,float,READ_WRITE> TargetDecelerationAEB;
-
-	vuint8_t getTargetDecelerationEnable();
-	void setTargetDecelerationEnable(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> TargetDecelerationEnable;
-
-	/* Torque */
-	vuint8_t getTorque();
-	void setTorque(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> Torque;
-
-	vuint8_t getTorqueEnable();
-	void setTorqueEnable(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> TorqueEnable;
-
-	/* Steering Angle */
-	vint16_t getSteeringAngleTarget();
-	void setSteeringAngleTarget(vint16_t value);
-	Property<Vehicle,vint16_t,READ_WRITE> SteeringAngleTarget;
-
-	vuint8_t getSteeringAngleTargetActive();
-	void setSteeringAngleTargetActive(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> SteeringAngleTargetActive;
-
-	/* Gear */
-	vuint8_t getGearShift();
-	void setGearShift(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> GearShift;
-
-	vuint8_t getGearShiftEnable();
-	void setGearShiftEnable(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> GearShiftEnable;
-
-	vuint8_t getGearShiftValid();
-	void setGearShiftValid(vuint8_t value);
-	Property<Vehicle,vuint8_t,READ_WRITE> GearShiftValid;
-
-	/// Read only ///
-	// EPS
-	vuint8_t getEPS_Failed();
-	Property<Vehicle,vuint8_t,READ_ONLY> EPS_Failed;
-
-	vuint8_t getAPA_EPAS_Failed();
-	Property<Vehicle,vuint8_t,READ_ONLY> APA_EPAS_Failed;
-
-	vuint8_t getAPA_ControlFeedback();
-	Property<Vehicle,vuint8_t,READ_ONLY> APA_ControlFeedback;
-
-	vuint8_t getTorqueSensorStatus();
-	Property<Vehicle,vuint8_t,READ_ONLY> TorqueSensorStatus;
-
-	float getSteeringTorque();
-	Property<Vehicle,float,READ_ONLY> SteeringTorque;
-
-	// Wheel Speed
-	/////////////////////////////////////////////
-	vuint8_t getWheelSpeedRearLeftDirection();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedRearLeftDirection;
-
-	vuint8_t getWheelSpeedRearLeftValid();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedRearLeftValid;
-
-	float getWheelSpeedRearLeftData();
-	Property<Vehicle,float,READ_ONLY> WheelSpeedRearLeftData;
-///////////////////////////////////////////
-	vuint8_t getWheelSpeedRearRightDirection();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedRearRightDirection;
-
-	vuint8_t getWheelSpeedRearRightValid();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedRearRightValid;
-
-	float getWheelSpeedRearRightData();
-	Property<Vehicle,float,READ_ONLY> WheelSpeedRearRightData;
-////////////////////////////////////////////////////////////////////
-	vuint8_t getWheelSpeedFrontLeftDirection();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedFrontLeftDirection;
-
-	vuint8_t getWheelSpeedFrontLeftValid();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedFrontLeftValid;
-
-	float getWheelSpeedFrontLeftData();
-	Property<Vehicle,float,READ_ONLY> WheelSpeedFrontLeftData;
-	//////////////////////////////////////////////////////////////////
-	vuint8_t getWheelSpeedFrontRightDirection();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedFrontRightDirection;
-
-	vuint8_t getWheelSpeedFrontRightValid();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedFrontRightValid;
-
-	float getWheelSpeedFrontRightData();
-	Property<Vehicle,float,READ_ONLY> WheelSpeedFrontRightData;
-
-	/// vehicle Speed
-	vuint8_t getVehicleSpeedValid();
-	Property<Vehicle,vuint8_t,READ_ONLY> VehicleSpeedValid;
-
-	float getVehicleSpeed();
-	Property<Vehicle,float,READ_ONLY> VehicleSpeed;
-
-	float getVehicleSpeedTarget();
-	Property<Vehicle,float,READ_ONLY> VehicleSpeedTarget;
-
-	// wheel pulse
-	vuint8_t getWheelSpeedDirection();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedDirection;
-
-	vuint8_t getWheelSpeedRearRightPulse();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedRearRightPulse;
-
-	vuint8_t getWheelSpeedRearLeftPulse();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedRearLeftPulse;
-
-	vuint8_t getWheelSpeedFrontRightPulse();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedFrontRightPulse;
-
-	vuint8_t getWheelSpeedForntLeftPulse();
-	Property<Vehicle,vuint8_t,READ_ONLY> WheelSpeedForntLeftPulse;
-	// SAS Steering angle
-	vint16_t getSteeringAngleActual();
-	Property<Vehicle,vint16_t,READ_ONLY> SteeringAngleActual;
-	vuint16_t getSteeringAngleSpeed();
-	Property<Vehicle,vuint16_t,READ_ONLY> SteeringAngleSpeed;
-	vuint8_t getSteeringAngleValid();
-	Property<Vehicle,vuint8_t,READ_ONLY> SteeringAngleValid;
-	vuint8_t getSAS_Failure();
-	Property<Vehicle,vuint8_t,READ_ONLY> SAS_Failure;
-
-	// ESP
-	vuint8_t getESP_QDC_ACC();
-	Property<Vehicle,vuint8_t,READ_ONLY> ESP_QDC_ACC;	
-
-	// EMS
-	vuint8_t getEMS_QEC_ACC();
-	Property<Vehicle,vuint8_t,READ_ONLY> EMS_QEC_ACC;
-
 	/*** Function ***/
-
 	// Vehicle control command function
 	void VehicleContorlStep1();
 	void VehicleContorlStep2();
@@ -186,125 +41,301 @@ public:
 	// Steering Angle control state machine
 	void SteeringAngleControlStateMachine();
 
-	// Vehicle information receive
-	void VehicleInformation(CAN_MB_tag mb_msg);
-	void VehicleInformation(vuint32_t id,vuint8_t dat[]);
+	/*** Variabel Property ***/
+	/* ACC */
+	float getTargetAccelerationACC();
+	void  setTargetAccelerationACC(float value);
+	Property<Vehicle,float,READ_WRITE> TargetAccelerationACC;
 
-	// Terminal control
-	void TerminalControlCommandReceive(vuint8_t data);
+	uint8_t getTargetAccelerationEnable();
+	void    setTargetAccelerationEnable(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> TargetAccelerationEnable;
 
-	void TerminalControlCommandSend(void);
-	void TerminalControlAckSend(vuint8_t id);
-	void TerminalControlSpeedSend(void);
+	/* AEB */
+	float getTargetDecelerationAEB();
+	void  setTargetDecelerationAEB(float value);
+	Property<Vehicle,float,READ_WRITE> TargetDecelerationAEB;
+
+	uint8_t getTargetDecelerationEnable();
+	void    setTargetDecelerationEnable(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> TargetDecelerationEnable;
+
+	/* Torque */
+	float getTorque();
+	void  setTorque(float value);
+	Property<Vehicle,float,READ_WRITE> Torque;
+
+	uint8_t getTorqueEnable();
+	void    setTorqueEnable(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> TorqueEnable;
+
+	/* Steering Angle */
+	float getSteeringAngleTarget();
+	void  setSteeringAngleTarget(float value);
+	Property<Vehicle,float,READ_WRITE> SteeringAngleTarget;
+
+	float getSteeringAngleSpeedTarget();
+	void  setSteeringAngleSpeedTarget(float value);
+	Property<Vehicle,float,READ_WRITE> SteeringAngleSpeedTarget;
+
+	uint8_t getSteeringAngleTargetActive();
+	void    setSteeringAngleTargetActive(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> SteeringAngleTargetActive;
+
+	/* Gear */
+	uint8_t getGearShift();
+	void    setGearShift(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> GearShift;
+
+	uint8_t getGearShiftEnable();
+	void    setGearShiftEnable(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> GearShiftEnable;
+
+	uint8_t getGearShiftValid();
+	void    setGearShiftValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> GearShiftValid;
+	/// Read only ///
+	// EPS
+	uint8_t getEPS_Failed();
+	void    setEPS_Failed(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> EPS_Failed;
+
+	uint8_t getAPA_EPAS_Failed();
+	void    setAPA_EPAS_Failed(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> APA_EPAS_Failed;
+
+	uint8_t getAPA_ControlFeedback();
+	void    setAPA_ControlFeedback(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> APA_ControlFeedback;
+
+	uint8_t getTorqueSensorStatus();
+	void    setTorqueSensorStatus(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> TorqueSensorStatus;
+
+	float getSteeringTorque();
+	void  setSteeringTorque(float value);
+	Property<Vehicle,float,READ_WRITE> SteeringTorque;
+
+	// Wheel Speed
+	/////////////////////////////////////////////
+	uint8_t getWheelSpeedRearLeftDirection();
+	void    setWheelSpeedRearLeftDirection(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedRearLeftDirection;
+
+	uint8_t getWheelSpeedRearLeftValid();
+	void    setWheelSpeedRearLeftValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedRearLeftValid;
+
+	float getWheelSpeedRearLeftData();
+	void  setWheelSpeedRearLeftData(float value);
+	Property<Vehicle,float,READ_WRITE> WheelSpeedRearLeftData;
+///////////////////////////////////////////
+	uint8_t getWheelSpeedRearRightDirection();
+	void    setWheelSpeedRearRightDirection(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedRearRightDirection;
+
+	uint8_t getWheelSpeedRearRightValid();
+	void    setWheelSpeedRearRightValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedRearRightValid;
+
+	float getWheelSpeedRearRightData();
+	void  setWheelSpeedRearRightData(float value);
+	Property<Vehicle,float,READ_WRITE> WheelSpeedRearRightData;
+////////////////////////////////////////////////////////////////////
+	uint8_t getWheelSpeedFrontLeftDirection();
+	void    setWheelSpeedFrontLeftDirection(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedFrontLeftDirection;
+
+	uint8_t getWheelSpeedFrontLeftValid();
+	void    setWheelSpeedFrontLeftValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedFrontLeftValid;
+
+	float getWheelSpeedFrontLeftData();
+	void  setWheelSpeedFrontLeftData(float value);
+	Property<Vehicle,float,READ_WRITE> WheelSpeedFrontLeftData;
+	//////////////////////////////////////////////////////////////////
+	uint8_t getWheelSpeedFrontRightDirection();
+	void    setWheelSpeedFrontRightDirection(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedFrontRightDirection;
+
+	uint8_t getWheelSpeedFrontRightValid();
+	void    setWheelSpeedFrontRightValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedFrontRightValid;
+
+	float getWheelSpeedFrontRightData();
+	void  setWheelSpeedFrontRightData(float value);
+	Property<Vehicle,float,READ_WRITE> WheelSpeedFrontRightData;
+
+	/// vehicle Speed
+	uint8_t getVehicleSpeedValid();
+	void    setVehicleSpeedValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> VehicleSpeedValid;
+
+	float getVehicleSpeed();
+	void  setVehicleSpeed(float value);
+	Property<Vehicle,float,READ_WRITE> VehicleSpeed;
+
+	/* Target Vehicle Speed */
+	float getVehicleSpeedTarget();
+	void  setVehicleSpeedTarget(float value);
+	Property<Vehicle,float,READ_WRITE> VehicleSpeedTarget;
+
+	uint8_t getVehicleSpeedControlEnable();
+	void    setVehicleSpeedControlEnable(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> VehicleSpeedControlEnable;
+
+	// wheel pulse
+	uint8_t getWheelSpeedDirection();
+	void    setWheelSpeedDirection(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedDirection;
+
+	uint8_t getWheelSpeedRearRightPulse();
+	void    setWheelSpeedRearRightPulse(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedRearRightPulse;
+
+	uint8_t getWheelSpeedRearLeftPulse();
+	void    setWheelSpeedRearLeftPulse(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedRearLeftPulse;
+
+	uint8_t getWheelSpeedFrontRightPulse();
+	void    setWheelSpeedFrontRightPulse(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedFrontRightPulse;
+
+	uint8_t getWheelSpeedFrontLeftPulse();
+	void    setWheelSpeedFrontLeftPulse(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> WheelSpeedFrontLeftPulse;
+
+	// SAS Steering angle
+	int16_t getSteeringAngleActual();
+	void    setSteeringAngleActual(int16_t value);
+	Property<Vehicle,int16_t,READ_WRITE> SteeringAngleActual;
+
+	uint16_t getSteeringAngleSpeed();
+	void     setSteeringAngleSpeed(uint16_t value);
+	Property<Vehicle,uint16_t,READ_WRITE> SteeringAngleSpeed;
+
+	uint8_t getSteeringAngleValid();
+	void    setSteeringAngleValid(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> SteeringAngleValid;
+
+	uint8_t getSAS_Failure();
+	void    setSAS_Failure(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> SAS_Failure;
+
+	// ESP
+	uint8_t getESP_QDC_ACC();
+	void    setESP_QDC_ACC(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> ESP_QDC_ACC;
+
+	// EMS
+	uint8_t getEMS_QEC_ACC();
+	void    setEMS_QEC_ACC(uint8_t value);
+	Property<Vehicle,uint8_t,READ_WRITE> EMS_QEC_ACC;
 private:
 	/*** State Machine ***/
-	vuint8_t _steering_angle_Control_state;
-	ReceiveFrame _terminal_frame;
-	vuint8_t _data_buffer[32];
-	vuint8_t _send_data_buffer[32];
-	vuint8_t _frame_id,_frame_length,_frame_cnt,_check_sum;
-	vuint8_t _frame_err_cnt;
+	/// steering angle control state machine
+	uint8_t _steering_angle_Control_state;
 
-	vuint8_t _test_data_buffer[1000];
-	vuint16_t _test_cnt;
-	Byte2Float _data_temp,_speed_data_temp;
 	/*** Send to Vehicle Messege ***/
 	/* Roolling Counter */
-	vuint8_t _rolling_counter_torque_AEB;
-	vuint8_t _rolling_counter_brake_ACC;
-	vuint8_t _rolling_counter_steering_control;
-	vuint8_t _rolling_counter_gear_control;
+	uint8_t _rolling_counter_torque_AEB;
+	uint8_t _rolling_counter_brake_ACC;
+	uint8_t _rolling_counter_steering_control;
+	uint8_t _rolling_counter_gear_control;
 
 	/* ACC */
 	// actual value
 	float _target_acceleration_acc;
-	vuint8_t _target_acceleration_enable;
+	uint8_t _target_acceleration_enable;
 	// current value
-	vuint8_t _current_target_acceleration_ACC;
-	vuint8_t _current_target_acceleration_enable_single;
+	uint8_t _current_target_acceleration_ACC;
+	uint8_t _current_target_acceleration_enable_single;
 
 	/* AEB */
 	// actual value
 	float _target_deceleration_aeb;
-	vuint8_t _target_deceleration_enable;
+	uint8_t _target_deceleration_enable;
 	// current value
-	vuint16_t _current_target_deceleration_AEB;
-	vuint8_t _current_target_deceleration_enable_single;
+	uint16_t _current_target_deceleration_AEB;
+	uint8_t _current_target_deceleration_enable_single;
 
 	/* Torque */
 	// actual value
-	vuint8_t _torque;
-	vuint8_t _torque_enable;
+	float _torque;
+	uint8_t _torque_enable;
 	// current value
-	vuint16_t _current_torque;
-	vuint8_t _current_torque_enable_single;
+	uint16_t _current_torque;
+	uint8_t _current_torque_enable_single;
 
 	/* SteeringAngle */
 	// actual value
 	float _steering_angle_set;
-	vint16_t _steering_angle_target;
-	vuint16_t _steering_angle_speed_target;
-	vuint8_t _steering_angle_target_active;
+	float _steering_angle_target;
+	float _steering_angle_speed_target;
+	uint8_t _steering_angle_target_active;
 	// current value
-	vint16_t _current_steering_angle_target;
-	vuint8_t _current_steering_angle_target_active_single;
+	int16_t _current_steering_angle_target;
+	uint8_t _current_steering_angle_target_active_single;
 
 	/* Gear */
 	// actual value
-	vuint8_t _gear_shift;
-	vuint8_t _gear_shift_enable;
-	vuint8_t _gear_shift_valid;
+	uint8_t _gear_shift;
+	uint8_t _gear_shift_enable;
+	uint8_t _gear_shift_valid;
 	// current value
-	vuint8_t _current_gear_shift;
-	vuint8_t _current_gear_shift_enable_single;
-	vuint8_t _current_gear_shift_valid_single;
+	uint8_t _current_gear_shift;
+	uint8_t _current_gear_shift_enable_single;
+	uint8_t _current_gear_shift_valid_single;
+
+	/// Target Vehicle Speed
+	float _vehicle_speed_target;
+	uint8_t _vehicle_speed_control_enable;
 
 	/*** Receive messege form vehicle ***/
-	vuint8_t _eps_failed;
-	vuint8_t _apa_epas_failed;
-	vuint8_t _apa_control_feedback;
-	vuint8_t _torque_sensor_status;
+	uint8_t _eps_failed;
+	uint8_t _apa_epas_failed;
+	uint8_t _apa_control_feedback;
+	uint8_t _torque_sensor_status;
 	float _steering_torque;
 
 	//Wheel Speed
-	vuint8_t _wheel_speed_rear_left_direction;
-	vuint8_t _wheel_speed_rear_left_valid;
+	uint8_t _wheel_speed_rear_left_direction;
+	uint8_t _wheel_speed_rear_left_valid;
 	float _wheel_speed_rear_left_data;
 
-	vuint8_t _wheel_speed_rear_right_direction;
-	vuint8_t _wheel_speed_rear_right_valid;
+	uint8_t _wheel_speed_rear_right_direction;
+	uint8_t _wheel_speed_rear_right_valid;
 	float _wheel_speed_rear_right_data;
 
-	vuint8_t _wheel_speed_front_left_direction;
-	vuint8_t _wheel_speed_front_left_valid;
+	uint8_t _wheel_speed_front_left_direction;
+	uint8_t _wheel_speed_front_left_valid;
 	float _wheel_speed_front_left_data;
 
-	vuint8_t _wheel_speed_front_right_direction;
-	vuint8_t _wheel_speed_front_right_valid;
+	uint8_t _wheel_speed_front_right_direction;
+	uint8_t _wheel_speed_front_right_valid;
 	float _wheel_speed_front_right_data;
 
-	// vehicle speed
-	vuint8_t _vehicle_speed_valid;
+	// vehicle speed Feedback
+	uint8_t _vehicle_speed_valid;
 	float _vehicle_speed;
-	float _vehicle_speed_target;
 
 	// wheel pulse
-	vuint8_t _wheel_speed_direction;
-	vuint8_t _wheel_speed_rear_right_pulse;
-	vuint8_t _wheel_speed_rear_left_pulse;
-	vuint8_t _wheel_speed_front_right_pulse;
-	vuint8_t _wheel_speed_front_left_pulse;
+	uint8_t _wheel_speed_direction;
+	uint8_t _wheel_speed_rear_right_pulse;
+	uint8_t _wheel_speed_rear_left_pulse;
+	uint8_t _wheel_speed_front_right_pulse;
+	uint8_t _wheel_speed_front_left_pulse;
 
 	// SAS Steering angle
-	vint16_t _steering_angle_actual;
-	vuint16_t _steering_angle_speed;
-	vuint8_t _steering_angle_valid;
-	vuint8_t _sas_failure;
+	int16_t _steering_angle_actual;
+	uint16_t _steering_angle_speed;
+	uint8_t _steering_angle_valid;
+	uint8_t _sas_failure;
 
 	// ESP
-	vuint8_t esp_qdc_acc;
+	uint8_t esp_qdc_acc;
 	// EMS
-	vuint8_t ems_qec_acc;
+	uint8_t ems_qec_acc;
 };
 
 
