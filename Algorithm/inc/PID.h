@@ -16,8 +16,10 @@ class PID {
 public:
 	PID();
 	PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim);
+	PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold);
 	virtual ~PID();
 	float pidUpdate(float measured);
+	float pidUpdateIntegralSeparation(float measured);
 
     /*** Variabel Property ***/
     /* KP */
@@ -54,6 +56,11 @@ public:
     float getDt();
     void setDt(float value);
     Property<PID,float,READ_WRITE> Dt;
+
+    /* OutputOffset */
+    float getThreshold();
+    void setThreshold(float value);
+    Property<PID,float,READ_WRITE> Threshold;
 private:
     float _desired;      //< set point
     float _error;        //< error
@@ -68,6 +75,7 @@ private:
     float _outD;         //< derivative output (debugging)
     float _iLimit;       //< integral limit, absolute value. '0' means no limit.
     float _outputLimit;  //< total PID output limit, absolute value. '0' means no limit.
+    float _threshold; //< the output offset set
     float _dt;           //< delta-time dt
 };
 
