@@ -1,10 +1,11 @@
 /*
  * Property.h
  *
- *  Created on: 2018年11月14日
+ *  Created on:
  *      Author: zhuguohua
  */
 #include <assert.h>
+#include "project.h"
 
 #ifndef SRC_PROPERTY_H_
 #define SRC_PROPERTY_H_
@@ -23,7 +24,7 @@ public:
 		Get = 0;
 	}
 	//-- This to set a pointer to the class that contain the
-	//   property --
+	//聽聽 property --
 	void setContainer(Container* cObject)
 	{
 		m_cObject = cObject;
@@ -46,7 +47,7 @@ public:
 			Get = 0;
 	}
 	//-- Overload the '=' sign to set the value using the set
-	//   member --
+	//聽聽 member --
 	ValueType operator =(const ValueType& value)
 	{
 		assert(m_cObject != 0);
@@ -56,7 +57,7 @@ public:
 	}
 
 	//-- To make possible to cast the property class to the
-	//   internal type --
+	//聽聽 internal type --
 	operator ValueType()
 	{
 		assert(m_cObject != 0);
@@ -66,7 +67,7 @@ public:
 private:
 	Container* m_cObject;
 	//-- Pointer to the module that
-    //   contains the property --
+    //聽聽 contains the property --
 	void (Container::*Set)(ValueType value);
 	//-- Pointer to set member function --
 	ValueType(Container::*Get)();
