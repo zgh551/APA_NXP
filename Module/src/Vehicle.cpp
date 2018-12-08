@@ -1,7 +1,7 @@
 /*
  * Vehicle.cpp
  *
- *  Created on: 2018Äê11ÔÂ21ÈÕ
+ *  Created on: 2018ï¿½ï¿½11ï¿½ï¿½21ï¿½ï¿½
  *      Author: zhuguohua
  */
 
@@ -10,6 +10,64 @@
 Vehicle::Vehicle()
 {
 	// TODO Auto-generated constructor stub
+	/*** the vehicle body information ***/
+	// Lenght
+	_wheelbase_lenght = 2.65;
+	_front_overhang_distance = 0.952;
+	_rear_overhang_distance = 1;
+
+	// width
+	_wheel_axis_width = 1.794;
+	_wheel_axis_width_half = 0.765;
+	_wheel_edge_distance = 0.132;
+
+	// the vehice four edge point calculate
+	_front_axis_lenght = sqrtf(powf(_wheel_axis_width_half + _wheel_edge_distance , 2) + powf(_wheelbase_lenght + _front_overhang_distance ,2));
+	_rear_axis_lenght  = sqrtf(powf(_wheel_axis_width_half + _wheel_edge_distance , 2) + powf(_rear_overhang_distance ,2));
+	_beta_front        = atanf( (_wheel_axis_width_half + _wheel_edge_distance) / (_wheelbase_lenght + _front_overhang_distance));
+	_beta_rear         = atanf( (_wheel_axis_width_half + _wheel_edge_distance) / _rear_overhang_distance );
+
+	////// Vehicle Body Information //////
+	/// Lenght
+	WheelBaseLenght.setContainer(this);
+	WheelBaseLenght.getter(&Vehicle::getWheelBaseLenght);
+	WheelBaseLenght.setter(&Vehicle::setWheelBaseLenght);
+
+	FrontOverhangDistance.setContainer(this);
+	FrontOverhangDistance.getter(&Vehicle::getFrontOverhangDistance);
+	FrontOverhangDistance.setter(&Vehicle::setFrontOverhangDistance);
+
+	RearOverhangDistance.setContainer(this);
+	RearOverhangDistance.getter(&Vehicle::getRearOverhangDistance);
+	RearOverhangDistance.setter(&Vehicle::setRearOverhangDistance);
+	/// Width
+	WheelAxisWidth.setContainer(this);
+	WheelAxisWidth.getter(&Vehicle::getWheelAxisWidth);
+	WheelAxisWidth.setter(&Vehicle::setWheelAxisWidth);
+
+	WheelAxisWidthHalf.setContainer(this);
+	WheelAxisWidthHalf.getter(&Vehicle::getWheelAxisWidthHalf);
+	WheelAxisWidthHalf.setter(&Vehicle::setWheelAxisWidthHalf);
+
+	WheelEdgeDistance.setContainer(this);
+	WheelEdgeDistance.getter(&Vehicle::getWheelEdgeDistance);
+	WheelEdgeDistance.setter(&Vehicle::setWheelEdgeDistance);
+	/// the vehicle edge point calculate information
+	FrontAxisLenght.setContainer(this);
+	FrontAxisLenght.getter(&Vehicle::getFrontAxisLenght);
+	FrontAxisLenght.setter(&Vehicle::setFrontAxisLenght);
+
+	RearAxisLenght.setContainer(this);
+	RearAxisLenght.getter(&Vehicle::getRearAxisLenght);
+	RearAxisLenght.setter(&Vehicle::setRearAxisLenght);
+
+	BetaFront.setContainer(this);
+	BetaFront.getter(&Vehicle::getBetaFront);
+	BetaFront.setter(&Vehicle::setBetaFront);
+
+	BetaRear.setContainer(this);
+	BetaRear.getter(&Vehicle::getBetaRear);
+	BetaRear.setter(&Vehicle::setBetaRear);
 	////// ACC //////
 	TargetAccelerationACC.setContainer(this);
 	TargetAccelerationACC.getter(&Vehicle::getTargetAccelerationACC);
@@ -132,27 +190,27 @@ Vehicle::Vehicle()
 
 	WheelSpeedFrontRightData.setContainer(this);
 	WheelSpeedFrontRightData.getter(&Vehicle::getWheelSpeedFrontRightData);
-	WheelSpeedFrontRightData.setter(&Vehicle::setWheelSpeedFrontRightData);	
+	WheelSpeedFrontRightData.setter(&Vehicle::setWheelSpeedFrontRightData);
 	// Wheel Pusle
 	WheelSpeedDirection.setContainer(this);
 	WheelSpeedDirection.getter(&Vehicle::getWheelSpeedDirection);
-	WheelSpeedDirection.setter(&Vehicle::setWheelSpeedDirection);	
+	WheelSpeedDirection.setter(&Vehicle::setWheelSpeedDirection);
 
 	WheelSpeedRearRightPulse.setContainer(this);
 	WheelSpeedRearRightPulse.getter(&Vehicle::getWheelSpeedRearRightPulse);
-	WheelSpeedRearRightPulse.setter(&Vehicle::setWheelSpeedRearRightPulse);	
+	WheelSpeedRearRightPulse.setter(&Vehicle::setWheelSpeedRearRightPulse);
 
 	WheelSpeedRearLeftPulse.setContainer(this);
 	WheelSpeedRearLeftPulse.getter(&Vehicle::getWheelSpeedRearLeftPulse);
-	WheelSpeedRearLeftPulse.setter(&Vehicle::setWheelSpeedRearLeftPulse);	
+	WheelSpeedRearLeftPulse.setter(&Vehicle::setWheelSpeedRearLeftPulse);
 
 	WheelSpeedFrontRightPulse.setContainer(this);
 	WheelSpeedFrontRightPulse.getter(&Vehicle::getWheelSpeedFrontRightPulse);
-	WheelSpeedFrontRightPulse.setter(&Vehicle::setWheelSpeedFrontRightPulse);	
+	WheelSpeedFrontRightPulse.setter(&Vehicle::setWheelSpeedFrontRightPulse);
 
 	WheelSpeedFrontLeftPulse.setContainer(this);
 	WheelSpeedFrontLeftPulse.getter(&Vehicle::getWheelSpeedFrontLeftPulse);
-	WheelSpeedFrontLeftPulse.setter(&Vehicle::setWheelSpeedFrontLeftPulse);	
+	WheelSpeedFrontLeftPulse.setter(&Vehicle::setWheelSpeedFrontLeftPulse);
 	/////////////vehicle speed
 	VehicleSpeedValid.setContainer(this);
 	VehicleSpeedValid.getter(&Vehicle::getVehicleSpeedValid);
@@ -190,7 +248,7 @@ Vehicle::Vehicle()
 	//ESP
 	ESP_QDC_ACC.setContainer(this);
 	ESP_QDC_ACC.getter(&Vehicle::getESP_QDC_ACC);
-	ESP_QDC_ACC.setter(&Vehicle::setESP_QDC_ACC);	
+	ESP_QDC_ACC.setter(&Vehicle::setESP_QDC_ACC);
 	//EMS
 	EMS_QEC_ACC.setContainer(this);
 	EMS_QEC_ACC.getter(&Vehicle::getEMS_QEC_ACC);
@@ -200,6 +258,64 @@ Vehicle::Vehicle()
 Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):PID(dt,kp,ki,kd,i_lim,out_lim)
 {
 	// TODO Auto-generated constructor stub
+	/*** the vehicle body information ***/
+	// Lenght
+	_wheelbase_lenght = 2.65;
+	_front_overhang_distance = 0.952;
+	_rear_overhang_distance = 1;
+
+	// width
+	_wheel_axis_width = 1.794;
+	_wheel_axis_width_half = 0.765;
+	_wheel_edge_distance = 0.132;
+
+	// the vehice four edge point calculate
+	_front_axis_lenght = sqrtf(powf(_wheel_axis_width_half + _wheel_edge_distance , 2) + powf(_wheelbase_lenght + _front_overhang_distance ,2));
+	_rear_axis_lenght  = sqrtf(powf(_wheel_axis_width_half + _wheel_edge_distance , 2) + powf(_rear_overhang_distance ,2));
+	_beta_front        = atanf( (_wheel_axis_width_half + _wheel_edge_distance) / (_wheelbase_lenght + _front_overhang_distance));
+	_beta_rear         = atanf( (_wheel_axis_width_half + _wheel_edge_distance) / _rear_overhang_distance );
+
+	////// Vehicle Body Information //////
+	/// Lenght
+	WheelBaseLenght.setContainer(this);
+	WheelBaseLenght.getter(&Vehicle::getWheelBaseLenght);
+	WheelBaseLenght.setter(&Vehicle::setWheelBaseLenght);
+
+	FrontOverhangDistance.setContainer(this);
+	FrontOverhangDistance.getter(&Vehicle::getFrontOverhangDistance);
+	FrontOverhangDistance.setter(&Vehicle::setFrontOverhangDistance);
+
+	RearOverhangDistance.setContainer(this);
+	RearOverhangDistance.getter(&Vehicle::getRearOverhangDistance);
+	RearOverhangDistance.setter(&Vehicle::setRearOverhangDistance);
+	/// Width
+	WheelAxisWidth.setContainer(this);
+	WheelAxisWidth.getter(&Vehicle::getWheelAxisWidth);
+	WheelAxisWidth.setter(&Vehicle::setWheelAxisWidth);
+
+	WheelAxisWidthHalf.setContainer(this);
+	WheelAxisWidthHalf.getter(&Vehicle::getWheelAxisWidthHalf);
+	WheelAxisWidthHalf.setter(&Vehicle::setWheelAxisWidthHalf);
+
+	WheelEdgeDistance.setContainer(this);
+	WheelEdgeDistance.getter(&Vehicle::getWheelEdgeDistance);
+	WheelEdgeDistance.setter(&Vehicle::setWheelEdgeDistance);
+	/// the vehicle edge point calculate information
+	FrontAxisLenght.setContainer(this);
+	FrontAxisLenght.getter(&Vehicle::getFrontAxisLenght);
+	FrontAxisLenght.setter(&Vehicle::setFrontAxisLenght);
+
+	RearAxisLenght.setContainer(this);
+	RearAxisLenght.getter(&Vehicle::getRearAxisLenght);
+	RearAxisLenght.setter(&Vehicle::setRearAxisLenght);
+
+	BetaFront.setContainer(this);
+	BetaFront.getter(&Vehicle::getBetaFront);
+	BetaFront.setter(&Vehicle::setBetaFront);
+
+	BetaRear.setContainer(this);
+	BetaRear.getter(&Vehicle::getBetaRear);
+	BetaRear.setter(&Vehicle::setBetaRear);
 	////// ACC //////
 	TargetAccelerationACC.setContainer(this);
 	TargetAccelerationACC.getter(&Vehicle::getTargetAccelerationACC);
@@ -322,27 +438,27 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):
 
 	WheelSpeedFrontRightData.setContainer(this);
 	WheelSpeedFrontRightData.getter(&Vehicle::getWheelSpeedFrontRightData);
-	WheelSpeedFrontRightData.setter(&Vehicle::setWheelSpeedFrontRightData);	
+	WheelSpeedFrontRightData.setter(&Vehicle::setWheelSpeedFrontRightData);
 	// Wheel Pusle
 	WheelSpeedDirection.setContainer(this);
 	WheelSpeedDirection.getter(&Vehicle::getWheelSpeedDirection);
-	WheelSpeedDirection.setter(&Vehicle::setWheelSpeedDirection);	
+	WheelSpeedDirection.setter(&Vehicle::setWheelSpeedDirection);
 
 	WheelSpeedRearRightPulse.setContainer(this);
 	WheelSpeedRearRightPulse.getter(&Vehicle::getWheelSpeedRearRightPulse);
-	WheelSpeedRearRightPulse.setter(&Vehicle::setWheelSpeedRearRightPulse);	
+	WheelSpeedRearRightPulse.setter(&Vehicle::setWheelSpeedRearRightPulse);
 
 	WheelSpeedRearLeftPulse.setContainer(this);
 	WheelSpeedRearLeftPulse.getter(&Vehicle::getWheelSpeedRearLeftPulse);
-	WheelSpeedRearLeftPulse.setter(&Vehicle::setWheelSpeedRearLeftPulse);	
+	WheelSpeedRearLeftPulse.setter(&Vehicle::setWheelSpeedRearLeftPulse);
 
 	WheelSpeedFrontRightPulse.setContainer(this);
 	WheelSpeedFrontRightPulse.getter(&Vehicle::getWheelSpeedFrontRightPulse);
-	WheelSpeedFrontRightPulse.setter(&Vehicle::setWheelSpeedFrontRightPulse);	
+	WheelSpeedFrontRightPulse.setter(&Vehicle::setWheelSpeedFrontRightPulse);
 
 	WheelSpeedFrontLeftPulse.setContainer(this);
 	WheelSpeedFrontLeftPulse.getter(&Vehicle::getWheelSpeedFrontLeftPulse);
-	WheelSpeedFrontLeftPulse.setter(&Vehicle::setWheelSpeedFrontLeftPulse);	
+	WheelSpeedFrontLeftPulse.setter(&Vehicle::setWheelSpeedFrontLeftPulse);
 	/////////////vehicle speed
 	VehicleSpeedValid.setContainer(this);
 	VehicleSpeedValid.getter(&Vehicle::getVehicleSpeedValid);
@@ -380,7 +496,7 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):
 	//ESP
 	ESP_QDC_ACC.setContainer(this);
 	ESP_QDC_ACC.getter(&Vehicle::getESP_QDC_ACC);
-	ESP_QDC_ACC.setter(&Vehicle::setESP_QDC_ACC);	
+	ESP_QDC_ACC.setter(&Vehicle::setESP_QDC_ACC);
 	//EMS
 	EMS_QEC_ACC.setContainer(this);
 	EMS_QEC_ACC.getter(&Vehicle::getEMS_QEC_ACC);
@@ -390,6 +506,64 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):
 Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold):PID(dt,kp,ki,kd,i_lim,out_lim,threshold)
 {
  	// TODO Auto-generated constructor stub
+	/*** the vehicle body information ***/
+	// Lenght
+	_wheelbase_lenght = 2.65;
+	_front_overhang_distance = 0.952;
+	_rear_overhang_distance = 1;
+
+	// width
+	_wheel_axis_width = 1.794;
+	_wheel_axis_width_half = 0.765;
+	_wheel_edge_distance = 0.132;
+
+	// the vehice four edge point calculate
+	_front_axis_lenght = sqrtf(powf(_wheel_axis_width_half + _wheel_edge_distance , 2) + powf(_wheelbase_lenght + _front_overhang_distance ,2));
+	_rear_axis_lenght  = sqrtf(powf(_wheel_axis_width_half + _wheel_edge_distance , 2) + powf(_rear_overhang_distance ,2));
+	_beta_front        = atanf( (_wheel_axis_width_half + _wheel_edge_distance) / (_wheelbase_lenght + _front_overhang_distance));
+	_beta_rear         = atanf( (_wheel_axis_width_half + _wheel_edge_distance) / _rear_overhang_distance );
+
+	////// Vehicle Body Information //////
+	/// Lenght
+	WheelBaseLenght.setContainer(this);
+	WheelBaseLenght.getter(&Vehicle::getWheelBaseLenght);
+	WheelBaseLenght.setter(&Vehicle::setWheelBaseLenght);
+
+	FrontOverhangDistance.setContainer(this);
+	FrontOverhangDistance.getter(&Vehicle::getFrontOverhangDistance);
+	FrontOverhangDistance.setter(&Vehicle::setFrontOverhangDistance);
+
+	RearOverhangDistance.setContainer(this);
+	RearOverhangDistance.getter(&Vehicle::getRearOverhangDistance);
+	RearOverhangDistance.setter(&Vehicle::setRearOverhangDistance);
+	/// Width
+	WheelAxisWidth.setContainer(this);
+	WheelAxisWidth.getter(&Vehicle::getWheelAxisWidth);
+	WheelAxisWidth.setter(&Vehicle::setWheelAxisWidth);
+
+	WheelAxisWidthHalf.setContainer(this);
+	WheelAxisWidthHalf.getter(&Vehicle::getWheelAxisWidthHalf);
+	WheelAxisWidthHalf.setter(&Vehicle::setWheelAxisWidthHalf);
+
+	WheelEdgeDistance.setContainer(this);
+	WheelEdgeDistance.getter(&Vehicle::getWheelEdgeDistance);
+	WheelEdgeDistance.setter(&Vehicle::setWheelEdgeDistance);
+	/// the vehicle edge point calculate information
+	FrontAxisLenght.setContainer(this);
+	FrontAxisLenght.getter(&Vehicle::getFrontAxisLenght);
+	FrontAxisLenght.setter(&Vehicle::setFrontAxisLenght);
+
+	RearAxisLenght.setContainer(this);
+	RearAxisLenght.getter(&Vehicle::getRearAxisLenght);
+	RearAxisLenght.setter(&Vehicle::setRearAxisLenght);
+
+	BetaFront.setContainer(this);
+	BetaFront.getter(&Vehicle::getBetaFront);
+	BetaFront.setter(&Vehicle::setBetaFront);
+
+	BetaRear.setContainer(this);
+	BetaRear.getter(&Vehicle::getBetaRear);
+	BetaRear.setter(&Vehicle::setBetaRear);
 	////// ACC //////
 	TargetAccelerationACC.setContainer(this);
 	TargetAccelerationACC.getter(&Vehicle::getTargetAccelerationACC);
@@ -512,27 +686,27 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,f
 
 	WheelSpeedFrontRightData.setContainer(this);
 	WheelSpeedFrontRightData.getter(&Vehicle::getWheelSpeedFrontRightData);
-	WheelSpeedFrontRightData.setter(&Vehicle::setWheelSpeedFrontRightData);	
+	WheelSpeedFrontRightData.setter(&Vehicle::setWheelSpeedFrontRightData);
 	// Wheel Pusle
 	WheelSpeedDirection.setContainer(this);
 	WheelSpeedDirection.getter(&Vehicle::getWheelSpeedDirection);
-	WheelSpeedDirection.setter(&Vehicle::setWheelSpeedDirection);	
+	WheelSpeedDirection.setter(&Vehicle::setWheelSpeedDirection);
 
 	WheelSpeedRearRightPulse.setContainer(this);
 	WheelSpeedRearRightPulse.getter(&Vehicle::getWheelSpeedRearRightPulse);
-	WheelSpeedRearRightPulse.setter(&Vehicle::setWheelSpeedRearRightPulse);	
+	WheelSpeedRearRightPulse.setter(&Vehicle::setWheelSpeedRearRightPulse);
 
 	WheelSpeedRearLeftPulse.setContainer(this);
 	WheelSpeedRearLeftPulse.getter(&Vehicle::getWheelSpeedRearLeftPulse);
-	WheelSpeedRearLeftPulse.setter(&Vehicle::setWheelSpeedRearLeftPulse);	
+	WheelSpeedRearLeftPulse.setter(&Vehicle::setWheelSpeedRearLeftPulse);
 
 	WheelSpeedFrontRightPulse.setContainer(this);
 	WheelSpeedFrontRightPulse.getter(&Vehicle::getWheelSpeedFrontRightPulse);
-	WheelSpeedFrontRightPulse.setter(&Vehicle::setWheelSpeedFrontRightPulse);	
+	WheelSpeedFrontRightPulse.setter(&Vehicle::setWheelSpeedFrontRightPulse);
 
 	WheelSpeedFrontLeftPulse.setContainer(this);
 	WheelSpeedFrontLeftPulse.getter(&Vehicle::getWheelSpeedFrontLeftPulse);
-	WheelSpeedFrontLeftPulse.setter(&Vehicle::setWheelSpeedFrontLeftPulse);	
+	WheelSpeedFrontLeftPulse.setter(&Vehicle::setWheelSpeedFrontLeftPulse);
 	/////////////vehicle speed
 	VehicleSpeedValid.setContainer(this);
 	VehicleSpeedValid.getter(&Vehicle::getVehicleSpeedValid);
@@ -570,7 +744,7 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,f
 	//ESP
 	ESP_QDC_ACC.setContainer(this);
 	ESP_QDC_ACC.getter(&Vehicle::getESP_QDC_ACC);
-	ESP_QDC_ACC.setter(&Vehicle::setESP_QDC_ACC);	
+	ESP_QDC_ACC.setter(&Vehicle::setESP_QDC_ACC);
 	//EMS
 	EMS_QEC_ACC.setContainer(this);
 	EMS_QEC_ACC.getter(&Vehicle::getEMS_QEC_ACC);
@@ -582,6 +756,97 @@ Vehicle::~Vehicle() {
 }
 
 /****** Property ******/
+/* the vehicle body information */
+// Lenght
+float Vehicle::getWheelBaseLenght()
+{
+	return _wheelbase_lenght;
+}
+void  Vehicle::setWheelBaseLenght(float value)
+{
+	_wheelbase_lenght = value;
+}
+
+float Vehicle::getFrontOverhangDistance()
+{
+	return _front_overhang_distance;
+}
+void  Vehicle::setFrontOverhangDistance(float value)
+{
+	_front_overhang_distance = value;
+}
+
+float Vehicle::getRearOverhangDistance()
+{
+	return _rear_overhang_distance;
+}
+void  Vehicle::setRearOverhangDistance(float value)
+{
+	_rear_overhang_distance = value;
+}
+// width
+float Vehicle::getWheelAxisWidth()
+{
+	return _wheel_axis_width;
+}
+void  Vehicle::setWheelAxisWidth(float value)
+{
+	_wheel_axis_width = value;
+}
+
+float Vehicle::getWheelAxisWidthHalf()
+{
+	return _wheel_axis_width_half;
+}
+void  Vehicle::setWheelAxisWidthHalf(float value)
+{
+	_wheel_axis_width_half = value;
+}
+
+float Vehicle::getWheelEdgeDistance()
+{
+	return _wheel_edge_distance;
+}
+void  Vehicle::setWheelEdgeDistance(float value)
+{
+	_wheel_edge_distance = value;
+}
+// the vehice four edge point calculate
+float Vehicle::getFrontAxisLenght()
+{
+	return _front_axis_lenght;
+}
+void  Vehicle::setFrontAxisLenght(float value)
+{
+	_front_axis_lenght = value;
+}
+
+float Vehicle::getRearAxisLenght()
+{
+	return _rear_axis_lenght;
+}
+void  Vehicle::setRearAxisLenght(float value)
+{
+	_rear_axis_lenght = value;
+}
+
+float Vehicle::getBetaFront()
+{
+	return _beta_front;
+}
+void  Vehicle::setBetaFront(float value)
+{
+	_beta_front = value;
+}
+
+float Vehicle::getBetaRear()
+{
+	return _beta_rear;
+}
+void  Vehicle::setBetaRear(float value)
+{
+	_beta_rear = value;
+}
 /// ACC
 float Vehicle::getTargetAccelerationACC()
 {
@@ -694,19 +959,6 @@ void    Vehicle::setGearShiftValid(uint8_t value)
 {
 	_gear_shift_valid = value;
 }
-
-// /// Target Speed
-// float Vehicle::getVehicleSpeedTarget()
-// {
-// 	return _vehicle_speed_target;
-// }
-// void  Vehicle::setVehicleSpeedTarget(float value)
-// {
-// 	_vehicle_speed_target = value;
-// }
-
-
-
 /* The information from vehicle and read only */
 /// EPS
 uint8_t Vehicle::getEPS_Failed()
@@ -1107,7 +1359,7 @@ void Vehicle::VehicleContorlStep3()
 											(
 												(((_current_gear_shift_enable_single & 0x01) << 2)
 												^(((_current_gear_shift_valid_single & 0x01) << 3) + _current_gear_shift)
-												^(_rolling_counter_gear_control & 0x0F)) << 4 
+												^(_rolling_counter_gear_control & 0x0F)) << 4
 											)|(_rolling_counter_gear_control & 0x0F)
 										);
 	for( i = 4 ;i < 8 ; i++ ){m_CAN_Packet.data[i] = 0;}
