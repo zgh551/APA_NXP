@@ -359,7 +359,7 @@ void Terminal::TerminalControlCommandReceive(uint8_t data)
 					break;
 				}
 				// ACK Single
-//				AckValid = 0x5A;
+				AckValid = 0x5A;
 				TerminalControlAckSend();
 			}
 			else
