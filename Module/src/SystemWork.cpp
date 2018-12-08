@@ -12,6 +12,8 @@ SystemWork::SystemWork() {
 	// TODO Auto-generated constructor stub
 	_system_working_state = Debug;
 
+	_working_module = 0;
+	_function_status = 2;
 	//// System Status //////
 	WorkingModule.setContainer(this);
 	WorkingModule.getter(&SystemWork::getWorkingModule);
@@ -26,6 +28,9 @@ SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out
 {
 	// TODO Auto-generated constructor stub
 	_system_working_state = Debug;
+
+	_working_module = 0;
+	_function_status = 2;
 
 	////// System Status //////
 	WorkingModule.setContainer(this);
@@ -42,6 +47,8 @@ SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out
 	// TODO Auto-generated constructor stub
 	_system_working_state = Debug;
 
+	_working_module = 0;
+	_function_status = 2;
 	////// System Status //////
 	WorkingModule.setContainer(this);
 	WorkingModule.getter(&SystemWork::getWorkingModule);
@@ -103,9 +110,8 @@ void SystemWork::SystemWorkState(void)
 
 void SystemWork::DubugStataMahine(void)
 {
-//	VehicleContorl();//vehicle control commond
+	VehicleContorl();//vehicle control commond
 	SteeringAngleControl(0.02);// steering angle control
-
 	switch((DubugState)_function_status)
 	{
 	case DirectControl:
