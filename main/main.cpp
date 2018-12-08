@@ -25,7 +25,7 @@ extern void xcptn_xmpl(void);
 
 void peri_clock_gating(void);
 
-Terminal m_Terminal_CA = Terminal(0.02,4,0.1,0,0.3,0.5,0.1);
+Terminal m_Terminal_CA = Terminal(0.02,3.5,0.1,0.1,0.3,1,0.1);
 
 vuint8_t cnt;
 bool TerminalSendFlag = false;
@@ -42,7 +42,7 @@ int main()
 
     // Flex Lin1 Uart
     FlexLin1_Uart_Buffer_Init(80,38400);
-//    FlexLin1_Uart_FIFO_Init(80,115200);
+//    FlexLin1_Uart_FIFO_Init(80,19200);
 
 
     // PIT0
@@ -82,7 +82,7 @@ void peri_clock_gating(void)
   MC_ME.PCTL79.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
   MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
   MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1]. No LINFlex_D_2 on Panther
-  MC_ME.PCTL146.B.RUN_CFG = 0b001; // DMAMUX_1:
+  MC_ME.PCTL146.B.RUN_CFG = 0b001; //DMAMUX_1:
 }
 
 #ifdef __cplusplus
