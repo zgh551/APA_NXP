@@ -1,7 +1,7 @@
 /*
  * Vehicle.h
  *
- *  Created on: 2018Äê11ÔÂ21ÈÕ
+ *  Created on: 2018
  *      Author: zhuguohua
  */
 
@@ -10,6 +10,7 @@
 #include "Property.h"
 #include "derivative.h"
 #include "project.h"
+#include "math.h"
 #include "can.h"
 #include "uart.h"
 #include "PID.h"
@@ -42,6 +43,47 @@ public:
 	void SteeringAngleControlStateMachine();
 
 	/*** Variabel Property ***/
+	/* the vehicle body information */
+	// Lenght
+	float getWheelBaseLenght();
+	void  setWheelBaseLenght(float value);
+	Property<Vehicle,float,READ_WRITE> WheelBaseLenght;
+
+	float getFrontOverhangDistance();
+	void  setFrontOverhangDistance(float value);
+	Property<Vehicle,float,READ_WRITE> FrontOverhangDistance;
+
+	float getRearOverhangDistance();
+	void  setRearOverhangDistance(float value);
+	Property<Vehicle,float,READ_WRITE> RearOverhangDistance;
+	// width
+	float getWheelAxisWidth();
+	void  setWheelAxisWidth(float value);
+	Property<Vehicle,float,READ_WRITE> WheelAxisWidth;
+
+	float getWheelAxisWidthHalf();
+	void  setWheelAxisWidthHalf(float value);
+	Property<Vehicle,float,READ_WRITE> WheelAxisWidthHalf;
+
+	float getWheelEdgeDistance();
+	void  setWheelEdgeDistance(float value);
+	Property<Vehicle,float,READ_WRITE> WheelEdgeDistance;
+	// the vehice four edge point calculate
+	float getFrontAxisLenght();
+	void  setFrontAxisLenght(float value);
+	Property<Vehicle,float,READ_WRITE> FrontAxisLenght;
+
+	float getRearAxisLenght();
+	void  setRearAxisLenght(float value);
+	Property<Vehicle,float,READ_WRITE> RearAxisLenght;
+
+	float getBetaFront();
+	void  setBetaFront(float value);
+	Property<Vehicle,float,READ_WRITE> BetaFront;
+
+	float getBetaRear();
+	void  setBetaRear(float value);
+	Property<Vehicle,float,READ_WRITE> BetaRear;
 	/* ACC */
 	float getTargetAccelerationACC();
 	void  setTargetAccelerationACC(float value);
@@ -232,6 +274,23 @@ public:
 	void    setEMS_QEC_ACC(uint8_t value);
 	Property<Vehicle,uint8_t,READ_WRITE> EMS_QEC_ACC;
 private:
+	/*** the vehicle body information ***/
+	// Lenght
+	float _wheelbase_lenght;
+	float _front_overhang_distance;
+	float _rear_overhang_distance;
+
+	// width
+	float _wheel_axis_width;
+	float _wheel_axis_width_half;
+	float _wheel_edge_distance;
+
+	// the vehice four edge point calculate
+	float _front_axis_lenght;
+	float _rear_axis_lenght;
+	float _beta_front;
+	float _beta_rear;
+
 	/*** State Machine ***/
 	/// steering angle control state machine
 	uint8_t _steering_angle_Control_state;
