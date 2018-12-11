@@ -13,6 +13,7 @@
 #include "math.h"
 #include "can.h"
 #include "uart.h"
+#include "gpio.h"
 #include "PID.h"
 
 #define V_KM_H 0.05625
@@ -42,6 +43,7 @@ public:
 	// Steering Angle control state machine
 	void SteeringAngleControlStateMachine();
 	void SteeringAngleControlStateMachineDelay();
+	void SteeringAngleControlStateMachineGpio();
 	/*** Variabel Property ***/
 	/* the vehicle body information */
 	// Lenght
