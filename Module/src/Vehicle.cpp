@@ -10,6 +10,7 @@
 Vehicle::Vehicle()
 {
 	// TODO Auto-generated constructor stub
+	_steering_angle_control_state = 0;
 	/*** the vehicle body information ***/
 	// Lenght
 	_wheelbase_lenght = 2.65;
@@ -258,6 +259,7 @@ Vehicle::Vehicle()
 Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):PID(dt,kp,ki,kd,i_lim,out_lim)
 {
 	// TODO Auto-generated constructor stub
+	_steering_angle_control_state = 0;
 	/*** the vehicle body information ***/
 	// Lenght
 	_wheelbase_lenght = 2.65;
@@ -506,6 +508,7 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):
 Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold):PID(dt,kp,ki,kd,i_lim,out_lim,threshold)
 {
  	// TODO Auto-generated constructor stub
+	_steering_angle_control_state = 0;
 	/*** the vehicle body information ***/
 	// Lenght
 	_wheelbase_lenght = 2.65;
@@ -1404,44 +1407,82 @@ void Vehicle::VehicleSpeedControl(float pid_output)
 
 void Vehicle::SteeringAngleControlStateMachine()
 {
-	switch(_steering_angle_Control_state)
+	switch(_steering_angle_control_state)
 	{
 		case 0:
 			if(!_apa_epas_failed)
 			{
-				_steering_angle_Control_state = 1;
+				_steering_angle_control_state = 1;
 			}
 			break;
 
 		case 1:
 			if(_apa_control_feedback)
 			{
-				_steering_angle_Control_state = 2;
+				_steering_angle_control_state = 2;
 			}
 			if(_apa_epas_failed)
 			{
-				_steering_angle_Control_state = 0;
+				_steering_angle_control_state = 0;
 			}
 			break;
 
 		case 2:
 			_steering_angle_target_active = 2;
-			_steering_angle_Control_state = 3;
+			_steering_angle_control_state = 3;
 			break;
 
 		case 3:
 			if(!_apa_control_feedback)
 			{
-				_steering_angle_Control_state = 0;
+				_steering_angle_control_state = 0;
 			}
 			if(_apa_epas_failed)
 			{
-				_steering_angle_Control_state = 0;
+				_steering_angle_control_state = 0;
 			}
 			break;
 
 		default:
-			_steering_angle_Control_state = 0;
+			_steering_angle_control_state = 0;
+			break;
+	}
+}
+
+void Vehicle::SteeringAngleControlStateMachineDelay()
+{
+	switch(_steering_angle_control_state)
+	{
+		case 0:
+			if(_steering_angle_target_active == 1)
+			{
+				_steering_angle_control_state = 1;
+				_steering_angle_active_cnt = 0;
+			}
+			break;
+
+		case 1:
+			if(_steering_angle_active_cnt >= 2)
+			{
+				_steering_angle_control_state = 2;
+			}
+			_steering_angle_active_cnt++;
+			break;
+
+		case 2:
+			_steering_angle_target_active = 2;
+			_steering_angle_control_state = 3;
+			break;
+
+		case 3:
+			if(_steering_angle_target_active == 0)
+			{
+				_steering_angle_control_state = 0;
+			}
+			break;
+
+		default:
+			_steering_angle_control_state = 0;
 			break;
 	}
 }
