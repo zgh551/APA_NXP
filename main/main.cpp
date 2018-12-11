@@ -61,26 +61,10 @@ int main()
    LED_RED = 1;
    LED_GREEN = 1;
    LED_BLUE = 1;
-   LED_STA = 0;
+
    /* Loop forever */
    for(;;)
    {
-	   if(m_Terminal_CA.APA_ControlFeedback == 1)
-	   {
-		   LED_RED = 1;
-		   LED_GREEN = 0;
-		   LED_BLUE = 1;
-
-		   LED_STA = 1;
-	   }
-	   else
-	   {
-		   LED_RED = 0;
-		   LED_GREEN = 1;
-		   LED_BLUE = 1;
-
-		   LED_STA = 0;
-	   }
 //		if(TerminalSendFlag)
 //		{
 //			m_Terminal_CA.TerminalControlCommandSend();
