@@ -1,7 +1,7 @@
 /*
  * Terminal.cpp
  *
- *  Created on: 2018Äê12ÔÂ6ÈÕ
+ *  Created on: 2018ï¿½ï¿½12ï¿½ï¿½6ï¿½ï¿½
  *      Author: zhuguohua
  */
 
@@ -130,7 +130,6 @@ void Terminal::VehicleInformation(vuint32_t id,vuint8_t dat[])
 			TorqueSensorStatus = (uint8_t)( dat[1] & 0x01 );
 			APA_ControlFeedback = (uint8_t)((dat[3] >> 5) & 0x01);
 			SteeringTorque = (float)(dat[2] * 0.1794 - 22.78);
-			SteeringAngleControlStateMachine();
 			break;
 
 		case 0x208:// wheel speed
@@ -309,7 +308,7 @@ void Terminal::TerminalControlCommandReceive(uint8_t data)
 					break;
 
 				case 0x4A:
-					// TODO ÁÙÊ±ÐÞ¸Ä
+					// TODO ï¿½ï¿½Ê±ï¿½Þ¸ï¿½
 					WorkingModule = _data_buffer[0];
 					FunctionStatus = _data_buffer[1];
 					break;
@@ -347,7 +346,7 @@ void Terminal::TerminalControlCommandReceive(uint8_t data)
 						{
 							_data_temp.b[3-i] = _data_buffer[i + 6];
 						}
-						TargetAccelerationACC = _data_temp.f;						
+						TargetAccelerationACC = _data_temp.f;
 					}
 					/// Target Vehicle Speed Value
 					VehicleSpeedTarget = _data_buffer[10]*0.01;
@@ -482,7 +481,7 @@ void Terminal::TerminalSystemStateSend(void)
 	_send_data_buffer[1] = 0x80;
 	_send_data_buffer[2] = 0xA5;
 	_send_data_buffer[3] = 3;
-	// TODO ÁÙÊ±ÐÞ¸Ä
+	// TODO ï¿½ï¿½Ê±ï¿½Þ¸ï¿½
 	_send_data_buffer[4] = WorkingModule;
 	_send_data_buffer[5] = FunctionStatus;
 
