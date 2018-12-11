@@ -65,6 +65,16 @@ int main()
    /* Loop forever */
    for(;;)
    {
+	   if(EXTERN_LEVEL)
+	   {
+		   LED_RED = LED_OFF;
+		   LED_GREEN = LED_ON;
+	   }
+	   else
+	   {
+		   LED_RED = LED_ON;
+		   LED_GREEN = LED_OFF;
+	   }
 //		if(TerminalSendFlag)
 //		{
 //			m_Terminal_CA.TerminalControlCommandSend();
