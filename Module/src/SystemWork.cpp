@@ -1,7 +1,7 @@
 /*
  * SystemWork.cpp
  *
- *  Created on: 2018Äê12ÔÂ5ÈÕ
+ *  Created on: 2018ï¿½ï¿½12ï¿½ï¿½5ï¿½ï¿½
  *      Author: zhuguohua
  */
 
@@ -111,6 +111,8 @@ void SystemWork::SystemWorkState(void)
 void SystemWork::DubugStataMahine(void)
 {
 	VehicleContorl();//vehicle control commond
+	// SteeringAngleControlStateMachine();// steering angle active
+	SteeringAngleControlStateMachineDelay();// steering angle active
 	SteeringAngleControl(0.02);// steering angle control
 	switch((DubugState)_function_status)
 	{
