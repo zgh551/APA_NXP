@@ -46,6 +46,10 @@ void initGPIO(void)
 	SIUL2.MSCR[PF13].B.OBE = 0;          /* Output Buffer Enable off */
 	SIUL2.MSCR[PF13].B.IBE = 1;			/* Input Buffer Enable on */
 
+	SIUL2.MSCR[PC1].B.SSS = 0;			/* Pin functionality as GPIO */
+	SIUL2.MSCR[PC1].B.OBE = 0;          /* Output Buffer Enable off */
+	SIUL2.MSCR[PC1].B.IBE = 1;			/* Input Buffer Enable on */
+
 /* General purpose output pins for test: */
 	SIUL2.MSCR[PC10].B.SSS = 0;			/* PG7: Pin functionality as GPIO */
 	SIUL2.MSCR[PC10].B.OBE = 1;          /* Output Buffer Enable on */

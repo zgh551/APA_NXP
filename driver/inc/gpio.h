@@ -31,10 +31,7 @@ extern "C" {
 #define LED_BLUE  SIUL2.GPDO[PC13].B.PDO
 #define LED_STA   SIUL2.GPDO[PA0].B.PDO
 
-#define BTN1 SIUL2.GPDI[1].B.PDI_4n
-#define BTN2 SIUL2.GPDI[2].B.PDI_4n
-#define BTN3 SIUL2.GPDI[89].B.PDI_4n
-#define BTN4 SIUL2.GPDI[91].B.PDI_4n
+#define EXTERN_LEVEL SIUL2.GPDI[PC1].B.PDI
 
 #define LED_ON 0
 #define LED_OFF 1
