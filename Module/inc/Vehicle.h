@@ -41,7 +41,7 @@ public:
 
 	// Steering Angle control state machine
 	void SteeringAngleControlStateMachine();
-
+	void SteeringAngleControlStateMachineDelay();
 	/*** Variabel Property ***/
 	/* the vehicle body information */
 	// Lenght
@@ -274,6 +274,7 @@ public:
 	void    setEMS_QEC_ACC(uint8_t value);
 	Property<Vehicle,uint8_t,READ_WRITE> EMS_QEC_ACC;
 private:
+	uint8_t _steering_angle_active_cnt;
 	/*** the vehicle body information ***/
 	// Lenght
 	float _wheelbase_lenght;
@@ -293,7 +294,7 @@ private:
 
 	/*** State Machine ***/
 	/// steering angle control state machine
-	uint8_t _steering_angle_Control_state;
+	uint8_t _steering_angle_control_state;
 
 	/*** Send to Vehicle Messege ***/
 	/* Roolling Counter */
