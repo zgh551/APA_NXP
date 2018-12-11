@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#define NXP_DemoBoard 0
+#define MotovisBoard_V1 1
 typedef struct _CAN_Packet
 {
 	uint32_t id;
