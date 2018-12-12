@@ -110,7 +110,7 @@ void SystemWork::SystemWorkState(void)
 
 void SystemWork::DubugStataMahine(void)
 {
-	// VehicleContorl();//vehicle control commond
+	 VehicleContorl();//vehicle control commond
 	// SteeringAngleControlStateMachine();// steering angle active
 	SteeringAngleControlStateMachineDelay();// steering angle active
 	// SteeringAngleControlStateMachineGpio();// steering angle active
