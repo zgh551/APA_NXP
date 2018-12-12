@@ -20,6 +20,7 @@ void dummy 						  (void);
 extern void PIT0_isr(void);
 extern void FlexCAN0_Isr(void);
 extern void FlexCAN1_Isr(void);
+extern void FlexCAN2_Isr(void);
 extern void FlexLin1_Uart_Isr(void);
 /*========================================================================*/
 /*	GLOBAL VARIABLES						                              */
@@ -582,7 +583,7 @@ const uint32_t __attribute__ ((section (".intc_vector_table"))) IntcIsrVectorTab
 (uint32_t) &dummy, /* Vector # 547 FLEXCAN_ESR_BOFF | FLEXCAN_Transmit_Warning | FLEXCAN_Receive_Warning FlexCAN_2 */
 (uint32_t) &dummy, /* Vector # 548 FLEXCAN_BUF_00_03 FlexCAN_2 */
 (uint32_t) &dummy, /* Vector # 549 FLEXCAN_BUF_04_07 FlexCAN_2 */
-(uint32_t) &dummy, /* Vector # 550 FLEXCAN_BUF_08_11 FlexCAN_2 */
+(uint32_t) &FlexCAN2_Isr, /* Vector # 550 FLEXCAN_BUF_08_11 FlexCAN_2 */
 (uint32_t) &dummy, /* Vector # 551 FLEXCAN_BUF_12_15 FlexCAN_2 */
 (uint32_t) &dummy, /* Vector # 552 FLEXCAN_BUF_16_31 FlexCAN_2 */
 (uint32_t) &dummy, /* Vector # 553 FLEXCAN_BUF_32_39 FlexCAN_2 */
