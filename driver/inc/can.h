@@ -29,6 +29,8 @@ void FlexCAN0_Init(void);
 void ReceiveMsg (void);
 
 void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet);
+void CAN1_TransmitMsg(CAN_Packet m_CAN_Packet);
+void CAN2_TransmitMsg(CAN_Packet m_CAN_Packet);
 
 #ifdef __cplusplus
 }
