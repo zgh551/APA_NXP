@@ -16,9 +16,10 @@
 *********************************************************************************************/
 void initGPIO(void)
 {
+	#ifdef DEVKIT_MPC5744P
 	/* LEDS on DEVKIT-MPC5744P */
 	SIUL2.MSCR[PC11].B.SSS = 0;			/* Pin functionality as GPIO */
-	SIUL2.MSCR[PC11].B.OBE = 1;          /* Output Buffer Enable on */
+	SIUL2.MSCR[PC11].B.OBE = 1;     /* Output Buffer Enable on */
 	SIUL2.MSCR[PC11].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PC11].B.PDO = 1;			/* Turn LED off, note that the LEDs are connected backwards 0 for ON, 1 for OFF */
 
@@ -28,7 +29,7 @@ void initGPIO(void)
 	SIUL2.GPDO[PC12].B.PDO = 1;			/* Turn LED off, note that the LEDs are connected backwards 0 for ON, 1 for OFF */
 
 	SIUL2.MSCR[PC13].B.SSS = 0;			/* Pin functionality as GPIO */
-	SIUL2.MSCR[PC13].B.OBE = 1;          /* Output Buffer Enable on */
+	SIUL2.MSCR[PC13].B.OBE = 1;     /* Output Buffer Enable on */
 	SIUL2.MSCR[PC13].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PC13].B.PDO = 1;			/* Turn LED off, note that the LEDs are connected backwards 0 for ON, 1 for OFF */
 
@@ -39,28 +40,60 @@ void initGPIO(void)
 
 	/* Buttons on DEVKIT-MPC5744P */
 	SIUL2.MSCR[PF12].B.SSS = 0;			/* Pin functionality as GPIO */
-	SIUL2.MSCR[PF12].B.OBE = 0;          /* Output Buffer Enable off */
+	SIUL2.MSCR[PF12].B.OBE = 0;     /* Output Buffer Enable off */
 	SIUL2.MSCR[PF12].B.IBE = 1;			/* Input Buffer Enable on */
 
 	SIUL2.MSCR[PF13].B.SSS = 0;			/* Pin functionality as GPIO */
-	SIUL2.MSCR[PF13].B.OBE = 0;          /* Output Buffer Enable off */
+	SIUL2.MSCR[PF13].B.OBE = 0;     /* Output Buffer Enable off */
 	SIUL2.MSCR[PF13].B.IBE = 1;			/* Input Buffer Enable on */
 
 	SIUL2.MSCR[PC1].B.SSS = 0;			/* Pin functionality as GPIO */
-	SIUL2.MSCR[PC1].B.OBE = 0;          /* Output Buffer Enable off */
+	SIUL2.MSCR[PC1].B.OBE = 0;      /* Output Buffer Enable off */
 	SIUL2.MSCR[PC1].B.IBE = 1;			/* Input Buffer Enable on */
+	#endif
 
-/* General purpose output pins for test: */
-	SIUL2.MSCR[PC10].B.SSS = 0;			/* PG7: Pin functionality as GPIO */
-	SIUL2.MSCR[PC10].B.OBE = 1;          /* Output Buffer Enable on */
-	SIUL2.MSCR[PC10].B.IBE = 0;			/* Input Buffer Enable off */
-	SIUL2.GPDO[PC10].B.PDO = 0;			/* Inialize low */
+	#ifdef MotovisBoard_V1
+	/* CAN Module Configure */
+	/// CAN_0 Standby Control Pin
+	SIUL2.MSCR[PD2].B.SSS = 0;			/* PD2: Pin functionality as GPIO */
+	SIUL2.MSCR[PD2].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PD2].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PD2].B.PDO = 0;			/* Inialize low */
+  /// CAN_1 Standby Control Pin
+	SIUL2.MSCR[PD3].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PD3].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PD3].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PD3].B.PDO = 0;			/* Inialize low */
+	/// CAN_2 Standby Control Pin
+	SIUL2.MSCR[PC4].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PC4].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PC4].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PC4].B.PDO = 1;			/* Inialize Hight */
+	/// CAN_2 Enable Pin
+	SIUL2.MSCR[PC7].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PC7].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PC7].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PC7].B.PDO = 1;			/* Inialize Hight */
 
-	SIUL2.MSCR[PC14].B.SSS = 0;			/* PG8: Pin functionality as GPIO */
-	SIUL2.MSCR[PC14].B.OBE = 1;          /* Output Buffer Enable on */
-	SIUL2.MSCR[PC14].B.IBE = 0;			/* Input Buffer Enable off */
-	SIUL2.GPDO[PC14].B.PDO = 0;			/* Inialize low */
+	/* LINFlexD Module Configure */
+	/// LINFlexD0 Sleep Control Pin
+	SIUL2.MSCR[PD0].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PD0].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PD0].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PD0].B.PDO = 1;			/* Inialize Hight */
+	/// LINFlexD1 Sleep Control Pin
+	SIUL2.MSCR[PD1].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PD1].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PD1].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PD1].B.PDO = 1;			/* Inialize Hight */
 
+	/* System Status LED Configure */
+	/// LED Control Pin
+	SIUL2.MSCR[PG5].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PG5].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PG5].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PG5].B.PDO = 1;			/* Inialize low */
+	#endif
 }
 
 void GPIO_toggle(uint16_t GPIO, uint32_t TOGGLES, uint32_t DELAY)

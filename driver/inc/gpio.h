@@ -26,12 +26,21 @@ extern "C" {
 /**********************************************************************************************
 * Macros
 **********************************************************************************************/
+#ifdef DEVKIT_MPC5744P
+/// DEVKIT_MPC5744P
 #define LED_RED   SIUL2.GPDO[PC11].B.PDO
 #define LED_GREEN SIUL2.GPDO[PC12].B.PDO
 #define LED_BLUE  SIUL2.GPDO[PC13].B.PDO
 #define LED_STA   SIUL2.GPDO[PA0].B.PDO
 
 #define EXTERN_LEVEL SIUL2.GPDI[PC1].B.PDI
+#endif
+
+#ifdef MotovisBoard_V1
+/// MotovisBoard_V1
+#define SYSTEM_LED SIUL2.GPDO[PG5].B.PDO
+
+#endif
 
 #define LED_ON 0
 #define LED_OFF 1
