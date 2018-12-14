@@ -12,8 +12,8 @@
 /* 0.1    R. Moran       10/12/2008    Initial Version                    */
 /* 1.1    K. Zemskov     24/02/2016    GHS support                        */
 /**************************************************************************/
-#include "../inc/compiler_api.h"
-#include "../inc/derivative.h" /* include peripheral declarations */
+#include "compiler_api.h"
+#include "derivative.h" /* include peripheral declarations */
 
 #define GetCoreID() ((uint16_t) MFSPR(286))
 

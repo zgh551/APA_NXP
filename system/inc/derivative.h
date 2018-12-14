@@ -4,4 +4,4 @@
  */
 
 /* Include the derivative-specific header file */
-#include "../../system/inc/MPC5744P.h"
+#include "MPC5744P.h"
