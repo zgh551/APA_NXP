@@ -41,6 +41,7 @@
 									<listOptionValue builtIn="false" value="START_FROM_FLASH"/>
 									<listOptionValue builtIn="false" value="_EWL_CONSOLE_SUPPORT"/>
 									<listOptionValue builtIn="false" value="MPC574xP"/>
+									<listOptionValue builtIn="false" value="MotovisBoard_V1"/>
 								</option>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.2113431149" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot.398132065" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
@@ -71,6 +72,7 @@
 									<listOptionValue builtIn="false" value="START_FROM_FLASH"/>
 									<listOptionValue builtIn="false" value="_EWL_CONSOLE_SUPPORT"/>
 									<listOptionValue builtIn="false" value="MPC574xP"/>
+									<listOptionValue builtIn="false" value="MotovisBoard_V1"/>
 								</option>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.827683184" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot.18179765" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
@@ -388,6 +390,7 @@
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1668081509" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MPC574xP"/>
 									<listOptionValue builtIn="false" value="_EWL_CONSOLE_SUPPORT"/>
+									<listOptionValue builtIn="false" value="MotovisBoard_V1"/>
 								</option>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.1226684377" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot.149753627" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
@@ -415,6 +418,7 @@
 								<option id="com.freescale.s32ds.cross.gnu.tool.cpp.compiler.option.debugging.format.1143787182" name="Debug format" superClass="com.freescale.s32ds.cross.gnu.tool.cpp.compiler.option.debugging.format" useByScannerDiscovery="true"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.788298530" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MPC574xP"/>
+									<listOptionValue builtIn="false" value="MotovisBoard_V1"/>
 									<listOptionValue builtIn="false" value="_EWL_CONSOLE_SUPPORT"/>
 								</option>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.446083994" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.e200z4" valueType="enumerated"/>
