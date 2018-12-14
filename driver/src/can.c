@@ -17,7 +17,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   uint8_t	i;
 
   CAN_0.MCR.B.MDIS = 1;       /* Disable module before selecting clock source*/
-  CAN_0.CTRL1.B.CLKSRC=0;     /* Clock Source = oscillator clock (40 MHz) */
+  CAN_0.CTRL1.B.CLKSRC= 1;     /* Clock Source = peripheral clock (40 MHz) */
   CAN_0.MCR.B.MDIS = 0;       /* Enable module for config. (Sets FRZ, HALT)*/
   while (!CAN_0.MCR.B.FRZACK) {} /* Wait for freeze acknowledge to set */
 	/* CAN bus: 40 MHz clksrc, 500K bps with 16 tq */
@@ -29,7 +29,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-  CAN_0.CTRL1.B.PRESDIV = 4;
+  CAN_0.CTRL1.B.PRESDIV = 0;
   CAN_0.CTRL1.B.PSEG1 = 3;
   CAN_0.CTRL1.B.PSEG2 = 3;
   CAN_0.CTRL1.B.RJW = 3;
@@ -91,7 +91,7 @@ void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-	CAN_1.CTRL1.B.PRESDIV = 4;
+	CAN_1.CTRL1.B.PRESDIV = 0;
 	CAN_1.CTRL1.B.PSEG1 = 3;
 	CAN_1.CTRL1.B.PSEG2 = 3;
 	CAN_1.CTRL1.B.RJW = 3;
@@ -151,7 +151,7 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-	CAN_2.CTRL1.B.PRESDIV = 4;
+	CAN_2.CTRL1.B.PRESDIV = 0;
 	CAN_2.CTRL1.B.PSEG1 = 3;
 	CAN_2.CTRL1.B.PSEG2 = 3;
 	CAN_2.CTRL1.B.RJW = 3;
@@ -178,13 +178,13 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	}
 
 	/* Configure the CAN2_TX pin to transmit. */
-	SIUL2.MSCR[PF14].B.SSS = 1; //PTF14 is for CAN2_TX. Select signal source select to CAN2_TX
+	SIUL2.MSCR[PF14].B.SSS = 2; //PTF14 is for CAN2_TX. Select signal source select to CAN2_TX
 	SIUL2.MSCR[PF14].B.OBE = 1; //Set pin to output. Enable output buffer
-	SIUL2.MSCR[PF14].B.SRC = 2; //Maximum slew rate
+	SIUL2.MSCR[PF14].B.SRC = 3; //Maximum slew rate
 
 	/* Configure the CAN2_RX pin. */
 	SIUL2.MSCR[PF15].B.IBE = 1; //PF15 is CAN2_RX pin. Enable input buffer
-	SIUL2.IMCR[33].B.SSS = 0b0001; //Set PF15 as CAN2_RX.
+	SIUL2.IMCR[34].B.SSS = 0b0001; //Set PF15 as CAN2_RX.
 
 	//  CAN_2.MCR.B.AEN = 1;
 	CAN_2.MCR.B.MAXMB = 0x3f;

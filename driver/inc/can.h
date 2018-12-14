@@ -25,6 +25,8 @@ typedef struct _CAN_Packet
 }CAN_Packet;
 
 void FlexCAN0_Init(void);
+void FlexCAN1_Init(void);
+void FlexCAN2_Init(void);
 
 void ReceiveMsg (void);
 
