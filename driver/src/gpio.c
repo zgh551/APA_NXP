@@ -92,7 +92,7 @@ void initGPIO(void)
 	SIUL2.MSCR[PG5].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
 	SIUL2.MSCR[PG5].B.OBE = 1;      /* Output Buffer Enable on */
 	SIUL2.MSCR[PG5].B.IBE = 0;			/* Input Buffer Enable off */
-	SIUL2.GPDO[PG5].B.PDO = 1;			/* Inialize low */
+	SIUL2.GPDO[PG5].B.PDO = 1;			/* Inialize Hight */
 	#endif
 }
 
