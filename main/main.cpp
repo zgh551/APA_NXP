@@ -3,31 +3,25 @@
  *
  */
 #include <math.h>
+#include "derivative.h" /* include peripheral declarations */
+#include "mode_entry.h"
 //#include "SystemWork.h"
 #include "PathPlanning.h"
 #include "Terminal.h"
-#include "mode_entry.h"
 #include "can.h"
 #include "pit.h"
 #include "uart.h"
 #include "gpio.h"
-#include "derivative.h" /* include peripheral declarations */
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 extern void xcptn_xmpl(void);
-
 #ifdef __cplusplus
 }
 #endif
 
-void peri_clock_gating(void);
-
 Terminal m_Terminal_CA = Terminal(0.02,3.5,0.1,0.1,0.3,1,0.1);
-
 vuint8_t cnt;
 bool TerminalSendFlag = false;
 float temp;
@@ -35,19 +29,28 @@ float temp;
 __attribute__ ((section(".text")))
 int main()
 {
-  xcptn_xmpl();	/* Configure and Enable Interrupts */
-  peri_clock_gating();
-  system160mhz();	/* sysclk=160MHz, dividers configured, mode trans*/
+  /* Configure and Enable Interrupts */
+  xcptn_xmpl();
+
+  /* Gate the peripheral clock */
+  PeripheralClockGating();
+
+  /* sysclk=200MHz, dividers configured, mode trans*/
+  System200Mhz();
+
   // Init the GPIO
   initGPIO();
-  // Flex CAN0
-  FlexCAN0_Init();
 
-  // Flex Lin1 Uart
+  // Init  CAN Flex Module
+  FlexCAN0_Init();
+  FlexCAN1_Init();
+  FlexCAN2_Init();
+
+  // Init Flex Lin1 Uart used to communication with terminal pc
   FlexLin1_Uart_Buffer_Init(80,38400);
 //    FlexLin1_Uart_FIFO_Init(80,19200);
 
-  // PIT0
+  // Init the PIT0
   PIT_0.MCR.B.MDIS = 0; /* Enable PIT module. NOTE: PIT module must be       */
                         /* enabled BEFORE writing to it's registers.         */
                         /* Other cores will write to PIT registers so the    */
@@ -75,17 +78,6 @@ int main()
 //			m_Terminal_CA.AckValid = 0;
 //		}
   }
-}
-
-void peri_clock_gating(void)
-{
-  MC_ME.RUN_PC[0].R = 0x00000000;  /* gate off clock for all RUN modes */
-  MC_ME.RUN_PC[1].R = 0x000000FE;  /* config. peri clock for all RUN modes */
-
-  MC_ME.PCTL79.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
-  MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
-  MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1]. No LINFlex_D_2 on Panther
-  MC_ME.PCTL146.B.RUN_CFG = 0b001; //DMAMUX_1:
 }
 
 #ifdef __cplusplus
