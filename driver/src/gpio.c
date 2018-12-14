@@ -65,12 +65,17 @@ void initGPIO(void)
 	SIUL2.MSCR[PD3].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PD3].B.PDO = 0;			/* Inialize low */
 	/// CAN_2 Standby Control Pin
-	SIUL2.MSCR[PC4].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PC4].B.SSS = 0;			/* PC4: Pin functionality as GPIO */
 	SIUL2.MSCR[PC4].B.OBE = 1;      /* Output Buffer Enable on */
 	SIUL2.MSCR[PC4].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PC4].B.PDO = 1;			/* Inialize Hight */
+	/// CAN_2 WAKE Pin
+	// SIUL2.MSCR[PC6].B.SSS = 0;			/* PC6: Pin functionality as GPIO */
+	// SIUL2.MSCR[PC6].B.OBE = 1;      /* Output Buffer Enable on */
+	// SIUL2.MSCR[PC6].B.IBE = 0;			/* Input Buffer Enable off */
+	// SIUL2.GPDO[PC6].B.PDO = 0;			/* Inialize Low */
 	/// CAN_2 Enable Pin
-	SIUL2.MSCR[PC7].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PC7].B.SSS = 0;			/* PC6: Pin functionality as GPIO */
 	SIUL2.MSCR[PC7].B.OBE = 1;      /* Output Buffer Enable on */
 	SIUL2.MSCR[PC7].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PC7].B.PDO = 1;			/* Inialize Hight */

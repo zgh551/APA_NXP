@@ -39,7 +39,7 @@ extern "C" {
 #ifdef MotovisBoard_V1
 /// MotovisBoard_V1
 #define SYSTEM_LED SIUL2.GPDO[PG5].B.PDO
-
+// #define CAN_WAKE   SIUL2.GPDO[PC6].B.PDO
 #endif
 
 #define LED_ON 0
