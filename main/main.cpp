@@ -58,23 +58,10 @@ int main()
    /*        = 0.8M x 4 / 160M = 3.2/160 = 0.02 sec.  */
    PIT_0.MCR.B.FRZ = 0; //Unfreeze timers
 
-   LED_RED = 1;
-   LED_GREEN = 1;
-   LED_BLUE = 1;
-
    /* Loop forever */
    for(;;)
    {
-	   if(EXTERN_LEVEL)
-	   {
-		   LED_RED = LED_OFF;
-		   LED_GREEN = LED_ON;
-	   }
-	   else
-	   {
-		   LED_RED = LED_ON;
-		   LED_GREEN = LED_OFF;
-	   }
+//     SYSTEM_LED = LED_ON;
 //		if(TerminalSendFlag)
 //		{
 //			m_Terminal_CA.TerminalControlCommandSend();
@@ -139,6 +126,17 @@ void FlexCAN1_Isr(void)
 	}
 }
 
+void FlexCAN2_Isr(void)
+{
+	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
+	{
+		m_Terminal_CA.VehicleInformation(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B);
+		/* release the internal lock for all Rx MBs
+		 * by reading the TIMER */
+		uint32_t temp = CAN_2.TIMER.R;
+		CAN_2.IFLAG1.R = 0x00000100;
+	}
+}
 void FlexLin1_Uart_Isr(void)
 {
 	m_Terminal_CA.TerminalControlCommandReceive(LINFlexD_1.BDRM.B.DATA4);
