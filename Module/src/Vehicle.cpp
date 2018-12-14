@@ -1295,6 +1295,8 @@ void Vehicle::VehicleContorlStep1()
 	m_CAN_Packet.data[6] = (uint8_t)((_current_steering_angle_target >> 8) & 0xFF);
 	m_CAN_Packet.data[7] = (uint8_t)((_current_steering_angle_target     ) & 0xFF);
 	CAN0_TransmitMsg(m_CAN_Packet);
+	CAN1_TransmitMsg(m_CAN_Packet);
+	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
 void Vehicle::VehicleContorlStep2()
