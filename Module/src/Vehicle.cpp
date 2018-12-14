@@ -1487,42 +1487,42 @@ void Vehicle::SteeringAngleControlStateMachineDelay()
 	}
 }
 
-void Vehicle::SteeringAngleControlStateMachineGpio()
-{
-	switch(_steering_angle_control_state)
-	{
-		case 0:
-			if(_steering_angle_target_active == 1)
-			{
-				_steering_angle_control_state = 1;
-			}
-			break;
-
-		case 1:
-			if(EXTERN_LEVEL)
-			{
-				_steering_angle_control_state = 2;
-			}
-			break;
-
-		case 2:
-			_steering_angle_target_active = 2;
-			_steering_angle_control_state = 3;
-			break;
-
-		case 3:
-			if(_steering_angle_target_active == 0)
-			{
-				_steering_angle_control_state = 0;
-			}
-			if(!EXTERN_LEVEL)
-			{
-				_steering_angle_control_state = 0;
-			}
-			break;
-
-		default:
-			_steering_angle_control_state = 0;
-			break;
-	}
-}
+//void Vehicle::SteeringAngleControlStateMachineGpio()
+//{
+//	switch(_steering_angle_control_state)
+//	{
+//		case 0:
+//			if(_steering_angle_target_active == 1)
+//			{
+//				_steering_angle_control_state = 1;
+//			}
+//			break;
+//
+//		case 1:
+//			if(EXTERN_LEVEL)
+//			{
+//				_steering_angle_control_state = 2;
+//			}
+//			break;
+//
+//		case 2:
+//			_steering_angle_target_active = 2;
+//			_steering_angle_control_state = 3;
+//			break;
+//
+//		case 3:
+//			if(_steering_angle_target_active == 0)
+//			{
+//				_steering_angle_control_state = 0;
+//			}
+//			if(!EXTERN_LEVEL)
+//			{
+//				_steering_angle_control_state = 0;
+//			}
+//			break;
+//
+//		default:
+//			_steering_angle_control_state = 0;
+//			break;
+//	}
+//}
