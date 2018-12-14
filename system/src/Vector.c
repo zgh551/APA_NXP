@@ -7,7 +7,7 @@
 /* This file starts in memory at the beginning of the                     */
 /*".core_exceptions_table" section.                                       */
 /**************************************************************************/
-#include "../inc/compiler_api.h"
+#include "compiler_api.h"
 
 #define PPCASMF(x) PPCASM (" " tostring(x) " ")
 #define PPCASMF2(x,x1) PPCASM (" " tostring(x) "," tostring(x1) " ")
