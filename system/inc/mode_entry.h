@@ -12,15 +12,11 @@
 extern "C" {
 #endif
 
-void PLL_160MHz();
-
-void system160mhz();
-
-void enter_STOP_mode();
+void System200Mhz(void);
+void PeripheralClockGating(void);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* MODE_ENTRY_H_ */
-
