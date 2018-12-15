@@ -1,26 +1,28 @@
 /*
- * pit.c
+ * linflexd.c
  *
- *  Created on: Feb 25, 2016
- *      Author: B55457
+ *  Created on: December 14, 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: linflexd.c                   COPYRIGHT (c) Motovis 2018      */
 
+/*                                                      All Rights Reserved  */
+/* DESCRIPTION: Transmit & receive LIN messages using LINflexD modules.      */
+/*  - LINFlexD_1 module divides its 80 MHz LIN_CLK input to get 10.417K baud.*/
+/*  - Transmit function sends 'hello   ' as 8 bytes with ID 0x35.            */
+/*  - Receive function requests data from slave with ID 0x35. An external    */
+/*    node or LIN tool is needed complete reception.  Without the node or    */
+/*    tool, code will wait forever for the receive flag.                     */
+/*                                                                           */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     December 14 2018    Initial Version                  */
+/*****************************************************************************/
 
 #include "pit.h"
 
-/*****************************************************************************/
-/* peri_clock_gating                                                         */
-/* Description: Configures enabling clocks to peri modules or gating them off*/
-/*              Default PCTL[RUN_CFG]=0, so by default RUN_PC[0] is selected.*/
-/*              RUN_PC[0] is configured here to gate off all clocks.         */
-/*****************************************************************************/
-
-//void peri_clock_gating (void) {
-//  MC_ME.RUN_PC[0].R = 0x00000000;  /* gate off clock for all RUN modes */
-//  MC_ME.RUN_PC[1].R = 0x000000FE;  /* config. peri clock for all RUN modes */
-//
-//  MC_ME.PCTL30.B.RUN_CFG = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
-//}
 
 void PIT0_init(uint32_t LDVAL) {
 	PIT_0.TIMER[0].LDVAL.R = LDVAL; /* Load # PIT clocks to count */
@@ -46,5 +48,3 @@ void PIT2_init(uint32_t LDVAL) {
 	INTC_0.PSR[228].R = 0x800B;
 	PIT_0.TIMER[2].TCTRL.B.TEN = 1; /* Enable channel */
 }
-
-
