@@ -115,11 +115,17 @@ void PeripheralClockGating(void)
   MC_ME.RUN_PC[0].R = 0x00000000;  /* gate off clock for all RUN modes */
   MC_ME.RUN_PC[1].R = 0x000000FE;  /* config. peri clock for all RUN modes */
 
-  MC_ME.PCTL77.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
-  MC_ME.PCTL78.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
+  /// CAN Module
+  MC_ME.PCTL77.B.RUN_CFG  = 0b001; //FlexCAN 2: select peripheral config RUN_PC[1]
+  MC_ME.PCTL78.B.RUN_CFG  = 0b001; //FlexCAN 1: select peripheral config RUN_PC[1]
   MC_ME.PCTL79.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
+  /// LIN Module
+  MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1].
+  MC_ME.PCTL204.B.RUN_CFG = 0b001; //LINFlexD_0: Select peripheral config RUN_PC[1].
+  /// PIT time module
   MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
-  MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1]. No LINFlex_D_2 on Panther
+  /// DMA module
+  // MC_ME.PCTL36.B.RUN_CFG  = 0b001; //DMAMUX_0:
   MC_ME.PCTL146.B.RUN_CFG = 0b001; //DMAMUX_1:
 }
 
