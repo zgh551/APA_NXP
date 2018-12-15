@@ -1,16 +1,27 @@
 /*
  * uart.c
  *
- *  Created on: 2018Äê11ÔÂ20ÈÕ
- *      Author: zhuguohua
+ *  Created on: December 14, 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: uart.c                   COPYRIGHT (c) Motovis 2018      */
+
+/*                                                      All Rights Reserved  */
+/* DESCRIPTION: Init the Uart modules.      																 */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     December 14 2018    Initial Version                  */
+/*****************************************************************************/
+
 #include "uart.h"
 static vuint8_t  TransData[] = "Hello World"; /* Transmit string & CR*/
 vuint8_t  Receive_buffer[100];
-void FlexLin1_Uart_Buffer_Init( unsigned int MegaHertz, unsigned int BaudRate )
+
+void FlexLin1_Uart_Buffer_Init( uint16_t MegaHertz, uint16_t BaudRate )
 {
-	unsigned int Fraction;
-	unsigned int Integer;
+	uint16_t Fraction,Integer;
 	/* enter INIT mode */
 	LINFlexD_1.LINCR1.B.INIT = 1;     /* Enter Initialization Mode */
 	LINFlexD_1.LINCR1.B.SLEEP = 0;    /* Exit Sleep Mode */
@@ -61,10 +72,10 @@ void FlexLin1_Uart_Buffer_Init( unsigned int MegaHertz, unsigned int BaudRate )
 	INTC_0.PSR[380].R = 0x800C; //set priority and core for RX UART interrupt
 }
 
-void FlexLin1_Uart_FIFO_Init( unsigned int MegaHertz, unsigned int BaudRate )
+void FlexLin1_Uart_FIFO_Init( uint16_t MegaHertz, uint16_t BaudRate )
 {
-	unsigned int Fraction;
-	unsigned int Integer;
+	uint16_t Fraction,Integer;
+
     FlexLin1_DMA_TX_Init();
     FlexLin1_DMA_RX_Init();
 
@@ -261,4 +272,3 @@ void TransmitData(uint8_t dat)
 	while (1 != LINFlexD_1.UARTSR.B.DTFTFF) {}// Wait for data transmission completed flag
 	LINFlexD_1.UARTSR.R = 0x0002;// clear the DTF flag and not the other flags
 }
-
