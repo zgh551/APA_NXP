@@ -24,7 +24,7 @@
 
 #include "project.h"
 
-#ifdef DEVKIT_MPC5744P
+
 void PLL_160MHz(void)
 {
   /* Connect XOSC to PLL. We ultimately use the output of PLL1. PLL1 must be fed the output of PLL0 */
@@ -59,6 +59,7 @@ void PLL_160MHz(void)
   MC_ME.MCTL.R = 0x3000A50F;
   while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
 }
+#ifdef DEVKIT_MPC5744P
 #endif
 
 #ifdef MotovisBoard_V1
@@ -109,8 +110,8 @@ void System200Mhz(void)
   /* PBRIDGEx_CLK Divide */
   MC_CGM.SC_DC0.B.DIV = 3;  /* Freq = sysclk / (0+1) = sysclk */
   MC_CGM.SC_DC0.B.DE  = 1;  /* Enable divided clock */
-
-  PLL_200MHz();
+  PLL_160MHz();
+//  PLL_200MHz();
 }
 
 void PeripheralClockGating(void)
