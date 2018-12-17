@@ -71,39 +71,9 @@ int main()
 //   PIT_0.MCR.B.FRZ = 0; //Unfreeze timers
 
    /* Loop forever */
-//   m_LIN_Packet.id = 0x35;
-//   m_LIN_Packet.length = 8;
-//
-//   m_LIN_Packet.BufferData.B.Data0 = 0x1;
-//   m_LIN_Packet.BufferData.B.Data1 = 0x2;
-//   m_LIN_Packet.BufferData.B.Data2 = 0x3;
-//   m_LIN_Packet.BufferData.B.Data3 = 0x4;
-//   m_LIN_Packet.BufferData.B.Data4 = 0x5;
-//   m_LIN_Packet.BufferData.B.Data5 = 0x6;
-//   m_LIN_Packet.BufferData.B.Data6 = 0x7;
-//   m_LIN_Packet.BufferData.B.Data7 = 0x8;
-
-//   m_LIN_Packet.BufferData.L.B.Data0 = 0x1;
-//   m_LIN_Packet.BufferData.L.B.Data1 = 0x1;
-//   m_LIN_Packet.BufferData.L.B.Data2 = 0x1;
-//   m_LIN_Packet.BufferData.L.B.Data3 = 0x1;
-//   m_LIN_Packet.BufferData.M.B.Data4 = 0x1;
-//   m_LIN_Packet.BufferData.M.B.Data5 = 0x1;
-//   m_LIN_Packet.BufferData.M.B.Data6 = 0x1;
-
-//   m_LIN_Packet.BufferData.Data[0]=0x1;
-//   m_LIN_Packet.BufferData.Data[1]=0x2;
-//   m_LIN_Packet.BufferData.Data[2]=0x3;
-//   m_LIN_Packet.BufferData.Data[3]=0x4;
-//   m_LIN_Packet.BufferData.Data[4]=0x5;
-//   m_LIN_Packet.BufferData.Data[5]=0x6;
-//   m_LIN_Packet.BufferData.Data[6]=0x7;
-//   m_LIN_Packet.BufferData.Data[7]=0x8;
-
-//   LIN0_TransmitFrame(m_LIN_Packet);
    for(;;)
    {
-//     SYSTEM_LED = LED_ON;
+     SYSTEM_LED = LED_ON;
 //		if(TerminalSendFlag)
 //		{
 //			m_Terminal_CA.TerminalControlCommandSend();
