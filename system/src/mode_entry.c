@@ -69,8 +69,8 @@ void PLL_200MHz(void)
 
   MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
 
-  MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
-  MC_CGM.AC2_DC0.B.DIV = 4;// set the divider division value
+//  MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
+//  MC_CGM.AC2_DC0.B.DIV = 4;// set the divider division value
 
   /* Configure PLL0 Dividers - 200MHz from 8Mhx XOSC */
   /* PLL input = FXOSC = 8MHz
@@ -85,26 +85,29 @@ void PLL_200MHz(void)
    * 10/10 = 1, so same frequency as PLL0
    */
   PLLDIG.PLL1DV.B.RFDPHI = 16;
-  PLLDIG.PLL1DV.B.MFD = 32;
+  PLLDIG.PLL1DV.B.MFD = 16;
 
   /* Configure PLL0 to 200 MHz. */
-  PLLDIG.PLL0DV.B.RFDPHI1 = 4;
-  PLLDIG.PLL0DV.B.RFDPHI = 4;
-  PLLDIG.PLL0DV.B.PREDIV  = 1;
-  PLLDIG.PLL0DV.B.MFD     = 100;
+  PLLDIG.PLL0DV.B.RFDPHI1 = 4 ;
+  PLLDIG.PLL0DV.B.RFDPHI  = 4 ;
+  PLLDIG.PLL0DV.B.PREDIV  = 1 ;
+  PLLDIG.PLL0DV.B.MFD     = 32;
 
   /* switch to PLL */
   MC_ME.DRUN_MC.R = 0x00130072;
   MC_ME.MCTL.R = 0x30005AF0;
   MC_ME.MCTL.R = 0x3000A50F;
+  while(!MC_ME.GS.B.S_PLL0);      //ME_GS Wait for PLL stabilization.
   while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
+  // ME_GS Check DRUN mode has successfully been entered
+//  while(MC_ME.GS.B.S_CURRENT_MODE != DRUN_MODE);
 }
 #endif
 
 void System200Mhz(void)
 {
   /* PBRIDGEx_CLK Divide */
-  MC_CGM.SC_DC0.B.DIV = 4;  /* Freq = sysclk / (0+1) = sysclk */
+  MC_CGM.SC_DC0.B.DIV = 3;  /* Freq = sysclk / (0+1) = sysclk */
   MC_CGM.SC_DC0.B.DE  = 1;  /* Enable divided clock */
 
   PLL_200MHz();

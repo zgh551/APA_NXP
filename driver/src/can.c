@@ -29,7 +29,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-  CAN_0.CTRL1.B.PRESDIV = 0;
+  CAN_0.CTRL1.B.PRESDIV = 5;
   CAN_0.CTRL1.B.PSEG1 = 3;
   CAN_0.CTRL1.B.PSEG2 = 3;
   CAN_0.CTRL1.B.RJW = 3;
