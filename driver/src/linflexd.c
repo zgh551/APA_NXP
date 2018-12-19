@@ -30,21 +30,36 @@ void InitLINFlexD0 ( uint16_t MegaHertz, uint16_t BaudRate )
 {
   uint16_t Fraction,Integer;
 
-  LINFlexD_0.LINCR1.B.INIT = 1;    /* Put LINFlex hardware in init mode */
-  LINFlexD_0.LINCR1.R= 0x00000311; /* Configure module as LIN master & header */
+  LINFlexD_0.LINCR1.B.SLEEP = 0; /* Exit Sleep Mode */
+  LINFlexD_0.LINCR1.B.INIT = 1;  /* Put LINFlex hardware in init mode */
+  /* wait for the INIT mode */
+  while (0x1000 != (LINFlexD_0.LINSR.R & 0xF000)) {}
+
+//  LINFlexD_0.LINCR1.R= 0x00000311; /* Configure module as LIN master & header */
 
   BaudRate  = (MegaHertz * 1000000) / BaudRate;
   Integer   = BaudRate / 16;
   Fraction  = BaudRate - (Integer * 16);
 
   LINFlexD_0.LINIBRR.B.IBR= Integer;  /* Mantissa baud rate divider component */
-         /* Baud rate divider = 100 MHz LIN_CLK input / (16*10417K bps) ~=480 */
+         /* Baud rate divider = 100 MHz LIN_CLK input / (16*19200 bps) ~= 326 */
   LINFlexD_0.LINFBRR.B.FBR = Fraction; /* Fraction baud rate divider comonent */
+
+  LINFlexD_0.LINCR2.B.IOBE = 1;
+
+   LINFlexD_0.LINTCSR.B.MODE = 1;
+   LINFlexD_0.LINOCR.R = 0x0000ffff;
+   LINFlexD_0.LINTCSR.B.MODE = 0;
+   LINFlexD_0.LINTCSR.B.IOT = 1;
+
   LINFlexD_0.LINCR1.R= 0x00000310;  /* Change module mode from init to normal */
 
   /* Configure LINFlexD_0 TxD Pin. */
   SIUL2.MSCR[PB2].B.SSS = 0b0001; //Pad PB2: Set to LINFlex_0 TxD.
   SIUL2.MSCR[PB2].B.OBE = 1; //Enable output buffer
+  SIUL2.MSCR[PB2].B.ODE = 1;    /* Pad PB2: Output Drain Enable */
+  SIUL2.MSCR[PB2].B.PUS = 1;    /* Pad PB2: Pull up selected */
+  SIUL2.MSCR[PB2].B.PUE = 1;    /* Pad PB2: Pull Enable */
   SIUL2.MSCR[PB2].B.SRC = 3; //Full drive-strength without slew rate control
 
   /* Configure LINFlexD_0 RxD Pin. */
@@ -58,7 +73,7 @@ void LIN0_TransmitFrame (LIN_Packet m_LIN_Packet)
   LINFlexD_0.BDRM.R = m_LIN_Packet.BufferData.R.M;
 
   LINFlexD_0.BIDR.B.ID = m_LIN_Packet.id;
-  LINFlexD_0.BIDR.B.DFL = m_LIN_Packet.length;
+  LINFlexD_0.BIDR.B.DFL = m_LIN_Packet.length - 1;
   LINFlexD_0.BIDR.B.CCS = 0;
   LINFlexD_0.BIDR.B.DIR = 1;
   LINFlexD_0.LINCR2.B.HTRQ = 1;   /* Request header transmission */
@@ -70,7 +85,7 @@ void LIN0_TransmitFrame (LIN_Packet m_LIN_Packet)
 void LIN0_ReceiveFrame(LIN_Packet *m_LIN_Packet)
 {
   LINFlexD_0.BIDR.B.ID  = m_LIN_Packet->id;
-  LINFlexD_0.BIDR.B.DFL = m_LIN_Packet->length;
+  LINFlexD_0.BIDR.B.DFL = m_LIN_Packet->length - 1;
   LINFlexD_0.BIDR.B.CCS = 0;
   LINFlexD_0.BIDR.B.DIR = 0;// receive the data
   LINFlexD_0.LINCR2.B.HTRQ = 1;     /* Request header transmission */
