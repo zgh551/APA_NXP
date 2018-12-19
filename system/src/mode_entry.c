@@ -24,14 +24,37 @@
 
 #include "project.h"
 
+void PeripheralClockGating(void)
+{
+  MC_ME.RUN_PC[0].R = 0x00000000;  /* gate off clock for all RUN modes */
+  MC_ME.RUN_PC[1].R = 0x000000FE;  /* config. peri clock for all RUN modes */
+
+  /// CAN Module
+  MC_ME.PCTL77.B.RUN_CFG  = 0b001; //FlexCAN 2: select peripheral config RUN_PC[1]
+  MC_ME.PCTL78.B.RUN_CFG  = 0b001; //FlexCAN 1: select peripheral config RUN_PC[1]
+  MC_ME.PCTL79.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
+  /// LIN Module
+  MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1].
+  MC_ME.PCTL204.B.RUN_CFG = 0b001; //LINFlexD_0: Select peripheral config RUN_PC[1].
+  /// PIT time module
+  MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
+  /// DMA module
+  // MC_ME.PCTL36.B.RUN_CFG  = 0b001; //DMAMUX_0:
+  MC_ME.PCTL146.B.RUN_CFG = 0b001; //DMAMUX_1:
+}
 
 void PLL_160MHz(void)
 {
+  /* PBRIDGEx_CLK Divide */
+  MC_CGM.SC_DC0.B.DIV = 3;  /* Freq = sysclk / (0+1) = sysclk */
+  MC_CGM.SC_DC0.B.DE  = 1;  /* Enable divided clock */
+
   /* Connect XOSC to PLL. We ultimately use the output of PLL1. PLL1 must be fed the output of PLL0 */
   MC_CGM.AC3_SC.B.SELCTL = 1; //40 MHz XOSC selected as input of PLL0
 
   MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
 
+  PeripheralClockGating();
   /* Configure PLL0 Dividers - 160MHz from 40Mhx XOSC */
   /* PLL input = FXOSC = 40MHz
      VCO range = 600-1200MHz
@@ -44,8 +67,8 @@ void PLL_160MHz(void)
    * MFD multiplies input by at least 10. So multiply by 10 and divide by 10.
    * 10/10 = 1, so same frequency as PLL0
    */
-  PLLDIG.PLL1DV.B.RFDPHI = 10;
-  PLLDIG.PLL1DV.B.MFD = 10;
+  PLLDIG.PLL1DV.B.RFDPHI = 16;
+  PLLDIG.PLL1DV.B.MFD = 16;
 
   /* Configure PLL0 to 160 MHz. */
   PLLDIG.PLL0DV.B.RFDPHI1 = 4;
@@ -59,20 +82,22 @@ void PLL_160MHz(void)
   MC_ME.MCTL.R = 0x3000A50F;
   while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
 }
-#ifdef DEVKIT_MPC5744P
-#endif
 
-#ifdef MotovisBoard_V1
 void PLL_200MHz(void)
 {
-  /* Connect XOSC to PLL. We ultimately use the output of PLL1. PLL1 must be fed the output of PLL0 */
-  MC_CGM.AC3_SC.B.SELCTL = 1; //8 MHz XOSC selected as input of PLL0
+	/* PBRIDGEx_CLK Divide */
+	MC_CGM.SC_DC0.B.DIV = 3;  /* Freq = sysclk / (0+1) = sysclk */
+	MC_CGM.SC_DC0.B.DE  = 1;  /* Enable divided clock */
 
-  MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
+	/* Connect XOSC to PLL. We ultimately use the output of PLL1. PLL1 must be fed the output of PLL0 */
+	MC_CGM.AC3_SC.B.SELCTL = 1; //8 MHz XOSC selected as input of PLL0
 
-//  MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
-//  MC_CGM.AC2_DC0.B.DIV = 4;// set the divider division value
+	MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
 
+	MC_CGM.AC2_DC0.B.DIV = 4;// set the divider division value
+	MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
+
+	PeripheralClockGating();
   /* Configure PLL0 Dividers - 200MHz from 8Mhx XOSC */
   /* PLL input = FXOSC = 8MHz
      VCO range = 18 - 2032MHz
@@ -92,7 +117,7 @@ void PLL_200MHz(void)
   PLLDIG.PLL0DV.B.RFDPHI1 = 4 ;
   PLLDIG.PLL0DV.B.RFDPHI  = 4 ;
   PLLDIG.PLL0DV.B.PREDIV  = 1 ;
-  PLLDIG.PLL0DV.B.MFD     = 32;
+  PLLDIG.PLL0DV.B.MFD     = 100;
 
   /* switch to PLL */
   MC_ME.DRUN_MC.R = 0x00130072;
@@ -100,37 +125,11 @@ void PLL_200MHz(void)
   MC_ME.MCTL.R = 0x3000A50F;
   while(!MC_ME.GS.B.S_PLL0);      //ME_GS Wait for PLL stabilization.
   while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
-  // ME_GS Check DRUN mode has successfully been entered
-//  while(MC_ME.GS.B.S_CURRENT_MODE != DRUN_MODE);
-}
-#endif
-
-void System200Mhz(void)
-{
-  /* PBRIDGEx_CLK Divide */
-  MC_CGM.SC_DC0.B.DIV = 3;  /* Freq = sysclk / (0+1) = sysclk */
-  MC_CGM.SC_DC0.B.DE  = 1;  /* Enable divided clock */
-  PLL_160MHz();
-//  PLL_200MHz();
 }
 
-void PeripheralClockGating(void)
+void SystemClockConfigure(void)
 {
-  MC_ME.RUN_PC[0].R = 0x00000000;  /* gate off clock for all RUN modes */
-  MC_ME.RUN_PC[1].R = 0x000000FE;  /* config. peri clock for all RUN modes */
-
-  /// CAN Module
-  MC_ME.PCTL77.B.RUN_CFG  = 0b001; //FlexCAN 2: select peripheral config RUN_PC[1]
-  MC_ME.PCTL78.B.RUN_CFG  = 0b001; //FlexCAN 1: select peripheral config RUN_PC[1]
-  MC_ME.PCTL79.B.RUN_CFG  = 0b001; //FlexCAN 0: select peripheral config RUN_PC[1]
-  /// LIN Module
-  MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1].
-  MC_ME.PCTL204.B.RUN_CFG = 0b001; //LINFlexD_0: Select peripheral config RUN_PC[1].
-  /// PIT time module
-  MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
-  /// DMA module
-  // MC_ME.PCTL36.B.RUN_CFG  = 0b001; //DMAMUX_0:
-  MC_ME.PCTL146.B.RUN_CFG = 0b001; //DMAMUX_1:
+  PLL_200MHz();
 }
 
 void enter_STOP_mode (void) {

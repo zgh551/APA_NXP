@@ -12,8 +12,7 @@
 extern "C" {
 #endif
 
-void System200Mhz(void);
-void PeripheralClockGating(void);
+void SystemClockConfigure(void);
 
 #ifdef __cplusplus
 }
