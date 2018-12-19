@@ -17,7 +17,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   uint8_t	i;
 
   CAN_0.MCR.B.MDIS = 1;       /* Disable module before selecting clock source*/
-  CAN_0.CTRL1.B.CLKSRC= 1;     /* Clock Source = peripheral clock (40 MHz) */
+  CAN_0.CTRL1.B.CLKSRC= 1;     /* Clock Source = CAN PLL Clock (40 MHz) */
   CAN_0.MCR.B.MDIS = 0;       /* Enable module for config. (Sets FRZ, HALT)*/
   while (!CAN_0.MCR.B.FRZACK) {} /* Wait for freeze acknowledge to set */
 	/* CAN bus: 40 MHz clksrc, 500K bps with 16 tq */
@@ -29,13 +29,12 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-  CAN_0.CTRL1.B.PRESDIV = 5;
+  CAN_0.CTRL1.B.PRESDIV = 4;
   CAN_0.CTRL1.B.PSEG1 = 3;
   CAN_0.CTRL1.B.PSEG2 = 3;
   CAN_0.CTRL1.B.RJW = 3;
   CAN_0.CTRL1.B.SMP = 1;
   CAN_0.CTRL1.B.PROPSEG = 6;
-//  CAN_0.CTRL1.R = 0x04DB0086;  /* CAN bus: same as for CAN_0 */
 
   for(i=0; i<64; i++){ 			//MPC574xP has 64 buffers
     CAN_0.MB[i].CS.B.CODE = 0;   /* Inactivate all message buffers */
@@ -79,7 +78,7 @@ void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	uint8_t	i;
 
 	CAN_1.MCR.B.MDIS = 1;       /* Disable module before selecting clock source*/
-	CAN_1.CTRL1.B.CLKSRC=0;     /* Clock Source = oscillator clock (40 MHz) */
+	CAN_1.CTRL1.B.CLKSRC = 1;     /* Clock Source = peripheral clock (40 MHz) */
 	CAN_1.MCR.B.MDIS = 0;       /* Enable module for config. (Sets FRZ, HALT)*/
 	while (!CAN_1.MCR.B.FRZACK) {} /* Wait for freeze acknowledge to set */
 	/* CAN bus: 40 MHz clksrc, 500K bps with 16 tq */
@@ -91,7 +90,7 @@ void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-	CAN_1.CTRL1.B.PRESDIV = 0;
+	CAN_1.CTRL1.B.PRESDIV = 4;
 	CAN_1.CTRL1.B.PSEG1 = 3;
 	CAN_1.CTRL1.B.PSEG2 = 3;
 	CAN_1.CTRL1.B.RJW = 3;
