@@ -30,11 +30,11 @@ public:
 	Ultrasonic();
 	virtual ~Ultrasonic();
 
-	void InitSensing_STP318(uint8_t tx,uint8_t rx);
-	LIN_STP318_Packet ReadData_STP318(uint8_t id);
+	void InitSensing_STP318(void (*TransmitFrame)(LIN_Packet),uint8_t tx,uint8_t rx);
+	LIN_STP318_Packet ReadSensing_STP318(void (*ReceiveFrame)(LIN_Packet *),uint8_t id);
 
-	void InitSensing_STP313(uint8_t tx_rx);
-	LIN_STP313_Packet ReadData_STP313(uint8_t id);
+	void InitSensing_STP313(void (*TransmitFrame)(LIN_Packet),uint8_t tx_rx);
+	LIN_STP313_Packet ReadSensing_STP313(void (*ReceiveFrame)(LIN_Packet *),uint8_t id);
 };
 
 #endif /* ULTRASONIC_H_ */
