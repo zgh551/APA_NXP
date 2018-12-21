@@ -308,7 +308,6 @@ void Terminal::TerminalControlCommandReceive(uint8_t data)
 					break;
 
 				case 0x4A:
-					// TODO ��ʱ�޸�
 					WorkingModule = _data_buffer[0];
 					FunctionStatus = _data_buffer[1];
 					break;
@@ -481,7 +480,7 @@ void Terminal::TerminalSystemStateSend(void)
 	_send_data_buffer[1] = 0x80;
 	_send_data_buffer[2] = 0xA5;
 	_send_data_buffer[3] = 3;
-	// TODO ��ʱ�޸�
+
 	_send_data_buffer[4] = WorkingModule;
 	_send_data_buffer[5] = FunctionStatus;
 
