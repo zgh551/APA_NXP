@@ -39,7 +39,7 @@ void PeripheralClockGating(void)
   /// PIT time module
   MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
   /// DMA module
-  // MC_ME.PCTL36.B.RUN_CFG  = 0b001; //DMAMUX_0:
+  MC_ME.PCTL36.B.RUN_CFG  = 0b001; //DMAMUX_0:
   MC_ME.PCTL146.B.RUN_CFG = 0b001; //DMAMUX_1:
 }
 
