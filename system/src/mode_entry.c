@@ -130,6 +130,9 @@ void PLL_200MHz(void)
 void SystemClockConfigure(void)
 {
   PLL_200MHz();
+
+  AIPS_0.MPRA.R |= 0x77777770;       /* All masters have RW & user level access */
+  AIPS_1.MPRA.R |= 0x77777770;       /* All masters have RW & user level access */
 }
 
 void enter_STOP_mode (void) {
