@@ -17,10 +17,16 @@
 /*		PROTOTYPES					                                 	  */
 /*========================================================================*/
 void dummy 						  (void);
+
+extern void eDMA_Channel2_Isr(void);
+
 extern void PIT0_isr(void);
+
 extern void FlexCAN0_Isr(void);
 extern void FlexCAN1_Isr(void);
 extern void FlexCAN2_Isr(void);
+
+extern void FlexLin0_Uart_Isr(void);
 extern void FlexLin1_Uart_Isr(void);
 /*========================================================================*/
 /*	GLOBAL VARIABLES						                              */
@@ -83,7 +89,7 @@ const uint32_t __attribute__ ((section (".intc_vector_table"))) IntcIsrVectorTab
 (uint32_t) &dummy, /* Vector #  52 eDMA Combined Error eDMA */
 (uint32_t) &dummy, /* Vector #  53 eDMA Channel 0 eDMA */
 (uint32_t) &dummy, /* Vector #  54 eDMA Channel 1 eDMA */
-(uint32_t) &dummy, /* Vector #  55 eDMA Channel 2 eDMA */
+(uint32_t) &eDMA_Channel2_Isr, /* Vector #  55 eDMA Channel 2 eDMA */
 (uint32_t) &dummy, /* Vector #  56 eDMA Channel 3 eDMA */
 (uint32_t) &dummy, /* Vector #  57 eDMA Channel 4 eDMA */
 (uint32_t) &dummy, /* Vector #  58 eDMA Channel 5 eDMA */
@@ -407,7 +413,7 @@ const uint32_t __attribute__ ((section (".intc_vector_table"))) IntcIsrVectorTab
 (uint32_t) &dummy, /* Vector # 373 Reserved for DSPI12_6 DSPI12 */
 (uint32_t) &dummy, /* Vector # 374 Reserved for DSPI12_7 DSPI12 */
 (uint32_t) &dummy, /* Vector # 375 Reserved for DSPI12_8 DSPI12 */
-(uint32_t) &dummy, /* Vector # 376 LINFlex_RXI LINFlex_0 */
+(uint32_t) &FlexLin0_Uart_Isr, /* Vector # 376 LINFlex_RXI LINFlex_0 */
 (uint32_t) &dummy, /* Vector # 377 LINFlex_TXI LINFlex_0 */
 (uint32_t) &dummy, /* Vector # 378 LINFlex_ERR LINFlex_0 */
 (uint32_t) &dummy, /* Vector # 379 Reserved for LINFlex/eSCI0_3 LINFlex_0 */
