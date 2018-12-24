@@ -52,17 +52,60 @@ typedef struct _LIN_Packet
 	}BufferData;
 }LIN_Packet;
 
+typedef struct _LIN_RAM
+{
+	LINFlexD_LINCR2_tag LINCR2;          /* LIN Control Register 2 */
+	LINFlexD_BIDR_tag 	BIDR;              /* Buffer Identifier Register */
+	union
+	{
+		struct
+		{
+			LINFlexD_BDRL_tag 	BDRL;              /* Buffer Data Register Least Significant */
+			LINFlexD_BDRM_tag 	BDRM;              /* Buffer Data Register Most Significant */
+		};
+		struct
+		{
+			vuint32_t null:8;
+			vuint32_t Status:8;
+			vuint32_t TOF:16;
+			vuint32_t Null;
+		}STP318;
+		struct
+		{
+			vuint32_t Width:8;
+			vuint32_t Level:8;
+			vuint32_t TOF1:16;
+			vuint32_t null:8;
+			vuint32_t Status:8;
+			vuint32_t TOF2:16;
+		}STP313;
+	};
+}LIN_RAM;
+
 void InitLINFlexD0( uint16_t MegaHertz, uint16_t BaudRate );
+void InitLINFlexD0_DMA ( uint16_t MegaHertz, uint16_t BaudRate );
 
-void LIN0_TransmitFrame (LIN_Packet m_LIN_Packet);
-void LIN0_ReceiveFrame(LIN_Packet *m_LIN_Packet);
+void FlexLin0_DMA_TX_M2S_Init(void);
+void FlexLin0_DMA_TX_S2M_Init(void);
+void FlexLin0_DMA_RX_S2M_Init(void);
 
-void transmitLINframe_0(void);
-void receiveLINframe_0(void);
+void LIN0_TransmitFrame (LIN_RAM m_LIN_RAM);
+void LIN0_TransmitFrame_DMA (LIN_RAM m_LIN_RAM);
+void LIN0_ReceiveFrame(LIN_RAM *m_LIN_RAM);
+void LIN0_ReceiveFrame_DMA(LIN_RAM *m_LIN_RAM);
 
-void initLINFlexD_1 (void);
-void transmitLINframe_1 (void);
-void receiveLINframe_1(void);
+//void LIN0_TransmitFrame (LIN_Packet m_LIN_Packet);
+//void LIN0_TransmitFrame_DMA (LIN_Packet m_LIN_Packet);
+//
+//void LIN0_ReceiveFrame(LIN_Packet *m_LIN_Packet);
+//void LIN0_ReceiveFrame_DMA(LIN_Packet *m_LIN_Packet);
+
+//void transmitLINframe_0(void);
+//void receiveLINframe_0(void);
+//
+//void initLINFlexD_1 (void);
+//void transmitLINframe_1 (void);
+//void receiveLINframe_1(void);
 
 #ifdef __cplusplus
 }
