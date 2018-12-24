@@ -33,14 +33,17 @@ vuint8_t cnt;
 bool TerminalSendFlag = false;
 float temp;
 
+uint8_t d0,d1,d2;
 __attribute__ ((section(".text")))
 int main()
 {
+
 	/* Configure and Enable Interrupts */
 	xcptn_xmpl();
 
 	/* Sysclk = 200MHz, dividers configured, mode trans*/
 	SystemClockConfigure();
+
 
     /* Init the GPIO */
 	initGPIO();
@@ -52,8 +55,13 @@ int main()
 
 /// Init Flex Lin1 Uart used to communication with terminal pc
 //  FlexLin1_Uart_Buffer_Init(100,38400);
-	InitLINFlexD0(100,19200);
 
+//	InitLINFlexD0(100,19200);
+
+	InitLINFlexD0_DMA(100,19200);
+	FlexLin0_DMA_TX_M2S_Init();
+	FlexLin0_DMA_TX_S2M_Init();
+	FlexLin0_DMA_RX_S2M_Init();
 /// Init the PIT0
 	PIT_0.MCR.B.MDIS = 0; /* Enable PIT module. NOTE: PIT module must be       */
                         /* enabled BEFORE writing to it's registers.         */
@@ -91,13 +99,17 @@ void PIT0_isr(void)
 //	m_Terminal_CA.SystemWorkState();
 	SYSTEM_LED = ~SYSTEM_LED;
 	cnt = (cnt + 1) % 5;
-	if(cnt == 0)
+	if(cnt == 1)
 	{
-		m_Ultrasonic.InitSensing_STP318(1, 1);
+		m_Ultrasonic.InitUltrasonicSensor(0);
 	}
-	if(cnt == 3)
+	if(cnt == 2)
 	{
-		m_LIN_STP318_Packet = m_Ultrasonic.ReadData_STP318(0xCf);
+//		m_Ultrasonic.ReadSensing_STP318(LIN0_ReceiveFrame_DMA,0xCf);
+		m_Ultrasonic.ReadUltrasonicSensor(0);
+//		d0 = m_Ultrasonic.UltrasonicDatas[1].BDRL.B.DATA0;
+//		d1 = m_Ultrasonic.UltrasonicDatas[1].BDRL.B.DATA1;
+//		d2 = m_Ultrasonic.UltrasonicDatas[1].BDRL.B.DATA2;
 	}
 	PIT_0.TIMER[0].TFLG.R |= 1;  /* Clear interrupt flag. w1c */
 }
@@ -135,6 +147,9 @@ void FlexCAN2_Isr(void)
 		CAN_2.IFLAG1.R = 0x00000100;
 	}
 }
+
+
+
 void FlexLin1_Uart_Isr(void)
 {
 	m_Terminal_CA.TerminalControlCommandReceive(LINFlexD_1.BDRM.B.DATA4);
