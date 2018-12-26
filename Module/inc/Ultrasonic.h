@@ -10,6 +10,9 @@
 
 #include "Property.h"
 #include "linflexd.h"
+
+#define FRONT_ULTRASONIC_ENABLE
+#define REAR_ULTRASONIC_ENABLE
 /*** LIN Device Data Struct ***/
 typedef struct _LIN_STP318_Packet
 {
@@ -40,13 +43,20 @@ public:
 	void InitUltrasonicSensor(uint8_t n);
 	void ReadUltrasonicSensor(uint8_t n);
 
-	void TimeScheduleStatus1_SR(void);
+	void UltrasonicScheduleStatusMachine(void);
+	void UltrasonicScheduleStatusMachine_V2(void);
 
 	/// Property
+	uint8_t getScheduleTimeCnt();
+	void    setScheduleTimeCnt(uint8_t value);
+	Property<Ultrasonic,uint8_t,READ_WRITE> ScheduleTimeCnt;
+
 	LIN_RAM* getUltrasonicDatas();
 	Property<Ultrasonic,LIN_RAM*,READ_ONLY> UltrasonicDatas;
 
 private:
+	uint8_t _schedule_time_cnt;
+
 	LIN_RAM _ultrasonic_datas[12];
 };
 
