@@ -26,7 +26,7 @@ void FlexCAN0_Init(void);
 void FlexCAN1_Init(void);
 void FlexCAN2_Init(void);
 
-void ReceiveMsg (void);
+void CAN_Configure();
 
 void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet);
 void CAN1_TransmitMsg(CAN_Packet m_CAN_Packet);

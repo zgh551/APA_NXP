@@ -194,53 +194,11 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	INTC_0.PSR[550].R = 0x8009;
 }
 
-void ReceiveMsg(void) {
-  uint8_t j;
-  uint32_t dummy;
-
-#if !(LOOPBACK)
-  while (CAN_1.IFLAG1.B.BUF4TO1I != 8) {};  /* Wait for CAN 1 MB 4 flag */
-  RxCODE   = CAN_1.MB[4].CS.B.CODE; /* Read CODE, ID, LENGTH, DATA, TIMESTAMP*/
-  RxID     = CAN_1.MB[4].ID.B.ID_STD;
-  RxLENGTH = CAN_1.MB[4].CS.B.DLC;
-  for (j=0; j<RxLENGTH; j++) {
-    RxDATA[j] = CAN_1.MB[4].DATA.B[j];
-  }
-  RxTIMESTAMP = CAN_1.MB[4].CS.B.TIMESTAMP;
-  dummy = CAN_1.TIMER.R;             /* Read TIMER to unlock message buffers */
-  if(dummy){}
-  CAN_1.IFLAG1.R = 0x00000010;       /* Clear CAN 1 MB 4 flag */
-#elif LOOPBACK && !(DEVKIT)
-  while (CAN_0.IFLAG1.B.BUF4TO1I != 8) {};  /* Wait for CAN 0 MB 4 flag */
-  RxCODE   = CAN_0.MB[4].CS.B.CODE; /* Read CODE, ID, LENGTH, DATA, TIMESTAMP*/
-  RxID     = CAN_0.MB[4].ID.B.ID_STD;
-  RxLENGTH = CAN_0.MB[4].CS.B.DLC;
-  for (j=0; j<RxLENGTH; j++) {
-    RxDATA[j] = CAN_0.MB[4].DATA.B[j];
-  }
-  RxTIMESTAMP = CAN_0.MB[4].CS.B.TIMESTAMP;
-  dummy = CAN_0.TIMER.R;             /* Read TIMER to unlock message buffers */
-  if(dummy){}
-  CAN_0.IFLAG1.R = 0x00000010;       /* Clear CAN 0 MB 4 flag */
-#else
-  while (CAN_2.IFLAG1.B.BUF4TO1I != 8) {};  /* Wait for CAN 2 MB 4 flag */
-  RxCODE   = CAN_2.MB[4].CS.B.CODE; /* Read CODE, ID, LENGTH, DATA, TIMESTAMP*/
-  RxID     = CAN_2.MB[4].ID.B.ID_STD;
-  RxLENGTH = CAN_2.MB[4].CS.B.DLC;
-  for (j=0; j<RxLENGTH; j++) {
-    RxDATA[j] = CAN_2.MB[4].DATA.B[j];
-  }
-  RxTIMESTAMP = CAN_2.MB[4].CS.B.TIMESTAMP;
-  dummy = CAN_2.TIMER.R;             /* Read TIMER to unlock message buffers */
-  if(dummy){}
-  CAN_2.IFLAG1.R = 0x00000010;       /* Clear CAN 2 MB 4 flag */
-#endif
-
-  if(RxDATA[0]== 'H')
-  {
-	  SIUL2.MSCR[PC11].B.OBE = 1; //PC11 (Red LED) set to output
-  }
-
+void CAN_Configure()
+{
+    FlexCAN0_Init();
+    FlexCAN1_Init();
+    FlexCAN2_Init();
 }
 
 void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
