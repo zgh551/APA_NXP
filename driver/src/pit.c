@@ -48,3 +48,19 @@ void PIT2_init(uint32_t LDVAL) {
 	INTC_0.PSR[228].R = 0x800B;
 	PIT_0.TIMER[2].TCTRL.B.TEN = 1; /* Enable channel */
 }
+
+
+void PIT_Configure()
+{
+		/// Init the PIT0
+		PIT_0.MCR.B.MDIS = 0; /* Enable PIT module. NOTE: PIT module must be       */
+	                        /* enabled BEFORE writing to it's registers.         */
+	                        /* Other cores will write to PIT registers so the    */
+	                        /* PIT is enabled here before starting other cores.  */
+		PIT_0.MCR.B.FRZ = 1;  /* Freeze PIT timers in debug mode */
+//		PIT0_init(1000000);//20ms
+		PIT0_init(250000);//5ms
+		/* timeout= 0.8M  PITclks x 4 sysclks/1 PITclk x 1 sec/160Msysck */
+		/*        = 0.8M x 4 / 160M = 3.2/160 = 0.02 sec.  */
+		PIT_0.MCR.B.FRZ = 0; //Unfreeze timers
+}

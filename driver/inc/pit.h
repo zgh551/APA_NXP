@@ -12,14 +12,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-//Enable the Peri clock for PIT
-void peri_clock_gating(void);
 
 void PIT0_init(uint32_t);
 
 void PIT1_init(uint32_t);
 
 void PIT2_init(uint32_t);
+
+void PIT_Configure();
 
 #ifdef __cplusplus
 }
