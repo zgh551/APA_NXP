@@ -19,6 +19,7 @@
 void dummy 						  (void);
 
 extern void eDMA_Channel2_Isr(void);
+extern void eDMA_Channel18_Isr(void);
 
 extern void PIT0_isr(void);
 
@@ -105,7 +106,7 @@ const uint32_t __attribute__ ((section (".intc_vector_table"))) IntcIsrVectorTab
 (uint32_t) &dummy, /* Vector #  68 eDMA Channel 15 eDMA */
 (uint32_t) &dummy, /* Vector #  69 eDMA Channel 16 eDMA */
 (uint32_t) &dummy, /* Vector #  70 eDMA Channel 17 eDMA */
-(uint32_t) &dummy, /* Vector #  71 eDMA Channel 18 eDMA */
+(uint32_t) &eDMA_Channel18_Isr, /* Vector #  71 eDMA Channel 18 eDMA */
 (uint32_t) &dummy, /* Vector #  72 eDMA Channel 19 eDMA */
 (uint32_t) &dummy, /* Vector #  73 eDMA Channel 20 eDMA */
 (uint32_t) &dummy, /* Vector #  74 eDMA Channel 21 eDMA */
