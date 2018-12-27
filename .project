@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>APA_NXP</project>
+		<project>APA_NXP_V1_0_0</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
