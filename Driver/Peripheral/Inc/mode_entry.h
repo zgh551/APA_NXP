@@ -1,9 +1,9 @@
-/*
- * mode_entry.h
- *
- *  Created on: Feb 26, 2016
- *      Author: B48683
- */
+ /*
+  * mode_entry.h
+  *
+  *  Created on: December 22 2018
+  *      Author: Guohua Zhu
+  */
 
 #ifndef MODE_ENTRY_H_
 #define MODE_ENTRY_H_

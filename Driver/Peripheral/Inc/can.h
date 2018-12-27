@@ -1,8 +1,8 @@
 /*
  * can.h
  *
- *  Created on: Mar 1, 2016
- *      Author: B55457
+ *  Created on: December 22 2018
+ *      Author: ZhuGuohua
  */
 
 #ifndef CAN_H_

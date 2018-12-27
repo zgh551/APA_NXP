@@ -1,8 +1,8 @@
 /*
  * linflexd_lin.h
  *
- *  Created on: Mar 2, 2016
- *      Author: B55457
+ *  Created on: December 22 2018
+ *      Author: Guohua Zhu
  */
 
 #ifndef LINFLEXD_H_
