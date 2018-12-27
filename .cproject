@@ -239,7 +239,7 @@
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
-				<externalSettings containerId="APA_NXP_V1_0_0;com.freescale.s32ds.cross.gnu.e200.exe.release.49295953" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+				<externalSettings containerId="APA_NXP;com.freescale.s32ds.cross.gnu.e200.exe.release.49295953" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 			</storageModule>
 		</cconfiguration>
 		<cconfiguration id="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953">
@@ -732,7 +732,9 @@
 		<configuration configurationName="Debug_RAM">
 			<resource resourceType="PROJECT" workspacePath="/APA"/>
 		</configuration>
-		<configuration configurationName="Debug"/>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/APA_NXP"/>
+		</configuration>
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/APA_NXP"/>
 		</configuration>
