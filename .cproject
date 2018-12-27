@@ -47,17 +47,34 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot.398132065" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.1023961774" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.306258662" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/driver/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/system/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Algorithm/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Application/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Module/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/utils/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.1605186852" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.8192135" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -78,17 +95,34 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot.18179765" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.480037825" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.86030860" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/utils/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/system/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/driver/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Module/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Application/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Algorithm/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.740260376" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1990159591" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -140,13 +174,34 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.sysroot.846833038" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries.1840880990" superClass="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
 								<option id="gnu.both.asm.option.include.paths.2917018" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/utils/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/driver/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.850295471" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile.705115255" superClass="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile"/>
@@ -172,18 +227,20 @@
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214.Project_Settings/Debugger/APA_Debug_RAM.launch" name="APA_Debug_RAM.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/APA_Debug_RAM.launch" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Algorithm"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Module"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Common"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Control"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Driver"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Interaction"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Percaption"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Planning"/>
 						<entry excluding="Linker_Files/57xx_ram.ld|Debugger/APA_Debug_RAM.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
-						<entry excluding="include" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="driver"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="main"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="utils"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="APA_NXP_V1_0_0;com.freescale.s32ds.cross.gnu.e200.exe.release.49295953" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+			</storageModule>
 		</cconfiguration>
 		<cconfiguration id="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -223,18 +280,43 @@
 								<option id="com.freescale.s32ds.cross.gnu.tool.c.compiler.option.debugging.format.764309002" name="Debug format" superClass="com.freescale.s32ds.cross.gnu.tool.c.compiler.option.debugging.format" useByScannerDiscovery="true"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.296372770" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="START_FROM_FLASH"/>
+									<listOptionValue builtIn="false" value="_EWL_CONSOLE_SUPPORT"/>
 									<listOptionValue builtIn="false" value="MPC574xP"/>
+									<listOptionValue builtIn="false" value="MotovisBoard_V1"/>
 								</option>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.1914259451" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot.150740680" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.1772761362" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1718903285" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.896592119" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -246,18 +328,43 @@
 								<option id="com.freescale.s32ds.cross.gnu.tool.cpp.compiler.option.debugging.format.153517254" name="Debug format" superClass="com.freescale.s32ds.cross.gnu.tool.cpp.compiler.option.debugging.format" useByScannerDiscovery="true"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.234204894" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="START_FROM_FLASH"/>
+									<listOptionValue builtIn="false" value="_EWL_CONSOLE_SUPPORT"/>
 									<listOptionValue builtIn="false" value="MPC574xP"/>
+									<listOptionValue builtIn="false" value="MotovisBoard_V1"/>
 								</option>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.1637651777" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot.1881909194" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.544936125" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1120137713" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.750067735" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -308,12 +415,35 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.sysroot.174256209" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries.249531183" superClass="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
 								<option id="gnu.both.asm.option.include.paths.1370355037" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.859087460" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile.1267350176" superClass="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile"/>
@@ -339,13 +469,16 @@
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953.Project_Settings/Debugger/APA_Debug_RAM.launch" name="APA_Debug_RAM.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/APA_Debug_RAM.launch" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Algorithm"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Module"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Common"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Control"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Driver"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Interaction"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Percaption"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Planning"/>
 						<entry excluding="Linker_Files/57xx_ram.ld|Debugger/APA_Debug_RAM.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 						<entry excluding="src|include" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="driver"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="main"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="utils"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -396,17 +529,34 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot.149753627" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.1796342873" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.501799224" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Algorithm/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applicaion/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Module/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/driver/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/utils/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/system/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FunsionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.742443896" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -425,17 +575,34 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot.1237835280" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.324218440" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1449950535" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Algorithm/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Application/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Module/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/driver/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/system/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/utils/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FunsionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1961164118" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -486,12 +653,34 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.sysroot.1775080705" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.sysroot" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries.480484202" superClass="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries" value="com.freescale.s32ds.cross.gnu.e200.tool.assembler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
 								<option id="gnu.both.asm.option.include.paths.1515523898" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/Peripheral/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/CANBUS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/HMI&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FunsionPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1958389388" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile.1473325152" superClass="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile"/>
@@ -515,17 +704,20 @@
 							<tool id="com.freescale.s32ds.cross.gnu.e200.tool.spt.preprocessor.380876492" name="SPT Preprocessor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.spt.preprocessor"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.982150830" name="MPC5744P.h" rcbsApplicability="disable" resourcePath="system/inc/MPC5744P.h" toolsToInvoke=""/>
+					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.982150830" name="MPC5744P.h" rcbsApplicability="disable" resourcePath="driver/system/inc/MPC5744P.h" toolsToInvoke=""/>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.Project_Settings/Debugger/APA_Debug.launch" name="APA_Debug.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/APA_Debug.launch" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Algorithm"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Module"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Common"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Control"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Driver"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Interaction"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Percaption"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Planning"/>
 						<entry excluding="Linker_Files/57xx_flash.ld|Debugger/APA_Debug.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
-						<entry excluding="include" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="driver"/>
+						<entry excluding="system|include" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="driver"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="driver/system"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="main"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="utils"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -535,27 +727,48 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="APA.com.freescale.s32ds.cross.gnu.e200.exe.1778559193" name="E200 Executable" projectType="com.freescale.s32ds.cross.gnu.e200.exe"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953;com.freescale.s32ds.cross.gnu.e200.exe.release.49295953.;com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.389432155;cdt.managedbuild.tool.gnu.c.compiler.input.896592119">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214;com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214.;com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.1442119954;cdt.managedbuild.tool.gnu.c.compiler.input.8192135">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug_RAM">
 			<resource resourceType="PROJECT" workspacePath="/APA"/>
 		</configuration>
-		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/APA"/>
-		</configuration>
+		<configuration configurationName="Debug"/>
 		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/APA"/>
+			<resource resourceType="PROJECT" workspacePath="/APA_NXP"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.embsys" parent_project="true" register_architecture="e200" register_board="---  none ---" register_chip="MPC5744P" register_core="e200z4251n3" register_vendor="Freescale"/>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="${ProjDirPath}/Planning/Common" path="main" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>${ProjDirPath}/Planning/Common</buildCommand>
+				<buildArguments>-j8</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+		</buildTargets>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214;com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214.;com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.1051356401;cdt.managedbuild.tool.gnu.cpp.compiler.input.1990159591">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM;com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.;com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.355972206;cdt.managedbuild.tool.gnu.cpp.compiler.input.1961164118">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214;com.freescale.s32ds.cross.gnu.e200.exe.debug.1970367214.;com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.1442119954;cdt.managedbuild.tool.gnu.c.compiler.input.8192135">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953;com.freescale.s32ds.cross.gnu.e200.exe.release.49295953.;com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.389432155;cdt.managedbuild.tool.gnu.c.compiler.input.896592119">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM;com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.;com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.410864902;cdt.managedbuild.tool.gnu.c.compiler.input.742443896">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.freescale.s32ds.cross.gnu.e200.exe.release.49295953;com.freescale.s32ds.cross.gnu.e200.exe.release.49295953.;com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.1903991077;cdt.managedbuild.tool.gnu.cpp.compiler.input.750067735">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
 </cproject>

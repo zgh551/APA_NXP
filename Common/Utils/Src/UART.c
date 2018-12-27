@@ -46,7 +46,7 @@ Revision History:
 *******************************************************************************/
 
 #include "sys/UART.h"
-#include "../../system/inc/MPC5744P.h"
+#include "MPC5744P.h"
 
 
 

@@ -1,11 +1,10 @@
 /*
- * Property.h
+ * property.h
  *
  *  Created on:
- *      Author: zhuguohua
+ *      Author: Guohua Zhu
  */
 #include <assert.h>
-#include "project.h"
 
 #ifndef SRC_PROPERTY_H_
 #define SRC_PROPERTY_H_

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>APA</name>
+	<name>APA_NXP</name>
 	<comment></comment>
 	<projects>
+		<project>APA_NXP</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

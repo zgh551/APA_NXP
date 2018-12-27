@@ -7,7 +7,7 @@
 
 #ifndef SRC_VEHICLE_H_
 #define SRC_VEHICLE_H_
-#include "Property.h"
+#include "property.h"
 #include "derivative.h"
 #include "project.h"
 #include "math.h"
