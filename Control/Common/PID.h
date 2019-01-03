@@ -8,9 +8,9 @@
 #ifndef PID_H_
 #define PID_H_
 
-#include "Property.h"
+#include "derivative.h"
+#include "property.h"
 #include <math.h>
-//namespace APA {
 
 class PID {
 public:
@@ -24,42 +24,42 @@ public:
     /*** Variabel Property ***/
     /* KP */
     float getKP();
-    void setKP(float value);
+    void  setKP(float value);
     Property<PID,float,READ_WRITE> KP;
 
     /* KI */
     float getKI();
-    void setKI(float value);
+    void  setKI(float value);
     Property<PID,float,READ_WRITE> KI;
 
     /* KD */
     float getKD();
-    void setKD(float value);
+    void  setKD(float value);
     Property<PID,float,READ_WRITE> KD;
 
     /* Desired */
     float getDesired();
-    void setDesired(float value);
+    void  setDesired(float value);
     Property<PID,float,READ_WRITE> Desired;
 
     /* ILimit */
     float getILimit();
-    void setILimit(float value);
+    void  setILimit(float value);
     Property<PID,float,READ_WRITE> ILimit;
 
     /* OutputLimit */
     float getOutputLimit();
-    void setOutputLimit(float value);
+    void  setOutputLimit(float value);
     Property<PID,float,READ_WRITE> OutputLimit;
 
     /* Dt */
     float getDt();
-    void setDt(float value);
+    void  setDt(float value);
     Property<PID,float,READ_WRITE> Dt;
 
     /* OutputOffset */
     float getThreshold();
-    void setThreshold(float value);
+    void  setThreshold(float value);
     Property<PID,float,READ_WRITE> Threshold;
 private:
     float _desired;      //< set point
@@ -78,7 +78,5 @@ private:
     float _threshold; //< the output offset set
     float _dt;           //< delta-time dt
 };
-
-//} /* namespace APA */
 
 #endif /* PID_H_ */
