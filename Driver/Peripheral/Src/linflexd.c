@@ -695,32 +695,4 @@ void FlexLin1_Uart_Isr(void)
 	LINFlexD_1.LINSR.B.RMB = 1;/* Clear RMB flag */
 }
 
-/*******************************************************************************
-Function Name : eDMA_Channel2_Isr
-Engineer      : Guohua Zhu
-Date          : Dec-24-2018
-Parameters    : NONE
-Modifies      : NONE
-Returns       : NONE
-Notes         : When DMA major finish,generate this isr
-Issues        : NONE
-*******************************************************************************/
-void eDMA_Channel2_Isr(void)
-{
-	DMA_0.INT.B.INT2 = 1;
-}
 
-/*******************************************************************************
-Function Name : eDMA_Channel18_Isr
-Engineer      : Guohua Zhu
-Date          : Dec-24-2018
-Parameters    : NONE
-Modifies      : NONE
-Returns       : NONE
-Notes         : When DMA major finish,generate this isr
-Issues        : NONE
-*******************************************************************************/
-void eDMA_Channel18_Isr(void)
-{
-	DMA_0.INT.B.INT18 = 1;
-}
