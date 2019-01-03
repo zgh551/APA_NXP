@@ -1,0 +1,83 @@
+/*
+ * chang_an_message.h
+ *
+ *  Created on: December 28 2018
+ *      Author: Guohua Zhu
+ */
+/*****************************************************************************/
+/* FILE NAME: chang_an_message.h                COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: chang an vehicle message class     					         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     December 28 2018    Initial Version                  */
+/*****************************************************************************/
+
+#ifndef CANBUS_CHANGAN_CHANG_AN_MESSAGE_H_
+#define CANBUS_CHANGAN_CHANG_AN_MESSAGE_H_
+
+#include "derivative.h"
+#include "property.h"
+#include "Interface/message_manager.h"
+
+#define V_M_S 0.015625
+
+class ChangAnMessage : public MessageManager
+{
+public:
+	ChangAnMessage();
+	virtual ~ChangAnMessage();
+
+	void Init();
+	void Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght) override;
+	// EPS
+	uint8_t getEPS_Failed();
+	void    setEPS_Failed(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> EPS_Failed;
+
+	uint8_t getAPA_EPAS_Failed();
+	void    setAPA_EPAS_Failed(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> APA_EPAS_Failed;
+
+	uint8_t getAPA_ControlFeedback();
+	void    setAPA_ControlFeedback(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> APA_ControlFeedback;
+
+	uint8_t getTorqueSensorStatus();
+	void    setTorqueSensorStatus(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> TorqueSensorStatus;
+
+	float getSteeringTorque();
+	void  setSteeringTorque(float value);
+	Property<ChangAnMessage,float,READ_WRITE> SteeringTorque;
+
+	uint8_t getSAS_Failure();
+	void    setSAS_Failure(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> SAS_Failure;
+
+	// ESP
+	uint8_t getESP_QDC_ACC();
+	void    setESP_QDC_ACC(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> ESP_QDC_ACC;
+
+	// EMS
+	uint8_t getEMS_QEC_ACC();
+	void    setEMS_QEC_ACC(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> EMS_QEC_ACC;
+private:
+	/*** Receive messege form vehicle ***/
+	//
+	uint8_t _eps_failed;
+	uint8_t _apa_epas_failed;
+	uint8_t _apa_control_feedback;
+	uint8_t _torque_sensor_status;
+	float _steering_torque;
+	uint8_t _sas_failure;
+	// ESP
+	uint8_t esp_qdc_acc;
+	// EMS
+	uint8_t ems_qec_acc;
+};
+
+#endif /* CANBUS_CHANGAN_CHANG_AN_MESSAGE_H_ */
