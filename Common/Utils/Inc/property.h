@@ -6,8 +6,8 @@
  */
 #include <assert.h>
 
-#ifndef SRC_PROPERTY_H_
-#define SRC_PROPERTY_H_
+#ifndef _PROPERTY_H_
+#define _PROPERTY_H_
 
 #define READ_ONLY 1
 #define WRITE_ONLY 2
