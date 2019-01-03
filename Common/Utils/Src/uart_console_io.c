@@ -1,5 +1,5 @@
 /* EWL
- * Copyright © 2009 Freescale Corporation.  All rights reserved.
+ * Copyright é”Ÿï¿½ 2009 Freescale Corporation.  All rights reserved.
  *
  */
 
@@ -19,7 +19,7 @@
   *		services in an embedded environment which lacks OS console
   *		support.
   */
-#pragma ANSI_strict off	/* _No_Console will be empty file */
+//#pragma ANSI_strict off	/* _No_Console will be empty file */
 
 #include <ansi_parms.h>
 
@@ -64,7 +64,7 @@ int_t __read_console(__file_handle handle, uchar_t * buffer, size_t * count)
 #if __dest_os == __starcore
 	#pragma unused(handle,ref_con)
 #else
-	#pragma unused(handle)
+//	#pragma unused(handle)
 #endif
 	MISRA_QUIET_UNUSED_ARGS()
 
@@ -90,7 +90,7 @@ int_t __read_console(__file_handle handle, uchar_t * buffer, size_t * count)
 		 * since it is the same functionality as ReadUART1,
 		 * but ReadUART1 broke end user's implementations
 		 */
-		err = ReadUARTN(buffer, 1u );
+//		err = ReadUARTN(buffer, 1u );
 #if __PPC_EABI__
         /* eppc wants backspace handled here */
 		if (*buffer == (uchar_t)'\b') {
@@ -134,7 +134,7 @@ int_t __write_console(__file_handle handle, uchar_t * buffer, size_t * count)
 #if __dest_os == __starcore
 	#pragma unused(handle,ref_con)
 #else
-	#pragma unused(handle)
+//	#pragma unused(handle)
 #endif
 	MISRA_QUIET_UNUSED_ARGS()
 
@@ -148,11 +148,11 @@ int_t __write_console(__file_handle handle, uchar_t * buffer, size_t * count)
 		return (int_t)__io_error;
 	}
 
-	if (WriteUARTN(buffer, (uint32_t)*count) != kUARTNoError) {
-		*count = 0u;
-		MISRA_EXCEPTION_RULE_14_7()
-		return (int_t)__io_error;
-	}
+//	if (WriteUARTN(buffer, (uint32_t)*count) != kUARTNoError) {
+//		*count = 0u;
+//		MISRA_EXCEPTION_RULE_14_7()
+//		return (int_t)__io_error;
+//	}
 
 
 #if __GCN_1_3_COMPATIBILITY__
@@ -178,11 +178,11 @@ int_t __write_console(__file_handle handle, uchar_t * buffer, size_t * count)
 
 
 /************************************************************************/
-#pragma overload int_t __close_console(__file_handle handle);
+//#pragma overload int_t __close_console(__file_handle handle);
 
 int_t __close_console(__file_handle handle)
 {
-	#pragma unused(handle)
+//	#pragma unused(handle)
 	MISRA_QUIET_UNUSED_ARGS()
 
 	return (int_t)__no_io_error;
@@ -197,7 +197,7 @@ static UARTError __init_uart_console(void)
 	static int_t initialized = 0;
 
 	if (initialized == 0) {
-		err = InitializeUART( UART_CONSOLE_BAUD_RATE );
+//		err = InitializeUART( UART_CONSOLE_BAUD_RATE );
 
 		if (err == kUARTNoError) {
 			initialized = 1;
