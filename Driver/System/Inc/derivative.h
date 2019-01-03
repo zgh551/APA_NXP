@@ -4,4 +4,15 @@
  */
 
 /* Include the derivative-specific header file */
-#include "MPC5744P.h"
+//#include "MPC5744P.h"
+
+
+
+#include "project.h"
+
+#include "can.h"
+#include "pit.h"
+#include "uart.h"
+#include "gpio.h"
+#include "linflexd.h"
+#include "mode_entry.h"
