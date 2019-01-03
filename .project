@@ -3,7 +3,6 @@
 	<name>APA_NXP</name>
 	<comment></comment>
 	<projects>
-		<project>APA_NXP</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

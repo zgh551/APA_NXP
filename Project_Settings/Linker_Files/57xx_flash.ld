@@ -128,6 +128,7 @@ SECTIONS
     {
       *(.rodata)
       *(.rodata.*)
+	  *(.got1)
     } > m_text
     
     .eh_frame_hdr : { *(.eh_frame_hdr) } > m_text
@@ -137,6 +138,12 @@ SECTIONS
 	{
 	  *(.data)
 	  *(.data.*)
+	  *(.got.plt) 
+	  *(.got)
+	  *(.got2)
+	  *(.dynamic)
+	  *(.fixup)        
+	  . = ALIGN(4);
 	}  > m_data AT>m_text
     
     .sdata2  :

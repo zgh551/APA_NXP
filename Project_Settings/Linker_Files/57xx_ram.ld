@@ -114,6 +114,7 @@ SECTIONS
     {
       *(.rodata)
       *(.rodata.*)
+	  *(.got1)
     } > SRAM
     
     .sdata2 :
@@ -135,6 +136,12 @@ SECTIONS
     {
       *(.data)
       *(.data.*)
+	  *(.got.plt) 
+	  *(.got)
+	  *(.got2)
+	  *(.dynamic)
+	  *(.fixup)        
+	  . = ALIGN(4);
     }  > SRAM 
     
     .sdata :
