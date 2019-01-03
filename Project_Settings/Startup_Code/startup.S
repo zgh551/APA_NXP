@@ -304,3 +304,11 @@ bss_Init_end:
 
 ;# Jump to Main
 		e_bl	main
+
+#ifdef __GNUC__   /* GCC */
+;# Empty _fini function 
+		.globl	_fini
+_fini:
+		e_b .
+#endif
+
