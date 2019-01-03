@@ -4,7 +4,16 @@
  *  Created on: December 11 2018
  *      Author: ZhuGuohua
  */
+/*****************************************************************************/
+/* FILE NAME: gpio.c                          COPYRIGHT (c) Motovis 2018      */
 
+/*                                                      All Rights Reserved  */
+/* DESCRIPTION: Transmit & receive LIN messages using LINflexD modules.      */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     December 29 2018    Initial Version                  */
+/*****************************************************************************/
 #include "gpio.h"
 
 /********************************************************************************************
@@ -52,7 +61,6 @@ void initGPIO(void)
 	SIUL2.MSCR[PC1].B.IBE = 1;			/* Input Buffer Enable on */
 	#endif
 
-	#ifdef MotovisBoard_V1
 	/* CAN Module Configure */
 	/// CAN_0 Standby Control Pin
 	SIUL2.MSCR[PD2].B.SSS = 0;			/* PD2: Pin functionality as GPIO */
@@ -98,7 +106,6 @@ void initGPIO(void)
 	SIUL2.MSCR[PG5].B.OBE = 1;      /* Output Buffer Enable on */
 	SIUL2.MSCR[PG5].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PG5].B.PDO = 1;			/* Inialize Hight */
-	#endif
 }
 
 void GPIO_toggle(uint16_t GPIO, uint32_t TOGGLES, uint32_t DELAY)

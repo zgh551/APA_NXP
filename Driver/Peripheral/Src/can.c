@@ -1,40 +1,46 @@
 /*
  * can.c
  *
- *  Created on: 2018��11��20��
- *      Author: zhuguohua
+ *  Created on: December 29, 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: can.c                          COPYRIGHT (c) Motovis 2018      */
 
+/*                                                      All Rights Reserved  */
+/* DESCRIPTION: Transmit & receive LIN messages using LINflexD modules.      */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     December 29 2018    Initial Version                  */
+/*****************************************************************************/
 #include "can.h"
-
-uint32_t  RxCODE;              /* Received message buffer code */
-uint32_t  RxID;                /* Received message ID */
-uint32_t  RxLENGTH;            /* Recieved message number of data bytes */
-uint8_t   RxDATA[8];           /* Received message data string*/
-uint32_t  RxTIMESTAMP;         /* Received message time */
 
 void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   uint8_t	i;
 
   CAN_0.MCR.B.MDIS = 1;       /* Disable module before selecting clock source*/
-  CAN_0.CTRL1.B.CLKSRC= 1;     /* Clock Source = CAN PLL Clock (40 MHz) */
+  CAN_0.CTRL1.B.CLKSRC= 0;     /* Clock Source = oscillator Clock (8 MHz) */
   CAN_0.MCR.B.MDIS = 0;       /* Enable module for config. (Sets FRZ, HALT)*/
   while (!CAN_0.MCR.B.FRZACK) {} /* Wait for freeze acknowledge to set */
-	/* CAN bus: 40 MHz clksrc, 500K bps with 16 tq */
-	/* PRESDIV+1 = Fclksrc/Ftq = 40 MHz/8MHz = 5 */
-	/*    so PRESDIV = 4 */
+	/* CAN bus: 10 MHz clksrc, 500K bps with 16 tq */
+	/* PRESDIV+1 = Fclksrc/Ftq = 8 MHz/8MHz = 1 */
+	/*    so PRESDIV = 0 */
 	/* PSEG2 = Phase_Seg2 - 1 = 4 - 1 = 3 */
 	/* PSEG1 = PSEG2 = 3 */
 	/* PROPSEG= Prop_Seg - 1 = 7 - 1 = 6 */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
-	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-  CAN_0.CTRL1.B.PRESDIV = 4;
+	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 10 MHz*/
+  CAN_0.CTRL1.B.PRESDIV = 0;
+
   CAN_0.CTRL1.B.PSEG1 = 3;
   CAN_0.CTRL1.B.PSEG2 = 3;
+  CAN_0.CTRL1.B.PROPSEG = 6;
+
   CAN_0.CTRL1.B.RJW = 3;
   CAN_0.CTRL1.B.SMP = 1;
-  CAN_0.CTRL1.B.PROPSEG = 6;
+
 
   for(i=0; i<64; i++){ 			//MPC574xP has 64 buffers
     CAN_0.MB[i].CS.B.CODE = 0;   /* Inactivate all message buffers */
@@ -69,16 +75,14 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   CAN_0.MCR.B.HALT = 0;
   while (CAN_0.MCR.B.FRZACK & CAN_0.MCR.B.NOTRDY) {} /* Wait to clear */
                  /* Good practice: wait for FRZACK on freeze mode entry/exit */
-  INTC_0.PSR[524].R = 0x8009;
-//  INTC_0.PSR[524].B.PRC_SELN0 = 1;
-//  INTC_0.PSR[524].B.PRIN = 9;
+//  INTC_0.PSR[524].R = 0x8009;
 }
 
 void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	uint8_t	i;
 
 	CAN_1.MCR.B.MDIS = 1;       /* Disable module before selecting clock source*/
-	CAN_1.CTRL1.B.CLKSRC = 1;     /* Clock Source = peripheral clock (40 MHz) */
+	CAN_1.CTRL1.B.CLKSRC = 0;     /* Clock Source = oscillator clock (8 MHz) */
 	CAN_1.MCR.B.MDIS = 0;       /* Enable module for config. (Sets FRZ, HALT)*/
 	while (!CAN_1.MCR.B.FRZACK) {} /* Wait for freeze acknowledge to set */
 	/* CAN bus: 40 MHz clksrc, 500K bps with 16 tq */
@@ -90,16 +94,16 @@ void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	/* RJW = Resync Jump Width - 1 = 4 = 1 */
 	/* SMP = 1: use 3 bits per CAN sample */
 	/* CLKSRC=0 (unchanged): Fcanclk= Fxtal= 40 MHz*/
-	CAN_1.CTRL1.B.PRESDIV = 4;
+	CAN_1.CTRL1.B.PRESDIV = 0;
 	CAN_1.CTRL1.B.PSEG1 = 3;
 	CAN_1.CTRL1.B.PSEG2 = 3;
 	CAN_1.CTRL1.B.RJW = 3;
 	CAN_1.CTRL1.B.SMP = 1;
 	CAN_1.CTRL1.B.PROPSEG = 6;
-	//  CAN_1.CTRL1.R = 0x04DB0086;  /* CAN bus: same as for CAN_1 */
 
-	for(i=0; i<64; i++){ 			//MPC574xP has 64 buffers
-	CAN_1.MB[i].CS.B.CODE = 0;   /* Inactivate all message buffers */
+	for(i=0; i<64; i++)//MPC574xP has 64 buffers
+	{
+		CAN_1.MB[i].CS.B.CODE = 0;   /* Inactivate all message buffers */
 	}
 	CAN_1.MB[0].CS.B.CODE = 8;     /* Message Buffer 0 set to TX INACTIVE */
 
@@ -113,7 +117,7 @@ void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	/* set mask registers - all ID bits must match */
 	for(i=0;i<64;i++)
 	{
-	CAN_1.RXIMR[i].R = 0x00;
+		CAN_1.RXIMR[i].R = 0x00;
 	}
 
 	/* Configure the CAN0_TX pin to transmit. */
@@ -156,10 +160,10 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	CAN_2.CTRL1.B.RJW = 3;
 	CAN_2.CTRL1.B.SMP = 1;
 	CAN_2.CTRL1.B.PROPSEG = 6;
-	//  CAN_2.CTRL1.R = 0x04DB0086;  /* CAN bus: same as for CAN_2 */
 
-	for(i=0; i<64; i++){ 			//MPC574xP has 64 buffers
-	CAN_2.MB[i].CS.B.CODE = 0;   /* Inactivate all message buffers */
+	for(i=0; i<64; i++)//MPC574xP has 64 buffers
+	{
+		CAN_2.MB[i].CS.B.CODE = 0;   /* Inactivate all message buffers */
 	}
 	CAN_2.MB[0].CS.B.CODE = 8;     /* Message Buffer 0 set to TX INACTIVE */
 
@@ -173,7 +177,7 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	/* set mask registers - all ID bits must match */
 	for(i=0;i<64;i++)
 	{
-	CAN_2.RXIMR[i].R = 0x00;
+		CAN_2.RXIMR[i].R = 0x00;
 	}
 
 	/* Configure the CAN2_TX pin to transmit. */
@@ -191,7 +195,7 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	CAN_2.MCR.B.HALT = 0;
 	while (CAN_2.MCR.B.FRZACK & CAN_2.MCR.B.NOTRDY) {} /* Wait to clear */
 	/* Good practice: wait for FRZACK on freeze mode entry/exit */
-	INTC_0.PSR[550].R = 0x8009;
+	INTC_0.PSR[550].R = 0x8008;
 }
 
 void CAN_Configure()

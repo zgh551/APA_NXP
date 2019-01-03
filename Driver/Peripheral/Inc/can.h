@@ -9,7 +9,7 @@
 #define CAN_H_
 
 #include "derivative.h"
-#include "project.h"
+
 
 #ifdef __cplusplus
 extern "C" {

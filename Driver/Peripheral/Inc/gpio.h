@@ -12,7 +12,6 @@
 /**********************************************************************************************
 * Includes
 **********************************************************************************************/
-#include "project.h"
 #include "derivative.h"
 
 #ifdef __cplusplus
@@ -36,11 +35,9 @@ extern "C" {
 #define EXTERN_LEVEL SIUL2.GPDI[PC1].B.PDI
 #endif
 
-#ifdef MotovisBoard_V1
-/// MotovisBoard_V1
+
 #define SYSTEM_LED SIUL2.GPDO[PG5].B.PDO
 // #define CAN_WAKE   SIUL2.GPDO[PC6].B.PDO
-#endif
 
 #define LED_ON 0
 #define LED_OFF 1
