@@ -8,6 +8,8 @@
 #ifndef MODE_ENTRY_H_
 #define MODE_ENTRY_H_
 
+#include "derivative.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

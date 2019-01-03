@@ -20,9 +20,7 @@
 /* ---   -----------    ----------------    ---------------------            */
 /* 1.0	 Guohua Zhu     December 14 2018    Initial Version                  */
 /*****************************************************************************/
-
-
-#include "project.h"
+#include "mode_entry.h"
 
 void PeripheralClockGating(void)
 {
@@ -94,8 +92,8 @@ void PLL_200MHz(void)
 
 	MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
 
-	MC_CGM.AC2_DC0.B.DIV = 4;// set the divider division value
-	MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
+//	MC_CGM.AC2_DC0.B.DIV = 1;// set the divider division value
+//	MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
 
 	PeripheralClockGating();
   /* Configure PLL0 Dividers - 200MHz from 8Mhx XOSC */

@@ -8,7 +8,7 @@
 #ifndef _UART_H_
 #define _UART_H_
 #include "derivative.h"
-#include "project.h"
+
 
 #ifdef __cplusplus
 extern "C" {

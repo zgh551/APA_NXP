@@ -8,7 +8,8 @@
 #ifndef PIT_H_
 #define PIT_H_
 
-#include "project.h"
+#include "derivative.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
