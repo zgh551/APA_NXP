@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include "PID.h"
+#include "pid.h"
 
 PID::PID() {
 	// TODO Auto-generated constructor stub
