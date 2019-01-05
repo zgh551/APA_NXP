@@ -15,12 +15,19 @@ Ultrasonic::Ultrasonic() {
 	ScheduleTimeCnt.getter(&Ultrasonic::getScheduleTimeCnt);
 	ScheduleTimeCnt.setter(&Ultrasonic::setScheduleTimeCnt);
 
+	ReadStage.setContainer(this);
+	ReadStage.getter(&Ultrasonic::getReadStage);
+	ReadStage.setter(&Ultrasonic::setReadStage);
+
 	SystemTime.setContainer(this);
 	SystemTime.getter(&Ultrasonic::getSystemTime);
 	SystemTime.setter(&Ultrasonic::setSystemTime);
 
 	UltrasonicPacket.setContainer(this);
 	UltrasonicPacket.getter(&Ultrasonic::getUltrasonicPacket);
+
+	UltrasonicDatas.setContainer(this);
+	UltrasonicDatas.getter(&Ultrasonic::getUltrasonicDatas);
 }
 
 Ultrasonic::~Ultrasonic() {
@@ -37,10 +44,15 @@ void Ultrasonic::Init(void)
 uint8_t Ultrasonic::getScheduleTimeCnt()             {return _schedule_time_cnt ;}
 void    Ultrasonic::setScheduleTimeCnt(uint8_t value){_schedule_time_cnt = value;}
 
+uint8_t Ultrasonic::getReadStage()             {return _read_stage ;}
+void    Ultrasonic::setReadStage(uint8_t value){_read_stage = value;}
+
 uint32_t Ultrasonic::getSystemTime()              {return _system_time ;}
 void     Ultrasonic::setSystemTime(uint32_t value){_system_time = value;}
 
 Ultrasonic_Packet* Ultrasonic::getUltrasonicPacket(){return _ultrasonic_packet;}
+
+LIN_RAM* Ultrasonic::getUltrasonicDatas(){return _ultrasonic_datas;}
 
 void Ultrasonic::InitSensing_STP318(uint8_t tx,uint8_t rx,void (*TransmitFrame)(LIN_RAM))
 {
@@ -475,3 +487,4 @@ void Ultrasonic::Update(uint8_t id,float t)
 			break;
 	}
 }
+

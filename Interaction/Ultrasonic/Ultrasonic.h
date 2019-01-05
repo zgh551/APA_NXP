@@ -8,8 +8,10 @@
 #ifndef ULTRASONIC_H_
 #define ULTRASONIC_H_
 
+//#include "../HMI/Terminal.h"
 #include "derivative.h"
 #include "property.h"
+
 
 #define FRONT_ULTRASONIC_ENABLE
 #define REAR_ULTRASONIC_ENABLE
@@ -41,7 +43,6 @@ typedef struct _Ultrasonic_Packet
 	float Time_Ms;
 	uint8_t status;
 	uint32_t Time_Tx;
-
 }Ultrasonic_Packet;
 
 class Ultrasonic {
@@ -72,6 +73,10 @@ public:
 	void    setScheduleTimeCnt(uint8_t value);
 	Property<Ultrasonic,uint8_t,READ_WRITE> ScheduleTimeCnt;
 
+	uint8_t getReadStage();
+	void    setReadStage(uint8_t value);
+	Property<Ultrasonic,uint8_t,READ_WRITE> ReadStage;
+
 	uint32_t getSystemTime();
 	void     setSystemTime(uint32_t value);
 	Property<Ultrasonic,uint32_t,READ_WRITE> SystemTime;
@@ -79,6 +84,8 @@ public:
 	Ultrasonic_Packet* getUltrasonicPacket();
 	Property<Ultrasonic,Ultrasonic_Packet*,READ_ONLY> UltrasonicPacket;
 
+	LIN_RAM* getUltrasonicDatas();
+	Property<Ultrasonic,LIN_RAM*,READ_ONLY> UltrasonicDatas;
 private:
 	uint32_t _system_time;
 	uint8_t  _schedule_time_cnt;
