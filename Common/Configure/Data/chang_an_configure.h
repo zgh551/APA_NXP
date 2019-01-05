@@ -48,51 +48,51 @@
 
 /*** turn radius and the steering angle relationship ***/
 // (400,470]
-#define a1 		( 0.07466)
-#define b1 		(-4.072)
+#define FIT_RADIUS_A1 		( 0.07466)
+#define FIT_RADIUS_B1 		(-4.072)
 
 // (300,400]
-#define a2 		( 0.06758)
-#define b2 		(-1.289)
+#define FIT_RADIUS_A2 		( 0.06758)
+#define FIT_RADIUS_B2 		(-1.289)
 
 // (200,300]
-#define a3 		( 0.0653)
-#define b3 		(-0.5621)
+#define FIT_RADIUS_A3 		( 0.0653)
+#define FIT_RADIUS_B3 		(-0.5621)
 
 // (100,200]
-#define a4 		( 0.06206)
-#define b4 		( 0.06662)
+#define FIT_RADIUS_A4 		( 0.06206)
+#define FIT_RADIUS_B4 		( 0.06662)
 
 // (50,100]
-#define a5 		( 0.06312)
-#define b5 		(-0.02795)
+#define FIT_RADIUS_A5 		( 0.06312)
+#define FIT_RADIUS_B5 		(-0.02795)
 
 // (0,50]
-#define a6 		( 0.06706)
-#define b6 		(-0.1501)
+#define FIT_RADIUS_A6 		( 0.06706)
+#define FIT_RADIUS_B6 		(-0.1501)
 
 // (-50,0)
-#define a7 		( 0.06442)
-#define b7 		(-0.07814)
+#define FIT_RADIUS_A7 		( 0.06442)
+#define FIT_RADIUS_B7 		(-0.07814)
 
 // (-100,-50]
-#define a8 		( 0.06123)
-#define b8 		(-0.02889)
+#define FIT_RADIUS_A8 		( 0.06123)
+#define FIT_RADIUS_B8 		(-0.02889)
 
 // (-200,-100]
-#define a9 		( 0.06356)
-#define b9 		(-0.2489)
+#define FIT_RADIUS_A9 		( 0.06356)
+#define FIT_RADIUS_B9 		(-0.2489)
 
 // (-300,-200]
-#define a10 	( 0.06393)
-#define b10 	(-0.3534)
+#define FIT_RADIUS_A10 		( 0.06393)
+#define FIT_RADIUS_B10 		(-0.3534)
 
 // (-400,-300]
-#define a11 	( 0.06846)
-#define b11 	(-1.662)
+#define FIT_RADIUS_A11 		( 0.06846)
+#define FIT_RADIUS_B11 		(-1.662)
 
 // (-510,-400]
-#define a12 	( 18.3)
-#define b12 	(-0.003017)
+#define FIT_RADIUS_A12 		( 18.3)
+#define FIT_RADIUS_B12 		(-0.003017)
 
 #endif
