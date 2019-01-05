@@ -82,25 +82,16 @@ private:
 	uint8_t _rolling_counter_gear_control;
 
 	/* ACC */
-	// actual value
-	float _target_acceleration_acc;
-	uint8_t _target_acceleration_enable;
 	// current value
 	uint8_t _current_target_acceleration_ACC;
 	uint8_t _current_target_acceleration_enable_single;
 
 	/* AEB */
-	// actual value
-	float _target_deceleration_aeb;
-	uint8_t _target_deceleration_enable;
 	// current value
 	uint16_t _current_target_deceleration_AEB;
 	uint8_t _current_target_deceleration_enable_single;
 
 	/* Torque */
-	// actual value
-	float _torque;
-	uint8_t _torque_enable;
 	// current value
 	uint16_t _current_torque;
 	uint8_t _current_torque_enable_single;
@@ -108,18 +99,11 @@ private:
 	/* SteeringAngle */
 	// actual value
 	float _steering_angle_set;
-	float _steering_angle_target;
-	float _steering_angle_rate_target;
-	uint8_t _steering_angle_target_active;
 	// current value
 	int16_t _current_steering_angle_target;
 	uint8_t _current_steering_angle_target_active_single;
 
 	/* Gear */
-	// actual value
-	uint8_t _gear;
-	uint8_t _gear_enable;
-	uint8_t _gear_valid;
 	// current value
 	uint8_t _current_gear;
 	uint8_t _current_gear_enable_single;

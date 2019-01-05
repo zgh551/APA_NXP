@@ -33,81 +33,74 @@ void ChangAnController::Init()
 	_rolling_counter_steering_control 	= 0;
 	_rolling_counter_gear_control 		= 0;
 
-	_target_acceleration_acc 	= 0;
-	_target_acceleration_enable = 0;
-	// current value
+	/* ACC */
 	_current_target_acceleration_ACC 			= 0;
 	_current_target_acceleration_enable_single 	= 0;
 
 	/* AEB */
-	// actual value
-	_target_deceleration_aeb 	= 0;
-	_target_deceleration_enable = 0;
-	// current value
 	_current_target_deceleration_AEB 			= 0;
 	_current_target_deceleration_enable_single 	= 0;
 
 	/* Torque */
-	// actual value
-	_torque 		= 0;
-	_torque_enable 	= 0;
-	// current value
 	_current_torque = 0;
 	_current_torque_enable_single = 0;
 
 	/* SteeringAngle */
-	// actual value
 	_steering_angle_set 			= 0;
-	_steering_angle_target 			= 0;
-	_steering_angle_rate_target 	= 0;
-	_steering_angle_target_active 	= 0;
-	// current value
+
 	_current_steering_angle_target 					= 0;
 	_current_steering_angle_target_active_single 	= 0;
 
 	/* Gear */
-	// actual value
-	_gear 			= 0;
-	_gear_enable 	= 0;
-	_gear_valid 	= 0;
-	// current value
 	_current_gear 				= 0;
 	_current_gear_enable_single = 0;
 	_current_gear_valid_single 	= 0;
 }
 
-
-
-
 void ChangAnController::Start()
 {
-	_target_acceleration_enable = 1;
-	_target_deceleration_enable  = 1;
-	_torque_enable = 1;
-	_gear_enable = 1;
-	_gear_valid = 1;
-	_steering_angle_target_active = 1;
+	GearEnable 	        = 1;
+	SteeringEnable      = 1;
+
+	AccelerationEnable  = 1;
+	DecelerationEnable  = 1;
+	TorqueEnable 	    = 1;
+	VelocityEnable      = 1;
 }
 
 void ChangAnController::Stop()
 {
-	_target_acceleration_enable  = 0;
-	_target_deceleration_enable  = 0;
-	_torque_enable 	= 0;
-	_gear_enable 	= 0;
-	_gear_valid 	= 0;
-	_steering_angle_target_active = 0;
+	GearEnable 	        = 0;
+	SteeringEnable      = 0;
+
+	AccelerationEnable  = 0;
+	DecelerationEnable  = 0;
+	TorqueEnable 	    = 0;
+	VelocityEnable      = 0;
 }
 
 void ChangAnController::Update(ControlCommand cmd)
 {
-	_torque 					= cmd.Torque;
-	_gear						= cmd.Gear;
-	_target_acceleration_acc 	= cmd.Acc;
-	_target_deceleration_aeb 	= cmd.Aeb;
+	GearEnable 	        = cmd.ControlEnable.B.GearEnable;
+	SteeringEnable      = cmd.ControlEnable.B.SteeringEnable;
 
-	_steering_angle_target 		= cmd.SteeringAngle;
-	_steering_angle_rate_target = cmd.SteeringAngleRate;
+	AccelerationEnable  = cmd.ControlEnable.B.AccelerationEnable;
+	DecelerationEnable  = cmd.ControlEnable.B.DecelerationEnable;
+	TorqueEnable 	    = cmd.ControlEnable.B.TorqueEnable;
+	VelocityEnable      = cmd.ControlEnable.B.VelocityEnable;
+
+
+	Gear			  = cmd.Gear;
+	SteeringAngle 	  = cmd.SteeringAngle;
+	SteeringAngleRate = cmd.SteeringAngleRate;
+
+	if(0 == VelocityEnable)
+	{
+		Acceleration 	  = cmd.Acceleration;
+	}
+	Deceleration 	  = cmd.Deceleration;
+	Torque 			  = cmd.Torque;
+	Velocity          = cmd.Velocity;
 }
 
 void ChangAnController::Push(float dt)
@@ -123,17 +116,17 @@ void ChangAnController::VehicleContorlStep1()
 	m_CAN_Packet.length = 8;
 	/// data buffer
 	/* ACC */
-	_current_target_acceleration_ACC = (uint8_t)((_target_acceleration_acc + 5.0)*20);
-	_current_target_acceleration_enable_single = _target_acceleration_enable;
+	_current_target_acceleration_ACC = (uint8_t)((Acceleration + 5.0)*20);
+	_current_target_acceleration_enable_single = AccelerationEnable;
 	/* AEB */
-	_current_target_deceleration_AEB = (uint16_t)((_target_deceleration_aeb + 16.0) * 2000);
-	_current_target_deceleration_enable_single = _target_deceleration_enable;
+	_current_target_deceleration_AEB = (uint16_t)((Deceleration + 16.0) * 2000);
+	_current_target_deceleration_enable_single = DecelerationEnable;
 	/* Torque */
-	_current_torque = (uint16_t)(_torque * 10.23);
-	_current_torque_enable_single = _torque_enable;
+	_current_torque = (uint16_t)(Torque * 10.23);
+	_current_torque_enable_single = TorqueEnable;
 	/* Steering Angle */
 	_current_steering_angle_target = (int16_t)(_steering_angle_set * 10);
-	_current_steering_angle_target_active_single = _steering_angle_target_active;
+	_current_steering_angle_target_active_single = SteeringEnable;
 
 	/// Data Mapping
 	m_CAN_Packet.data[0] = _current_target_acceleration_ACC;
@@ -165,9 +158,9 @@ void ChangAnController::VehicleContorlStep2()
 	m_CAN_Packet.id = 0x6FF;
 	m_CAN_Packet.length = 8;
 	/// data buffer
-	_current_gear = _gear;
-	_current_gear_enable_single = _gear_enable;
-	_current_gear_valid_single  = _gear_valid;
+	_current_gear = Gear;
+	_current_gear_enable_single = GearEnable;
+	_current_gear_valid_single  = GearEnable;
 
 	/// data mapping
 	for(i=0;i<4;i++){m_CAN_Packet.data[i] = 0;}
@@ -243,9 +236,9 @@ void ChangAnController::VehicleContorl()
 
 void ChangAnController::SteeringAngleControl(float dt)
 {
-    float da = _steering_angle_rate_target * dt;
-    float left_target_angle = _steering_angle_target - da;
-    float right_target_angle = _steering_angle_target + da;
+    float da = SteeringAngleRate * dt;
+    float left_target_angle = SteeringAngle - da;
+    float right_target_angle = SteeringAngle + da;
 
     if(_steering_angle_set < left_target_angle)
     {
@@ -257,7 +250,7 @@ void ChangAnController::SteeringAngleControl(float dt)
     }
     else
     {
-    	_steering_angle_set = _steering_angle_target;
+    	_steering_angle_set = SteeringAngle;
     }
 }
 
@@ -266,7 +259,7 @@ void ChangAnController::SteeringAngleControlStateMachine(uint8_t fd)
 	switch(_steerig_angle_active_control_state)
 	{
 		case WaitSteeringAngleControlSingleState:
-			if(1 == _steering_angle_target_active)
+			if(1 == SteeringEnable)
 			{
 				_steerig_angle_active_control_state = WaitFeedbackSingleState;
 			}
@@ -275,13 +268,13 @@ void ChangAnController::SteeringAngleControlStateMachine(uint8_t fd)
 		case WaitFeedbackSingleState:
 			if(fd)
 			{
-				_steering_angle_target_active = 2;
+				SteeringEnable = 2;
 				_steerig_angle_active_control_state = WaitExistState;
 			}
 			break;
 
 		case WaitExistState:
-			if( (!fd) | ( 0 == _steering_angle_target_active ))
+			if( (!fd) | ( 0 == SteeringEnable ))
 			{
 				_steerig_angle_active_control_state = WaitSteeringAngleControlSingleState;
 			}
