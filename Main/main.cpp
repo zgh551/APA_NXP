@@ -25,7 +25,8 @@
 #include "ChangAn/chang_an_controller.h"
 #include "ChangAn/chang_an_message.h"
 #include "../Common/VehicleState/GeometricTrack/geometric_track.h"
-
+#include <lon_control.h>
+#include "pid.h"
 //using namespace std;
 
 #ifdef __cplusplus
@@ -36,12 +37,13 @@ extern void xcptn_xmpl(void);
 }
 #endif
 
-Terminal m_Terminal_CA = Terminal(0.02,3.5,0.1,0.1,0.3,1,0.1);
+Terminal m_Terminal_CA;
 Ultrasonic m_Ultrasonic;
 ChangAnController m_ChangAnController;
 ChangAnMessage m_ChangAnMessage;
 GeometricTrack m_GeometricTrack;
-
+LonControl m_LonControl;
+PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
 vuint8_t cnt;
 bool TerminalSendFlag = false;
 float temp;
@@ -69,9 +71,7 @@ int main()
 		/* Loop forever */
 		for(;;)
 		{
-			m_ChangAnMessage.SteeringAngle = 420;
-			m_ChangAnMessage.WheelSpeedRearLeft = 0.3;
-			m_ChangAnMessage.WheelSpeedRearRight = 0.4;
+			m_Terminal_CA.Push(&m_Ultrasonic);
 		}
 }
 
@@ -90,6 +90,7 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
+	m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);
 	m_ChangAnController.Push(0.02);
 	m_GeometricTrack.Update(&m_ChangAnMessage,0.02);
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();
@@ -160,7 +161,7 @@ void FlexCAN2_Isr(void)
 {
 	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-		m_Terminal_CA.VehicleInformation(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 //		uint32_t temp = CAN_2.TIMER.R;
