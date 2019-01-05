@@ -74,6 +74,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1194180490" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -120,6 +121,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.1228741557" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1261271260" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -199,6 +201,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.793304228" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile.319867647" superClass="com.freescale.s32ds.cross.gnu.tool.assembler.inputType.asmfile"/>
@@ -543,6 +546,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.2126857288" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1252468191" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -589,6 +593,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.1428372391" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.314091492" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -645,6 +650,7 @@
 									<listOptionValue builtIn="false" value="&quot;${VLE_EWL_DIR}/EWL_C++/include/pa&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${MPC574XP_AMMCLIB_S32DS_1.1.9_PATH}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Utils/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
