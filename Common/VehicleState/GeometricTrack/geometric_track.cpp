@@ -58,16 +58,16 @@ float GeometricTrack::SteeringAngle2TurnningRadiusExp(float steer,float a,float 
 
 float GeometricTrack::TurnRadiusCalculate(float steering_angle)
 {
-	return 	steering_angle >  400 ? SteeringAngle2TurnningRadius(steering_angle,a1,b1) :
-			steering_angle >  300 ? SteeringAngle2TurnningRadius(steering_angle,a2,b2) :
-			steering_angle >  200 ? SteeringAngle2TurnningRadius(steering_angle,a3,b3) :
-			steering_angle >  100 ? SteeringAngle2TurnningRadius(steering_angle,a4,b4) :
-			steering_angle >   50 ? SteeringAngle2TurnningRadius(steering_angle,a5,b5) :
-			steering_angle >    0 ? SteeringAngle2TurnningRadius(steering_angle,a6,b6) :
-			steering_angle <    0 ? SteeringAngle2TurnningRadius(steering_angle,a7,b7) :
-			steering_angle < - 50 ? SteeringAngle2TurnningRadius(steering_angle,a8,b8) :
-			steering_angle < -100 ? SteeringAngle2TurnningRadius(steering_angle,a9,b9) :
-			steering_angle < -200 ? SteeringAngle2TurnningRadius(steering_angle,a10,b10) :
-			steering_angle < -300 ? SteeringAngle2TurnningRadius(steering_angle,a11,b11) :
-			steering_angle < -400 ? SteeringAngle2TurnningRadiusExp(steering_angle,a12,b12) : 0;
+	return 	steering_angle >  400 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A1,FIT_RADIUS_B1) :
+			steering_angle >  300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A2,FIT_RADIUS_B2) :
+			steering_angle >  200 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A3,FIT_RADIUS_B3) :
+			steering_angle >  100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A4,FIT_RADIUS_B4) :
+			steering_angle >   50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A5,FIT_RADIUS_B5) :
+			steering_angle >    0 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A6,FIT_RADIUS_B6) :
+			steering_angle <    0 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A7,FIT_RADIUS_B7) :
+			steering_angle < - 50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A8,FIT_RADIUS_B8) :
+			steering_angle < -100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A9,FIT_RADIUS_B9) :
+			steering_angle < -200 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A10,FIT_RADIUS_B10) :
+			steering_angle < -300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A11,FIT_RADIUS_B11) :
+			steering_angle < -400 ? SteeringAngle2TurnningRadiusExp(steering_angle,FIT_RADIUS_A12,FIT_RADIUS_B12) : 0;
 }
