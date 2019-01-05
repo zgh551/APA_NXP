@@ -1,0 +1,76 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+
+
+BO_ 1312 chang_an_interface: 1 Vector__XXX
+ SG_ AEB_EnableSingle : 3|1@1+ (1,0) [0|1] "1" Vector__XXX
+ SG_ ACC_EnableSingle : 2|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ SteeringAngleEnableSingle : 1|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ GearEnableSingle : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+
+
+
+BA_DEF_  "DBName" STRING ;
+BA_DEF_  "SM Parameters" STRING ;
+BA_DEF_  "Baud Rate" INT 0 100000;
+BA_DEF_  "Cycle Length" INT 0 100000;
+BA_DEF_  "Max Static Id" INT 0 100000;
+BA_DEF_  "Max Id" INT 0 100000;
+BA_DEF_  "Macrotick Length" FLOAT 0 100000;
+BA_DEF_  "Channel Number" INT 0 1;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_ BO_  "Sync" INT 0 1;
+BA_DEF_ BO_  "Mux" INT 0 1;
+BA_DEF_ BO_  "Identifier Number" INT 0 100000;
+BA_DEF_ BO_  "Slot Length" INT 0 100000;
+BA_DEF_ BO_  "Slot Start" INT 0 100000;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "SM Parameters" "";
+BA_DEF_DEF_  "Baud Rate" 20;
+BA_DEF_DEF_  "Cycle Length" 0;
+BA_DEF_DEF_  "Max Static Id" 0;
+BA_DEF_DEF_  "Max Id" 0;
+BA_DEF_DEF_  "Macrotick Length" 0;
+BA_DEF_DEF_  "Channel Number" 0;
+BA_DEF_DEF_  "BusType" "FlexRay";
+BA_DEF_DEF_  "Sync" 0;
+BA_DEF_DEF_  "Mux" 0;
+BA_DEF_DEF_  "Identifier Number" 0;
+BA_DEF_DEF_  "Slot Length" 0;
+BA_DEF_DEF_  "Slot Start" 0;
+BA_ "DBName" "MPC574x";
+
