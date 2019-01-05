@@ -7,33 +7,38 @@
 
 #ifndef TERMINAL_H_
 #define TERMINAL_H_
-//#include "Property.h"
-//#include "derivative.h"
-//#include "project.h"
-#include "SystemWork.h"
+
+#include "property.h"
+#include "derivative.h"
+#include "Interface/vehicle_controller.h"
+#include "Interface/message_manager.h"
+#include "Interface/vehicle_state.h"
+#include "Ultrasonic.h"
+//#include "SystemWork.h"
 
 
-class Terminal : public SystemWork
+class Terminal
 {
 public:
 	Terminal();
-	Terminal(float dt,float kp,float ki,float kd,float i_lim,float out_lim);
-	Terminal(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold);
-
 	virtual ~Terminal();
 
 	// CAN Module:Vehicle information receive
-	void VehicleInformation(CAN_MB_tag mb_msg);
-	void VehicleInformation(vuint32_t id,vuint8_t dat[]);
+	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl);
 
 	// Terminal Control
-	void TerminalControlCommandReceive(uint8_t data);
+	void Push(MessageManager *msg);
 
-	void TerminalControlCommandSend(void);
-	void TerminalControlSpeedSend(void);
-	void TerminalSystemStateSend(void);
+	void Push(VehicleState *msg);
 
-	void TerminalControlAckSend(void);
+	void Push(Ultrasonic *u);
+
+	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
+//	void TerminalControlCommandSend(void);
+//	void TerminalControlSpeedSend(void);
+//	void TerminalSystemStateSend(void);
+//
+//	void TerminalControlAckSend(void);
 
 	/*** Property ***/
 	// AckValid
