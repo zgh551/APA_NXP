@@ -171,9 +171,9 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	CAN_2.IMASK1.R = 0x00000100;
 	// mail buffer 8 set to receive
 	CAN_2.MB[8].CS.B.IDE = 0;      /* MB 8 will look for a standard ID */
-	CAN_2.MB[8].ID.B.ID_STD = 0x200; /* MB 8 will look for ID = 0x555 */
+	CAN_2.MB[8].ID.B.ID_STD = 0x500; /* MB 8 will look for ID = 0x555 */
 	CAN_2.MB[8].CS.B.CODE = 4;     /* MB 8 set to RX EMPTY */
-	CAN_2.RXMGMASK.R = 0x1003ffff; /* Global acceptance mask */
+	CAN_2.RXMGMASK.R = 0x1C03ffff; /* Global acceptance mask */
 	/* set mask registers - all ID bits must match */
 	for(i=0;i<64;i++)
 	{
