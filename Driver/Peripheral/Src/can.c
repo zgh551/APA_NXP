@@ -75,7 +75,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   CAN_0.MCR.B.HALT = 0;
   while (CAN_0.MCR.B.FRZACK & CAN_0.MCR.B.NOTRDY) {} /* Wait to clear */
                  /* Good practice: wait for FRZACK on freeze mode entry/exit */
-//  INTC_0.PSR[524].R = 0x8009;
+  INTC_0.PSR[524].R = 0x8009;
 }
 
 void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
@@ -113,7 +113,8 @@ void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
 	CAN_1.MB[8].CS.B.IDE = 0;      /* MB 8 will look for a standard ID */
 	CAN_1.MB[8].ID.B.ID_STD = 0x200; /* MB 8 will look for ID = 0x555 */
 	CAN_1.MB[8].CS.B.CODE = 4;     /* MB 8 set to RX EMPTY */
-	CAN_1.RXMGMASK.R = 0x1003ffff; /* Global acceptance mask */
+//	CAN_1.RXMGMASK.R = 0x1C03ffff; /* Global acceptance mask */
+	CAN_1.RXMGMASK.R = 0x0003ffff; /* Global acceptance mask */
 	/* set mask registers - all ID bits must match */
 	for(i=0;i<64;i++)
 	{
