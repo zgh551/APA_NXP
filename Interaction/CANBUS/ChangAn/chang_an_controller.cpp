@@ -148,7 +148,7 @@ void ChangAnController::VehicleContorlStep1()
 									  ( _current_steering_angle_target_active_single & 0x03));
 	m_CAN_Packet.data[6] = (uint8_t)((_current_steering_angle_target >> 8) & 0xFF);
 	m_CAN_Packet.data[7] = (uint8_t)((_current_steering_angle_target     ) & 0xFF);
-	CAN0_TransmitMsg(m_CAN_Packet);
+	CAN1_TransmitMsg(m_CAN_Packet);
 }
 
 void ChangAnController::VehicleContorlStep2()
@@ -191,7 +191,7 @@ void ChangAnController::VehicleContorlStep2()
 								+	((_current_target_deceleration_AEB     ) & 0xFF)
 								) ^ 0xFF
 							);
-	CAN0_TransmitMsg(m_CAN_Packet);
+	CAN1_TransmitMsg(m_CAN_Packet);
 }
 
 void ChangAnController::VehicleContorlStep3()
@@ -220,7 +220,7 @@ void ChangAnController::VehicleContorlStep3()
 											)|(_rolling_counter_gear_control & 0x0F)
 										);
 	for( i = 4 ;i < 8 ; i++ ){m_CAN_Packet.data[i] = 0;}
-	CAN0_TransmitMsg(m_CAN_Packet);
+	CAN1_TransmitMsg(m_CAN_Packet);
 }
 
 void ChangAnController::VehicleContorl()
