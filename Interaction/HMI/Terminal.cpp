@@ -37,7 +37,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 	uint8_t i,check_sum;
 	switch(id)
 	{
-		case 0x506://eps status
+		case 0x516://eps status
 			check_sum =0 ;
 			for(i=0;i<7;i++){
 				check_sum += dat[i];
@@ -46,11 +46,16 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			if(check_sum == dat[7])
 			{
 				ctl->GearEnable 		=  dat[0]       & 0x01;
-				ctl->SteeringEnable 	= (dat[0] >> 1) & 0x01;
+
 				ctl->AccelerationEnable = (dat[0] >> 2) & 0x01;
-				ctl->DecelerationEnable = (dat[0] >> 3) & 0x01;
-				ctl->TorqueEnable       = (dat[0] >> 4) & 0x01;
-				ctl->VelocityEnable     = (dat[0] >> 5) & 0x01;
+				ctl->DecelerationEnable = (dat[0] >> 4) & 0x01;
+				ctl->TorqueEnable       = (dat[0] >> 5) & 0x01;
+				ctl->VelocityEnable     = (dat[0] >> 3) & 0x01;
+
+				if( (0 == ctl->SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
+				{
+					ctl->SteeringEnable 	= (dat[0] >> 1) & 0x01;
+				}
 
 				ctl->Gear 				= (uint8_t)dat[1];
 				ctl->SteeringAngle 		= (float)(((int16_t)((dat[3] << 8) | dat[2])) * 0.1);
@@ -58,7 +63,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			}
 			break;
 
-		case 0x507://eps status
+		case 0x517://eps status
 			check_sum =0 ;
 			for(i=0;i<7;i++){
 				check_sum += dat[i];
@@ -73,6 +78,12 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			}
 			break;
 
+        case 0x508://传感器9
+        case 0x509://传感器10
+        case 0x50A://传感器11
+        case 0x50B://传感器12
+
+			break;
 		default:
 
 			break;
