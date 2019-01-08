@@ -90,17 +90,24 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
-	m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);
-	m_ChangAnController.Push(0.02);
-	m_GeometricTrack.Update(&m_ChangAnMessage,0.02);
-	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();
-	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
+	if(m_Ultrasonic.SystemTime % 4 == 0)
+	{
+		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+		m_ChangAnController.Push(0.02);//20ms
+	}
+	else if(m_Ultrasonic.SystemTime % 4 == 1)
+	{
+		m_GeometricTrack.Update(&m_ChangAnMessage,0.02);//20ms
+	}
 
+	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
+	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
+	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
 	{
 		SYSTEM_LED = ~SYSTEM_LED;
 	}
-	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	PIT_0.TIMER[0].TFLG.R |= 1;  /* Clear interrupt flag. w1c */
 }
 /*******************************************************************************
@@ -117,10 +124,11 @@ void FlexCAN0_Isr(void)
 {
 	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
+		m_ChangAnMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
 //		m_Terminal_CA.VehicleInformation(CAN_0.MB[8].ID.B.ID_STD,CAN_0.MB[8].DATA.B);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
-//		uint32_t temp = CAN_0.TIMER.R;
+		uint32_t temp = CAN_0.TIMER.R;
 		CAN_0.IFLAG1.R = 0x00000100;
 	}
 }
@@ -139,10 +147,10 @@ void FlexCAN1_Isr(void)
 {
 	if(CAN_1.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-		m_ChangAnMessage.Parse(CAN_1.MB[8].ID.B.ID_STD, CAN_1.MB[8].DATA.B, CAN_1.MB[8].CS.B.DLC);
+//		m_ChangAnMessage.Parse(CAN_1.MB[8].ID.B.ID_STD, CAN_1.MB[8].DATA.B, CAN_1.MB[8].CS.B.DLC);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
-//		uint32_t temp = CAN_1.TIMER.R;
+		uint32_t temp = CAN_1.TIMER.R;
 		CAN_1.IFLAG1.R = 0x00000100;
 	}
 }
@@ -164,7 +172,7 @@ void FlexCAN2_Isr(void)
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
-//		uint32_t temp = CAN_2.TIMER.R;
+		uint32_t temp = CAN_2.TIMER.R;
 		CAN_2.IFLAG1.R = 0x00000100;
 	}
 }
@@ -181,7 +189,7 @@ Issues        : NONE
 *******************************************************************************/
 void eDMA_Channel2_Isr(void)
 {
-	m_Ultrasonic.Update(0, 25);
+	m_Ultrasonic.Update(0, 0);
 	DMA_0.INT.B.INT2 = 1;
 }
 
@@ -197,7 +205,7 @@ Issues        : NONE
 *******************************************************************************/
 void eDMA_Channel18_Isr(void)
 {
-	m_Ultrasonic.Update(1, 25);
+	m_Ultrasonic.Update(1, 0);
 	DMA_0.INT.B.INT18 = 1;
 }
 #ifdef __cplusplus
