@@ -117,8 +117,8 @@ void InitLINFlexD0_DMA ( uint16_t MegaHertz, uint16_t BaudRate )
 	SIUL2.MSCR[PB3].B.IBE = 1; //Pad PB3: Enable input buffer
 	SIUL2.IMCR[165].B.SSS = 0b0001; //Connect LINFlexD_0 signal to PB3
 
-	INTC_0.PSR[55].R  = 0x800B; //set priority and core for DMA Channel1 interrupt
-	INTC_0.PSR[376].R = 0x800A; //set priority and core for LIN0 RX Channel1 interrupt
+	INTC_0.PSR[55].R  = 0x8005; //set priority and core for DMA Channel1 interrupt
+	INTC_0.PSR[376].R = 0x8006; //set priority and core for LIN0 RX Channel1 interrupt
 }
 
 /*******************************************************************************
@@ -397,8 +397,8 @@ void InitLINFlexD1_DMA ( uint16_t MegaHertz, uint16_t BaudRate )
 	SIUL2.MSCR[PD12].B.IBE = 1;     //Pad PD12: Enable input buffer
 	SIUL2.IMCR[166].B.SSS = 0b0010; //Connect LINFlexD_1 signal to PD12
 
-	INTC_0.PSR[71].R  = 0x800B; //set priority and core for DMA Channel18 interrupt
-	INTC_0.PSR[380].R = 0x800A; //set priority and core for LIN1 RX interrupt
+	INTC_0.PSR[71].R  = 0x8005; //set priority and core for DMA Channel18 interrupt
+	INTC_0.PSR[380].R = 0x8006; //set priority and core for LIN1 RX interrupt
 }
 
 /*******************************************************************************
