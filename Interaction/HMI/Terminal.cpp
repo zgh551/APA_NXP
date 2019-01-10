@@ -1,9 +1,18 @@
 /*
- * Terminal.cpp
+ * terminal.cpp
  *
- *  Created on: 2018ï¿½ï¿½12ï¿½ï¿½6ï¿½ï¿½
- *      Author: zhuguohua
+ *  Created on: January 8 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: terminal.cpp                        COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: Interaction terminal            					         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 8 2019      Initial Version                  */
+/*****************************************************************************/
 
 #include "Terminal.h"
 
@@ -32,7 +41,7 @@ void Terminal::setAckValid(uint8_t value)
 	_ack_valid = value;
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrasonic *u,MessageManager *msg)
 {
 	uint8_t i,check_sum;
 	switch(id)
@@ -46,20 +55,18 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			if(check_sum == dat[7])
 			{
 				ctl->GearEnable 		=  dat[0]       & 0x01;
-
 				ctl->AccelerationEnable = (dat[0] >> 2) & 0x01;
 				ctl->DecelerationEnable = (dat[0] >> 4) & 0x01;
 				ctl->TorqueEnable       = (dat[0] >> 5) & 0x01;
 				ctl->VelocityEnable     = (dat[0] >> 3) & 0x01;
-
 				if( (0 == ctl->SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
 				{
 					ctl->SteeringEnable 	= (dat[0] >> 1) & 0x01;
 				}
-
 				ctl->Gear 				= (uint8_t)dat[1];
 				ctl->SteeringAngle 		= (float)(((int16_t)((dat[3] << 8) | dat[2])) * 0.1);
 				ctl->SteeringAngleRate 	= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.01);
+				AckValid = 0xa5;
 			}
 			break;
 
@@ -82,79 +89,102 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
         case 0x509://´«¸ÐÆ÷10
         case 0x50A://´«¸ÐÆ÷11
         case 0x50B://´«¸ÐÆ÷12
-
+        	Ultrasonic_Packet ultrasonic_packet;
+        	ultrasonic_packet.Distance1 = (float)(((uint16_t )((dat[1] << 8) | dat[0])) * u->Compensation(0));
+        	ultrasonic_packet.Distance2 = (float)(((uint16_t )((dat[3] << 8) | dat[2])) * u->Compensation(0));
+        	ultrasonic_packet.Level = dat[4] * LEVEL_RATIO;
+        	ultrasonic_packet.Width = dat[5] * WIDTH_RATIO;
+        	ultrasonic_packet.status = dat[6];
+        	u->setUltrasonicPacket(id & 0x00f,ultrasonic_packet);
 			break;
+
+        case 0x510:
+        	msg->SteeringAngle = ((int16_t)((dat[3] << 8) | dat[2])) * 0.1;
+        	break;
+
+        case 0x520:
+        	msg->WheelSpeedRearLeft  = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001;
+        	msg->WheelSpeedRearRight = ((uint16_t)((dat[7] << 8) | dat[6])) * 0.001;
+        	break;
 		default:
 
 			break;
 	}
 }
 
-void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
+void Terminal::Push(ChangAnMessage *msg)
 {
 	CAN_Packet m_CAN_Packet;
-	m_CAN_Packet.id = 0x400 | id;
-	m_CAN_Packet.length = 8;
-	if(id < 8)
-	{
+	int16_t temp_int16;
+	uint16_t temp_uint16;
 
-		m_CAN_Packet.data[0] =  msg[id].STP318.TOF       & 0xff;
-		m_CAN_Packet.data[1] = (msg[id].STP318.TOF >> 8) & 0xff;
-		m_CAN_Packet.data[2] = 0;
-		m_CAN_Packet.data[3] = 0;
-		m_CAN_Packet.data[4] = 0;
-		m_CAN_Packet.data[5] = 0;
-		m_CAN_Packet.data[6] =  msg[id].STP318.Status;
-		m_CAN_Packet.data[7] = 0;
-	}
-	else
-	{
-		m_CAN_Packet.data[0] =  msg[id].STP313.TOF1       & 0xff;
-		m_CAN_Packet.data[1] = (msg[id].STP313.TOF1 >> 8) & 0xff;
-		m_CAN_Packet.data[2] =  msg[id].STP313.TOF2       & 0xff;
-		m_CAN_Packet.data[3] = (msg[id].STP313.TOF2 >> 8) & 0xff;
-		m_CAN_Packet.data[4] =  msg[id].STP313.Level;
-		m_CAN_Packet.data[5] =  msg[id].STP313.Width;
-		m_CAN_Packet.data[6] =  msg[id].STP313.Status;
-		m_CAN_Packet.data[7] =  0;
-	}
+	m_CAN_Packet.id = 0x410;
+	m_CAN_Packet.length = 8;
+
+	m_CAN_Packet.data[0] = ( (msg->EMS_QEC_ACC & 0x01) << 2) | ( (msg->ESP_QDC_ACC & 0x01) << 1) | (msg->APA_EPAS_Failed & 0x01);
+	m_CAN_Packet.data[1] = 0;
+
+	temp_int16 = (int16_t)(msg->SteeringAngle * 10);
+	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
+
+	temp_uint16 = (uint16_t)(msg->SteeringAngleRate * 100);
+	m_CAN_Packet.data[4] = temp_uint16 & 0xff;
+	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
+
+	temp_int16 = (int16_t)(msg->SteeringTorque * 100);
+	m_CAN_Packet.data[6] = temp_int16 & 0xff;
+	m_CAN_Packet.data[7] = (temp_int16 >> 8) & 0xff;
+
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::Push(MessageManager *msg)
+void Terminal::Push(VehicleController *msg)
 {
 	CAN_Packet m_CAN_Packet;
-	m_CAN_Packet.id = 0x6fe;
+	int16_t temp_int16;
+	uint16_t temp_uint16;
+
+	m_CAN_Packet.id = 0x411;
 	m_CAN_Packet.length = 8;
 
-	/// Data Mapping
-//	m_CAN_Packet.data[0] = _current_target_acceleration_ACC;
-//	m_CAN_Packet.data[1] = (uint8_t)((_current_target_deceleration_AEB >> 8) & 0xFF);
-//	m_CAN_Packet.data[2] = (uint8_t)((_current_target_deceleration_AEB     ) & 0xFF);
-//	m_CAN_Packet.data[3] = (uint8_t)( _rolling_counter_torque_AEB & 0x0F);
-//	m_CAN_Packet.data[3] = _current_target_acceleration_enable_single ?
-//						   (uint8_t) ( m_CAN_Packet.data[3] | 0x80 ) :
-//						   (uint8_t) ( m_CAN_Packet.data[3] & 0x7F ) ;
-//	m_CAN_Packet.data[3] = _current_target_deceleration_enable_single ?
-//						   (uint8_t) ( m_CAN_Packet.data[3] | 0x40 ) :
-//						   (uint8_t) ( m_CAN_Packet.data[3] & 0xBF ) ;
-//	m_CAN_Packet.data[4] = (uint8_t)((_current_torque >> 2) & 0xFF);
-//	m_CAN_Packet.data[5] = (uint8_t)((_current_torque << 6) & 0xC0);
-//	m_CAN_Packet.data[5] = _current_torque_enable_single              ?
-//						   (uint8_t) ( m_CAN_Packet.data[5] | 0x20 ) :
-//						   (uint8_t) ( m_CAN_Packet.data[5] & 0xDF ) ;
-//	m_CAN_Packet.data[5] = (uint8_t) ((m_CAN_Packet.data[5] & 0xFC ) |
-//									  ( _current_steering_angle_target_active_single & 0x03));
-//	m_CAN_Packet.data[6] = (uint8_t)((_current_steering_angle_target >> 8) & 0xFF);
-//	m_CAN_Packet.data[7] = (uint8_t)((_current_steering_angle_target     ) & 0xFF);
+	m_CAN_Packet.data[0] = 	 msg->AccelerationEnable 	   |
+							(msg->DecelerationEnable << 1) |
+							(msg->TorqueEnable       << 2) |
+							(msg->VelocityEnable     << 3) |
+							(msg->SteeringEnable     << 4) |
+							(msg->GearEnable         << 6) ;
+	m_CAN_Packet.data[1] = 0 ;
+
+	temp_int16 = (int16_t)(msg->Acceleration * 100);
+	m_CAN_Packet.data[2] = temp_int16 & 0xff ;
+	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff ;
+
+	temp_int16 = (int16_t)(msg->Deceleration * 100);
+	m_CAN_Packet.data[4] = temp_int16 & 0xff ;
+	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff ;
+
+	temp_uint16 = (uint16_t)(msg->Torque * 100);
+	m_CAN_Packet.data[6] =  temp_uint16 & 0xff ;
+	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff ;
+
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-
-
 
 void Terminal::Push(VehicleState *msg)
 {
-
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x440;
+	m_CAN_Packet.length = 8;
+	m_CAN_Packet.data[0] = ((int16_t) (msg->X * 100)) & 0xff;
+	m_CAN_Packet.data[1] = (((int16_t)(msg->X * 100)) >> 8) & 0xff;
+	m_CAN_Packet.data[2] = ((int16_t) (msg->Y * 100)) & 0xff;
+	m_CAN_Packet.data[3] = (((int16_t)(msg->Y * 100)) >> 8) & 0xff;
+	m_CAN_Packet.data[4] = ((int16_t) (msg->Yaw * 100)) & 0xff;
+	m_CAN_Packet.data[5] = (((int16_t)(msg->Yaw * 100)) >> 8) & 0xff;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
 
@@ -198,6 +228,57 @@ void Terminal::Push(Ultrasonic *u)
 			break;
 	}
 }
+
+void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x400 | id;
+	m_CAN_Packet.length = 8;
+	if(id < 8)
+	{
+
+		m_CAN_Packet.data[0] =  msg[id].STP318.TOF       & 0xff;
+		m_CAN_Packet.data[1] = (msg[id].STP318.TOF >> 8) & 0xff;
+		m_CAN_Packet.data[2] = 0;
+		m_CAN_Packet.data[3] = 0;
+		m_CAN_Packet.data[4] = 0;
+		m_CAN_Packet.data[5] = 0;
+		m_CAN_Packet.data[6] =  msg[id].STP318.Status;
+		m_CAN_Packet.data[7] = 0;
+	}
+	else
+	{
+		m_CAN_Packet.data[0] =  msg[id].STP313.TOF1       & 0xff;
+		m_CAN_Packet.data[1] = (msg[id].STP313.TOF1 >> 8) & 0xff;
+		m_CAN_Packet.data[2] =  msg[id].STP313.TOF2       & 0xff;
+		m_CAN_Packet.data[3] = (msg[id].STP313.TOF2 >> 8) & 0xff;
+		m_CAN_Packet.data[4] =  msg[id].STP313.Level;
+		m_CAN_Packet.data[5] =  msg[id].STP313.Width;
+		m_CAN_Packet.data[6] =  msg[id].STP313.Status;
+		m_CAN_Packet.data[7] =  0;
+	}
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::Ack(void)
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x416;
+	m_CAN_Packet.length = 8;
+	m_CAN_Packet.data[0] = 0x5A;
+	m_CAN_Packet.data[1] = 0xA5;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+
+
+
 // Terminal control UART Interface
 //void Terminal::TerminalControlCommandReceive(uint8_t data)
 //{

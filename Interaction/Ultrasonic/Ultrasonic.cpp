@@ -1,9 +1,18 @@
 /*
- * Ultrasonic.cpp
+ * ultrasonic.cpp
  *
- *  Created on: 2018��12��15��
- *      Author: zhuguohua
+ *  Created on: January 8 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: ultrasonic.cpp                      COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: this module process the ultrasonic data				         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 8 2019      Initial Version                  */
+/*****************************************************************************/
 
 #include "Ultrasonic.h"
 
@@ -53,6 +62,11 @@ void     Ultrasonic::setSystemTime(uint32_t value){_system_time = value;}
 Ultrasonic_Packet* Ultrasonic::getUltrasonicPacket(){return _ultrasonic_packet;}
 
 LIN_RAM* Ultrasonic::getUltrasonicDatas(){return _ultrasonic_datas;}
+
+void Ultrasonic::setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p)
+{
+	_ultrasonic_packet[n] = p;
+}
 
 void Ultrasonic::InitSensing_STP318(uint8_t tx,uint8_t rx,void (*TransmitFrame)(LIN_RAM))
 {

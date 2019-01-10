@@ -1,15 +1,25 @@
 /*
- * Terminal.h
+ * terminal.h
  *
- *  Created on: 2018Äê12ÔÂ6ÈÕ
- *      Author: zhuguohua
+ *  Created on: January 8 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: terminal.h                          COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: Interaction terminal            					         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 8 2019      Initial Version                  */
+/*****************************************************************************/
 
 #ifndef TERMINAL_H_
 #define TERMINAL_H_
 
 #include "property.h"
 #include "derivative.h"
+#include "ChangAn/chang_an_message.h"
 #include "Interface/vehicle_controller.h"
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
@@ -24,22 +34,20 @@ public:
 	virtual ~Terminal();
 
 	// CAN Module:Vehicle information receive
-	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl);
+	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrasonic *u,MessageManager *msg);
 
 	// Terminal Control
-	void Push(MessageManager *msg);
+//	void Push(MessageManager *msg);
+	void Push(ChangAnMessage *msg);
+
+	void Push(VehicleController *msg);
 
 	void Push(VehicleState *msg);
 
 	void Push(Ultrasonic *u);
 
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
-//	void TerminalControlCommandSend(void);
-//	void TerminalControlSpeedSend(void);
-//	void TerminalSystemStateSend(void);
-//
-//	void TerminalControlAckSend(void);
-
+	void Ack(void);
 	/*** Property ***/
 	// AckValid
 	uint8_t getAckValid();

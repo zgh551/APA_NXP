@@ -1,9 +1,18 @@
 /*
- * Ultrasonic.h
+ * ultrasonic.h
  *
- *  Created on: 2018��12��15��
- *      Author: zhuguohua
+ *  Created on: January 8 2018
+ *      Author: Guohua Zhu
  */
+/*****************************************************************************/
+/* FILE NAME: ultrasonic.h                        COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: this module process the ultrasonic data				         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 8 2019      Initial Version                  */
+/*****************************************************************************/
 
 #ifndef ULTRASONIC_H_
 #define ULTRASONIC_H_
@@ -82,10 +91,13 @@ public:
 	Property<Ultrasonic,uint32_t,READ_WRITE> SystemTime;
 
 	Ultrasonic_Packet* getUltrasonicPacket();
+	void setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p);
 	Property<Ultrasonic,Ultrasonic_Packet*,READ_ONLY> UltrasonicPacket;
 
 	LIN_RAM* getUltrasonicDatas();
 	Property<Ultrasonic,LIN_RAM*,READ_ONLY> UltrasonicDatas;
+
+
 private:
 	uint32_t _system_time;
 	uint8_t  _schedule_time_cnt;
