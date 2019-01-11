@@ -8,7 +8,7 @@
 #ifndef SYSTEMWORK_H_
 #define SYSTEMWORK_H_
 
-#include "Property.h"
+#include "property.h"
 #include "derivative.h"
 #include "project.h"
 #include "Vehicle.h"
