@@ -27,6 +27,9 @@
 #include "../Common/VehicleState/GeometricTrack/geometric_track.h"
 #include <lon_control.h>
 #include "pid.h"
+#include <parallel_parking_path_planning.h>
+#include <vehicle_body.h>
+#include <vector_2d.h>
 //using namespace std;
 
 #ifdef __cplusplus
@@ -44,6 +47,10 @@ ChangAnMessage m_ChangAnMessage;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
+
+ParallelParkingPathPlanning m_ParallelParkingPathPlanning;
+VehicleBody m_VehicleBody;
+Vector2d m_Vector2d;
 vuint8_t cnt;
 bool TerminalSendFlag = false;
 float temp;
@@ -69,9 +76,36 @@ int main()
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
+
+		m_ParallelParkingPathPlanning.Init();
+		m_Vector2d = m_VehicleBody.Center;
+
+//		m_Vector2d. = 0;
 		for(;;)
 		{
+			if(0xA5 == m_Terminal_CA.AckValid)
+			{
+				m_Terminal_CA.Ack();
+				m_Terminal_CA.AckValid = 0;
+			}
 			m_Terminal_CA.Push(&m_Ultrasonic);
+
+			if(m_Ultrasonic.SystemTime % 4 == 1)
+			{
+				m_Terminal_CA.Push(&m_ChangAnController);
+			}
+			if(m_Ultrasonic.SystemTime % 4 == 2)
+			{
+				m_Terminal_CA.Push(&m_GeometricTrack);
+			}
+			if(m_Ultrasonic.SystemTime % 4 == 3)
+			{
+				m_Terminal_CA.Push(&m_ChangAnMessage);
+			}
+//			m_ChangAnMessage.WheelSpeedDirection = 1;
+//			m_ChangAnMessage.WheelSpeedRearLeft = 5;
+//			m_ChangAnMessage.WheelSpeedRearRight = 5;
+//			m_ChangAnMessage.SteeringAngle = -430;
 		}
 }
 
@@ -90,18 +124,20 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
-	if(m_Ultrasonic.SystemTime % 4 == 0)
+	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 	{
 		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
 		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
-		m_ChangAnController.Push(0.02);//20ms
+		m_ChangAnController.Push(0.02);
 	}
-	else if(m_Ultrasonic.SystemTime % 4 == 1)
+
+	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
-		m_GeometricTrack.Update(&m_ChangAnMessage,0.02);//20ms
+		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
 	}
 
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
+
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
@@ -169,7 +205,7 @@ void FlexCAN2_Isr(void)
 {
 	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController,&m_Ultrasonic,&m_ChangAnMessage);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_2.TIMER.R;
