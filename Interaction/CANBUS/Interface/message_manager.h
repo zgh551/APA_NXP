@@ -80,6 +80,11 @@ public:
 	void  setSteeringAngleRate(float value);
 	Property<MessageManager,float,READ_WRITE> SteeringAngleRate;
 
+	// TCU
+	float getGear();
+	void  setGear(float value);
+	Property<MessageManager,float,READ_WRITE> Gear;
+
 	// ESP Sensor
 	float getYawRate();
 	void  setYawRate(float value);
@@ -110,8 +115,11 @@ private:
 	uint8_t _wheel_pulse_direction;
 
 	// SAS Steering angle
-	float  _steering_angle;
+	float _steering_angle;
 	float _steering_angle_rate;
+
+	// TCU
+	float _gear;
 
 	// ESP Sensor
 	float _yaw_rate;

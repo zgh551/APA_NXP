@@ -69,6 +69,11 @@ MessageManager::MessageManager() {
 	SteeringAngleRate.getter(&MessageManager::getSteeringAngleRate);
 	SteeringAngleRate.setter(&MessageManager::setSteeringAngleRate);
 
+	// TCU
+	Gear.setContainer(this);
+	Gear.getter(&MessageManager::getGear);
+	Gear.setter(&MessageManager::setGear);
+
 	// ESP Sensor
 	YawRate.setContainer(this);
 	YawRate.getter(&MessageManager::getYawRate);
@@ -126,6 +131,10 @@ void  MessageManager::setSteeringAngle(float value){_steering_angle = value;}
 
 float MessageManager::getSteeringAngleRate()           { return _steering_angle_rate;}
 void  MessageManager::setSteeringAngleRate(float value){_steering_angle_rate = value;}
+
+// TCU gear
+float MessageManager::getGear()           { return _gear;}
+void  MessageManager::setGear(float value){_gear = value;}
 
 // ESP Sensor
 float MessageManager::getYawRate()           { return _yaw_rate;}
