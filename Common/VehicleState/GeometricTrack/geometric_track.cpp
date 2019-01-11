@@ -4,7 +4,21 @@
  *  Created on: 2019Äê1ÔÂ2ÈÕ
  *      Author: zhuguohua
  */
-
+/*
+ * geometric_track.cpp
+ *
+ *  Created on: January 9 2019
+ *      Author: Guohua Zhu
+ */
+/*****************************************************************************/
+/* FILE NAME: geometric_track.cpp                 COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: track the vehilce position        					         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 9 2019      Initial Version                  */
+/*****************************************************************************/
 #include "../GeometricTrack/geometric_track.h"
 
 GeometricTrack::GeometricTrack() {
@@ -25,7 +39,7 @@ void GeometricTrack::Init(void)
 	LinearVelocity = 0.0f;
 }
 
-void GeometricTrack::Update(MessageManager *msg,float dt)
+void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 {
 	float v;
 	v = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft)*0.5;
@@ -43,6 +57,42 @@ void GeometricTrack::Update(MessageManager *msg,float dt)
 		X = X + LinearVelocity * cosf(Yaw) * dt;
 		Y = Y + LinearVelocity * sinf(Yaw) * dt;
 	}
+	_last_yaw = Yaw;
+}
+
+void GeometricTrack::PulseUpdate(MessageManager *msg,float dt)
+{
+	float rear_left_displacement,rear_right_displacement;
+	float displacement;
+	float radius;
+
+	rear_left_displacement = msg->WheelPulseDirection == 0 ?
+							(msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO :
+							 msg->WheelPulseDirection == 1 ?
+						   -(msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO : 0;
+
+
+	rear_right_displacement = msg->WheelPulseDirection == 0 ?
+							 (msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO :
+							  msg->WheelPulseDirection == 1 ?
+							-(msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO : 0;
+
+	displacement = (rear_left_displacement + rear_right_displacement) * 0.5;
+
+	if(msg->SteeringAngle != 0)
+	{
+		radius = TurnRadiusCalculate(msg->SteeringAngle);
+		Yaw  = _last_yaw + displacement / radius;
+		X = X - radius * (sinf(_last_yaw) - sinf(Yaw));
+		Y = Y - radius * (cosf(Yaw) - cosf(_last_yaw));
+	}
+	else
+	{
+		X = X + displacement * cosf(Yaw);
+		Y = Y + displacement * sinf(Yaw);
+	}
+	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
+	_last_rear_right_pulse = msg->WheelPulseRearRight;
 	_last_yaw = Yaw;
 }
 

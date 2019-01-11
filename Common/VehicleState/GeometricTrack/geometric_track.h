@@ -26,7 +26,8 @@ public:
 
 	void Init(void);
 
-	void Update(MessageManager *msg,float dt) override;
+	void VelocityUpdate(MessageManager *msg,float dt) override;
+	void PulseUpdate(MessageManager *msg,float dt) override;
 
 	float SteeringAngle2TurnningRadiusExp(float steer,float a,float b);
 
@@ -35,6 +36,9 @@ public:
 	float TurnRadiusCalculate(float steering_angle);
 private:
 	float _last_yaw;
+
+	uint8_t _last_rear_left_pulse;
+	uint8_t _last_rear_right_pulse;
 };
 
 #endif /* VEHICLESTATE_GEOMETRICTRACK_GEOMETRIC_TRACK_H_ */
