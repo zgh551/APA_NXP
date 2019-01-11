@@ -29,7 +29,8 @@ public:
 
 	void Init();
 
-	virtual void Update(MessageManager *msg,float dt) = 0;
+	virtual void VelocityUpdate(MessageManager *msg,float dt) = 0;
+	virtual void PulseUpdate(MessageManager *msg,float dt) = 0;
 
 	float getX();
 	void  setX(float value);
