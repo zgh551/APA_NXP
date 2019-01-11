@@ -10,18 +10,18 @@
 
 /****************** 车辆信息 ******************/
 // 长度(m)
-#define LENGHT                           (4.89)
+#define LENGHT                           (4.49)
 // 宽度(m)
-#define WIDTH                            (1.78)
+#define WIDTH                            (1.594)
 // 高度(m)
 #define HEIGHT                           (1.35)
 // 轴距(m)
-#define WHEEL_BASE                        (2.8)
+#define WHEEL_BASE                        (2.64)
 // 车辆边沿到车辆中心点的距离(m)
-#define FRONT_EDGE_TO_CENTER              (3.2)
-#define REAR_EDGE_TO_CENTER               (1.2)
-#define LEFT_EDGE_TO_CENTER               (1.0)
-#define RIGHT_EDGE_TO_CENTER              (1.0)
+#define FRONT_EDGE_TO_CENTER              (3.54)
+#define REAR_EDGE_TO_CENTER               (0.905)
+#define LEFT_EDGE_TO_CENTER               (0.797)
+#define RIGHT_EDGE_TO_CENTER              (0.797)
 
 // 最小转弯半径(m)
 #define MIN_TURN_RADIUS                   (5.1)
@@ -41,7 +41,7 @@
 // 速度修正比例系数
 #define SPEED_REVISE_RATIO               (1.01)
 // 轮脉冲比例系数
-#define WHEEL_PUSLE_RATIO                (0.13)
+#define WHEEL_PUSLE_RATIO                (0.02540618132391610878926842900878)
 
 // Math ratio
 #define PI 								 (3.1415926)
