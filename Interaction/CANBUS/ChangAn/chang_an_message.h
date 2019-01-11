@@ -72,10 +72,17 @@ private:
 	uint8_t _apa_epas_failed;
 	uint8_t _apa_control_feedback;
 	uint8_t _torque_sensor_status;
-	float _steering_torque;
-	uint8_t _sas_failure;
+	float   _steering_torque;
+
+	// SAS
+	uint8_t  _sas_failure;
+
+	// TCU
+	uint8_t _gear_actual;
+
 	// ESP
 	uint8_t esp_qdc_acc;
+
 	// EMS
 	uint8_t ems_qec_acc;
 };

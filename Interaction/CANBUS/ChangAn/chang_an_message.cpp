@@ -70,7 +70,7 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			APA_EPAS_Failed = (uint8_t)((dat[1] >> 1) & 0x01);
 			TorqueSensorStatus = (uint8_t)( dat[1] & 0x01 );
 			APA_ControlFeedback = (uint8_t)((dat[3] >> 5) & 0x01);
-			SteeringTorque = (float)(dat[2] * 0.1794 - 22.78);
+			SteeringTorque = (float)(((int8_t)dat[2]) * 0.17);
 			break;
 
 		case 0x208:// wheel speed
@@ -82,11 +82,6 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			WheelSpeedFrontLeft  = ((uint16_t)(((dat[6] & 0x1F) << 8) | dat[7])) * V_M_S;
 			break;
 
-		case 0x218://ChangAnMessage speed
-//			VehicleSpeedValid = (uint8_t)( dat[4] >> 5 ) & 0x01;
-//			VehicleSpeed = (float)(((uint16_t)(((dat[4] & 0x1F) << 8) | dat[5])) * V_M_S);
-			break;
-
 		case 0x258://Wheel speed pulse
 			WheelPulseDirection  = (uint8_t)(dat[2] & 0x03);
 			WheelPulseRearRight  = (uint8_t)dat[4];
@@ -95,15 +90,19 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			WheelPulseFrontLeft  = (uint8_t)dat[7];
 			break;
 
-		case 0x277://ESP
+		case 0x268:// TCU GEAR
+
+			break;
+
+		case 0x277:// ESP
 			ESP_QDC_ACC = (uint8_t)( (dat[3] >> 1) & 0x03);
 			break;
 
-		case 0x26A://EMS
+		case 0x26A:// EMS
 			EMS_QEC_ACC = (uint8_t)( (dat[0] >> 1) & 0x03);
 			break;
 
-		case 0x180://actual steering angle
+		case 0x180://SAS
 			SteeringAngle = (float)(((int16_t)((dat[0] << 8) | dat[1])) * 0.1);
 			SteeringAngleRate = (uint16_t)(dat[2] * 4);
 			SAS_Failure = (uint8_t)( dat[3] >> 6 ) & 0x01;
@@ -114,7 +113,6 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			break;
 	}
 }
-
 
 /// EPS
 uint8_t ChangAnMessage::getEPS_Failed()             {return  _eps_failed;}
@@ -129,7 +127,7 @@ void    ChangAnMessage::setAPA_ControlFeedback(uint8_t value){_apa_control_feedb
 uint8_t ChangAnMessage::getTorqueSensorStatus()             {return _torque_sensor_status ;}
 void    ChangAnMessage::setTorqueSensorStatus(uint8_t value){_torque_sensor_status = value;}
 
-float ChangAnMessage::getSteeringTorque()           {return _steering_torque ;}
+float ChangAnMessage::getSteeringTorque()             {return _steering_torque ;}
 void  ChangAnMessage::setSteeringTorque(float value){_steering_torque = value;}
 
 uint8_t ChangAnMessage::getSAS_Failure()			 {return _sas_failure ;}
