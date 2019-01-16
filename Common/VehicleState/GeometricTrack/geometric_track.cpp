@@ -1,12 +1,6 @@
 /*
  * geometric_track.cpp
  *
- *  Created on: 2019Äê1ÔÂ2ÈÕ
- *      Author: zhuguohua
- */
-/*
- * geometric_track.cpp
- *
  *  Created on: January 9 2019
  *      Author: Guohua Zhu
  */
@@ -36,6 +30,25 @@ void GeometricTrack::Init(void)
 	Y = 0.0f;
 	Z = 0.0f;
 	Yaw = 0.0f;
+	LinearVelocity = 0.0f;
+}
+
+void GeometricTrack::Init(float x,float y,float yaw)
+{
+	X = x;
+	Y = y;
+	Z = 0.0f;
+	Yaw = yaw;
+	LinearVelocity = 0.0f;
+}
+void GeometricTrack::Init(VehicleBody v)
+{
+	Vector2d v_temp;
+	v_temp = v.Center;
+	X = v_temp.getX();
+	Y = v_temp.getY();
+	Z = 0.0f;
+	Yaw = v.AttitudeYaw;
 	LinearVelocity = 0.0f;
 }
 
