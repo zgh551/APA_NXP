@@ -1,18 +1,37 @@
 /*
  * vehicle_body.cpp
  *
- *  Created on: 2019Äê1ÔÂ10ÈÕ
- *      Author: zhuguohua
+ *  Created on: January 12 2019
+ *      Author: Guohua Zhu
  */
-
+/*****************************************************************************/
+/* FILE NAME: vehicle_body.cpp                    COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: achieve vehicle rotation property and the interface	         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 12 2019      Initial Version                 */
+/*****************************************************************************/
 #include <vehicle_body.h>
+
+VehilceConfig m_VehilceConfig;
 
 VehicleBody::VehicleBody() {
 	// TODO Auto-generated constructor stub
+	m_VehilceConfig.Init();
+
+	AttitudeYaw.setContainer(this);
+	AttitudeYaw.getter(&VehicleBody::getAttitudeYaw);
+	AttitudeYaw.setter(&VehicleBody::setAttitudeYaw);
 
 	Center.setContainer(this);
 	Center.getter(&VehicleBody::getCenter);
 	Center.setter(&VehicleBody::setCenter);
+
+	Rotation.setContainer(this);
+	Rotation.getter(&VehicleBody::getRotation);
+	Rotation.setter(&VehicleBody::setRotation);
 
 	FrontLeft.setContainer(this);
 	FrontLeft.getter(&VehicleBody::getFrontLeft);
@@ -35,13 +54,128 @@ VehicleBody::~VehicleBody() {
 	// TODO Auto-generated destructor stub
 }
 
-void Rotation(float angle)
+void VehicleBody::RotationCenter(float radius)
 {
-
+	Vector2d v = Vector2d(radius * cosf(_attitude_yaw),
+			              radius * sinf(_attitude_yaw));
+	_rotation = _center + v.rotate(PI/2);
 }
+
+float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
+{
+	float theta_edge,theta_x,theta_y;
+	float theta_d1,theta_d2;
+	float radius_square;
+	float x_axis_distance,y_axis_distance;
+	float y_axis_len,x_axis_len;
+	Vector2d boundary_x,boundary_y;
+	radius_square = (edge_points -_rotation).LengthSquare();
+	/////////////////////////////////////////////////////////////////////////////////
+	y_axis_distance = powf(boundary.getY() - _rotation.getY(),2);
+	if(radius_square > y_axis_distance)
+	{
+		x_axis_len = sqrtf( radius_square - y_axis_distance);
+
+		boundary_x.X = (edge_points -_rotation).getX() > 0 ?  _rotation.getX() + x_axis_len : _rotation.getX() - x_axis_len;
+		boundary_x.Y = boundary.getY();
+
+		theta_x = (boundary_x -_rotation).Angle();
+	}
+	else
+	{
+		theta_x = 0;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	x_axis_distance = powf(boundary.getX() - _rotation.getX(),2);
+	if(radius_square > x_axis_distance)
+	{
+		y_axis_len = sqrtf( radius_square - x_axis_distance);
+
+		boundary_y.X = boundary.getX();
+		boundary_y.Y = (edge_points -_rotation).getY() > 0 ? _rotation.getY() + y_axis_len : _rotation.getY() - y_axis_len;
+
+		theta_y = (boundary_y -_rotation).Angle();
+	}
+	else
+	{
+		theta_y = 0;
+	}
+	////////////////////////////////////////////////////////////////////////////////////
+	theta_edge = (edge_points -_rotation).Angle();
+
+	theta_d1 = theta_x - theta_edge;
+	theta_d2 = theta_y - theta_edge;
+	if(theta_d1 > 0 && theta_d2 > 0)
+	{
+		return theta_d1 < theta_d2 ? theta_d1 : theta_d2;
+	}
+	else if(theta_d1 > 0 && theta_d2 < 0)
+	{
+		return theta_d1;
+	}
+	else if(theta_d1 < 0 && theta_d2 > 0)
+	{
+		return theta_d2;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+// radius is +-
+void VehicleBody::Rotate(float angle)
+{
+	_center = (_center - _rotation).rotate(angle) + _rotation;
+	_attitude_yaw += angle;
+}
+
+void VehicleBody::EdgePoint(void)
+{
+	Vector2d v;
+
+	v = Vector2d( m_VehilceConfig.FrontDiagonalAxis * cosf(_attitude_yaw),
+				  m_VehilceConfig.FrontDiagonalAxis * sinf(_attitude_yaw));
+
+	_front_left  = _center + v.rotate( m_VehilceConfig.FrontDiagonalAngle);
+	_front_right = _center + v.rotate(-m_VehilceConfig.FrontDiagonalAngle);
+
+	v = Vector2d( -m_VehilceConfig.RearDiagonalAxis * cosf(_attitude_yaw),
+				  -m_VehilceConfig.RearDiagonalAxis * sinf(_attitude_yaw));
+
+	_rear_left  = _center + v.rotate(-m_VehilceConfig.RearDiagonalAngle);
+	_rear_right = _center + v.rotate( m_VehilceConfig.RearDiagonalAngle);
+}
+
+
+
+void VehicleBody::OneTrial(float radius,Vector2d r)
+{
+	float theta1,theta2,min_theta;
+	RotationCenter(radius);
+	EdgePoint();
+	if(radius < 0)
+	{
+		theta1 = RotateAngle(RearLeft, r);
+		theta2 = RotateAngle(RearRight, r);
+	}
+	else
+	{
+		theta1 = RotateAngle(FrontLeft, r);
+		theta2 = RotateAngle(FrontRight, r);
+	}
+	min_theta = fabsf(theta1) < fabsf(theta2) ? theta1 : theta2;
+	Rotate(min_theta);
+}
+
+float VehicleBody::getAttitudeYaw()           { return  _attitude_yaw;}
+void  VehicleBody::setAttitudeYaw(float value){ _attitude_yaw = value;}
 
 Vector2d VehicleBody::getCenter()              { return  _center;}
 void     VehicleBody::setCenter(Vector2d value){ _center = value;}
+
+Vector2d VehicleBody::getRotation()              { return  _rotation;}
+void     VehicleBody::setRotation(Vector2d value){ _rotation = value;}
 
 Vector2d VehicleBody::getFrontLeft()              { return  _front_left;}
 void     VehicleBody::setFrontLeft(Vector2d value){ _front_left = value;}
