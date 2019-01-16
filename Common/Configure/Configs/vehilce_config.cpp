@@ -9,22 +9,6 @@
 
 VehilceConfig::VehilceConfig() {
 	// TODO Auto-generated constructor stub
-	RadiusFrontLeft.setContainer(this);
-	RadiusFrontLeft.getter(&VehilceConfig::getRadiusFrontLeft);
-	RadiusFrontLeft.setter(&VehilceConfig::setRadiusFrontLeft);
-
-	RadiusFrontRight.setContainer(this);
-	RadiusFrontRight.getter(&VehilceConfig::getRadiusFrontRight);
-	RadiusFrontRight.setter(&VehilceConfig::setRadiusFrontRight);
-
-	RadiusRearLeft.setContainer(this);
-	RadiusRearLeft.getter(&VehilceConfig::getRadiusRearLeft);
-	RadiusRearLeft.setter(&VehilceConfig::setRadiusRearLeft);
-
-	RadiusRearRight.setContainer(this);
-	RadiusRearRight.getter(&VehilceConfig::getRadiusRearRight);
-	RadiusRearRight.setter(&VehilceConfig::setRadiusRearRight);
-
 	FrontDiagonalAxis.setContainer(this);
 	FrontDiagonalAxis.getter(&VehilceConfig::getFrontDiagonalAxis);
 	FrontDiagonalAxis.setter(&VehilceConfig::setFrontDiagonalAxis);
@@ -40,6 +24,22 @@ VehilceConfig::VehilceConfig() {
 	RearDiagonalAngle.setContainer(this);
 	RearDiagonalAngle.getter(&VehilceConfig::getRearDiagonalAngle);
 	RearDiagonalAngle.setter(&VehilceConfig::setRearDiagonalAngle);
+
+	RadiusFrontLeft.setContainer(this);
+	RadiusFrontLeft.getter(&VehilceConfig::getRadiusFrontLeft);
+	RadiusFrontLeft.setter(&VehilceConfig::setRadiusFrontLeft);
+
+	RadiusFrontRight.setContainer(this);
+	RadiusFrontRight.getter(&VehilceConfig::getRadiusFrontRight);
+	RadiusFrontRight.setter(&VehilceConfig::setRadiusFrontRight);
+
+	RadiusRearLeft.setContainer(this);
+	RadiusRearLeft.getter(&VehilceConfig::getRadiusRearLeft);
+	RadiusRearLeft.setter(&VehilceConfig::setRadiusRearLeft);
+
+	RadiusRearRight.setContainer(this);
+	RadiusRearRight.getter(&VehilceConfig::getRadiusRearRight);
+	RadiusRearRight.setter(&VehilceConfig::setRadiusRearRight);
 }
 
 VehilceConfig::~VehilceConfig() {
@@ -55,18 +55,19 @@ void VehilceConfig::Init()
 	RearDiagonalAngle  = atanf(LEFT_EDGE_TO_CENTER/REAR_EDGE_TO_CENTER);
 }
 
-void VehilceConfig::EdgeRadiusUpdate(int8_t steer,float r)
+// r is + and -
+void VehilceConfig::EdgeRadius(float r)
 {
-	RadiusFrontLeft = sqrtf( powf( r - steer * LEFT_EDGE_TO_CENTER , 2 ) +
+	RadiusFrontLeft = sqrtf( powf( r - LEFT_EDGE_TO_CENTER , 2 ) +
 			                 powf( FRONT_EDGE_TO_CENTER , 2 ) );
 
-	RadiusFrontRight = sqrtf( powf( r + steer * RIGHT_EDGE_TO_CENTER , 2 ) +
+	RadiusFrontRight = sqrtf( powf( r + RIGHT_EDGE_TO_CENTER , 2 ) +
                               powf( FRONT_EDGE_TO_CENTER , 2 ) );
 
-	RadiusRearLeft = sqrtf( powf( r - steer * LEFT_EDGE_TO_CENTER , 2 ) +
+	RadiusRearLeft = sqrtf( powf( r -  LEFT_EDGE_TO_CENTER , 2 ) +
 			                powf( REAR_EDGE_TO_CENTER , 2 ) );
 
-	RadiusRearRight = sqrtf( powf( r + steer * RIGHT_EDGE_TO_CENTER , 2 ) +
+	RadiusRearRight = sqrtf( powf( r + RIGHT_EDGE_TO_CENTER , 2 ) +
                              powf( REAR_EDGE_TO_CENTER , 2 ) );
 }
 

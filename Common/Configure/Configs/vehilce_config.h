@@ -19,23 +19,7 @@ public:
 	virtual ~VehilceConfig();
 
 	void Init();
-	void EdgeRadiusUpdate(int8_t steer,float r);
-
-	float getRadiusFrontLeft();
-	void  setRadiusFrontLeft(float value);
-	Property<VehilceConfig,float,READ_WRITE> RadiusFrontLeft;
-
-	float getRadiusFrontRight();
-	void  setRadiusFrontRight(float value);
-	Property<VehilceConfig,float,READ_WRITE> RadiusFrontRight;
-
-	float getRadiusRearLeft();
-	void  setRadiusRearLeft(float value);
-	Property<VehilceConfig,float,READ_WRITE> RadiusRearLeft;
-
-	float getRadiusRearRight();
-	void  setRadiusRearRight(float value);
-	Property<VehilceConfig,float,READ_WRITE> RadiusRearRight;
+	void EdgeRadius(float r);
 
 	float getFrontDiagonalAxis();
 	void  setFrontDiagonalAxis(float value);
@@ -52,19 +36,33 @@ public:
 	float getRearDiagonalAngle();
 	void  setRearDiagonalAngle(float value);
 	Property<VehilceConfig,float,READ_WRITE> RearDiagonalAngle;
-private:
-	// the rotation radisu of the four edge
-	float _radius_front_left;
-	float _radius_front_right;
-	float _radius_rear_left;
-	float _radius_rear_right;
 
+	float getRadiusFrontLeft();
+	void  setRadiusFrontLeft(float value);
+	Property<VehilceConfig,float,READ_WRITE> RadiusFrontLeft;
+
+	float getRadiusFrontRight();
+	void  setRadiusFrontRight(float value);
+	Property<VehilceConfig,float,READ_WRITE> RadiusFrontRight;
+
+	float getRadiusRearLeft();
+	void  setRadiusRearLeft(float value);
+	Property<VehilceConfig,float,READ_WRITE> RadiusRearLeft;
+
+	float getRadiusRearRight();
+	void  setRadiusRearRight(float value);
+	Property<VehilceConfig,float,READ_WRITE> RadiusRearRight;
+private:
 	// the diagonal axis of the four edge to the center point and the angle
 	float _front_diagonal_axis;
 	float _front_diagonal_angle;
 	float _rear_diagonal_axis;
 	float _rear_diagonal_angle;
-//	float
+
+	float _radius_front_left;
+	float _radius_front_right;
+	float _radius_rear_left;
+	float _radius_rear_right;
 };
 
 #endif /* CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_ */
