@@ -1,10 +1,18 @@
 /*
  * vector_2d.cpp
  *
- *  Created on: 2019Äê1ÔÂ2ÈÕ
- *      Author: zhuguohua
+ *  Created on: January 2 2019
+ *      Author: Guohua Zhu
  */
-
+/*****************************************************************************/
+/* FILE NAME: vector_2d.cpp                       COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: the vector property             					         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 2 2019      Initial Version                  */
+/*****************************************************************************/
 #include <vector_2d.h>
 
 Vector2d::Vector2d() {
@@ -20,6 +28,43 @@ Vector2d::Vector2d() {
 
 Vector2d::~Vector2d() {
 	// TODO Auto-generated destructor stub
+}
+
+float Vector2d::Length(void)const
+{
+	return hypotf(this->_x,this->_y);
+}
+
+float Vector2d::LengthSquare(void)const
+{
+	return this->_x * this->_x + this->_y * this->_y;
+}
+
+float Vector2d::Angle(void)const
+{
+	return atan2f(this->_y , this->_x);
+}
+
+float Vector2d::DistanceTo(const Vector2d &other)const
+{
+	return hypotf(this->_x - other._x , this->_y - other._y);
+}
+
+
+Vector2d Vector2d::rotate(const float angle) const
+{
+	return Vector2d(this->_x * cosf(angle) - this->_y * sinf(angle),
+			        this->_x * sinf(angle) + this->_y * cosf(angle));
+}
+
+Vector2d Vector2d::operator+(const Vector2d& other) const
+{
+	return Vector2d(this->_x + other._x,this->_y + other._y);
+}
+
+Vector2d Vector2d::operator-(const Vector2d& other) const
+{
+	return Vector2d(this->_x - other._x,this->_y - other._y);
 }
 
 float Vector2d::getX()           { return  _x;}
