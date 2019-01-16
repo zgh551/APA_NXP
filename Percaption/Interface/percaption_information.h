@@ -25,16 +25,29 @@ public:
 	void  setPositionY(float value);
 	Property<PercaptionInformation,float,READ_WRITE> PositionY;
 
-	float getPositionYaw();
-	void  setPositionYaw(float value);
-	Property<PercaptionInformation,float,READ_WRITE> PositionYaw;
+	float getAttitudeYaw();
+	void  setAttitudeYaw(float value);
+	Property<PercaptionInformation,float,READ_WRITE> AttitudeYaw;
+
+	float getParkingLength();
+	void  setParkingLength(float value);
+	Property<PercaptionInformation,float,READ_WRITE> ParkingLength;
+
+	float getParkingWidth();
+	void  setParkingWidth(float value);
+	Property<PercaptionInformation,float,READ_WRITE> ParkingWidth;
+
+	bool getDetectParkingStatus();
+	void setDetectParkingStatus(bool value);
+	Property<PercaptionInformation,bool,READ_WRITE> DetectParkingStatus;
+
 private:
-	bool _detect_parking_status;
 	float _position_x;
 	float _position_y;
-	float _position_yaw;
-	float _parking_lenght;
+	float _attitude_yaw;
+	float _parking_length;
 	float _parking_width;
+	bool  _detect_parking_status;
 };
 
 #endif /* INTERFACE_PERCAPTION_INFORMATION_H_ */
