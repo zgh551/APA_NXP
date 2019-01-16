@@ -24,8 +24,22 @@
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
 #include "Ultrasonic.h"
+#include "parallel_planning.h"
+#include "percaption_information.h"
 //#include "SystemWork.h"
 
+typedef union _byte2float
+{
+	uint8_t b[4];
+	float f;
+}Byte2Float;
+
+typedef union _Byte2Int
+{
+	uint8_t b[2];
+	uint16_t u16;
+	int16_t  i16;
+}Byte2Int;
 
 class Terminal
 {
@@ -34,8 +48,13 @@ public:
 	virtual ~Terminal();
 
 	// CAN Module:Vehicle information receive
-	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrasonic *u,MessageManager *msg);
+	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl);
+	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
+	void Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg);
 
+	void Parse(vuint32_t id,vuint8_t dat[],PercaptionInformation *pi,ParallelPlanning *pp);
+
+	void Parse(vuint32_t id,vuint8_t dat[],ParallelPlanning *msg);
 	// Terminal Control
 //	void Push(MessageManager *msg);
 	void Push(ChangAnMessage *msg);
@@ -48,13 +67,29 @@ public:
 
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
 	void Ack(void);
+
+	void VehicleInitPositionSend(VehicleBody v);
+	void ParkingMsgSend(PercaptionInformation pi,float fm,float rm);
+	void FrontTrialPositionSend(VehicleBody v,uint8_t cnt);
+	void RearTrialPositionSend(VehicleBody v,uint8_t cnt);
+	void EnterParkingPositionSend(VehicleBody v,uint8_t cnt,uint8_t s);
+
 	/*** Property ***/
 	// AckValid
 	uint8_t getAckValid();
 	void setAckValid(uint8_t value);
 	Property<Terminal,uint8_t,READ_WRITE> AckValid;
 
+	// Commond
+	uint8_t getCommand();
+	void setCommand(uint8_t value);
+	Property<Terminal,uint8_t,READ_WRITE> Command;
+
 private:
+	/// terminal command
+	uint8_t _command;
+
+
 	/// terminal receive frame state machine
 	ReceiveFrame _terminal_frame;
 	uint8_t _data_buffer[32];

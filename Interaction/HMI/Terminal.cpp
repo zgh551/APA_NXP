@@ -25,6 +25,11 @@ Terminal::Terminal() {
 	AckValid.setContainer(this);
 	AckValid.getter(&Terminal::getAckValid);
 	AckValid.setter(&Terminal::setAckValid);
+
+	// ACK Valid
+	Command.setContainer(this);
+	Command.getter(&Terminal::getCommand);
+	Command.setter(&Terminal::setCommand);
 }
 
 Terminal::~Terminal() {
@@ -32,16 +37,12 @@ Terminal::~Terminal() {
 }
 
 /// AckValid
-uint8_t Terminal::getAckValid()
-{
-	return _ack_valid;
-}
-void Terminal::setAckValid(uint8_t value)
-{
-	_ack_valid = value;
-}
-
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrasonic *u,MessageManager *msg)
+uint8_t Terminal::getAckValid()             {return _ack_valid ;}
+void    Terminal::setAckValid(uint8_t value){_ack_valid = value;}
+uint8_t Terminal::getCommand()             {return _command ;}
+void    Terminal::setCommand(uint8_t value){_command = value;}
+/**************************************************************************************/
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 {
 	uint8_t i,check_sum;
 	switch(id)
@@ -85,6 +86,16 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrason
 			}
 			break;
 
+		default:
+
+			break;
+	}
+}
+
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u)
+{
+	switch(id)
+	{
         case 0x508://传感器9
         case 0x509://传感器10
         case 0x50A://传感器11
@@ -97,14 +108,30 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrason
         	ultrasonic_packet.status = dat[6];
         	u->setUltrasonicPacket(id & 0x00f,ultrasonic_packet);
 			break;
+		default:
 
+			break;
+	}
+}
+
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
+{
+	Byte2Int temp_int;
+	switch(id)
+	{
         case 0x510:
-        	msg->SteeringAngle = ((int16_t)((dat[3] << 8) | dat[2])) * 0.1;
+        	temp_int.b[1] = dat[2];
+        	temp_int.b[0] = dat[3];
+        	msg->SteeringAngle = temp_int.i16 * 0.1;
         	break;
 
         case 0x520:
-        	msg->WheelSpeedRearLeft  = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001;
-        	msg->WheelSpeedRearRight = ((uint16_t)((dat[7] << 8) | dat[6])) * 0.001;
+        	temp_int.b[1] = dat[4];
+        	temp_int.b[0] = dat[5];
+        	msg->WheelSpeedRearLeft = temp_int.u16 * 0.001;
+        	temp_int.b[1] = dat[6];
+        	temp_int.b[0] = dat[7];
+        	msg->WheelSpeedRearRight = temp_int.u16 * 0.001;
         	break;
 		default:
 
@@ -112,6 +139,59 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl,Ultrason
 	}
 }
 
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],PercaptionInformation *pi,ParallelPlanning *pp)
+{
+	Byte2Int temp_int;
+	switch(id)
+	{
+        case 0x540:
+        	temp_int.b[1] = dat[0];
+        	temp_int.b[0] = dat[1];
+        	pi->PositionX = temp_int.i16 * 0.01;
+        	temp_int.b[1] = dat[2];
+        	temp_int.b[0] = dat[3];
+        	pi->PositionY = temp_int.i16 * 0.01;
+        	temp_int.b[1] = dat[4];
+        	temp_int.b[0] = dat[5];
+        	pi->AttitudeYaw = temp_int.i16 * 0.01;
+        	temp_int.b[1] = dat[6];
+        	temp_int.b[0] = dat[7];
+        	pp->LatMarginMove = temp_int.i16 * 0.01;
+        	break;
+
+        case 0x541:
+        	temp_int.b[1] = dat[0];
+        	temp_int.b[0] = dat[1];
+        	pi->ParkingLength = temp_int.u16 * 0.001;
+        	temp_int.b[1] = dat[2];
+        	temp_int.b[0] = dat[3];
+        	pi->ParkingWidth = temp_int.u16 * 0.001;
+        	temp_int.b[1] = dat[4];
+        	temp_int.b[0] = dat[5];
+        	pp->FrontMarginBoundary = temp_int.u16 * 0.001;
+        	temp_int.b[1] = dat[6];
+        	temp_int.b[0] = dat[7];
+        	pp->RearMarginBoundary = temp_int.u16 * 0.001;
+        	break;
+		default:
+
+			break;
+	}
+}
+
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],ParallelPlanning *msg)
+{
+	switch(id)
+	{
+        case 0x530:
+        	msg->Command = (uint8_t)dat[0];
+        	break;
+
+        default:
+        	break;
+	}
+}
+/**************************************************************************************/
 void Terminal::Push(ChangAnMessage *msg)
 {
 	CAN_Packet m_CAN_Packet;
@@ -174,7 +254,7 @@ void Terminal::Push(VehicleController *msg)
 void Terminal::Push(VehicleState *msg)
 {
 	CAN_Packet m_CAN_Packet;
-	m_CAN_Packet.id = 0x440;
+	m_CAN_Packet.id = 0x442;
 	m_CAN_Packet.length = 8;
 	m_CAN_Packet.data[0] = ((int16_t) (msg->X * 100)) & 0xff;
 	m_CAN_Packet.data[1] = (((int16_t)(msg->X * 100)) >> 8) & 0xff;
@@ -186,7 +266,6 @@ void Terminal::Push(VehicleState *msg)
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-
 
 void Terminal::Push(Ultrasonic *u)
 {
@@ -228,7 +307,7 @@ void Terminal::Push(Ultrasonic *u)
 			break;
 	}
 }
-
+/**************************************************************************************/
 void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 {
 	CAN_Packet m_CAN_Packet;
@@ -276,340 +355,121 @@ void Terminal::Ack(void)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
+void Terminal::VehicleInitPositionSend(VehicleBody v)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x440;
+	m_CAN_Packet.length = 8;
 
+	temp_v = v.Center;
+	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
 
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
 
-// Terminal control UART Interface
-//void Terminal::TerminalControlCommandReceive(uint8_t data)
-//{
-//	uint8_t i;
-//	switch(_terminal_frame)
-//	{
-//		case FirstHead1:
-//			if(data == 0xAA)
-//			{
-//				_check_sum = data;
-//				_terminal_frame = FirstHead2;
-//			}
-//			break;
-//		case FirstHead2:
-//			if(data == 0x55)
-//			{
-//				_check_sum += data;
-//				_terminal_frame = ID;
-//			}
-//			else
-//			{
-//				_terminal_frame = FirstHead1;
-//			}
-//			break;
-//
-//		case ID:
-//			_frame_id = data;
-//			_check_sum += data;
-//			_terminal_frame = Length;
-//			break;
-//
-//		case Length:
-//			_frame_length = data;
-//			_check_sum += data;
-//			_frame_cnt = 0;
-//			_terminal_frame = Data;
-//		break;
-//
-//		case Data:
-//			_data_buffer[_frame_cnt] = data;
-//			_check_sum += data;
-//			_frame_cnt++;
-//			if(_frame_cnt >= _frame_length)
-//			{
-//				_terminal_frame = CheckSum;
-//			}
-//			break;
-//
-//		case CheckSum:
-//			if(_check_sum == data)
-//			{
-//				switch(_frame_id)
-//				{
-//				case 0x1A:
-//					GearShiftEnable = _data_buffer[0] & 0x01;
-//					GearShiftValid = (_data_buffer[0] >> 1) & 0x01;
-//
-//					if( (((_data_buffer[0] >> 2) & 0x01) == 0) || (SteeringAngleTargetActive == 0))
-//					{
-//						SteeringAngleTargetActive = (_data_buffer[0] >> 2) & 0x01;
-//					}
-//
-//					TorqueEnable = (_data_buffer[0] >> 3) & 0x01;
-//					TargetDecelerationEnable = (_data_buffer[0] >> 4) & 0x01;
-//					TargetAccelerationEnable = (_data_buffer[0] >> 5) & 0x01;
-//
-//					GearShift = _data_buffer[1];
-//
-//					Torque = ((uint16_t)((_data_buffer[3] << 8) | _data_buffer[2]))*0.1;
-//
-//					SteeringAngleTarget = ((int16_t)((_data_buffer[5] << 8) | _data_buffer[4])) * 0.1;
-//
-//					SteeringAngleSpeedTarget = ((uint16_t)((_data_buffer[7] << 8) | _data_buffer[6])) * 0.01;
-//
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i + 8];
-//					}
-//					TargetDecelerationAEB = _data_temp.f;
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i + 12];
-//					}
-//					TargetAccelerationACC = _data_temp.f;
-//					break;
-//
-//				case 0x2A:
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i];
-//					}
-//					KP = _data_temp.f;
-//
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i + 4];
-//					}
-//					KI = _data_temp.f;
-//
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i + 8];
-//					}
-//					KD = _data_temp.f;
-//					break;
-//
-//				case 0x2B:// Threshold
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i];
-//					}
-//					Threshold = _data_temp.f;
-//					break;
-//
-//				case 0x3A:// Target Vehicle Set
-//					for(i = 0;i<4;i++)
-//					{
-//						_data_temp.b[3-i] = _data_buffer[i];
-//					}
-//					VehicleSpeedTarget= _data_temp.f;
-//					Desired = VehicleSpeedTarget;
-//					break;
-//
-//				case 0x4A:
-//					WorkingModule = _data_buffer[0];
-//					FunctionStatus = _data_buffer[1];
-//					break;
-//
-//				case 0x5A:
-//					//Gear Enable Single
-//					GearShiftEnable = _data_buffer[0] & 0x01;
-//					GearShiftValid  = _data_buffer[0] & 0x01;
-//
-//					/// Steering Angle Active
-//					if( (((_data_buffer[0] >> 1) & 0x01) == 0) || (SteeringAngleTargetActive == 0))
-//					{
-//						SteeringAngleTargetActive = (_data_buffer[0] >> 1) & 0x01;
-//					}
-//
-//					/// ACC Enable Single
-//					TargetAccelerationEnable = (_data_buffer[0] >> 2) & 0x01;
-//
-//					/// Speed Control Single
-//					VehicleSpeedControlEnable = (_data_buffer[0] >> 3) & 0x01;
-//
-//					/// Gear Value
-//					GearShift = _data_buffer[1];
-//
-//					/// Steering Angle Value
-//					SteeringAngleTarget = ((int16_t)((_data_buffer[3] << 8) | _data_buffer[2])) * 0.1;
-//
-//					/// Steering Angle Value
-//					SteeringAngleSpeedTarget = ((uint16_t)((_data_buffer[5] << 8) | _data_buffer[4])) * 0.01;
-//
-//					/// ACC Value
-//					if(!VehicleSpeedControlEnable)
-//					{
-//						for(i = 0;i<4;i++)
-//						{
-//							_data_temp.b[3-i] = _data_buffer[i + 6];
-//						}
-//						TargetAccelerationACC = _data_temp.f;
-//					}
-//					/// Target Vehicle Speed Value
-//					VehicleSpeedTarget = _data_buffer[10]*0.01;
-//					Desired = VehicleSpeedTarget;
-//					break;
-//
-//				default:
-//
-//					break;
-//				}
-				// ACK Single
-//				AckValid = 0x5A;
-//				TerminalControlAckSend();
-//			}
-//			else
-//			{
-//				_frame_err_cnt++;
-//			}
-//			_terminal_frame = FirstHead1;
-//			break;
-//	}
-//}
+void Terminal::ParkingMsgSend(PercaptionInformation pi,float fm,float rm)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x441;
+	m_CAN_Packet.length = 8;
 
-//void Terminal::TerminalControlCommandSend(void)
-//{
-//	uint8_t i,check_sum;
-//	Byte2Float data_temp;
-//	Byte2Int data_temp_int;
-//
-//	_send_data_buffer[0] = 0x7F;
-//	_send_data_buffer[1] = 0x80;
-//	_send_data_buffer[2] = 0x85;
-//	_send_data_buffer[3] = 19;
-//	_send_data_buffer[4] = ((EMS_QEC_ACC << 2) & 0x04) | ((ESP_QDC_ACC << 1) & 0x02) | APA_EPAS_Failed;
-//	_send_data_buffer[5] = 	(  TargetAccelerationEnable         & 0x01) |
-//							( (TargetDecelerationEnable   << 1) & 0x02) |
-//							( (TorqueEnable               << 2) & 0x04) |
-//							( (GearShiftEnable            << 3) & 0x08) |
-//							( (SteeringAngleTargetActive  << 4) & 0x30) ;
-//
-//	_send_data_buffer[6] = (uint8_t)(SteeringAngleActual & 0xff);
-//	_send_data_buffer[7] = (uint8_t)((SteeringAngleActual >> 8) & 0xff);
-//
-//	_send_data_buffer[8] = (uint8_t)(SteeringAngleSpeed & 0xff);
-//	_send_data_buffer[9] = (uint8_t)((SteeringAngleSpeed >> 8) & 0xff);
-//
-//	data_temp.f = SteeringTorque;
-//	for(i = 0; i < 4; i++)
-//	{
-//		_send_data_buffer[i + 10] = data_temp.b[3-i] ;
-//	}
-//
-//	data_temp.f = TargetAccelerationACC;
-//	for(i = 0; i < 4; i++)
-//	{
-//		_send_data_buffer[i + 14] = data_temp.b[3-i] ;
-//	}
-//
-//	data_temp_int.u16 = (uint16_t)(Torque * 10);
-//	_send_data_buffer[18] = data_temp_int.b[1];
-//	_send_data_buffer[19] = data_temp_int.b[0];
-//
-//
-//	_send_data_buffer[20] = 0;
-//	_send_data_buffer[21] = 0;
-//	_send_data_buffer[22] = 0;
-//
-//	check_sum = 0;
-//	for(i=0;i<23;i++)
-//	{
-//		check_sum += _send_data_buffer[i];
-//	}
-//	_send_data_buffer[23] = check_sum;
-//
-//	for(i=0;i<24;i++)
-//	{
-//		TransmitData(_send_data_buffer[i]);
-//	}
-//}
-//
-//void Terminal::TerminalControlSpeedSend(void)
-//{
-//	uint8_t i,check_sum;
-//	_send_data_buffer[0] = 0x7F;
-//	_send_data_buffer[1] = 0x80;
-//	_send_data_buffer[2] = 0x95;
-//	_send_data_buffer[3] = 19;
-//	_speed_data_temp.f = VehicleSpeed;
-//	for(i = 0;i<4;i++)
-//	{
-//		_send_data_buffer[i + 4] = _speed_data_temp.b[3-i] ;
-//	}
-//
-//	_send_data_buffer[8] = (uint8_t)(( (uint16_t)(WheelSpeedFrontLeftData*10)    ) & 0xff);
-//	_send_data_buffer[9] = (uint8_t)((((uint16_t)(WheelSpeedFrontLeftData*10))>>8) & 0xff);
-//
-//	_send_data_buffer[10] = (uint8_t)(( (uint16_t)(WheelSpeedFrontRightData*10)    ) & 0xff);
-//	_send_data_buffer[11] = (uint8_t)((((uint16_t)(WheelSpeedFrontRightData*10))>>8) & 0xff);
-//
-//	_send_data_buffer[12] = (uint8_t)(( (uint16_t)(WheelSpeedRearLeftData*10)    ) & 0xff);
-//	_send_data_buffer[13] = (uint8_t)((((uint16_t)(WheelSpeedRearLeftData*10))>>8) & 0xff);
-//
-//	_send_data_buffer[14] = (uint8_t)(( (uint16_t)(WheelSpeedRearRightData*10)    ) & 0xff);
-//	_send_data_buffer[15] = (uint8_t)((((uint16_t)(WheelSpeedRearRightData*10))>>8) & 0xff);
-//
-//	_send_data_buffer[16] = WheelSpeedFrontLeftPulse;
-//	_send_data_buffer[17] = WheelSpeedFrontRightPulse;
-//	_send_data_buffer[18] = WheelSpeedRearLeftPulse;
-//	_send_data_buffer[19] = WheelSpeedRearRightPulse;
-//
-//	_send_data_buffer[20] = WheelSpeedDirection;
-//	_send_data_buffer[21] = 0;
-//	_send_data_buffer[22] = 0;
-//
-//	check_sum = 0;
-//	for(i=0;i<23;i++)
-//	{
-//		check_sum += _send_data_buffer[i];
-//	}
-//	_send_data_buffer[23] = check_sum;
-//	for(i=0;i<24;i++)
-//	{
-//		TransmitData(_send_data_buffer[i]);
-//	}
-//}
-//
-//void Terminal::TerminalSystemStateSend(void)
-//{
-//	uint8_t i,check_sum;
-//
-//	_send_data_buffer[0] = 0x7F;
-//	_send_data_buffer[1] = 0x80;
-//	_send_data_buffer[2] = 0xA5;
-//	_send_data_buffer[3] = 3;
-//
-//	_send_data_buffer[4] = WorkingModule;
-//	_send_data_buffer[5] = FunctionStatus;
-//
-//	_send_data_buffer[6] = 0;
-//
-//	check_sum = 0;
-//	for(i=0;i<7;i++)
-//	{
-//		check_sum += _send_data_buffer[i];
-//	}
-//	_send_data_buffer[7] = check_sum;
-//	for(i=0;i<8;i++)
-//	{
-//		TransmitData(_send_data_buffer[i]);
-//	}
-//}
-//
-//void Terminal::TerminalControlAckSend(void)
-//{
-//	uint8_t i,check_sum;
-//	_send_data_buffer[0] = 0x7F;
-//	_send_data_buffer[1] = 0x80;
-//	_send_data_buffer[2] = _frame_id;
-//	_send_data_buffer[3] = 1;
-//	_send_data_buffer[4] = 0x5A;
-//
-//	check_sum = 0;
-//	for(i=0;i<5;i++)
-//	{
-//		check_sum += _send_data_buffer[i];
-//	}
-//	_send_data_buffer[5] = check_sum;
-//	for(i=0;i<6;i++)
-//	{
-//		TransmitData(_send_data_buffer[i]);
-//	}
-//}
+	temp_int.u16 = (uint16_t)(pi.ParkingLength * 1000);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(pi.ParkingWidth * 1000);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(fm * 1000);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(rm * 1000);
+	m_CAN_Packet.data[6] = temp_int.b[1];
+	m_CAN_Packet.data[7] = temp_int.b[0];
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::FrontTrialPositionSend(VehicleBody v,uint8_t cnt)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x443;
+	m_CAN_Packet.length = 8;
+
+	temp_v = v.Center;
+	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+
+	m_CAN_Packet.data[6] = cnt;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::RearTrialPositionSend(VehicleBody v,uint8_t cnt)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x444;
+	m_CAN_Packet.length = 8;
+
+	temp_v = v.Center;
+	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+
+	m_CAN_Packet.data[6] = cnt;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::EnterParkingPositionSend(VehicleBody v,uint8_t cnt,uint8_t s)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x445;
+	m_CAN_Packet.length = 8;
+
+	temp_v = v.Center;
+	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+
+	m_CAN_Packet.data[6] = cnt;
+	m_CAN_Packet.data[7] = s;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
