@@ -84,6 +84,7 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 
 		case 0x258://Wheel speed pulse
 			WheelPulseDirection  = (uint8_t)(dat[2] & 0x03);
+
 			WheelPulseRearRight  = (uint8_t)dat[4];
 			WheelPulseRearLeft   = (uint8_t)dat[5];
 			WheelPulseFrontRight = (uint8_t)dat[6];
