@@ -25,11 +25,12 @@
 #include "ChangAn/chang_an_controller.h"
 #include "ChangAn/chang_an_message.h"
 #include "../Common/VehicleState/GeometricTrack/geometric_track.h"
-#include <lon_control.h>
+#include "lon_control.h"
 #include "pid.h"
-#include <parallel_parking_path_planning.h>
-#include <vehicle_body.h>
-#include <vector_2d.h>
+#include "parallel_planning.h"
+#include "percaption_information.h"
+#include "vehicle_body.h"
+#include "vector_2d.h"
 //using namespace std;
 
 #ifdef __cplusplus
@@ -48,13 +49,15 @@ GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
 
-ParallelParkingPathPlanning m_ParallelParkingPathPlanning;
+ParallelPlanning m_ParallelPlanning;
+PercaptionInformation m_PercaptionInformation;
 VehicleBody m_VehicleBody;
 Vector2d m_Vector2d;
+Vector2d r_v;
 vuint8_t cnt;
 bool TerminalSendFlag = false;
 float temp;
-
+VehicleBody _temp_body;
 __attribute__ ((section(".text")))
 int main()
 {
@@ -77,10 +80,9 @@ int main()
 		PIT_Configure();
 		/* Loop forever */
 
-		m_ParallelParkingPathPlanning.Init();
-		m_Vector2d = m_VehicleBody.Center;
-
-//		m_Vector2d. = 0;
+		m_Vector2d.X = 1;
+		m_Vector2d.Y = 0;
+		r_v = m_Vector2d.rotate(PI/2);
 		for(;;)
 		{
 			if(0xA5 == m_Terminal_CA.AckValid)
@@ -88,6 +90,13 @@ int main()
 				m_Terminal_CA.Ack();
 				m_Terminal_CA.AckValid = 0;
 			}
+//			if(0x41 == m_ParallelPlanning.ConsoleState)
+//			{
+//				m_ParallelPlanning.ConsoleState = 0;
+//				m_Terminal_CA.ParkingMsgSend(m_PercaptionInformation, m_ParallelPlanning.FrontMarginBoundary, m_ParallelPlanning.RearMarginBoundary);
+//				m_Terminal_CA.VehicleInitPositionSend(m_ParallelPlanning.InitParking);
+//			}
+
 			m_Terminal_CA.Push(&m_Ultrasonic);
 
 			if(m_Ultrasonic.SystemTime % 4 == 1)
@@ -124,18 +133,29 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
-	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
+//	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
+//	{
+//		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+//		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+//		m_ChangAnController.Push(0.02);
+//	}
+
+	if(0x52 == m_ParallelPlanning.Command)
 	{
-		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
-		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
-		m_ChangAnController.Push(0.02);
+		m_ParallelPlanning.Command = 0;
+//		float f = m_ParallelPlanning.getInitParking().getCenter().X;
+		m_GeometricTrack.Init(m_ParallelPlanning.InitParking);
+//		m_GeometricTrack.Init(0,0,0);
 	}
 
 	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
 		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
 	}
-
+	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
+	{
+		m_ParallelPlanning.Work(&m_PercaptionInformation);
+	}
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
 
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
@@ -161,10 +181,10 @@ void FlexCAN0_Isr(void)
 	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
 		m_ChangAnMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
-//		m_Terminal_CA.VehicleInformation(CAN_0.MB[8].ID.B.ID_STD,CAN_0.MB[8].DATA.B);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_0.TIMER.R;
+		if(!temp){}
 		CAN_0.IFLAG1.R = 0x00000100;
 	}
 }
@@ -187,6 +207,7 @@ void FlexCAN1_Isr(void)
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_1.TIMER.R;
+		if(!temp){}
 		CAN_1.IFLAG1.R = 0x00000100;
 	}
 }
@@ -205,10 +226,15 @@ void FlexCAN2_Isr(void)
 {
 	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController,&m_Ultrasonic,&m_ChangAnMessage);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_Ultrasonic);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnMessage);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_PercaptionInformation, &m_ParallelPlanning);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ParallelPlanning);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_2.TIMER.R;
+		if(!temp){}
 		CAN_2.IFLAG1.R = 0x00000100;
 	}
 }
