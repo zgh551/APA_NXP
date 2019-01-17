@@ -53,8 +53,20 @@ float Vector2d::DistanceTo(const Vector2d &other)const
 
 Vector2d Vector2d::rotate(const float angle) const
 {
-	return Vector2d(this->_x * cosf(angle) - this->_y * sinf(angle),
-			        this->_x * sinf(angle) + this->_y * cosf(angle));
+	float s_value,c_value;
+	s_value = sinf(angle);
+	c_value = cosf(angle);
+	return Vector2d(this->_x * c_value - this->_y * s_value,
+			        this->_x * s_value + this->_y * c_value);
+}
+
+Vector2d Vector2d::Orthogonal(const float angle) const
+{
+	float s_value,c_value;
+	s_value = sinf(angle);
+	c_value = cosf(angle);
+	return Vector2d(this->_x * c_value * c_value + this->_y * s_value * c_value,
+			        this->_x * s_value * c_value + this->_y * s_value * s_value);
 }
 
 Vector2d Vector2d::operator+(const Vector2d& other) const
@@ -65,6 +77,11 @@ Vector2d Vector2d::operator+(const Vector2d& other) const
 Vector2d Vector2d::operator-(const Vector2d& other) const
 {
 	return Vector2d(this->_x - other._x,this->_y - other._y);
+}
+
+Vector2d Vector2d::operator*(const double ratio) const
+{
+	return Vector2d(this->_x * ratio,this->_y * ratio);
 }
 
 float Vector2d::getX()           { return  _x;}

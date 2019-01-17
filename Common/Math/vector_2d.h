@@ -36,10 +36,12 @@ public:
 
 	Vector2d rotate(const float angle) const;
 
+	Vector2d Orthogonal(const float angle) const;
+
 	Vector2d operator+(const Vector2d &other) const;
 	Vector2d operator-(const Vector2d &other) const;
 
-
+	Vector2d operator*(const double ratio) const;
 
 	float getX();
 	void  setX(float value);
