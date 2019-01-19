@@ -148,21 +148,20 @@ void VehicleBody::EdgePoint(void)
 }
 
 
-
-void VehicleBody::OneTrial(float radius,Vector2d r)
+void VehicleBody::OneTrial(float radius,Vector2d boundary)
 {
 	float theta1,theta2,min_theta;
 	RotationCenter(radius);
 	EdgePoint();
 	if(radius < 0)
 	{
-		theta1 = RotateAngle(RearLeft, r);
-		theta2 = RotateAngle(RearRight, r);
+		theta1 = RotateAngle(RearLeft, boundary);
+		theta2 = RotateAngle(RearRight, boundary);
 	}
 	else
 	{
-		theta1 = RotateAngle(FrontLeft, r);
-		theta2 = RotateAngle(FrontRight, r);
+		theta1 = RotateAngle(FrontLeft, boundary);
+		theta2 = RotateAngle(FrontRight, boundary);
 	}
 	min_theta = fabsf(theta1) < fabsf(theta2) ? theta1 : theta2;
 	Rotate(min_theta);

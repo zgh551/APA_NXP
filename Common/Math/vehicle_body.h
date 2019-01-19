@@ -29,15 +29,16 @@ public:
 	VehicleBody();
 	virtual ~VehicleBody();
 
+	// 已知车库边界和车辆的某个边角点，求该边角点不碰撞边沿的最大旋转角度
 	float RotateAngle(Vector2d vehicle_edge,Vector2d boundary);
+	// 跟据旋转半径求旋转中心点的坐标
 	void RotationCenter(float radius);
+	// 车体模型旋转
 	void Rotate(float angle);
+	// 求车体模型的四个边角点的坐标
 	void EdgePoint(void);
-
-
-	void OneTrial(float radius,Vector2d r);
-
-
+	// 已知边界和旋转半径，车体模型尝试一次旋转
+	void OneTrial(float radius,Vector2d boundary);
 
 	float getAttitudeYaw();
 	void  setAttitudeYaw(float value);
