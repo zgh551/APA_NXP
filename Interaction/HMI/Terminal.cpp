@@ -307,6 +307,45 @@ void Terminal::Push(Ultrasonic *u)
 			break;
 	}
 }
+
+void Terminal::Push(PercaptionInformation *p)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x441;
+	m_CAN_Packet.length = 8;
+
+	temp_int.u16 = (uint16_t)(p->ParkingLength * 1000);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(p->ParkingWidth * 1000);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x440;
+	m_CAN_Packet.length = 8;
+
+	temp_int.i16 = (int16_t)(p->PositionX * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->PositionY * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->AttitudeYaw * 100);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+
+	m_CAN_Packet.data[6] = p->DetectParkingStatus;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
 /**************************************************************************************/
 void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 {

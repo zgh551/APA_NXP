@@ -65,6 +65,8 @@ public:
 
 	void Push(Ultrasonic *u);
 
+	void Push(PercaptionInformation *p);
+///////////////////////////////////////////////////////////////////////////
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
 	void Ack(void);
 
