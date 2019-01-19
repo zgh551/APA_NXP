@@ -82,8 +82,10 @@ void ChangAnController::Stop()
 void ChangAnController::Update(ControlCommand cmd)
 {
 	GearEnable 	        = cmd.ControlEnable.B.GearEnable;
-	SteeringEnable      = cmd.ControlEnable.B.SteeringEnable;
-
+	if( (0 == SteeringEnable) || (0 == cmd.ControlEnable.B.SteeringEnable) )
+	{
+		SteeringEnable  = cmd.ControlEnable.B.SteeringEnable;
+	}
 	AccelerationEnable  = cmd.ControlEnable.B.AccelerationEnable;
 	DecelerationEnable  = cmd.ControlEnable.B.DecelerationEnable;
 	TorqueEnable 	    = cmd.ControlEnable.B.TorqueEnable;
