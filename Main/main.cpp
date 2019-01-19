@@ -57,7 +57,7 @@ Vector2d r_v;
 vuint8_t cnt;
 bool TerminalSendFlag = false;
 float temp;
-VehicleBody _temp_body;
+//VehicleBody _temp_body;
 __attribute__ ((section(".text")))
 int main()
 {
@@ -80,15 +80,30 @@ int main()
 		PIT_Configure();
 		/* Loop forever */
 
-		m_Vector2d.X = 1;
-		m_Vector2d.Y = 0;
-		r_v = m_Vector2d.rotate(PI/2);
+		m_PercaptionInformation.AttitudeYaw = 0;
+		m_PercaptionInformation.DetectParkingStatus = 1;
+		m_PercaptionInformation.ParkingLength = 6.2;
+		m_PercaptionInformation.ParkingWidth = 2.2;
+		m_PercaptionInformation.PositionX = 10.2;
+		m_PercaptionInformation.PositionY = 3.5;
+		m_Terminal_CA.Push(&m_PercaptionInformation);
 		for(;;)
 		{
+			//Task 一次性的计算任务
+			m_ParallelPlanning.Work(&m_PercaptionInformation);
+
+
 			if(0xA5 == m_Terminal_CA.AckValid)
 			{
 				m_Terminal_CA.Ack();
 				m_Terminal_CA.AckValid = 0;
+			}
+			if(0x52 == m_ParallelPlanning.Command)
+			{
+				m_ParallelPlanning.Command = 0;
+		//		float f = m_ParallelPlanning.getInitParking().getCenter().X;
+				m_GeometricTrack.Init(m_ParallelPlanning.InitParking);
+		//		m_GeometricTrack.Init(0,0,0);
 			}
 //			if(0x41 == m_ParallelPlanning.ConsoleState)
 //			{
@@ -133,33 +148,29 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
-//	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
-//	{
-//		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
-//		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
-//		m_ChangAnController.Push(0.02);
-//	}
-
-	if(0x52 == m_ParallelPlanning.Command)
+	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 	{
-		m_ParallelPlanning.Command = 0;
-//		float f = m_ParallelPlanning.getInitParking().getCenter().X;
-		m_GeometricTrack.Init(m_ParallelPlanning.InitParking);
-//		m_GeometricTrack.Init(0,0,0);
-	}
 
+	}
 	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
-		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+		m_ChangAnController.Push(0.02);
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 	{
-		m_ParallelPlanning.Work(&m_PercaptionInformation);
+		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
 	}
+	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
+	{
+
+	}
+
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
 
-	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
+	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
 	{
 		SYSTEM_LED = ~SYSTEM_LED;
