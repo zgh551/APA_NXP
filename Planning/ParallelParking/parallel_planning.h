@@ -1,19 +1,29 @@
-/*
- * parallel_planning.h
- *
- *  Created on: 2019年1月12日
- *      Author: zhuguohua
- */
+/*****************************************************************************/
+/* FILE NAME: parallel_planning.h                 COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: the parallel parking trajectory planning                     */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 9  2019      Initial Version                 */
+/* 1.0	 Guohua Zhu     January 16 2019      Add ReversedTrial Function      */
+/* 1.0	 Guohua Zhu     January 17 2019      Add TransitionArc Function      */
+/*****************************************************************************/
+
 #include "derivative.h"
 #include "property.h"
+#include "math.h"
 #include "chang_an_configure.h"
 #include "vehilce_config.h"
 #include "vehicle_body.h"
 #include "Terminal.h"
 #include "planning.h"
+#include "algebraic_geometry.h"
 
 #ifndef PARALLELPARKING_PARALLEL_PLANNING_H_
 #define PARALLELPARKING_PARALLEL_PLANNING_H_
+
+#define K 1
 
 typedef enum _ParallelPlanningState
 {
@@ -21,6 +31,12 @@ typedef enum _ParallelPlanningState
 	EnterParkingPointPlanning,
 	null
 }ParallelPlanningState;
+
+typedef enum _ParallelControlState
+{
+	WaitPlanningFinish = 0,
+
+}ParallelControlState;
 
 class ParallelPlanning : public Planning
 {
@@ -31,9 +47,13 @@ public:
 
 	void Init() override;
 	void Work(PercaptionInformation *p) override;
+	void Control(VehicleController *c) override;
+
 
 	void ReversedTrial(PercaptionInformation *inf);
 
+	void TransitionArc(PercaptionInformation *inf);
+	/***************************************************************/
 	float getLeftVirtualBoundary();
 	void  setLeftVirtualBoundary(float value);
 	Property<ParallelPlanning,float,READ_WRITE> LeftVirtualBoundary;
@@ -82,8 +102,8 @@ public:
 	void    setConsoleState(uint8_t value);
 	Property<ParallelPlanning,uint8_t,READ_WRITE> ConsoleState;
 private:
-	ParallelPlanningState _parallel_state;
-
+	ParallelPlanningState _parallel_planning_state;
+	ParallelControlState  _parallel_control_state;
 	uint8_t _command;
 	uint8_t _console_state;
 	uint8_t _reverse_cnt;
@@ -99,8 +119,23 @@ private:
 	float _front_margin_boundary;
 	float _rear_margin_boundary;
 
+	Vector2d _parking_left_front;
+
 	VehicleBody _init_parking;//泊车初始位置信息
 	VehicleBody _enter_parking;//入库点位置信息
+
+	Line   _line_init;
+	Line   _line_middle;
+	Circle _circle_left;
+	Circle _circle_right;
+
+	Vector2d _line_init_circle_right_tangent;
+	Vector2d _line_middle_circle_right_tangent;
+	Vector2d _line_middle_circle_left_tangent;
+
+	Vector2d _line_init_circle_right_turn;
+	Vector2d _line_middle_circle_right_turn;
+	Vector2d _line_middle_circle_left_turn;
 };
 
 #endif /* PARALLELPARKING_PARALLEL_PLANNING_H_ */

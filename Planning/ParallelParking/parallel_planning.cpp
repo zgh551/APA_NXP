@@ -1,18 +1,24 @@
-/*
- * parallel_parking_path_planning.cpp
- *
- *  Created on: 2019年1月9日
- *      Author: zhuguohua
- */
-
+/*****************************************************************************/
+/* FILE NAME: parallel_planning.cpp               COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: the parallel parking trajectory planning                     */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 9  2019      Initial Version                 */
+/* 1.0	 Guohua Zhu     January 16 2019      Add ReversedTrial Function      */
+/* 1.0	 Guohua Zhu     January 17 2019      Add TransitionArc Function      */
+/*****************************************************************************/
 #include "parallel_planning.h"
-#include "math.h"
+
 
 Terminal m_ParallelPlanningTerminal;
 VehilceConfig m_ParallelVehilceConfig;
 VehicleBody front_trial_body,rear_trial_body;
 Vector2d enter_point;
-Vector2d parking_right_rear,parking_right_front,parking_left_front;//库位边角点
+Vector2d parking_right_rear,parking_right_front;//库位边角点
+AlgebraicGeometry m_AlgebraicGeometry;
+
 
 ParallelPlanning::ParallelPlanning() {
 	// TODO Auto-generated constructor stub
@@ -86,21 +92,21 @@ void ParallelPlanning::Init()
 
 void ParallelPlanning::Work(PercaptionInformation *p)
 {
-	switch(_parallel_state)
+	switch(_parallel_planning_state)
 	{
 		case WaitStart:
 			if(0x51 == _command)
 			{
 				_trial_status = 0;
 				_reverse_cnt = 0;
-				_parallel_state = EnterParkingPointPlanning;
+				_parallel_planning_state = EnterParkingPointPlanning;
 			}
 			break;
 
 		case EnterParkingPointPlanning:
 			ReversedTrial(p);
 			_command = 0x52;
-			_parallel_state = WaitStart;
+			_parallel_planning_state = WaitStart;
 			break;
 
 		case null:
@@ -111,12 +117,25 @@ void ParallelPlanning::Work(PercaptionInformation *p)
 	}
 }
 
+void ParallelPlanning::Control(VehicleController *c)
+{
+	switch(_parallel_control_state)
+	{
+		case WaitPlanningFinish:
+			break;
+
+		default:
+			break;
+	}
+}
+
+
 void ParallelPlanning::ReversedTrial(PercaptionInformation *inf)
 {
 	// 车位信息发送
 	m_ParallelPlanningTerminal.ParkingMsgSend(*inf,_front_margin_boundary,_rear_margin_boundary);
 	/// 车辆初始位置信息
-	_init_parking.Center      = Vector2d(inf->ParkingLength + inf->PositionX + REAR_EDGE_TO_CENTER,inf->PositionY + RIGHT_EDGE_TO_CENTER);
+	_init_parking.Center      = Vector2d(inf->PositionX,inf->PositionY);
 	_init_parking.AttitudeYaw = inf->AttitudeYaw;
 	// TODO 终端信息 车辆初始位置信息
 	m_ParallelPlanningTerminal.VehicleInitPositionSend(_init_parking);
@@ -127,7 +146,7 @@ void ParallelPlanning::ReversedTrial(PercaptionInformation *inf)
 	// 车库点计算
 	parking_right_rear = Vector2d(_rear_virtual_boundary,_right_virtual_boundary);
 	parking_right_front = Vector2d(_front_virtual_boundary,_right_virtual_boundary);
-	parking_left_front = Vector2d(_front_virtual_boundary,0);
+	_parking_left_front = Vector2d(_front_virtual_boundary,0);
 	// 根据车位宽度，确定车辆最终停车的横向位置
 	m_ParallelVehilceConfig.EdgeRadius(MIN_TURN_RADIUS);
 	MinParkingWidth  = LEFT_EDGE_TO_CENTER + m_ParallelVehilceConfig.RadiusRearRight - MIN_TURN_RADIUS + _right_margin_boundary;
@@ -178,7 +197,7 @@ void ParallelPlanning::ReversedTrial(PercaptionInformation *inf)
 
 				front_trial_body.RotationCenter(MIN_TURN_RADIUS);
 				m_ParallelVehilceConfig.EdgeRadius(MIN_TURN_RADIUS);
-				_trial_status = (front_trial_body.getRotation() - parking_left_front).Length() >= m_ParallelVehilceConfig.RadiusFrontRight ? 1 : 0;
+				_trial_status = (front_trial_body.getRotation() - _parking_left_front).Length() >= m_ParallelVehilceConfig.RadiusFrontRight ? 1 : 0;
 				if(_trial_status)
 				{
 					front_trial_body.EdgePoint();
@@ -194,7 +213,7 @@ void ParallelPlanning::ReversedTrial(PercaptionInformation *inf)
 
 				rear_trial_body.RotationCenter(MIN_TURN_RADIUS);
 				m_ParallelVehilceConfig.EdgeRadius(MIN_TURN_RADIUS);
-				_trial_status = (rear_trial_body.getRotation() - parking_left_front).Length() >= m_ParallelVehilceConfig.RadiusFrontRight ? 1 : 0;
+				_trial_status = (rear_trial_body.getRotation() - _parking_left_front).Length() >= m_ParallelVehilceConfig.RadiusFrontRight ? 1 : 0;
 				if(_trial_status)
 				{
 					rear_trial_body.EdgePoint();
@@ -213,6 +232,43 @@ void ParallelPlanning::ReversedTrial(PercaptionInformation *inf)
 	}
 }
 
+void ParallelPlanning::TransitionArc(PercaptionInformation *inf)
+{
+//	Line   _l_init;
+//	Circle _circle_left;
+//	Circle _circle_right;
+
+	Line cr_line;
+
+	//圆心和直线变量初始化
+	_line_init.Point.X = inf->PositionX;
+	_line_init.Point.Y = inf->PositionY;
+	_line_init.Angle   = inf->AttitudeYaw;
+
+	_circle_left.Center = _enter_parking.Rotation;
+	_circle_left.Radius = MIN_TURN_RADIUS;
+
+	_circle_right.Radius = MIN_TURN_RADIUS;
+	// 计算初始右侧圆心位置
+	m_AlgebraicGeometry.Tangent_CCL(_line_init,_circle_left,&_circle_right);
+	do
+	{
+	// 沿右下方向移动圆心坐标
+	cr_line.Point = _circle_right.Center;
+	cr_line.Angle = _line_init.Angle + PI/4;
+	_circle_right.Center.X = _circle_right.Center.getX() + 0.1;
+	_circle_right.Center.Y = m_AlgebraicGeometry.LinearAlgebra(cr_line, _circle_right.Center.getX());
+	// 重新根据右圆心坐标计算右圆半径和切点坐标
+	m_AlgebraicGeometry.Tangent_CL(_line_init,&_circle_right,&_line_init_circle_right_tangent);
+	// 计算左右圆之间切线的切点坐标
+	m_AlgebraicGeometry.Tangent_CLC(_circle_left, _circle_right,&_line_middle,&_line_middle_circle_left_tangent,&_line_middle_circle_right_tangent);
+	}
+	//碰撞判定
+	while(
+			(_circle_right.Radius - RIGHT_EDGE_TO_CENTER) < (_parking_left_front - _circle_right.Center).Length() ||
+			(_line_middle_circle_left_tangent - _line_middle_circle_right_tangent).Length() < K*1
+	);
+}
 /**************************************************************************************************/
 float ParallelPlanning::getLeftVirtualBoundary()           { return  _left_virtual_boundary;}
 void  ParallelPlanning::setLeftVirtualBoundary(float value){ _left_virtual_boundary = value;}
