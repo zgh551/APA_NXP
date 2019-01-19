@@ -1,10 +1,12 @@
-/*
- * path_plannig.cpp
- *
- *  Created on: 2019Äê1ÔÂ9ÈÕ
- *      Author: zhuguohua
- */
-
+/*****************************************************************************/
+/* FILE NAME: path_plannig.cpp                    COPYRIGHT (c) Motovis 2018 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: the trajectory planning interface  					         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     January 9 2019      Initial Version                  */
+/*****************************************************************************/
 #include <planning.h>
 
 Planning::Planning() {
