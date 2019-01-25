@@ -139,7 +139,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],PercaptionInformation *pi,ParallelPlanning *pp)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,ParallelPlanning *pp)
 {
 	Byte2Int temp_int;
 	switch(id)
@@ -234,7 +234,7 @@ void Terminal::Push(VehicleController *msg)
 							(msg->VelocityEnable     << 3) |
 							(msg->SteeringEnable     << 4) |
 							(msg->GearEnable         << 6) ;
-	m_CAN_Packet.data[1] = 0 ;
+	m_CAN_Packet.data[1] = msg->Gear ;
 
 	temp_int16 = (int16_t)(msg->Acceleration * 100);
 	m_CAN_Packet.data[2] = temp_int16 & 0xff ;
@@ -244,7 +244,7 @@ void Terminal::Push(VehicleController *msg)
 	m_CAN_Packet.data[4] = temp_int16 & 0xff ;
 	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff ;
 
-	temp_uint16 = (uint16_t)(msg->Torque * 100);
+	temp_uint16 = (uint16_t)(msg->Velocity * 100);
 	m_CAN_Packet.data[6] =  temp_uint16 & 0xff ;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff ;
 
@@ -254,12 +254,16 @@ void Terminal::Push(VehicleController *msg)
 void Terminal::Push(VehicleState *msg)
 {
 	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
 	m_CAN_Packet.id = 0x442;
 	m_CAN_Packet.length = 8;
-	m_CAN_Packet.data[0] = ((int16_t) (msg->X * 100)) & 0xff;
-	m_CAN_Packet.data[1] = (((int16_t)(msg->X * 100)) >> 8) & 0xff;
-	m_CAN_Packet.data[2] = ((int16_t) (msg->Y * 100)) & 0xff;
-	m_CAN_Packet.data[3] = (((int16_t)(msg->Y * 100)) >> 8) & 0xff;
+
+	temp_int.i16 = (int16_t) (msg->getPosition().X * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t) (msg->getPosition().Y * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
 	m_CAN_Packet.data[4] = ((int16_t) (msg->Yaw * 100)) & 0xff;
 	m_CAN_Packet.data[5] = (((int16_t)(msg->Yaw * 100)) >> 8) & 0xff;
 	m_CAN_Packet.data[6] = 0;
@@ -308,7 +312,7 @@ void Terminal::Push(Ultrasonic *u)
 	}
 }
 
-void Terminal::Push(PercaptionInformation *p)
+void Terminal::Push(Percaption *p)
 {
 	CAN_Packet m_CAN_Packet;
 	Byte2Int temp_int;
@@ -343,6 +347,25 @@ void Terminal::Push(PercaptionInformation *p)
 	m_CAN_Packet.data[5] = temp_int.b[0];
 
 	m_CAN_Packet.data[6] = p->DetectParkingStatus;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::Push(ParallelPlanning *p)
+{
+	CAN_Packet m_CAN_Packet;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x448;
+	m_CAN_Packet.length = 8;
+
+	m_CAN_Packet.data[0] = p->ParkingStatus;
+	m_CAN_Packet.data[1] = 0;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
@@ -418,7 +441,7 @@ void Terminal::VehicleInitPositionSend(VehicleBody v)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::ParkingMsgSend(PercaptionInformation pi,float fm,float rm)
+void Terminal::ParkingMsgSend(Percaption *p,float fm,float rm)
 {
 	CAN_Packet m_CAN_Packet;
 	Byte2Int temp_int;
@@ -426,10 +449,10 @@ void Terminal::ParkingMsgSend(PercaptionInformation pi,float fm,float rm)
 	m_CAN_Packet.id = 0x441;
 	m_CAN_Packet.length = 8;
 
-	temp_int.u16 = (uint16_t)(pi.ParkingLength * 1000);
+	temp_int.u16 = (uint16_t)(p->ParkingLength * 1000);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(pi.ParkingWidth * 1000);
+	temp_int.u16 = (uint16_t)(p->ParkingWidth * 1000);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
 	temp_int.u16 = (uint16_t)(fm * 1000);
@@ -510,5 +533,53 @@ void Terminal::EnterParkingPositionSend(VehicleBody v,uint8_t cnt,uint8_t s)
 
 	m_CAN_Packet.data[6] = cnt;
 	m_CAN_Packet.data[7] = s;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::TurnPointSend(Turn v,uint8_t cnt)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x446;
+	m_CAN_Packet.length = 8;
+
+	temp_v = v.Point;
+	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(v.SteeringAngle * 10);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+
+	m_CAN_Packet.data[6] = cnt;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::ParkingCenterPointSend(Vector2d v)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int temp_int;
+	Vector2d temp_v;
+	m_CAN_Packet.id = 0x447;
+	m_CAN_Packet.length = 8;
+
+	temp_v = v;
+	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }

@@ -25,7 +25,7 @@
 #include "Interface/vehicle_state.h"
 #include "Ultrasonic.h"
 #include "parallel_planning.h"
-#include "percaption_information.h"
+#include "percaption.h"
 //#include "SystemWork.h"
 
 typedef union _byte2float
@@ -52,7 +52,7 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
 	void Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg);
 
-	void Parse(vuint32_t id,vuint8_t dat[],PercaptionInformation *pi,ParallelPlanning *pp);
+	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,ParallelPlanning *pp);
 
 	void Parse(vuint32_t id,vuint8_t dat[],ParallelPlanning *msg);
 	// Terminal Control
@@ -65,16 +65,20 @@ public:
 
 	void Push(Ultrasonic *u);
 
-	void Push(PercaptionInformation *p);
+	void Push(Percaption *p);
+
+	void Push(ParallelPlanning *p);
 ///////////////////////////////////////////////////////////////////////////
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
 	void Ack(void);
 
 	void VehicleInitPositionSend(VehicleBody v);
-	void ParkingMsgSend(PercaptionInformation pi,float fm,float rm);
+	void ParkingMsgSend(Percaption *pi,float fm,float rm);
 	void FrontTrialPositionSend(VehicleBody v,uint8_t cnt);
 	void RearTrialPositionSend(VehicleBody v,uint8_t cnt);
 	void EnterParkingPositionSend(VehicleBody v,uint8_t cnt,uint8_t s);
+	void TurnPointSend(Turn v,uint8_t cnt);
+	void ParkingCenterPointSend(Vector2d v);
 
 	/*** Property ***/
 	// AckValid
