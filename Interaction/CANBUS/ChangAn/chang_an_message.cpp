@@ -92,7 +92,7 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			break;
 
 		case 0x268:// TCU GEAR
-
+			Gear = (uint8_t)(dat[1] & 0x0f);
 			break;
 
 		case 0x277:// ESP
