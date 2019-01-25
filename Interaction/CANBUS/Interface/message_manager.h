@@ -81,9 +81,9 @@ public:
 	Property<MessageManager,float,READ_WRITE> SteeringAngleRate;
 
 	// TCU
-	float getGear();
-	void  setGear(float value);
-	Property<MessageManager,float,READ_WRITE> Gear;
+	uint8_t getGear();
+	void    setGear(uint8_t value);
+	Property<MessageManager,uint8_t,READ_WRITE> Gear;
 
 	// ESP Sensor
 	float getYawRate();
@@ -119,7 +119,7 @@ private:
 	float _steering_angle_rate;
 
 	// TCU
-	float _gear;
+	uint8_t _gear;
 
 	// ESP Sensor
 	float _yaw_rate;

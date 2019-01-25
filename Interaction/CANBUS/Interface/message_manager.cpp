@@ -133,8 +133,8 @@ float MessageManager::getSteeringAngleRate()           { return _steering_angle_
 void  MessageManager::setSteeringAngleRate(float value){_steering_angle_rate = value;}
 
 // TCU gear
-float MessageManager::getGear()           { return _gear;}
-void  MessageManager::setGear(float value){_gear = value;}
+uint8_t MessageManager::getGear()           { return _gear;}
+void    MessageManager::setGear(uint8_t value){_gear = value;}
 
 // ESP Sensor
 float MessageManager::getYawRate()           { return _yaw_rate;}
