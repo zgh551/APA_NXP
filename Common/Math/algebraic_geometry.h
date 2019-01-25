@@ -16,6 +16,7 @@
 #include "vector_2d.h"
 #include "math.h"
 #include "chang_an_configure.h"
+#include "common_configure.h"
 
 typedef struct _Line
 {
@@ -40,6 +41,8 @@ public:
 	//过一点的直线方程
 	float LinearAlgebra(Line l,float x);
 
+	// 已知圆上两点和半径，算两点间的弧长
+	float ArcLength(Vector2d a,Vector2d b,float r);
 	//已知圆的半径，求与圆和直线相切圆的坐标位置
 	void Tangent_CCL(Line l,Circle cl,Circle *cr);
 	// 已知线段和圆心，求相切圆的半径
