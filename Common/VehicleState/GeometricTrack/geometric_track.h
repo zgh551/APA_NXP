@@ -17,9 +17,9 @@
 #ifndef VEHICLESTATE_GEOMETRICTRACK_GEOMETRIC_TRACK_H_
 #define VEHICLESTATE_GEOMETRICTRACK_GEOMETRIC_TRACK_H_
 
-#include "math.h"
+
 #include "../Interface/vehicle_state.h"
-#include "chang_an_configure.h"
+
 #include <vehicle_body.h>
 typedef struct _fit_ratio
 {
@@ -37,15 +37,9 @@ public:
 	void Init(float x,float y,float yaw);
 	void Init(VehicleBody v);
 
-
 	void VelocityUpdate(MessageManager *msg,float dt) override;
 	void PulseUpdate(MessageManager *msg,float dt) override;
 
-	float SteeringAngle2TurnningRadiusExp(float steer,float a,float b);
-
-	float SteeringAngle2TurnningRadius(float steer,float a,float b);
-
-	float TurnRadiusCalculate(float steering_angle);
 private:
 	float _last_yaw;
 
