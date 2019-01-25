@@ -28,7 +28,7 @@
 #include "lon_control.h"
 #include "pid.h"
 #include "parallel_planning.h"
-#include "percaption_information.h"
+#include "percaption.h"
 #include "vehicle_body.h"
 #include "vector_2d.h"
 //using namespace std;
@@ -50,7 +50,7 @@ LonControl m_LonControl;
 PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
 
 ParallelPlanning m_ParallelPlanning;
-PercaptionInformation m_PercaptionInformation;
+Percaption m_PercaptionInformation;
 VehicleBody m_VehicleBody;
 Vector2d m_Vector2d;
 Vector2d r_v;
@@ -80,37 +80,28 @@ int main()
 		PIT_Configure();
 		/* Loop forever */
 
-		m_PercaptionInformation.AttitudeYaw = 0;
-		m_PercaptionInformation.DetectParkingStatus = 1;
-		m_PercaptionInformation.ParkingLength = 6.2;
-		m_PercaptionInformation.ParkingWidth = 2.2;
-		m_PercaptionInformation.PositionX = 10.2;
-		m_PercaptionInformation.PositionY = 3.5;
-		m_Terminal_CA.Push(&m_PercaptionInformation);
+//		m_PercaptionInformation.AttitudeYaw = 0;
+//		m_PercaptionInformation.DetectParkingStatus = 1;
+//		m_PercaptionInformation.ParkingLength = 6.2;
+//		m_PercaptionInformation.ParkingWidth = 2.2;
+//		m_PercaptionInformation.PositionX = 10.2;
+//		m_PercaptionInformation.PositionY = 3.5;
+//		m_Terminal_CA.Push(&m_PercaptionInformation);
 		for(;;)
 		{
 			//Task 一次性的计算任务
-			m_ParallelPlanning.Work(&m_PercaptionInformation);
-
+			m_ParallelPlanning.Work(&m_PercaptionInformation,&m_GeometricTrack);
 
 			if(0xA5 == m_Terminal_CA.AckValid)
 			{
 				m_Terminal_CA.Ack();
 				m_Terminal_CA.AckValid = 0;
 			}
-			if(0x52 == m_ParallelPlanning.Command)
+			if(0x60 == m_ParallelPlanning.Command)
 			{
-				m_ParallelPlanning.Command = 0;
-		//		float f = m_ParallelPlanning.getInitParking().getCenter().X;
 				m_GeometricTrack.Init(m_ParallelPlanning.InitParking);
-		//		m_GeometricTrack.Init(0,0,0);
+				m_ParallelPlanning.Command = 0x70;
 			}
-//			if(0x41 == m_ParallelPlanning.ConsoleState)
-//			{
-//				m_ParallelPlanning.ConsoleState = 0;
-//				m_Terminal_CA.ParkingMsgSend(m_PercaptionInformation, m_ParallelPlanning.FrontMarginBoundary, m_ParallelPlanning.RearMarginBoundary);
-//				m_Terminal_CA.VehicleInitPositionSend(m_ParallelPlanning.InitParking);
-//			}
 
 			m_Terminal_CA.Push(&m_Ultrasonic);
 
@@ -125,6 +116,10 @@ int main()
 			if(m_Ultrasonic.SystemTime % 4 == 3)
 			{
 				m_Terminal_CA.Push(&m_ChangAnMessage);
+			}
+			if(m_Ultrasonic.SystemTime % 13 == 1)
+			{
+				m_Terminal_CA.Push(&m_ParallelPlanning);
 			}
 //			m_ChangAnMessage.WheelSpeedDirection = 1;
 //			m_ChangAnMessage.WheelSpeedRearLeft = 5;
@@ -150,10 +145,11 @@ void PIT0_isr(void)
 {
 	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 	{
-
+		m_ParallelPlanning.Control(&m_ChangAnController, &m_ChangAnMessage, &m_GeometricTrack, &m_Ultrasonic);
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
+		// TODO 测试时可以屏蔽
 		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
 		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
 		m_ChangAnController.Push(0.02);
@@ -168,7 +164,6 @@ void PIT0_isr(void)
 	}
 
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
-
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
