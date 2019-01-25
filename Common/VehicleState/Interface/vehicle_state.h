@@ -19,6 +19,10 @@
 
 #include "derivative.h"
 #include "property.h"
+#include "math.h"
+#include "vector_2d.h"
+#include "chang_an_configure.h"
+#include "common_configure.h"
 #include "Interface/message_manager.h"
 
 class VehicleState
@@ -32,17 +36,18 @@ public:
 	virtual void VelocityUpdate(MessageManager *msg,float dt) = 0;
 	virtual void PulseUpdate(MessageManager *msg,float dt) = 0;
 
-	float getX();
-	void  setX(float value);
-	Property<VehicleState,float,READ_WRITE> X;
+	float SteeringAngle2TurnningRadiusExp(float steer,float a,float b);
+	float TurnningRadius2SteeringAngleExp(float radius,float a,float b);
 
-	float getY();
-	void  setY(float value);
-	Property<VehicleState,float,READ_WRITE> Y;
+	float SteeringAngle2TurnningRadius(float steer,float a,float b);
+	float TurnningRadius2SteeringAngle(float radius,float a,float b);
 
-	float getZ();
-	void  setZ(float value);
-	Property<VehicleState,float,READ_WRITE> Z;
+	float TurnRadiusCalculate(float steering_angle);
+	float SteeringAngleCalculate(float radius);
+
+	Vector2d getPosition();
+	void     setPosition(Vector2d value);
+	Property<VehicleState,Vector2d,READ_WRITE> Position;
 
 	float getYaw();
 	void  setYaw(float value);
@@ -51,13 +56,16 @@ public:
 	float getLinearVelocity();
 	void  setLinearVelocity(float value);
 	Property<VehicleState,float,READ_WRITE> LinearVelocity;
-private:
-	float _x;
-	float _y;
-	float _z;
-	float _yaw;
 
+	float getLinearRate();
+	void  setLinearRate(float value);
+	Property<VehicleState,float,READ_WRITE> LinearRate;
+
+protected:
+	Vector2d _position;
+	float    _yaw;
 	float _linear_velocity;
+	float _linear_rate;
 };
 
 #endif /* VEHICLESTATE_VEHICLESTATE_H_ */
