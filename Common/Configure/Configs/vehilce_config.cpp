@@ -6,6 +6,7 @@
  */
 
 #include <vehilce_config.h>
+#include "common_configure.h"
 
 VehilceConfig::VehilceConfig() {
 	// TODO Auto-generated constructor stub
