@@ -20,11 +20,12 @@
 // 车辆边沿到车辆中心点的距离(m)
 #define FRONT_EDGE_TO_CENTER              (3.54)
 #define REAR_EDGE_TO_CENTER               (0.905)
-#define LEFT_EDGE_TO_CENTER               (0.797)
-#define RIGHT_EDGE_TO_CENTER              (0.797)
+#define LEFT_EDGE_TO_CENTER               (0.9275)
+#define RIGHT_EDGE_TO_CENTER              (0.9275)
 
 // 最小转弯半径(m)
-#define MIN_TURN_RADIUS                   (5.1)
+#define MIN_RIGHT_TURN_RADIUS             (4.7079)
+#define MIN_LEFT_TURN_RADIUS              (4.6614)
 // 转向传动比
 #define STEERING_RATIO                   (15.3)
 
@@ -42,9 +43,6 @@
 #define SPEED_REVISE_RATIO               (1.01)
 // 轮脉冲比例系数
 #define WHEEL_PUSLE_RATIO                (0.02540618132391610878926842900878)
-
-// Math ratio
-#define PI 								 (3.1415926)
 
 /*** turn radius and the steering angle relationship ***/
 // (400,470]
@@ -68,12 +66,12 @@
 #define FIT_RADIUS_B5 		(-0.02795)
 
 // (0,50]
-#define FIT_RADIUS_A6 		( 0.06706)
-#define FIT_RADIUS_B6 		(-0.1501)
+#define FIT_RADIUS_A6 		( 0.062  )
+#define FIT_RADIUS_B6 		( 0.0    )
 
 // (-50,0)
-#define FIT_RADIUS_A7 		( 0.06442)
-#define FIT_RADIUS_B7 		(-0.07814)
+#define FIT_RADIUS_A7 		( 0.062  )
+#define FIT_RADIUS_B7 		( 0.0    )
 
 // (-100,-50]
 #define FIT_RADIUS_A8 		( 0.06123)
