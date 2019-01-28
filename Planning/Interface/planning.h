@@ -27,9 +27,9 @@
 #define EMERGENCY_BRAKING	  (-5 ) // 紧急制动的减速度
 #define PLANNING_BRAKING	  (-1  ) // 规划减速度
 #define PLANNING_BRAKING_R	  ( 1 ) // 规划减速度的倒数
-#define STRAIGHT_VELOCITY	  ( 0.6 ) // 直线段的速度
+#define STRAIGHT_VELOCITY	  ( 0.4 ) // 直线段的速度
 #define CURVE_VELOCITY	      ( 0.3 ) // 曲线段的速度
-#define TURN_FEEDFORWARD_TIME ( 0.01) // 转向角前向反馈的补偿时间
+#define TURN_FEEDFORWARD_TIME ( 0.0) // 转向角前向反馈的补偿时间
 #define PARKING_CENTER_MARGIN ( 0.1 ) // 泊车中心点余量
 
 //extern GeometricTrack    m_GeometricTrack;
