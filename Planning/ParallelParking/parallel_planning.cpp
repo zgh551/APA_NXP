@@ -8,6 +8,8 @@
 /* 1.0	 Guohua Zhu     January 9  2019      Initial Version                 */
 /* 1.0	 Guohua Zhu     January 16 2019      Add ReversedTrial Function      */
 /* 1.0	 Guohua Zhu     January 17 2019      Add TransitionArc Function      */
+/* 1.0	 Guohua Zhu     January 21 2019      Add  Control State Machine      */
+/* 1.0	 Guohua Zhu     January 23 2019      Add  Control Other Machine      */
 /*****************************************************************************/
 #include "parallel_planning.h"
 
