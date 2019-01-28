@@ -103,7 +103,7 @@ int main()
 				m_ParallelPlanning.Command = 0x70;
 			}
 
-			m_Terminal_CA.Push(&m_Ultrasonic);
+			    m_Terminal_CA.Push(&m_Ultrasonic);
 
 			if(m_Ultrasonic.SystemTime % 4 == 1)
 			{
