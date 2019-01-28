@@ -27,7 +27,7 @@
 #define MIN_RIGHT_TURN_RADIUS             (4.7079)
 #define MIN_LEFT_TURN_RADIUS              (4.6614)
 // 转向传动比
-#define STEERING_RATIO                   (15.3)
+#define STEERING_RATIO                    (15.3)
 
 // 最大加速度(m/s2)
 #define MAX_ACCELERATION                    (3)
