@@ -72,7 +72,7 @@ typedef enum _RightFrontTrialState
 {
 	RightFrontTrialGearShift,
 	RightFrontTrialVehicleMove,
-	RightFrontTrialSelectTrial,
+	RightFrontTrialDisableACC,
 	RightFrontTrialWaitArrive,
 	RightFrontTrialWaitStill
 }RightFrontTrialState;
@@ -81,7 +81,7 @@ typedef enum _LeftRearTrialState
 {
 	LeftRearTrialGearShift,
 	LeftRearTrialVehicleMove,
-	LeftRearTrialSelectTrial,
+	LeftRearTrialDisableACC,
 	LeftRearTrialWaitArrive,
 	LeftRearTrialWaitStill
 }LeftRearTrialState;
@@ -91,6 +91,8 @@ typedef enum _ParkingCompleteState
 	GearShiftJudge,
 	FrontMoveAdjust,
 	RearMoveAdjust,
+	FrontMoveDisableACC,
+	RearMoveDisableACC,
 	FrontWaitArrive,
 	RearWaitArrive,
 	FrontMoveStill,
@@ -194,6 +196,7 @@ private:
 	uint8_t _console_state;
 	uint8_t _reverse_cnt;
 	uint8_t _forward_cnt;
+	uint8_t _acc_disable_cnt;
 	uint8_t _trial_status;
 	uint8_t _parking_status;
 
