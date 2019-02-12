@@ -88,7 +88,7 @@ int main()
 //		m_Terminal_CA.Push(&m_PercaptionInformation);
 		for(;;)
 		{
-			//Task Ò»´ÎĞÔµÄ¼ÆËãÈÎÎñ
+			//Task ä¸€æ¬¡æ€§çš„è®¡ç®—ä»»åŠ¡
 			m_ParallelPlanning.Work(&m_PercaptionInformation,&m_GeometricTrack);
 
 			if(0xA5 == m_Terminal_CA.AckValid)
@@ -153,7 +153,7 @@ void PIT0_isr(void)
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
-		// TODO ²âÊÔÊ±¿ÉÒÔÆÁ±Î
+		// TODO æµ‹è¯•æ—¶å¯ä»¥å±è”½
 		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
 		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
 		m_ChangAnController.Push(0.02);

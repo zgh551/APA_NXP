@@ -103,10 +103,10 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u)
 {
 	switch(id)
 	{
-        case 0x508://´«¸ÐÆ÷9
-        case 0x509://´«¸ÐÆ÷10
-        case 0x50A://´«¸ÐÆ÷11
-        case 0x50B://´«¸ÐÆ÷12
+        case 0x508://ä¼ æ„Ÿå™¨9
+        case 0x509://ä¼ æ„Ÿå™¨10
+        case 0x50A://ä¼ æ„Ÿå™¨11
+        case 0x50B://ä¼ æ„Ÿå™¨12
         	Ultrasonic_Packet ultrasonic_packet;
         	ultrasonic_packet.Distance1 = (float)(((uint16_t )((dat[1] << 8) | dat[0])) * u->Compensation(0));
         	ultrasonic_packet.Distance2 = (float)(((uint16_t )((dat[3] << 8) | dat[2])) * u->Compensation(0));

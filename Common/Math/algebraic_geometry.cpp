@@ -18,12 +18,12 @@ AlgebraicGeometry::~AlgebraicGeometry() {
 
 }
 
-//¶ş´Î·½³ÌÇó½â
+//äºŒæ¬¡æ–¹ç¨‹æ±‚è§£
 float AlgebraicGeometry::QuadraticEquation(float a,float b,float c)
 {
 	return 0.5 * (-b + sqrtf(b*b - 4*a*c)) / a;
 }
-//¹ıÒ»µãµÄÖ±Ïß·½³Ì
+//è¿‡ä¸€ç‚¹çš„ç›´çº¿æ–¹ç¨‹
 float AlgebraicGeometry::LinearAlgebra(Line l,float x)
 {
 	return tanf(l.Angle)*(x - l.Point.getX()) + l.Point.getY();
@@ -35,7 +35,7 @@ float AlgebraicGeometry::ArcLength(Vector2d a,Vector2d b,float r)
 }
 
 
-//ÒÑÖªÔ²µÄ°ë¾¶£¬ÇóÓëÔ²ºÍÖ±ÏßÏàÇĞÔ²µÄ×ø±êÎ»ÖÃ
+//å·²çŸ¥åœ†çš„åŠå¾„ï¼Œæ±‚ä¸åœ†å’Œç›´çº¿ç›¸åˆ‡åœ†çš„åæ ‡ä½ç½®
 void AlgebraicGeometry::Tangent_CCL(Line l,Circle cl,Circle *cr)
 {
 	float a,b,c;
@@ -55,7 +55,7 @@ void AlgebraicGeometry::Tangent_CCL(Line l,Circle cl,Circle *cr)
 	cr->Center.Y = LinearAlgebra(l,cr->Center.getX()) - sec_v*cr->Radius;
 }
 
-// ÇóÓëÖ±ÏßÏàÇĞÔ²µÄ°ë¾¶
+// æ±‚ä¸ç›´çº¿ç›¸åˆ‡åœ†çš„åŠå¾„
 void AlgebraicGeometry::Tangent_CL(Line l,Circle *c,Vector2d *p)
 {
 	Vector2d temp_difference;
@@ -65,7 +65,7 @@ void AlgebraicGeometry::Tangent_CL(Line l,Circle *c,Vector2d *p)
 	c->Radius = fabsf(sinf(l.Angle)*temp_difference.getX() - cosf(l.Angle)*temp_difference.getY());
 }
 
-// ÒÑÖªÁ½Ô²ĞÄÎ»ÖÃ£¬ÇóÓëÁ½Ô²ÏàÇĞÖ±ÏßµÄÇĞµãÎ»ÖÃ
+// å·²çŸ¥ä¸¤åœ†å¿ƒä½ç½®ï¼Œæ±‚ä¸ä¸¤åœ†ç›¸åˆ‡ç›´çº¿çš„åˆ‡ç‚¹ä½ç½®
 void AlgebraicGeometry::Tangent_CLC(Circle cl,Circle cr,Line *lm,Vector2d *ll,Vector2d *lr)
 {
 	float K1;

@@ -27,20 +27,20 @@ public:
 	Vector2d(const float x,const float y) noexcept:_x(x),_y(y){}
 	virtual ~Vector2d();
 
-	//Ê¸Á¿Ä£³¤
+	//çŸ¢é‡æ¨¡é•¿
 	float Length(void)const;
-	//Ê¸Á¿Ä£³¤µÄÆ½·½
+	//çŸ¢é‡æ¨¡é•¿çš„å¹³æ–¹
 	float LengthSquare(void)const;
-	// Ê¸Á¿½Ç¶È
+	// çŸ¢é‡è§’åº¦
 	float Angle(void)const;
-	//ÇóÁ¬¸öÊ¸Á¿Ö®¼äµÄ¾àÀë
+	//æ±‚è¿ä¸ªçŸ¢é‡ä¹‹é—´çš„è·ç¦»
 	float DistanceTo(const Vector2d &other)const;
-	//Ê¸Á¿Ğı×ª£¬Ğı×ª½Ç¶ÈÄæÊ±ÕëÎªÕı£¬Ë³Ê±ÕëÎª¸º
+	//çŸ¢é‡æ—‹è½¬ï¼Œæ—‹è½¬è§’åº¦é€†æ—¶é’ˆä¸ºæ­£ï¼Œé¡ºæ—¶é’ˆä¸ºè´Ÿ
 	Vector2d rotate(const float angle) const;
-	//Ê¸Á¿Õı½»µã¼ÆËã
+	//çŸ¢é‡æ­£äº¤ç‚¹è®¡ç®—
 	Vector2d Orthogonal(const float angle) const;
 
-	//ÔËËã·ûÖØÔØ
+	//è¿ç®—ç¬¦é‡è½½
 	Vector2d operator+(const Vector2d &other) const;
 	Vector2d operator-(const Vector2d &other) const;
 	Vector2d operator*(const double ratio) const;

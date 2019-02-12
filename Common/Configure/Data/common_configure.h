@@ -1,7 +1,7 @@
 /*
  * common_configure.h
  *
- *  Created on: 2019Äê1ÔÂ22ÈÕ
+ *  Created on: 2019å¹´1æœˆ22æ—¥
  *      Author: zhuguohua
  */
 

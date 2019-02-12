@@ -35,19 +35,19 @@ public:
 	AlgebraicGeometry();
 	virtual ~AlgebraicGeometry();
 
-	//¶ş´Î·½³ÌÇó½â
+	//äºŒæ¬¡æ–¹ç¨‹æ±‚è§£
 	float QuadraticEquation(float a,float b,float c);
 
-	//¹ıÒ»µãµÄÖ±Ïß·½³Ì
+	//è¿‡ä¸€ç‚¹çš„ç›´çº¿æ–¹ç¨‹
 	float LinearAlgebra(Line l,float x);
 
-	// ÒÑÖªÔ²ÉÏÁ½µãºÍ°ë¾¶£¬ËãÁ½µã¼äµÄ»¡³¤
+	// å·²çŸ¥åœ†ä¸Šä¸¤ç‚¹å’ŒåŠå¾„ï¼Œç®—ä¸¤ç‚¹é—´çš„å¼§é•¿
 	float ArcLength(Vector2d a,Vector2d b,float r);
-	//ÒÑÖªÔ²µÄ°ë¾¶£¬ÇóÓëÔ²ºÍÖ±ÏßÏàÇĞÔ²µÄ×ø±êÎ»ÖÃ
+	//å·²çŸ¥åœ†çš„åŠå¾„ï¼Œæ±‚ä¸åœ†å’Œç›´çº¿ç›¸åˆ‡åœ†çš„åæ ‡ä½ç½®
 	void Tangent_CCL(Line l,Circle cl,Circle *cr);
-	// ÒÑÖªÏß¶ÎºÍÔ²ĞÄ£¬ÇóÏàÇĞÔ²µÄ°ë¾¶
+	// å·²çŸ¥çº¿æ®µå’Œåœ†å¿ƒï¼Œæ±‚ç›¸åˆ‡åœ†çš„åŠå¾„
 	void Tangent_CL(Line l,Circle *c,Vector2d *p);
-	// ÒÑÖªÁ½Ô²ĞÄÎ»ÖÃ£¬ÇóÓëÁ½Ô²ÏàÇĞÖ±ÏßµÄÇĞµãÎ»ÖÃ
+	// å·²çŸ¥ä¸¤åœ†å¿ƒä½ç½®ï¼Œæ±‚ä¸ä¸¤åœ†ç›¸åˆ‡ç›´çº¿çš„åˆ‡ç‚¹ä½ç½®
 	void Tangent_CLC(Circle cl,Circle cr,Line *lm,Vector2d *ll,Vector2d *lr);
 private:
 

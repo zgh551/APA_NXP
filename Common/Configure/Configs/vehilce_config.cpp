@@ -1,7 +1,7 @@
 /*
  * vehilce_config.cpp
  *
- *  Created on: 2019Äê1ÔÂ10ÈÕ
+ *  Created on: 2019å¹´1æœˆ10æ—¥
  *      Author: zhuguohua
  */
 

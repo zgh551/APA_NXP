@@ -71,7 +71,7 @@ ParallelPlanning::ParallelPlanning() {
 	ParkingStatus.getter(&ParallelPlanning::getParkingStatus);
 	ParkingStatus.setter(&ParallelPlanning::setParkingStatus);
 
-	//±ß½çÄÚmarginÎªÕıÖµ
+	//è¾¹ç•Œå†…marginä¸ºæ­£å€¼
 	_lat_margin_move       =  0.0f;
 	_right_margin_boundary =  0.1f;
 	_front_margin_boundary =  0.1f;
@@ -82,7 +82,7 @@ ParallelPlanning::~ParallelPlanning() {
 	// TODO Auto-generated destructor stub
 }
 
-// _left_virtual_boundary : ¶¨Òå±ß½çÄÚÎªÕıÖµ £¬±ß½çÍâÎª¸ºÖµ
+// _left_virtual_boundary : å®šä¹‰è¾¹ç•Œå†…ä¸ºæ­£å€¼ ï¼Œè¾¹ç•Œå¤–ä¸ºè´Ÿå€¼
 void ParallelPlanning::Init()
 {
 	_parking_status = 0;
@@ -188,6 +188,7 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
 {
 	float angle_vector;
+	VehicleBody motion_body;
 	switch(_curve_state)
 	{
 		case GearShift:
@@ -208,6 +209,7 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case FirstTurnPoint:
+			// è€ƒè™‘è½¬å‘è§’æ‰§è¡Œå»¶è¿Ÿæ—¶é—´
 			if( (s->getPosition().getX() -_line_init_circle_right_turn.Point.getX()) < s->LinearRate * TURN_FEEDFORWARD_TIME)
 			{
 				_parallel_command.SteeringAngle = _line_init_circle_right_turn.SteeringAngle;
@@ -217,7 +219,13 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case SecondTurnPoint:
+			// æ ¹æ®å½“å‰è½¦é€Ÿï¼Œå®æ—¶æ›´æ–°è½¬å‘è§’é€Ÿåº¦
 			_parallel_command.SteeringAngleRate = s->LinearRate * RK;
+			if(fabsf(msg->SteeringAngle - _parallel_command.SteeringAngle ) < 1)
+			{
+				angle_vector = (s->getPosition() - _line_middle_circle_right_turn.Point).Angle();
+			}
+			// è±¡é™ç‚¹åˆ¤å®šæ§åˆ¶
 			angle_vector = (s->getPosition() - _line_middle_circle_right_turn.Point).Angle();
 			if(angle_vector > 0 && angle_vector < PI_2 )
 			{
@@ -236,7 +244,8 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 
 		case ThirdTurnPoint:
 			_parallel_command.SteeringAngleRate = s->LinearRate * RK;
-			angle_vector = (s->getPosition() - _line_middle_circle_right_turn.Point).Angle();
+
+			angle_vector = (s->getPosition() - _line_middle_circle_left_turn.Point).Angle();
 			if(angle_vector > 0 && angle_vector < PI_2 )
 			{
 				if((s->getPosition() -_line_middle_circle_left_turn.Point).Length() < s->LinearRate * TURN_FEEDFORWARD_TIME)
@@ -253,17 +262,37 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case WaitArrive:
-			angle_vector = (s->getPosition() - _enter_parking.Center).Angle();
-			if(angle_vector > 0 && angle_vector < PI_2 )
-			{
-				if( m_AlgebraicGeometry.ArcLength(s->getPosition(), _enter_parking.Center, _circle_left.Radius) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
-				{
-					_parallel_command.Acceleration  = PLANNING_BRAKING;
-					_parallel_command.ControlEnable.B.VelocityEnable = 0;
-					_curve_state = WaitStill;
-				}
-			}
-			else
+			_parallel_command.SteeringAngleRate = s->LinearRate * RK;
+
+//			angle_vector = (s->getPosition() - _enter_parking.Center).Angle();
+//			if( (s->Yaw * _circle_left.Radius) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
+//			{
+//				_parallel_command.Acceleration  = PLANNING_BRAKING;
+//				_parallel_command.ControlEnable.B.VelocityEnable = 0;
+//				_curve_state = WaitStill;
+//			}
+//			else if(angle_vector > 0 && angle_vector < PI_2 )
+//			{
+//				if( m_AlgebraicGeometry.ArcLength(s->getPosition(), _enter_parking.Center, _circle_left.Radius) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
+//				{
+//					_parallel_command.Acceleration  = PLANNING_BRAKING;
+//					_parallel_command.ControlEnable.B.VelocityEnable = 0;
+//					_curve_state = WaitStill;
+//				}
+//			}
+//			else
+//			{
+//				_parallel_command.Deceleration  = EMERGENCY_BRAKING;
+//				_parallel_command.Acceleration  = EMERGENCY_BRAKING;
+//				_parallel_command.ControlEnable.B.VelocityEnable = 0;
+//				_parallel_command.ControlEnable.B.DecelerationEnable = 1;
+//				_curve_state = WaitStill;
+//			}
+
+			motion_body.Center = s->getPosition();
+			motion_body.AttitudeYaw = s->getYaw();
+			motion_body.EdgePoint();
+			if( (motion_body.getRearLeft().getX() < _rear_virtual_boundary) || (motion_body.getRearRight().getY() < _right_virtual_boundary) )
 			{
 				_parallel_command.Deceleration  = EMERGENCY_BRAKING;
 				_parallel_command.Acceleration  = EMERGENCY_BRAKING;
@@ -271,7 +300,17 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 				_parallel_command.ControlEnable.B.DecelerationEnable = 1;
 				_curve_state = WaitStill;
 			}
-			if( (s->Yaw * _circle_left.Radius) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
+			else
+			{
+				if( (motion_body.getRearLeft().getX() - _rear_virtual_boundary) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R) ||
+					(motion_body.getRearRight().getY() - _right_virtual_boundary) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
+				{
+					_parallel_command.Acceleration  = PLANNING_BRAKING;
+					_parallel_command.ControlEnable.B.VelocityEnable = 0;
+					_curve_state = WaitStill;
+				}
+			}
+			if( (s->Yaw * MIN_RIGHT_TURN_RADIUS) < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
 			{
 				_parallel_command.Acceleration  = PLANNING_BRAKING;
 				_parallel_command.ControlEnable.B.VelocityEnable = 0;
@@ -294,12 +333,23 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			}
 			else
 			{
-				angle_vector = (s->getPosition() - _enter_parking.Center).Angle();
-				if( (angle_vector > 0) && (angle_vector < PI_2) )
-				{
+//				angle_vector = (s->getPosition() - _enter_parking.Center).Angle();
+//				if( (angle_vector > 0) && (angle_vector < PI_2) )
+//				{
+//
+//				}
+//				else
+//				{
+//					_parallel_command.Deceleration  = EMERGENCY_BRAKING;
+//					_parallel_command.Acceleration  = EMERGENCY_BRAKING;
+//					_parallel_command.ControlEnable.B.VelocityEnable = 0;
+//					_parallel_command.ControlEnable.B.DecelerationEnable = 1;
+//				}
 
-				}
-				else
+				motion_body.Center = s->getPosition();
+				motion_body.AttitudeYaw = s->getYaw();
+				motion_body.EdgePoint();
+				if( (motion_body.getRearLeft().getX() < _rear_virtual_boundary) || (motion_body.getRearRight().getY() < _right_virtual_boundary) || (s->Yaw < 0))
 				{
 					_parallel_command.Deceleration  = EMERGENCY_BRAKING;
 					_parallel_command.Acceleration  = EMERGENCY_BRAKING;
@@ -334,20 +384,19 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			{
 				_parallel_command.Velocity = CURVE_VELOCITY;
 				_parallel_command.ControlEnable.B.VelocityEnable = 1;
-				_right_front_state = RightFrontTrialWaitArrive;
+				_parallel_command.ControlEnable.B.AccelerationEnable = 0;
+				_acc_disable_cnt = 0;
+				_right_front_state = RightFrontTrialDisableACC;
 			}
 			break;
 
-		case RightFrontTrialSelectTrial:
-			if(_reverse_cnt % 2 == 1)
+		case RightFrontTrialDisableACC:
+			_acc_disable_cnt++;
+			if(_acc_disable_cnt > ACC_DISABLE_TIME)
 			{
-				_right_front_trial = front_trial_arrary[_forward_cnt];
+				_parallel_command.ControlEnable.B.AccelerationEnable = 1;
+				_right_front_state = RightFrontTrialWaitArrive;
 			}
-			else
-			{
-				_right_front_trial = rear_trial_arrary[_forward_cnt];
-			}
-			_right_front_state = RightFrontTrialWaitArrive;
 			break;
 
 		case RightFrontTrialWaitArrive:
@@ -397,7 +446,7 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 				motion_body.Center = s->getPosition();
 				motion_body.AttitudeYaw = s->getYaw();
 				motion_body.EdgePoint();
-				if(motion_body.getFrontRight().getX() > _front_virtual_boundary)
+				if( (motion_body.getFrontRight().getX() > _front_virtual_boundary)  || (s->Yaw < 0) )
 				{
 					_parallel_command.Deceleration  = EMERGENCY_BRAKING;
 					_parallel_command.Acceleration  = EMERGENCY_BRAKING;
@@ -432,20 +481,19 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			{
 				_parallel_command.Velocity = CURVE_VELOCITY;
 				_parallel_command.ControlEnable.B.VelocityEnable = 1;
-				_left_rear_state = LeftRearTrialWaitArrive;
+				_parallel_command.ControlEnable.B.AccelerationEnable = 0;
+				_acc_disable_cnt = 0;
+				_left_rear_state = LeftRearTrialDisableACC;
 			}
 			break;
 
-		case LeftRearTrialSelectTrial:
-			if(_reverse_cnt % 2 == 1)
+		case LeftRearTrialDisableACC:
+			_acc_disable_cnt++;
+			if(_acc_disable_cnt > ACC_DISABLE_TIME)
 			{
-				_right_front_trial = front_trial_arrary[_forward_cnt];
+				_parallel_command.ControlEnable.B.AccelerationEnable = 1;
+				_left_rear_state = LeftRearTrialWaitArrive;
 			}
-			else
-			{
-				_right_front_trial = rear_trial_arrary[_forward_cnt];
-			}
-			_left_rear_state = LeftRearTrialWaitArrive;
 			break;
 
 		case LeftRearTrialWaitArrive:
@@ -502,7 +550,6 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 					_parallel_command.Acceleration  = EMERGENCY_BRAKING;
 					_parallel_command.ControlEnable.B.VelocityEnable = 0;
 					_parallel_command.ControlEnable.B.DecelerationEnable = 1;
-					_left_rear_state = LeftRearTrialWaitStill;
 				}
 			}
 			break;
@@ -546,7 +593,9 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			{
 				_parallel_command.Velocity = 0.2;
 				_parallel_command.ControlEnable.B.VelocityEnable = 1;
-				_parking_complete_state = FrontWaitArrive;
+				_parallel_command.ControlEnable.B.AccelerationEnable = 0;
+				_acc_disable_cnt = 0;
+				_parking_complete_state = FrontMoveDisableACC;
 			}
 			break;
 
@@ -555,19 +604,39 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			{
 				_parallel_command.Velocity = 0.2;
 				_parallel_command.ControlEnable.B.VelocityEnable = 1;
+				_parallel_command.ControlEnable.B.AccelerationEnable = 0;
+				_acc_disable_cnt = 0;
+				_parking_complete_state = RearMoveDisableACC;
+			}
+			break;
+
+		case FrontMoveDisableACC:
+			_acc_disable_cnt++;
+			if(_acc_disable_cnt > ACC_DISABLE_TIME)
+			{
+				_parallel_command.ControlEnable.B.AccelerationEnable = 1;
+				_parking_complete_state = FrontWaitArrive;
+			}
+			break;
+
+		case RearMoveDisableACC:
+			_acc_disable_cnt++;
+			if(_acc_disable_cnt > ACC_DISABLE_TIME)
+			{
+				_parallel_command.ControlEnable.B.AccelerationEnable = 1;
 				_parking_complete_state = RearWaitArrive;
 			}
 			break;
 
 		case FrontWaitArrive:
-			// ´øÔ¤²âµÄÍ£³µ
+			// å¸¦é¢„æµ‹çš„åœè½¦
 			if( (s->getPosition() - _parking_center_point).Length() < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
 			{
 				_parallel_command.Acceleration  = PLANNING_BRAKING;
 				_parallel_command.ControlEnable.B.VelocityEnable = 0;
 				_parking_complete_state = FrontMoveStill;
 			}
-			// Î´ÄÜ°´ÕÕ¹æ»®Í£Ö¹£¬Ğè½ô¼±Í£³µ
+			// æœªèƒ½æŒ‰ç…§è§„åˆ’åœæ­¢ï¼Œéœ€ç´§æ€¥åœè½¦
 			if( s->getPosition().getX() > _parking_center_point.getX() )
 			{
 				_parallel_command.Deceleration  = EMERGENCY_BRAKING;
@@ -579,14 +648,14 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case RearWaitArrive:
-			// ´øÔ¤²âµÄÍ£³µ
+			// å¸¦é¢„æµ‹çš„åœè½¦
 			if( (s->getPosition() - _parking_center_point).Length() < ( s->LinearRate * s->LinearRate * 0.5 * PLANNING_BRAKING_R))
 			{
 				_parallel_command.Acceleration  = PLANNING_BRAKING;
 				_parallel_command.ControlEnable.B.VelocityEnable = 0;
 				_parking_complete_state = RearMoveStill;
 			}
-			// Î´ÄÜ°´ÕÕ¹æ»®Í£Ö¹£¬Ğè½ô¼±Í£³µ
+			// æœªèƒ½æŒ‰ç…§è§„åˆ’åœæ­¢ï¼Œéœ€ç´§æ€¥åœè½¦
 			if( s->getPosition().getX() < _parking_center_point.getX() )
 			{
 				_parallel_command.Deceleration  = EMERGENCY_BRAKING;
@@ -752,47 +821,49 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 
 void ParallelPlanning::ReversedTrial(Percaption *inf)
 {
-	// ³µÎ»ĞÅÏ¢·¢ËÍ
+	// è½¦ä½ä¿¡æ¯å‘é€
 	m_ParallelPlanningTerminal.ParkingMsgSend(inf,_front_margin_boundary,_rear_margin_boundary);
-	/// ³µÁ¾³õÊ¼Î»ÖÃĞÅÏ¢
-	_init_parking.Center      = Vector2d(inf->PositionX,inf->PositionY);
-	_init_parking.AttitudeYaw = inf->AttitudeYaw;
-	// TODO ÖÕ¶ËĞÅÏ¢ ³µÁ¾³õÊ¼Î»ÖÃĞÅÏ¢
+	/// è½¦è¾†åˆå§‹ä½ç½®ä¿¡æ¯
+//	_init_parking.Center      = Vector2d(inf->PositionX,inf->PositionY);
+//	_init_parking.AttitudeYaw = inf->AttitudeYaw;
+	// TODO ç»ˆç«¯ä¿¡æ¯ è½¦è¾†åˆå§‹ä½ç½®ä¿¡æ¯
 //	m_ParallelPlanningTerminal.VehicleInitPositionSend(_init_parking);
-	/// ³µÎ»ĞéÄâ±ß½ç¼ÆËã
-	_right_virtual_boundary = -inf->ParkingWidth + _right_margin_boundary;
-	_front_virtual_boundary = inf->ParkingLength - _front_margin_boundary;
+	/// è½¦ä½è™šæ‹Ÿè¾¹ç•Œè®¡ç®—
+	_right_virtual_boundary = -inf->ParkingWidth  + _right_margin_boundary;
+	_front_virtual_boundary =  inf->ParkingLength - _front_margin_boundary;
 	_rear_virtual_boundary  = _rear_margin_boundary;
-	// ³µ¿âµã¼ÆËã
+	// è½¦åº“ç‚¹è®¡ç®—
 	parking_right_rear  = Vector2d(_rear_virtual_boundary,_right_virtual_boundary);
 	parking_right_front = Vector2d(_front_virtual_boundary,_right_virtual_boundary);
 	_parking_left_front = Vector2d(_front_virtual_boundary,0);
 
-	// ¸ù¾İ³µÎ»¿í¶È£¬È·¶¨³µÁ¾×îÖÕÍ£³µµÄºáÏòÎ»ÖÃ
+	// æ ¹æ®è½¦ä½å®½åº¦ï¼Œç¡®å®šè½¦è¾†æœ€ç»ˆåœè½¦çš„æ¨ªå‘ä½ç½®
 	m_ParallelVehilceConfig.EdgeRadius(MIN_LEFT_TURN_RADIUS);
 	MinParkingWidth  = LEFT_EDGE_TO_CENTER + m_ParallelVehilceConfig.RadiusRearRight - MIN_LEFT_TURN_RADIUS + _right_margin_boundary;
-	if(inf->ParkingWidth >= MinParkingWidth)//¿âÎ»¿í¶È×ã¹»
+	if(inf->ParkingWidth >= MinParkingWidth)//åº“ä½å®½åº¦è¶³å¤Ÿ
 	{
 		enter_point.Y = -LEFT_EDGE_TO_CENTER + _lat_margin_move;
 	}
-	else //¿âÎ»¿í¶ÈÌ«Ğ¡£¬µ÷ÕûyÖá·½ÏòÎ»ÖÃ
+	else //åº“ä½å®½åº¦å¤ªå°ï¼Œè°ƒæ•´yè½´æ–¹å‘ä½ç½®
 	{
 		enter_point.Y = -LEFT_EDGE_TO_CENTER + MinParkingWidth - inf->ParkingWidth;
 	}
 	_parking_center_point = Vector2d( (_front_virtual_boundary - _rear_virtual_boundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.Y);
 
 	m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
-	// ¸ù¾İ³µÎ»³¤¶È£¬È·¶¨³µÁ¾×îÖÕµÄ×İÏòÎ»ÖÃ
+	// æ ¹æ®è½¦ä½é•¿åº¦ï¼Œç¡®å®šè½¦è¾†æœ€ç»ˆçš„çºµå‘ä½ç½®
 	MinParkingLength = REAR_EDGE_TO_CENTER + sqrtf(powf(m_ParallelVehilceConfig.RadiusFrontRight,2) - powf(MIN_LEFT_TURN_RADIUS + enter_point.Y,2));
-	if( inf->ParkingLength > (MinParkingLength + _front_margin_boundary + _rear_margin_boundary))//Âú×ãÒ»´ÎÈë¿âÌõ¼ş
+	if( inf->ParkingLength > (MinParkingLength + _front_margin_boundary + _rear_margin_boundary))//æ»¡è¶³ä¸€æ¬¡å…¥åº“æ¡ä»¶
 	{
-		enter_point.X = _rear_margin_boundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - _front_margin_boundary - _rear_margin_boundary - LENGHT)*0.5;
+		enter_point.X = _rear_margin_boundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - _front_margin_boundary - _rear_margin_boundary - MinParkingLength)*0.5;
 		_enter_parking.Center = enter_point;
+		_enter_parking.RotationCenter(MIN_LEFT_TURN_RADIUS);
 
-		front_trial_arrary[_reverse_cnt] = enter_point;
-		rear_trial_arrary[_reverse_cnt]  = enter_point;
+		rear_trial_body.Center = enter_point;
+		rear_trial_body.AttitudeYaw = 0.0f;
+		m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 	}
-	else//²»Âú×ãÒ»´ÎÈë¿â£¬Ğè¶à´Î³¢ÊÔ
+	else//ä¸æ»¡è¶³ä¸€æ¬¡å…¥åº“ï¼Œéœ€å¤šæ¬¡å°è¯•
 	{
 		enter_point.X = inf->ParkingLength - _front_margin_boundary - FRONT_EDGE_TO_CENTER;
 		front_trial_body.Center = enter_point;
@@ -866,7 +937,7 @@ void ParallelPlanning::TransitionArc(Percaption *inf,VehicleState *s)
 {
 	Line cr_line;
 
-	//Ô²ĞÄºÍÖ±Ïß±äÁ¿³õÊ¼»¯
+	//åœ†å¿ƒå’Œç›´çº¿å˜é‡åˆå§‹åŒ–
 	_line_init.Point.X = inf->PositionX;
 	_line_init.Point.Y = inf->PositionY;
 	_line_init.Angle   = inf->AttitudeYaw;
@@ -875,24 +946,24 @@ void ParallelPlanning::TransitionArc(Percaption *inf,VehicleState *s)
 	_circle_left.Radius = MIN_LEFT_TURN_RADIUS;
 
 	_circle_right.Radius = MIN_RIGHT_TURN_RADIUS;
-	// ¼ÆËã³õÊ¼ÓÒ²àÔ²ĞÄÎ»ÖÃ
+	// è®¡ç®—åˆå§‹å³ä¾§åœ†å¿ƒä½ç½®
 	m_AlgebraicGeometry.Tangent_CCL(_line_init,_circle_left,&_circle_right);
 	do
 	{
-		// ÑØÓÒÏÂ·½ÏòÒÆ¶¯Ô²ĞÄ×ø±ê
+		// æ²¿å³ä¸‹æ–¹å‘ç§»åŠ¨åœ†å¿ƒåæ ‡
 		cr_line.Point = _circle_right.Center;
 		cr_line.Angle = _line_init.Angle - PI/4;
 		_circle_right.Center.X = _circle_right.Center.getX() + 0.1;
 		_circle_right.Center.Y = m_AlgebraicGeometry.LinearAlgebra(cr_line, _circle_right.Center.getX());
-		// ÖØĞÂ¸ù¾İÓÒÔ²ĞÄ×ø±ê¼ÆËãÓÒÔ²°ë¾¶ºÍÇĞµã×ø±ê
+		// é‡æ–°æ ¹æ®å³åœ†å¿ƒåæ ‡è®¡ç®—å³åœ†åŠå¾„å’Œåˆ‡ç‚¹åæ ‡
 		m_AlgebraicGeometry.Tangent_CL(_line_init,&_circle_right,&_line_init_circle_right_tangent);
-		// ¼ÆËã×óÓÒÔ²Ö®¼äÇĞÏßµÄÇĞµã×ø±ê
+		// è®¡ç®—å·¦å³åœ†ä¹‹é—´åˆ‡çº¿çš„åˆ‡ç‚¹åæ ‡
 		m_AlgebraicGeometry.Tangent_CLC(_circle_left, _circle_right,&_line_middle,&_line_middle_circle_left_tangent,&_line_middle_circle_right_tangent);
 	}
-	//Åö×²ÅĞ¶¨
+	//ç¢°æ’åˆ¤å®š
 	while(
 			(_circle_right.Radius - RIGHT_EDGE_TO_CENTER) < (_parking_left_front - _circle_right.Center).Length() ||
-			(_line_middle_circle_left_tangent - _line_middle_circle_right_tangent).Length() < 1.5 * K * s->SteeringAngleCalculate(_circle_right.Radius)
+			(_line_middle_circle_left_tangent - _line_middle_circle_right_tangent).Length() < 2 * K * s->SteeringAngleCalculate(_circle_right.Radius)
 	);
 }
 
@@ -910,7 +981,7 @@ void ParallelPlanning::TurnningPoint(VehicleState *s)
 	// turning arc:sencond point
 	ahead_angle = _ahead_distance / _circle_right.Radius;
 	_line_middle_circle_right_turn.Point = _circle_right.Center +
-   (_line_middle_circle_right_tangent    - _circle_right.Center).rotate(ahead_angle);
+   (_line_middle_circle_right_tangent    - _circle_right.Center).rotate(-ahead_angle);
 	_line_middle_circle_right_turn.SteeringAngle = 0;
 	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_right_turn,1);
 	// line:third point
