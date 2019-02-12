@@ -51,7 +51,7 @@ float VehicleState::SteeringAngle2TurnningRadius(float steer,float a,float b)
 
 float VehicleState::SteeringAngle2TurnningRadiusExp(float steer,float a,float b)
 {
-	return steer < 0 ? a * expf(b * -steer) : -a * expf(b * -steer);
+	return steer < 0 ? -a * expf(b * -steer) : a * expf(b * steer);
 }
 
 float VehicleState::TurnningRadius2SteeringAngleExp(float radius,float a,float b)
@@ -72,12 +72,12 @@ float VehicleState::TurnRadiusCalculate(float steering_angle)
 			steering_angle >  100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A4,FIT_RADIUS_B4) :
 			steering_angle >   50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A5,FIT_RADIUS_B5) :
 			steering_angle >    0 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A6,FIT_RADIUS_B6) :
-			steering_angle <    0 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A7,FIT_RADIUS_B7) :
-			steering_angle < - 50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A8,FIT_RADIUS_B8) :
-			steering_angle < -100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A9,FIT_RADIUS_B9) :
-			steering_angle < -200 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A10,FIT_RADIUS_B10) :
-			steering_angle < -300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A11,FIT_RADIUS_B11) :
-			steering_angle < -400 ? SteeringAngle2TurnningRadiusExp(steering_angle,FIT_RADIUS_A12,FIT_RADIUS_B12) : 0;
+			steering_angle >  -50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A7,FIT_RADIUS_B7) :
+			steering_angle > -100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A8,FIT_RADIUS_B8) :
+			steering_angle > -200 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A9,FIT_RADIUS_B9) :
+			steering_angle > -300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A10,FIT_RADIUS_B10) :
+			steering_angle > -400 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A11,FIT_RADIUS_B11) :
+			                        SteeringAngle2TurnningRadiusExp(steering_angle,FIT_RADIUS_A12,FIT_RADIUS_B12);
 }
 
 float VehicleState::SteeringAngleCalculate(float radius)
