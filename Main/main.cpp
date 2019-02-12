@@ -79,7 +79,6 @@ int main()
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
-
 //		m_PercaptionInformation.AttitudeYaw = 0;
 //		m_PercaptionInformation.DetectParkingStatus = 1;
 //		m_PercaptionInformation.ParkingLength = 6.2;
@@ -103,24 +102,29 @@ int main()
 				m_ParallelPlanning.Command = 0x70;
 			}
 
-			    m_Terminal_CA.Push(&m_Ultrasonic);
+			if(0xA5 == m_Terminal_CA.PushActive)
+			{
+				m_Terminal_CA.PushActive = 0;
+				m_Terminal_CA.Push(&m_Ultrasonic);
 
-			if(m_Ultrasonic.SystemTime % 4 == 1)
-			{
-				m_Terminal_CA.Push(&m_ChangAnController);
+				if(m_Ultrasonic.SystemTime % 4 == 0)
+				{
+					m_Terminal_CA.Push(&m_ChangAnController);
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 1)
+				{
+					m_Terminal_CA.Push(&m_GeometricTrack);
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 2)
+				{
+					m_Terminal_CA.Push(&m_ChangAnMessage);
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 3)
+				{
+					m_Terminal_CA.Push(&m_ParallelPlanning);
+				}
 			}
-			if(m_Ultrasonic.SystemTime % 4 == 2)
-			{
-				m_Terminal_CA.Push(&m_GeometricTrack);
-			}
-			if(m_Ultrasonic.SystemTime % 4 == 3)
-			{
-				m_Terminal_CA.Push(&m_ChangAnMessage);
-			}
-			if(m_Ultrasonic.SystemTime % 13 == 1)
-			{
-				m_Terminal_CA.Push(&m_ParallelPlanning);
-			}
+
 //			m_ChangAnMessage.WheelSpeedDirection = 1;
 //			m_ChangAnMessage.WheelSpeedRearLeft = 5;
 //			m_ChangAnMessage.WheelSpeedRearRight = 5;
@@ -170,6 +174,7 @@ void PIT0_isr(void)
 	{
 		SYSTEM_LED = ~SYSTEM_LED;
 	}
+	m_Terminal_CA.PushActive = 0xA5;
 	PIT_0.TIMER[0].TFLG.R |= 1;  /* Clear interrupt flag. w1c */
 }
 /*******************************************************************************
