@@ -88,14 +88,20 @@ public:
 
 	// Commond
 	uint8_t getCommand();
-	void setCommand(uint8_t value);
+	void    setCommand(uint8_t value);
 	Property<Terminal,uint8_t,READ_WRITE> Command;
+
+	// Commond
+	uint8_t getPushActive();
+	void    setPushActive(uint8_t value);
+	Property<Terminal,uint8_t,READ_WRITE> PushActive;
 
 private:
 	/// terminal command
 	uint8_t _command;
 
-
+	/// push state
+	uint8_t _push_active;
 	/// terminal receive frame state machine
 	ReceiveFrame _terminal_frame;
 	uint8_t _data_buffer[32];

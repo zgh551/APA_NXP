@@ -20,7 +20,7 @@ Terminal::Terminal() {
 	// TODO Auto-generated constructor stub
 	_terminal_frame = FirstHead1;
 	_frame_err_cnt = 0;
-
+	_push_active = 0;
 	// ACK Valid
 	AckValid.setContainer(this);
 	AckValid.getter(&Terminal::getAckValid);
@@ -30,6 +30,11 @@ Terminal::Terminal() {
 	Command.setContainer(this);
 	Command.getter(&Terminal::getCommand);
 	Command.setter(&Terminal::setCommand);
+
+	// Push Active
+	PushActive.setContainer(this);
+	PushActive.getter(&Terminal::getPushActive);
+	PushActive.setter(&Terminal::setPushActive);
 }
 
 Terminal::~Terminal() {
@@ -41,6 +46,8 @@ uint8_t Terminal::getAckValid()             {return _ack_valid ;}
 void    Terminal::setAckValid(uint8_t value){_ack_valid = value;}
 uint8_t Terminal::getCommand()             {return _command ;}
 void    Terminal::setCommand(uint8_t value){_command = value;}
+uint8_t Terminal::getPushActive()             {return _push_active ;}
+void    Terminal::setPushActive(uint8_t value){_push_active = value;}
 /**************************************************************************************/
 void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 {
