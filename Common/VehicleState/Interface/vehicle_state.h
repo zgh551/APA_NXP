@@ -24,6 +24,7 @@
 #include "chang_an_configure.h"
 #include "common_configure.h"
 #include "Interface/message_manager.h"
+#include "vehilce_config.h"
 
 class VehicleState
 {
@@ -31,19 +32,12 @@ public:
 	VehicleState();
 	virtual ~VehicleState();
 
-	void Init();
+	void Init(void);
 
 	virtual void VelocityUpdate(MessageManager *msg,float dt) = 0;
 	virtual void PulseUpdate(MessageManager *msg,float dt) = 0;
 
-	float SteeringAngle2TurnningRadiusExp(float steer,float a,float b);
-	float TurnningRadius2SteeringAngleExp(float radius,float a,float b);
 
-	float SteeringAngle2TurnningRadius(float steer,float a,float b);
-	float TurnningRadius2SteeringAngle(float radius,float a,float b);
-
-	float TurnRadiusCalculate(float steering_angle);
-	float SteeringAngleCalculate(float radius);
 
 	Vector2d getPosition();
 	void     setPosition(Vector2d value);
