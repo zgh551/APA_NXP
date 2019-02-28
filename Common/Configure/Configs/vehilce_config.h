@@ -12,6 +12,7 @@
 #include "property.h"
 #include "math.h"
 #include "chang_an_configure.h"
+#include "common_configure.h"
 
 class VehilceConfig {
 public:
@@ -20,7 +21,16 @@ public:
 
 	void Init();
 	void EdgeRadius(float r);
+	/**********************************************************************/
+	float SteeringAngle2TurnningRadiusExp(float steer,float a,float b);
+	float TurnningRadius2SteeringAngleExp(float radius,float a,float b);
 
+	float SteeringAngle2TurnningRadius(float steer,float a,float b);
+	float TurnningRadius2SteeringAngle(float radius,float a,float b);
+
+	float TurnRadiusCalculate(float steering_angle);
+	float SteeringAngleCalculate(float radius);
+	/**********************************************************************/
 	float getFrontDiagonalAxis();
 	void  setFrontDiagonalAxis(float value);
 	Property<VehilceConfig,float,READ_WRITE> FrontDiagonalAxis;

@@ -6,10 +6,8 @@
  */
 
 #include <vehilce_config.h>
-#include "common_configure.h"
 
 VehilceConfig::VehilceConfig() {
-	// TODO Auto-generated constructor stub
 	FrontDiagonalAxis.setContainer(this);
 	FrontDiagonalAxis.getter(&VehilceConfig::getFrontDiagonalAxis);
 	FrontDiagonalAxis.setter(&VehilceConfig::setFrontDiagonalAxis);
@@ -41,10 +39,12 @@ VehilceConfig::VehilceConfig() {
 	RadiusRearRight.setContainer(this);
 	RadiusRearRight.getter(&VehilceConfig::getRadiusRearRight);
 	RadiusRearRight.setter(&VehilceConfig::setRadiusRearRight);
+
+	Init();
 }
 
 VehilceConfig::~VehilceConfig() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void VehilceConfig::Init()
@@ -70,6 +70,59 @@ void VehilceConfig::EdgeRadius(float r)
 
 	RadiusRearRight = sqrtf( powf( r + RIGHT_EDGE_TO_CENTER , 2 ) +
                              powf( REAR_EDGE_TO_CENTER , 2 ) );
+}
+
+float VehilceConfig::SteeringAngle2TurnningRadius(float steer,float a,float b)
+{
+	return WHEEL_BASE / tanf((a * steer + b) * PI / 180);
+}
+
+float VehilceConfig::SteeringAngle2TurnningRadiusExp(float steer,float a,float b)
+{
+	return steer < 0 ? -a * expf(b * -steer) : a * expf(b * steer);
+}
+
+float VehilceConfig::TurnningRadius2SteeringAngleExp(float radius,float a,float b)
+{
+	return radius < 0 ? -logf(-radius/a)/b : logf(radius/a)/b;
+}
+
+float VehilceConfig::TurnningRadius2SteeringAngle(float radius,float a,float b)
+{
+	return (atanf(WHEEL_BASE/radius) * 180 / PI - b)/a;
+}
+
+float VehilceConfig::TurnRadiusCalculate(float steering_angle)
+{
+	return 	steering_angle >  400 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A1,FIT_RADIUS_B1) :
+			steering_angle >  300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A2,FIT_RADIUS_B2) :
+			steering_angle >  200 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A3,FIT_RADIUS_B3) :
+			steering_angle >  100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A4,FIT_RADIUS_B4) :
+			steering_angle >   50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A5,FIT_RADIUS_B5) :
+			steering_angle >    0 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A6,FIT_RADIUS_B6) :
+			steering_angle >  -50 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A7,FIT_RADIUS_B7) :
+			steering_angle > -100 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A8,FIT_RADIUS_B8) :
+			steering_angle > -200 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A9,FIT_RADIUS_B9) :
+			steering_angle > -300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A10,FIT_RADIUS_B10) :
+			steering_angle > -400 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A11,FIT_RADIUS_B11) :
+					                SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A12,FIT_RADIUS_B12);
+}
+
+float VehilceConfig::SteeringAngleCalculate(float radius)
+{
+	return
+		   radius >   48.308 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A6,FIT_RADIUS_B6) :
+		   radius >   24.018 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A5,FIT_RADIUS_B5) :
+		   radius >   11.910 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A4,FIT_RADIUS_B4) :
+		   radius >   7.6736 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A3,FIT_RADIUS_B3) :
+		   radius >    5.463 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A2,FIT_RADIUS_B2) :
+		   radius >        0 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A1,FIT_RADIUS_B1) :
+		   radius > - 5.4745 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A12,FIT_RADIUS_B12) :
+		   radius > - 7.7214 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A11,FIT_RADIUS_B11):
+		   radius > - 11.975 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A10,FIT_RADIUS_B10):
+		   radius > - 24.975 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A9,FIT_RADIUS_B9):
+		   radius > - 49.975 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A8,FIT_RADIUS_B8):
+		                       TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A7,FIT_RADIUS_B7);
 }
 
 float VehilceConfig::getRadiusFrontLeft()           { return  _radius_front_left;}
