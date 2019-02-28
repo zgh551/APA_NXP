@@ -162,8 +162,8 @@ int8_t Planning::ForecastCircleParkingPointMargin(VehicleState *s,Vector2d stop_
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.Deceleration  = EMERGENCY_BRAKING;
-				_control_command.Acceleration  = EMERGENCY_BRAKING;
+				_control_command.Deceleration  = planning_braking_aeb_;
+				_control_command.Acceleration  = planning_braking_aeb_;
 				return SUCCESS;
 			}
 			else if((_plan_algebraic_geometry.ArcLength(s->getPosition(), stop_point, radius) - margin) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
@@ -206,8 +206,8 @@ int8_t Planning::ForecastCircleParkingPointMargin(VehicleState *s,Vector2d stop_
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.Deceleration  = EMERGENCY_BRAKING;
-				_control_command.Acceleration  = EMERGENCY_BRAKING;
+				_control_command.Deceleration  = planning_braking_aeb_;
+				_control_command.Acceleration  = planning_braking_aeb_;
 				return SUCCESS;
 			}
 			if((margin - _plan_algebraic_geometry.ArcLength(s->getPosition(), stop_point, radius)) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
@@ -227,8 +227,8 @@ int8_t Planning::ForecastCircleParkingPointMargin(VehicleState *s,Vector2d stop_
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.DecelerationEnable = 1;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.Deceleration  = EMERGENCY_BRAKING;
-			_control_command.Acceleration  = EMERGENCY_BRAKING;
+			_control_command.Deceleration  = planning_braking_aeb_;
+			_control_command.Acceleration  = planning_braking_aeb_;
 			return SUCCESS;
 		}
 	}
@@ -275,8 +275,8 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.Deceleration  = EMERGENCY_BRAKING;
-				_control_command.Acceleration  = EMERGENCY_BRAKING;
+				_control_command.Deceleration  = planning_braking_aeb_;
+				_control_command.Acceleration  = planning_braking_aeb_;
 				return SUCCESS;
 			}
 			else if(((s->getPosition() - stop_point).Length() - margin) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
@@ -319,8 +319,8 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.Deceleration  = EMERGENCY_BRAKING;
-				_control_command.Acceleration  = EMERGENCY_BRAKING;
+				_control_command.Deceleration  = planning_braking_aeb_;
+				_control_command.Acceleration  = planning_braking_aeb_;
 				return SUCCESS;
 			}
 			if((margin - (s->getPosition() - stop_point).Length()) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
@@ -340,8 +340,8 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.DecelerationEnable = 1;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.Deceleration  = EMERGENCY_BRAKING;
-			_control_command.Acceleration  = EMERGENCY_BRAKING;
+			_control_command.Deceleration  = planning_braking_aeb_;
+			_control_command.Acceleration  = planning_braking_aeb_;
 			return SUCCESS;
 		}
 	}
@@ -398,8 +398,8 @@ int8_t Planning::ForecastCircleParking(VehicleState *s,Vector2d stop_point,float
 		_control_command.ControlEnable.B.VelocityEnable = 0;
 		_control_command.ControlEnable.B.DecelerationEnable = 1;
 		_control_command.ControlEnable.B.AccelerationEnable = 1;
-		_control_command.Deceleration  = EMERGENCY_BRAKING;
-		_control_command.Acceleration  = EMERGENCY_BRAKING;
+		_control_command.Deceleration  = planning_braking_aeb_;
+		_control_command.Acceleration  = planning_braking_aeb_;
 		return SUCCESS;
 	}
 }
@@ -411,8 +411,8 @@ int8_t Planning::ForecastCircleBoundaryMargin(VehicleState *s,Vector2d stop_poin
 		_control_command.ControlEnable.B.VelocityEnable = 0;
 		_control_command.ControlEnable.B.AccelerationEnable = 1;
 		_control_command.ControlEnable.B.DecelerationEnable = 1;
-		_control_command.Deceleration  = EMERGENCY_BRAKING;
-		_control_command.Acceleration  = EMERGENCY_BRAKING;
+		_control_command.Deceleration  = planning_braking_aeb_;
+		_control_command.Acceleration  = planning_braking_aeb_;
 		return SUCCESS;
 	}
 	else
@@ -556,11 +556,11 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 		if( (_boundary_collision_body.getRearLeft().getX()  < RearVirtualBoundary  ) ||
 			(_boundary_collision_body.getRearRight().getY() < InsideVirtualBoundary) )
 		{
-			_control_command.Acceleration  = EMERGENCY_BRAKING;
-			_control_command.Deceleration  = EMERGENCY_BRAKING;
+			_control_command.Acceleration  = planning_braking_aeb_;
+//			_control_command.Deceleration  = planning_braking_aeb_;
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.ControlEnable.B.DecelerationEnable = 1;
+//			_control_command.ControlEnable.B.DecelerationEnable = 1;
 			return SUCCESS;
 		}
 		else
@@ -585,8 +585,8 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 		if(( _boundary_collision_body.getFrontRight().getX() > FrontVirtualBoundary ) ||
 		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) )
 		{
-			_control_command.Acceleration  = EMERGENCY_BRAKING;
-			_control_command.Deceleration  = EMERGENCY_BRAKING;
+			_control_command.Acceleration  = planning_braking_aeb_;
+			_control_command.Deceleration  = planning_braking_aeb_;
 			_control_command.ControlEnable.B.VelocityEnable = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
 			_control_command.ControlEnable.B.DecelerationEnable = 1;

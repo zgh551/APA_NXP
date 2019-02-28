@@ -36,12 +36,12 @@
 #define PARKING_FINISH        ( 1   ) // 泊车完成的状态标志
 //
 #define STEERING_RATE         ( 300 ) // 转向角速度
-#define EMERGENCY_BRAKING	  (-5   ) // 紧急制动的减速度
-#define PLANNING_BRAKING	  (-10  ) // 规划减速度
+#define EMERGENCY_BRAKING	  (-1   ) // 紧急制动的减速度
+#define PLANNING_BRAKING	  (-1  ) // 规划减速度
 #define PLANNING_BRAKING_R	  ( 0.1 ) // 规划减速度的倒数
 #define STRAIGHT_VELOCITY	  ( 0.5 ) // 直线段的速度
 #define CURVE_VELOCITY	      ( 0.3 ) // 曲线段的速度
-#define TURN_FEEDFORWARD_TIME ( 0.0 ) // 转向角前向反馈的补偿时间
+#define TURN_FEEDFORWARD_TIME ( 0.1 ) // 转向角前向反馈的补偿时间
 #define PARKING_CENTER_MARGIN ( 0.1 ) // 泊车中心点余量
 #define ACC_DISABLE_TIME      ( 50  ) // ACC失效时间
 /**************************速度控制******************************/
