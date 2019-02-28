@@ -8,7 +8,6 @@
 #include "pid.h"
 
 PID::PID() {
-	// TODO Auto-generated constructor stub
     KP.setContainer(this);
     KP.getter(&PID::getKP);
     KP.setter(&PID::setKP);
@@ -56,7 +55,6 @@ PID::PID() {
 }
 
 PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim) {
-	// TODO Auto-generated constructor stub
     KP.setContainer(this);
     KP.getter(&PID::getKP);
     KP.setter(&PID::setKP);
@@ -104,7 +102,6 @@ PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim) {
 }
 
 PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold) {
-	// TODO Auto-generated constructor stub
     KP.setContainer(this);
     KP.getter(&PID::getKP);
     KP.setter(&PID::setKP);
@@ -152,7 +149,7 @@ PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float thr
 }
 
 PID::~PID() {
-	// TODO Auto-generated destructor stub
+
 }
 
 /****** Property ******/

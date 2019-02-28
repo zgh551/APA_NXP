@@ -8,12 +8,11 @@
 #include <lon_control.h>
 
 LonControl::LonControl() {
-	// TODO Auto-generated constructor stub
 
 }
 
 LonControl::~LonControl() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void LonControl::Init()

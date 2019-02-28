@@ -8,11 +8,10 @@
 #include <ultrasonic_abstacle_percption.h>
 
 UltrasonicAbstaclePercption::UltrasonicAbstaclePercption() {
-	// TODO Auto-generated constructor stub
 
 }
 
 UltrasonicAbstaclePercption::~UltrasonicAbstaclePercption() {
-	// TODO Auto-generated destructor stub
+
 }
 

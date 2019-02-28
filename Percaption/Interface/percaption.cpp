@@ -8,7 +8,6 @@
 #include <percaption.h>
 
 Percaption::Percaption() {
-	// TODO Auto-generated constructor stub
 	PositionX.setContainer(this);
 	PositionX.getter(&Percaption::getPositionX);
 	PositionX.setter(&Percaption::setPositionX);
@@ -35,7 +34,7 @@ Percaption::Percaption() {
 }
 
 Percaption::~Percaption() {
-	// TODO Auto-generated destructor stub
+
 }
 
 float Percaption::getPositionX()           { return  _position_x;}

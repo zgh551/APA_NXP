@@ -17,8 +17,6 @@
 #include "Interface/message_manager.h"
 
 MessageManager::MessageManager() {
-	// TODO Auto-generated constructor stub
-
 	// wheel speed
 	WheelSpeedFrontLeft.setContainer(this);
 	WheelSpeedFrontLeft.getter(&MessageManager::getWheelSpeedFrontLeft);
@@ -89,7 +87,7 @@ MessageManager::MessageManager() {
 }
 
 MessageManager::~MessageManager() {
-	// TODO Auto-generated destructor stub
+
 }
 
 

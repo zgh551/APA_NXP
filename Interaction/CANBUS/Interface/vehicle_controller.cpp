@@ -16,7 +16,6 @@
 #include "Interface/vehicle_controller.h"
 
 VehicleController::VehicleController() {
-	// TODO Auto-generated constructor stub
 	////// ACC //////
 		Acceleration.setContainer(this);
 		Acceleration.getter(&VehicleController::getAcceleration);
@@ -77,7 +76,7 @@ VehicleController::VehicleController() {
 }
 
 VehicleController::~VehicleController() {
-	// TODO Auto-generated destructor stub
+
 }
 
 /// ACC

@@ -9,7 +9,6 @@
 
 
 SystemWork::SystemWork() {
-	// TODO Auto-generated constructor stub
 	_system_working_state = Debug;
 
 	_working_module = 0;
@@ -26,7 +25,6 @@ SystemWork::SystemWork() {
 
 SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out_lim):Vehicle(dt,kp,ki,kd,i_lim,out_lim)
 {
-	// TODO Auto-generated constructor stub
 	_system_working_state = Debug;
 
 	_working_module = 0;
@@ -44,7 +42,6 @@ SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out
 
 SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold):Vehicle(dt,kp,ki,kd,i_lim,out_lim,threshold)
 {
-	// TODO Auto-generated constructor stub
 	_system_working_state = Debug;
 
 	_working_module = 0;
@@ -60,7 +57,7 @@ SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out
 }
 
 SystemWork::~SystemWork() {
-	// TODO Auto-generated destructor stub
+
 }
 
 uint8_t SystemWork::getWorkingModule()

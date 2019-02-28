@@ -17,7 +17,6 @@
 #include "Ultrasonic.h"
 
 Ultrasonic::Ultrasonic() {
-	// TODO Auto-generated constructor stub
 	Init();
 
 	ScheduleTimeCnt.setContainer(this);
@@ -40,7 +39,7 @@ Ultrasonic::Ultrasonic() {
 }
 
 Ultrasonic::~Ultrasonic() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void Ultrasonic::Init(void)

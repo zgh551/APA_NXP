@@ -17,12 +17,11 @@
 #include <ChangAn/chang_an_controller.h>
 
 ChangAnController::ChangAnController() {
-	// TODO Auto-generated constructor stub
 	Init();
 }
 
 ChangAnController::~ChangAnController() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void ChangAnController::Init()

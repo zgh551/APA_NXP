@@ -17,12 +17,11 @@
 #include <ChangAn/chang_an_message.h>
 
 ChangAnMessage::ChangAnMessage() {
-	// TODO Auto-generated constructor stub
 	Init();
 }
 
 ChangAnMessage::~ChangAnMessage() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void ChangAnMessage::Init()

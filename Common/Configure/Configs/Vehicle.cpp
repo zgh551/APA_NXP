@@ -9,7 +9,6 @@
 
 Vehicle::Vehicle()
 {
-	// TODO Auto-generated constructor stub
 	_steering_angle_control_state = 0;
 	/*** the vehicle body information ***/
 	// Lenght
@@ -258,7 +257,6 @@ Vehicle::Vehicle()
 
 Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):PID(dt,kp,ki,kd,i_lim,out_lim)
 {
-	// TODO Auto-generated constructor stub
 	_steering_angle_control_state = 0;
 	/*** the vehicle body information ***/
 	// Lenght
@@ -507,7 +505,6 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim):
 
 Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold):PID(dt,kp,ki,kd,i_lim,out_lim,threshold)
 {
- 	// TODO Auto-generated constructor stub
 	_steering_angle_control_state = 0;
 	/*** the vehicle body information ***/
 	// Lenght
@@ -755,7 +752,7 @@ Vehicle::Vehicle(float dt,float kp,float ki,float kd,float i_lim,float out_lim,f
  }
 
 Vehicle::~Vehicle() {
-	// TODO Auto-generated destructor stub
+
 }
 
 /****** Property ******/
