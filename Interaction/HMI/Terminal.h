@@ -24,9 +24,8 @@
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
 #include "Ultrasonic.h"
-#include "parallel_planning.h"
+#include "planning.h"
 #include "percaption.h"
-//#include "SystemWork.h"
 
 typedef union _byte2float
 {
@@ -52,9 +51,10 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
 	void Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg);
 
-	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,ParallelPlanning *pp);
+	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,Planning *pp);
 
-	void Parse(vuint32_t id,vuint8_t dat[],ParallelPlanning *msg);
+	void Parse(vuint32_t id,vuint8_t dat[],Planning *msg);
+	void Parse(vuint32_t id,vuint8_t dat[]);
 	// Terminal Control
 //	void Push(MessageManager *msg);
 	void Push(ChangAnMessage *msg);
@@ -67,9 +67,10 @@ public:
 
 	void Push(Percaption *p);
 
-	void Push(ParallelPlanning *p);
+	void Push(Planning *p);
 ///////////////////////////////////////////////////////////////////////////
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
+	void UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk);
 	void Ack(void);
 
 	void VehicleInitPositionSend(VehicleBody v);

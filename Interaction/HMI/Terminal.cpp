@@ -17,7 +17,6 @@
 #include "Terminal.h"
 
 Terminal::Terminal() {
-	// TODO Auto-generated constructor stub
 	_terminal_frame = FirstHead1;
 	_frame_err_cnt = 0;
 	_push_active = 0;
@@ -38,7 +37,7 @@ Terminal::Terminal() {
 }
 
 Terminal::~Terminal() {
-	// TODO Auto-generated destructor stub
+
 }
 
 /// AckValid
@@ -146,7 +145,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,ParallelPlanning *pp)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,Planning *pp)
 {
 	Byte2Int temp_int;
 	switch(id)
@@ -163,7 +162,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,ParallelPlanning
         	pi->AttitudeYaw = temp_int.i16 * 0.01;
         	temp_int.b[1] = dat[6];
         	temp_int.b[0] = dat[7];
-        	pp->LatMarginMove = temp_int.i16 * 0.01;
+        	pp->OuterMarginMove = temp_int.i16 * 0.01;
         	break;
 
         case 0x541:
@@ -186,12 +185,36 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,ParallelPlanning
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],ParallelPlanning *msg)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],Planning *msg)
+{
+	switch(id)
+	{
+        case 0x532:
+        	msg->Command = (uint8_t)dat[0];
+        	break;
+
+        case 0x560:
+        	msg->PlanningBrakingAcc      = ((int8_t)dat[0])*0.1f;
+        	msg->PlanningBrakingAccR     = 1/fabs(msg->PlanningBrakingAcc);
+        	msg->PlanningBrakingAeb      = ((int8_t)dat[1])*0.1f;
+        	msg->TurnningFeedforwardTime = ((uint8_t)dat[2])*0.01f;
+        	msg->AccDisableTime          = (uint8_t)(50 * ((uint8_t)dat[3])*0.01f);
+        	msg->PositionMin             = ((uint8_t)dat[4])*0.01f;
+        	msg->PositionMax             = ((uint8_t)dat[5])*0.01f;
+        	msg->ParkingMargin           = ((uint8_t)dat[6])*0.01f;
+        	msg->KpYaw                   = (uint8_t)dat[7];
+        	break;
+        default:
+        	break;
+	}
+}
+
+void Terminal::Parse(vuint32_t id,vuint8_t dat[])
 {
 	switch(id)
 	{
         case 0x530:
-        	msg->Command = (uint8_t)dat[0];
+        	Command = (uint8_t)dat[0];
         	break;
 
         default:
@@ -358,7 +381,7 @@ void Terminal::Push(Percaption *p)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::Push(ParallelPlanning *p)
+void Terminal::Push(Planning *p)
 {
 	CAN_Packet m_CAN_Packet;
 	Vector2d temp_v;
@@ -403,6 +426,36 @@ void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 		m_CAN_Packet.data[4] =  msg[id].STP313.Level;
 		m_CAN_Packet.data[5] =  msg[id].STP313.Width;
 		m_CAN_Packet.data[6] =  msg[id].STP313.Status;
+		m_CAN_Packet.data[7] =  0;
+	}
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x400 | id;
+	m_CAN_Packet.length = 8;
+	if(id < 8)
+	{
+		m_CAN_Packet.data[0] = ((uint8_t)(msg_pk[id].Distance1*100))      & 0xff;
+		m_CAN_Packet.data[1] = ((uint8_t)(msg_pk[id].Distance1*100) >> 8) & 0xff;
+		m_CAN_Packet.data[2] = 0;
+		m_CAN_Packet.data[3] = 0;
+		m_CAN_Packet.data[4] = 0;
+		m_CAN_Packet.data[5] = 0;
+		m_CAN_Packet.data[6] =  msg_pk[id].status;
+		m_CAN_Packet.data[7] = 0;
+	}
+	else
+	{
+		m_CAN_Packet.data[0] = ((uint8_t)(msg_pk[id].Distance1 * 100)    ) & 0xff;
+		m_CAN_Packet.data[1] = ((uint8_t)(msg_pk[id].Distance1 * 100)>> 8) & 0xff;
+		m_CAN_Packet.data[2] = ((uint8_t)(msg_pk[id].Distance2 * 100)    ) & 0xff;
+		m_CAN_Packet.data[3] = ((uint8_t)(msg_pk[id].Distance2 * 100)>> 8) & 0xff;
+		m_CAN_Packet.data[4] = ((uint8_t)(msg_pk[id].Level * 10     )    ) & 0xff;
+		m_CAN_Packet.data[5] = (uint8_t)(msg_pk[id].Width);
+		m_CAN_Packet.data[6] =  msg_pk[id].status;
 		m_CAN_Packet.data[7] =  0;
 	}
 	CAN2_TransmitMsg(m_CAN_Packet);
