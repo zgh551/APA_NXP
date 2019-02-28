@@ -9,24 +9,11 @@
 /* 1.0	 Guohua Zhu     January 16 2019      Add ReversedTrial Function      */
 /* 1.0	 Guohua Zhu     January 17 2019      Add TransitionArc Function      */
 /*****************************************************************************/
-
-#include "derivative.h"
-#include "property.h"
-#include "math.h"
-#include "chang_an_configure.h"
-#include "common_configure.h"
-#include "vehilce_config.h"
-#include "vehicle_body.h"
-#include "Terminal.h"
-#include "planning.h"
-#include "algebraic_geometry.h"
-
-
 #ifndef PARALLELPARKING_PARALLEL_PLANNING_H_
 #define PARALLELPARKING_PARALLEL_PLANNING_H_
 
-#define K  0.0016   //  0.8/500
-#define RK 625
+#include "Terminal.h"
+#include "planning.h"
 
 // 轨迹规划状态
 typedef enum _ParallelPlanningState
@@ -48,14 +35,16 @@ typedef enum _ParallelControlState
 	LeftRearTrial,
 	ParkingComplete
 }ParallelControlState;
+
 // 初始位置调整状态
-typedef enum _InitPointAdjuatState //Initial Position Adjustment Relative State
+typedef enum _InitPointAdjustState //Initial Position Adjustment Relative State
 {
 	InitPointFrontAdjust,
 	InitPointMove,
 	InitPoitArriveJudge,
 	WaitVehicleStop,
-}InitPointAdjuatState;
+}InitPointAdjustState;
+
 // 曲线估计段状态
 typedef enum _CurveTrajectoryState
 {
@@ -107,7 +96,7 @@ public:
 	virtual ~ParallelPlanning();
 
 	void Init() override;
-	void Work(Percaption *p,VehicleState *s) override;
+	void Work(Percaption *p) override;
 	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u) override;
 
 	/***************************************************************/
@@ -120,61 +109,14 @@ public:
 
 	void ReversedTrial(Percaption *inf);
 
-	void TransitionArc(Percaption *inf,VehicleState *s);
+	void TransitionArc(Percaption *inf);
 
-	void TurnningPoint(VehicleState *s);
-	/***************************************************************/
-	float getLeftVirtualBoundary();
-	void  setLeftVirtualBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> LeftVirtualBoundary;
+	void TurnningPoint();
 
-	float getRightVirtualBoundary();
-	void  setRightVirtualBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> RightVirtualBoundary;
+	Line getLineInit();
+	void setLineInit(Line value);
+	Property<ParallelPlanning,Line,READ_WRITE> LineInit;
 
-	float getFrontVirtualBoundary();
-	void  setFrontVirtualBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> FrontVirtualBoundary;
-
-	float getRearVirtualBoundary();
-	void  setRearVirtualBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> RearVirtualBoundary;
-	/***************************************************************/
-	float getLatMarginMove();
-	void  setLatMarginMove(float value);
-	Property<ParallelPlanning,float,READ_WRITE> LatMarginMove;
-
-	float getRightMarginBoundary();
-	void  setRightMarginBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> RightMarginBoundary;
-
-	float getFrontMarginBoundary();
-	void  setFrontMarginBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> FrontMarginBoundary;
-
-	float getRearMarginBoundary();
-	void  setRearMarginBoundary(float value);
-	Property<ParallelPlanning,float,READ_WRITE> RearMarginBoundary;
-
-	VehicleBody getInitParking();
-	void        setInitParking(VehicleBody value);
-	Property<ParallelPlanning,VehicleBody,READ_WRITE> InitParking;
-
-	VehicleBody getEnterParking();
-	void        setEnterParking(VehicleBody value);
-	Property<ParallelPlanning,VehicleBody,READ_WRITE> EnterParking;
-
-	uint8_t getCommand();
-	void    setCommand(uint8_t value);
-	Property<ParallelPlanning,uint8_t,READ_WRITE> Command;
-
-	uint8_t getConsoleState();
-	void    setConsoleState(uint8_t value);
-	Property<ParallelPlanning,uint8_t,READ_WRITE> ConsoleState;
-
-	uint8_t getParkingStatus();
-	void    setParkingStatus(uint8_t value);
-	Property<ParallelPlanning,uint8_t,READ_WRITE> ParkingStatus;
 protected:
 	VehicleBody front_trial_body,rear_trial_body;
 	Vector2d    enter_point;
@@ -183,8 +125,8 @@ protected:
 private:
 	ParallelPlanningState _parallel_planning_state;
 	ParallelControlState  _parallel_control_state;
-	///////////////////////////////////////////////
-	InitPointAdjuatState _adjust_state;
+	///////////////////// state machine //////////////////////////
+	InitPointAdjustState _adjust_state;
 	CurveTrajectoryState _curve_state;
 
 	RightFrontTrialState _right_front_state;
@@ -192,30 +134,16 @@ private:
 
 	ParkingCompleteState _parking_complete_state;
 	///////////////////////////////////////////////
-	uint8_t _command;
-	uint8_t _console_state;
 	uint8_t _reverse_cnt;
-	uint8_t _forward_cnt;
 	uint8_t _acc_disable_cnt;
 	uint8_t _trial_status;
-	uint8_t _parking_status;
 
-	float _left_virtual_boundary;
-	float _right_virtual_boundary;
-	float _front_virtual_boundary;
-	float _rear_virtual_boundary;
+//	Vector2d _parking_left_front;
 
-	float _lat_margin_move;
-	float _right_margin_boundary;
-	float _front_margin_boundary;
-	float _rear_margin_boundary;
+	VehicleBody _init_parking; // 泊车初始车辆位置
+	VehicleBody _enter_parking;// 泊车入库位置
 
-	Vector2d _parking_left_front;
-	Vector2d _parking_center_point;
-
-	VehicleBody _init_parking;//
-	VehicleBody _enter_parking;//
-
+	/********************* Geometry Variable ************************/
 	Line   _line_init;
 	Line   _line_middle;
 	Circle _circle_left;
@@ -233,14 +161,12 @@ private:
 
 	Vector2d _right_front_trial;
 	Vector2d _left_rear_trial;
-	// trial point
 
+	// trial point
 	Vector2d front_trial_arrary[12];
 	Vector2d rear_trial_arrary[12];
 
 	float _ahead_distance;
-
-	ControlCommand _parallel_command;
 };
 
 #endif /* PARALLELPARKING_PARALLEL_PLANNING_H_ */
