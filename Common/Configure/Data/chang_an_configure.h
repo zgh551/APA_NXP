@@ -90,7 +90,7 @@
 #define FIT_RADIUS_B11 		(-1.662)
 
 // (-510,-400]
-#define FIT_RADIUS_A12 		( 18.3)
-#define FIT_RADIUS_B12 		(-0.003017)
+#define FIT_RADIUS_A12 		( 0.06652)
+#define FIT_RADIUS_B12 		(-1.586)
 
 #endif
