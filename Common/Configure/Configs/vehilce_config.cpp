@@ -74,7 +74,8 @@ void VehilceConfig::EdgeRadius(float r)
 
 float VehilceConfig::SteeringAngle2TurnningRadius(float steer,float a,float b)
 {
-	return WHEEL_BASE / tanf((a * steer + b) * PI / 180);
+	return steer < 0 ? -WHEEL_BASE / tanf((a * -steer + b) * PI / 180) :
+			            WHEEL_BASE / tanf((a *  steer + b) * PI / 180) ;
 }
 
 float VehilceConfig::SteeringAngle2TurnningRadiusExp(float steer,float a,float b)
@@ -89,7 +90,8 @@ float VehilceConfig::TurnningRadius2SteeringAngleExp(float radius,float a,float 
 
 float VehilceConfig::TurnningRadius2SteeringAngle(float radius,float a,float b)
 {
-	return (atanf(WHEEL_BASE/radius) * 180 / PI - b)/a;
+	return radius < 0 ? -(atanf(-WHEEL_BASE/radius) * 180 / PI - b)/a :
+			             (atanf( WHEEL_BASE/radius) * 180 / PI - b)/a ;
 }
 
 float VehilceConfig::TurnRadiusCalculate(float steering_angle)
