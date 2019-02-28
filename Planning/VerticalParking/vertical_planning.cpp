@@ -941,7 +941,7 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 			break;
 
 		case OuterTrialVehicleMoveDrive:
-			if(msg->Gear > 0 && msg->Gear < 7 && fabs(msg->SteeringAngle - _stop_point_steering_angle) < 1)
+			if((msg->Gear > 0) && (msg->Gear < 7) && (fabs(msg->SteeringAngle - _stop_point_steering_angle) < 0.5))
 			{
 				_acc_disable_cnt = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
