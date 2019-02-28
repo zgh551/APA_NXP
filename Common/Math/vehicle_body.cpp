@@ -18,7 +18,6 @@
 VehilceConfig m_VehilceConfig;
 
 VehicleBody::VehicleBody() {
-	// TODO Auto-generated constructor stub
 	m_VehilceConfig.Init();
 
 	AttitudeYaw.setContainer(this);
@@ -51,7 +50,7 @@ VehicleBody::VehicleBody() {
 }
 
 VehicleBody::~VehicleBody() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void VehicleBody::RotationCenter(float radius)
@@ -105,6 +104,7 @@ float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
 
 	theta_d1 = theta_x - theta_edge;
 	theta_d2 = theta_y - theta_edge;
+
 	if(theta_d1 > 0 && theta_d2 > 0)
 	{
 		return theta_d1 < theta_d2 ? theta_d1 : theta_d2;
@@ -116,6 +116,48 @@ float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
 	else if(theta_d1 < 0 && theta_d2 > 0)
 	{
 		return theta_d2;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+float VehicleBody::RotateAngle(Vector2d boundary)
+{
+	float theta,alpha,beta,gama,lamda;
+	float radius_square,x_axis_distance,y_axis_len,theta_edge,theta_y,theta_d2;
+	Vector2d boundary_y,edge_points;
+
+	theta = (boundary - _rotation).Angle();
+	alpha = asinf(REAR_EDGE_TO_CENTER/(boundary - _rotation).Length());
+	gama  = (_center - _rotation).Angle();
+	if(theta < PI_2)//往右边界倒库情况
+	{
+		beta = theta + alpha;
+		edge_points = _rear_right;
+	}
+	else//往左边界倒库情况
+	{
+		beta = theta - alpha;
+		edge_points = _rear_left;
+	}
+	lamda = beta - gama;
+
+	radius_square = (edge_points -_rotation).LengthSquare();
+	x_axis_distance = powf(boundary.getX() - _rotation.getX(),2);
+	if(radius_square > x_axis_distance)
+	{
+		y_axis_len = sqrtf( radius_square - x_axis_distance);
+
+		boundary_y.X = boundary.getX();
+		boundary_y.Y = (edge_points -_rotation).getY() > 0 ? _rotation.getY() + y_axis_len : _rotation.getY() - y_axis_len;
+
+		theta_y = (boundary_y -_rotation).Angle();
+		theta_edge = (edge_points -_rotation).Angle();
+		theta_d2 = theta_y - theta_edge;
+
+		return fabs(lamda) > fabs(theta_d2) ? lamda : theta_d2;
 	}
 	else
 	{
@@ -166,6 +208,26 @@ void VehicleBody::OneTrial(float radius,Vector2d boundary)
 	min_theta = fabsf(theta1) < fabsf(theta2) ? theta1 : theta2;
 	Rotate(min_theta);
 }
+
+void VehicleBody::VerticalTrial(float radius,Vector2d boundary)
+{
+	float min_theta;
+	RotationCenter(radius);
+	EdgePoint();
+	if(radius < 0)
+	{
+//		theta1 = RotateAngle(RearLeft, boundary);
+		min_theta = RotateAngle(boundary);
+	}
+	else
+	{
+//		theta1 = RotateAngle(FrontLeft, boundary);
+//		theta2 = RotateAngle(FrontRight, boundary);
+	}
+//	min_theta = fabsf(theta1) > fabsf(theta2) ? theta1 : theta2;
+	Rotate(min_theta);
+}
+
 
 float VehicleBody::getAttitudeYaw()           { return  _attitude_yaw;}
 void  VehicleBody::setAttitudeYaw(float value){ _attitude_yaw = value;}
