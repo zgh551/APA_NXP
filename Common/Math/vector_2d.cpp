@@ -16,7 +16,6 @@
 #include <vector_2d.h>
 
 Vector2d::Vector2d() {
-	// TODO Auto-generated constructor stub
 	X.setContainer(this);
 	X.getter(&Vector2d::getX);
 	X.setter(&Vector2d::setX);
@@ -27,7 +26,7 @@ Vector2d::Vector2d() {
 }
 
 Vector2d::~Vector2d() {
-	// TODO Auto-generated destructor stub
+
 }
 
 float Vector2d::Length(void)const
