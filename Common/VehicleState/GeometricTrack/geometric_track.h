@@ -19,7 +19,7 @@
 
 
 #include "../Interface/vehicle_state.h"
-
+#include <percaption.h>
 #include <vehicle_body.h>
 typedef struct _fit_ratio
 {
@@ -36,6 +36,8 @@ public:
 	void Init(void);
 	void Init(float x,float y,float yaw);
 	void Init(VehicleBody v);
+	void Init(Line l);
+	void Init(Percaption *p);
 
 	void VelocityUpdate(MessageManager *msg,float dt) override;
 	void PulseUpdate(MessageManager *msg,float dt) override;

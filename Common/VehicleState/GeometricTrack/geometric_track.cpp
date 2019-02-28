@@ -15,13 +15,14 @@
 /*****************************************************************************/
 #include "../GeometricTrack/geometric_track.h"
 
+VehilceConfig m_GeometricVehicleConfig;
+
 GeometricTrack::GeometricTrack() {
-	// TODO Auto-generated constructor stub
 	Init();
 }
 
 GeometricTrack::~GeometricTrack() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void GeometricTrack::Init(void)
@@ -37,6 +38,7 @@ void GeometricTrack::Init(float x,float y,float yaw)
 	_position.setX(x);
 	_position.Y = y;
 	Yaw = yaw;
+	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
 }
 void GeometricTrack::Init(VehicleBody v)
@@ -44,6 +46,24 @@ void GeometricTrack::Init(VehicleBody v)
 	_position.X = v.getCenter().getX();
 	_position.Y = v.getCenter().getY();
 	Yaw = v.AttitudeYaw;
+	_last_yaw = Yaw;
+	LinearVelocity = 0.0f;
+}
+void GeometricTrack::Init(Line l)
+{
+	_position.X = l.Point.getX();
+	_position.Y = l.Point.getY();
+	Yaw = l.Angle;
+	_last_yaw = Yaw;
+	LinearVelocity = 0.0f;
+}
+
+void GeometricTrack::Init(Percaption *p)
+{
+	_position.X = p->PositionX;
+	_position.Y = p->PositionY;
+	Yaw = p->AttitudeYaw;
+	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
 }
 
@@ -54,9 +74,9 @@ void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 	LinearVelocity = msg->WheelSpeedDirection == 0 ?  LinearRate :
 					 msg->WheelSpeedDirection == 1 ? -LinearRate : 0;
 
-	if(msg->SteeringAngle != 0)
+	if(fabs(msg->SteeringAngle) > 1)
 	{
-		radius = TurnRadiusCalculate(msg->SteeringAngle);
+		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + LinearVelocity * dt / radius;
 		_position.X = _position.X + radius * (sinf(Yaw) - sinf(_last_yaw));
 		_position.Y = _position.Y + radius * (cosf(_last_yaw) - cosf(Yaw));
@@ -79,22 +99,40 @@ void GeometricTrack::PulseUpdate(MessageManager *msg,float dt)
 	LinearVelocity = msg->WheelSpeedDirection == 0 ?  LinearRate :
 					 msg->WheelSpeedDirection == 1 ? -LinearRate : 0;
 
-	rear_left_displacement = msg->WheelPulseDirection == 0 ?
-							(msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO :
-							 msg->WheelPulseDirection == 1 ?
-						   -(msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO : 0;
+	if(msg->WheelPulseRearLeft >= _last_rear_left_pulse)
+	{
+		rear_left_displacement = msg->WheelPulseDirection == 0 ?
+								(msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO :
+								 msg->WheelPulseDirection == 1 ?
+							   -(msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO : 0;
+	}
+	else
+	{
+		rear_left_displacement = msg->WheelPulseDirection == 0 ?
+								(254 + msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO :
+								 msg->WheelPulseDirection == 1 ?
+							   -(254 + msg->WheelPulseRearLeft - _last_rear_left_pulse) * WHEEL_PUSLE_RATIO : 0;
+	}
 
-
-	rear_right_displacement = msg->WheelPulseDirection == 0 ?
-							 (msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO :
-							  msg->WheelPulseDirection == 1 ?
-							-(msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO : 0;
-
+	if(msg->WheelPulseRearRight >= _last_rear_right_pulse)
+	{
+		rear_right_displacement = msg->WheelPulseDirection == 0 ?
+								 (msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO :
+								  msg->WheelPulseDirection == 1 ?
+								-(msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO : 0;
+	}
+	else
+	{
+		rear_right_displacement = msg->WheelPulseDirection == 0 ?
+								 (254 + msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO :
+								  msg->WheelPulseDirection == 1 ?
+								-(254 + msg->WheelPulseRearRight - _last_rear_right_pulse) * WHEEL_PUSLE_RATIO : 0;
+	}
 	displacement = (rear_left_displacement + rear_right_displacement) * 0.5;
 
 	if(msg->SteeringAngle != 0)
 	{
-		radius = TurnRadiusCalculate(msg->SteeringAngle);
+		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + displacement / radius;
 		_position.X = _position.X + radius * (sinf(Yaw) - sinf(_last_yaw));
 		_position.Y = _position.Y + radius * (cosf(_last_yaw) - cosf(Yaw));
