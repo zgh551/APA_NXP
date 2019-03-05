@@ -40,19 +40,16 @@ public:
 	void Init(Percaption *p);
 
 	void VelocityUpdate(MessageManager *msg,float dt) override;
-	void PulseUpdate(MessageManager *msg,float dt) override;
+	void PulseUpdate(MessageManager *msg) override;
 
 private:
 	float _last_yaw;
 
-	int16_t _last_rear_left_pulse;
-	int16_t _last_rear_right_pulse;
+	uint8_t _last_rear_left_pulse;
+	uint8_t _last_rear_right_pulse;
 
 	int16_t _delta_rear_left_pulse;
 	int16_t _delta_rear_right_pulse;
-
-	int32_t _last_sum_rear_left_pulse;
-	int32_t _last_sum_rear_right_pulse;
 
 	int32_t _sum_rear_left_pulse;
 	int32_t _sum_rear_right_pulse;

@@ -33,10 +33,10 @@ void GeometricTrack::Init(void)
 	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
 
+	_last_rear_left_pulse   = 0;
+	_last_rear_right_pulse  = 0;
 	_sum_rear_left_pulse    = 0;
 	_sum_rear_right_pulse   = 0;
-	_last_sum_rear_left_pulse  = 0;
-	_last_sum_rear_right_pulse = 0;
 	_delta_rear_left_pulse  = 0;
 	_delta_rear_right_pulse = 0;
 }
@@ -48,6 +48,13 @@ void GeometricTrack::Init(float x,float y,float yaw)
 	Yaw = yaw;
 	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
+
+	_last_rear_left_pulse   = 0;
+	_last_rear_right_pulse  = 0;
+	_sum_rear_left_pulse    = 0;
+	_sum_rear_right_pulse   = 0;
+	_delta_rear_left_pulse  = 0;
+	_delta_rear_right_pulse = 0;
 }
 void GeometricTrack::Init(VehicleBody v)
 {
@@ -56,6 +63,13 @@ void GeometricTrack::Init(VehicleBody v)
 	Yaw = v.AttitudeYaw;
 	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
+
+	_last_rear_left_pulse   = 0;
+	_last_rear_right_pulse  = 0;
+	_sum_rear_left_pulse    = 0;
+	_sum_rear_right_pulse   = 0;
+	_delta_rear_left_pulse  = 0;
+	_delta_rear_right_pulse = 0;
 }
 void GeometricTrack::Init(Line l)
 {
@@ -65,10 +79,10 @@ void GeometricTrack::Init(Line l)
 	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
 
+	_last_rear_left_pulse   = 0;
+	_last_rear_right_pulse  = 0;
 	_sum_rear_left_pulse    = 0;
 	_sum_rear_right_pulse   = 0;
-	_last_sum_rear_left_pulse  = 0;
-	_last_sum_rear_right_pulse = 0;
 	_delta_rear_left_pulse  = 0;
 	_delta_rear_right_pulse = 0;
 }
@@ -81,6 +95,8 @@ void GeometricTrack::Init(Percaption *p)
 	_last_yaw = Yaw;
 	LinearVelocity = 0.0f;
 
+	_last_rear_left_pulse   = 0;
+	_last_rear_right_pulse  = 0;
 	_sum_rear_left_pulse    = 0;
 	_sum_rear_right_pulse   = 0;
 	_delta_rear_left_pulse  = 0;
@@ -109,9 +125,8 @@ void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 	_last_yaw = Yaw;
 }
 
-void GeometricTrack::PulseUpdate(MessageManager *msg,float dt)
+void GeometricTrack::PulseUpdate(MessageManager *msg)
 {
-//	float rear_left_displacement,rear_right_displacement;
 	float displacement;
 	float radius;
 
@@ -119,40 +134,22 @@ void GeometricTrack::PulseUpdate(MessageManager *msg,float dt)
 	LinearVelocity = msg->WheelSpeedDirection == 0 ?  LinearRate :
 					 msg->WheelSpeedDirection == 1 ? -LinearRate : 0;
 
-	if(msg->WheelPulseRearLeft >= _last_rear_left_pulse)
-	{
-		_delta_rear_left_pulse = msg->WheelPulseDirection == 0 ?
-								(msg->WheelPulseRearLeft - _last_rear_left_pulse) :
-								 msg->WheelPulseDirection == 1 ?
-							   -(msg->WheelPulseRearLeft - _last_rear_left_pulse) : 0;
-	}
-	else
-	{
-		_delta_rear_left_pulse = msg->WheelPulseDirection == 0 ?
-								(255 + msg->WheelPulseRearLeft - _last_rear_left_pulse) :
-								 msg->WheelPulseDirection == 1 ?
-							   -(255 + msg->WheelPulseRearLeft - _last_rear_left_pulse) : 0;
-	}
+	_delta_rear_left_pulse =  msg->WheelPulseDirection == 0 ?
+							((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : 254) +
+							  msg->WheelPulseRearLeft  - _last_rear_left_pulse) :
+							  msg->WheelPulseDirection == 1 ?
+						   -((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : 254) +
+							  msg->WheelPulseRearLeft  - _last_rear_left_pulse) : 0;
 
-	if(msg->WheelPulseRearRight >= _last_rear_right_pulse)
-	{
-		_delta_rear_right_pulse = msg->WheelPulseDirection == 0 ?
-								 (msg->WheelPulseRearRight - _last_rear_right_pulse) :
-								  msg->WheelPulseDirection == 1 ?
-								-(msg->WheelPulseRearRight - _last_rear_right_pulse) : 0;
-	}
-	else
-	{
-		_delta_rear_right_pulse = msg->WheelPulseDirection == 0 ?
-								 (255 + msg->WheelPulseRearRight - _last_rear_right_pulse) :
-								  msg->WheelPulseDirection == 1 ?
-								-(255 + msg->WheelPulseRearRight - _last_rear_right_pulse) : 0;
-	}
-	_sum_rear_left_pulse += _delta_rear_left_pulse;
-	_sum_rear_right_pulse += _delta_rear_right_pulse;
 
-	displacement = (_sum_rear_left_pulse + _sum_rear_right_pulse -
-			        _last_sum_rear_left_pulse - _last_sum_rear_right_pulse) * 0.5 * WHEEL_PUSLE_RATIO;
+	_delta_rear_right_pulse =  msg->WheelPulseDirection == 0 ?
+							 ((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : 254) +
+							   msg->WheelPulseRearRight  - _last_rear_right_pulse) :
+							   msg->WheelPulseDirection == 1 ?
+							-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : 254) +
+							   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
+
+	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 
 	if(msg->SteeringAngle != 0)
 	{
@@ -167,11 +164,10 @@ void GeometricTrack::PulseUpdate(MessageManager *msg,float dt)
 		_position.Y = _position.Y + displacement * sinf(Yaw);
 	}
 
-	_last_rear_left_pulse = msg->WheelPulseRearLeft ;
+	_sum_rear_left_pulse  += _delta_rear_left_pulse;
+	_sum_rear_right_pulse += _delta_rear_right_pulse;
+
+	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
 	_last_rear_right_pulse = msg->WheelPulseRearRight;
-
-	_last_sum_rear_left_pulse  = _sum_rear_left_pulse;
-	_last_sum_rear_right_pulse = _sum_rear_right_pulse;
-
 	_last_yaw = Yaw;
 }
