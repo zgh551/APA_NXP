@@ -501,3 +501,115 @@ void Ultrasonic::Update(uint8_t id,float t)
 	}
 }
 
+void Ultrasonic::Update(float t)
+{
+	  switch(_schedule_time_cnt)
+  {
+		case 0:
+			 _ultrasonic_packet[2].Distance1 = _ultrasonic_datas[2].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[2].status    = _ultrasonic_datas[2].STP318.Status;
+			 _ultrasonic_packet[2].Time_Ms   = _ultrasonic_packet[2].Time_Tx * 5 + _ultrasonic_datas[2].STP318.TOF * 0.0005;
+
+			 _ultrasonic_packet[4].Distance1 = _ultrasonic_datas[4].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[4].status    = _ultrasonic_datas[4].STP318.Status;
+			 _ultrasonic_packet[4].Time_Ms   = _ultrasonic_packet[4].Time_Tx * 5 + _ultrasonic_datas[4].STP318.TOF * 0.0005;
+			break;
+
+		case 7:
+			 _ultrasonic_packet[1].Distance1 = _ultrasonic_datas[1].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[1].status = _ultrasonic_datas[1].STP318.Status;
+			 _ultrasonic_packet[1].Time_Ms = _ultrasonic_packet[1].Time_Tx * 5 + _ultrasonic_datas[1].STP318.TOF * 0.0005;
+
+			 _ultrasonic_packet[7].Distance1 = _ultrasonic_datas[7].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[7].status = _ultrasonic_datas[7].STP318.Status;
+			 _ultrasonic_packet[7].Time_Ms = _ultrasonic_packet[7].Time_Tx * 5 + _ultrasonic_datas[7].STP318.TOF * 0.0005;
+			break;
+
+		case 10:
+			 _ultrasonic_packet[8].Distance1 = _ultrasonic_datas[8].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[8].Distance2 = _ultrasonic_datas[8].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[8].Level = _ultrasonic_datas[8].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[8].Width = _ultrasonic_datas[8].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[8].status = _ultrasonic_datas[8].STP313.Status;
+			 _ultrasonic_packet[8].Time_Ms = _ultrasonic_packet[8].Time_Tx * 5 + _ultrasonic_datas[8].STP313.TOF1 * 0.0005;
+
+			 _ultrasonic_packet[11].Distance1 = _ultrasonic_datas[11].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[11].Distance2 = _ultrasonic_datas[11].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[11].Level = _ultrasonic_datas[11].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[11].Width = _ultrasonic_datas[11].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[11].status = _ultrasonic_datas[11].STP313.Status;
+			 _ultrasonic_packet[11].Time_Ms = _ultrasonic_packet[11].Time_Tx * 5 + _ultrasonic_datas[11].STP313.TOF1 * 0.0005;
+			break;
+
+		case 12:
+			 _ultrasonic_packet[9].Distance1 = _ultrasonic_datas[9].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[9].Distance2 = _ultrasonic_datas[9].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[9].Level = _ultrasonic_datas[9].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[9].Width = _ultrasonic_datas[9].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[9].status = _ultrasonic_datas[9].STP313.Status;
+			 _ultrasonic_packet[9].Time_Ms = _ultrasonic_packet[9].Time_Tx * 5 + _ultrasonic_datas[9].STP313.TOF1 * 0.0005;
+
+			 _ultrasonic_packet[10].Distance1 = _ultrasonic_datas[10].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[10].Distance2 = _ultrasonic_datas[10].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[10].Level     = _ultrasonic_datas[10].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[10].Width     = _ultrasonic_datas[10].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[10].status    = _ultrasonic_datas[10].STP313.Status;
+			 _ultrasonic_packet[10].Time_Ms   = _ultrasonic_packet[10].Time_Tx * 5 + _ultrasonic_datas[10].STP313.TOF1 * 0.0005;
+			break;
+
+		case 13:
+			 _ultrasonic_packet[3].Distance1 = _ultrasonic_datas[3].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[3].status    = _ultrasonic_datas[3].STP318.Status;
+			 _ultrasonic_packet[3].Time_Ms   = _ultrasonic_packet[3].Time_Tx * 5 + _ultrasonic_datas[3].STP318.TOF * 0.0005;
+
+			 _ultrasonic_packet[5].Distance1 = _ultrasonic_datas[5].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[5].status    = _ultrasonic_datas[5].STP318.Status;
+			 _ultrasonic_packet[5].Time_Ms   = _ultrasonic_packet[5].Time_Tx * 5 + _ultrasonic_datas[5].STP318.TOF * 0.0005;
+			break;
+
+		case 20:
+			 _ultrasonic_packet[0].Distance1 = _ultrasonic_datas[0].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[0].status    = _ultrasonic_datas[0].STP318.Status;
+			 _ultrasonic_packet[0].Time_Ms   = _ultrasonic_packet[0].Time_Tx * 5 + _ultrasonic_datas[0].STP318.TOF * 0.0005;
+
+			 _ultrasonic_packet[6].Distance1 = _ultrasonic_datas[6].STP318.TOF * Compensation(t);
+			 _ultrasonic_packet[6].status    = _ultrasonic_datas[6].STP318.Status;
+			 _ultrasonic_packet[6].Time_Ms   = _ultrasonic_packet[6].Time_Tx * 5 + _ultrasonic_datas[6].STP318.TOF * 0.0005;
+			break;
+
+		case 23:
+			 _ultrasonic_packet[8].Distance1 = _ultrasonic_datas[8].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[8].Distance2 = _ultrasonic_datas[8].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[8].Level = _ultrasonic_datas[8].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[8].Width = _ultrasonic_datas[8].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[8].status = _ultrasonic_datas[8].STP313.Status;
+			 _ultrasonic_packet[8].Time_Ms = _ultrasonic_packet[8].Time_Tx * 5 + _ultrasonic_datas[8].STP313.TOF1 * 0.0005;
+
+			 _ultrasonic_packet[11].Distance1 = _ultrasonic_datas[11].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[11].Distance2 = _ultrasonic_datas[11].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[11].Level = _ultrasonic_datas[11].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[11].Width = _ultrasonic_datas[11].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[11].status = _ultrasonic_datas[11].STP313.Status;
+			 _ultrasonic_packet[11].Time_Ms = _ultrasonic_packet[11].Time_Tx * 5 + _ultrasonic_datas[11].STP313.TOF1 * 0.0005;
+			break;
+
+		case 25:
+			 _ultrasonic_packet[9].Distance1 = _ultrasonic_datas[9].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[9].Distance2 = _ultrasonic_datas[9].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[9].Level = _ultrasonic_datas[9].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[9].Width = _ultrasonic_datas[9].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[9].status = _ultrasonic_datas[9].STP313.Status;
+			 _ultrasonic_packet[9].Time_Ms = _ultrasonic_packet[9].Time_Tx * 5 + _ultrasonic_datas[9].STP313.TOF1 * 0.0005;
+
+			 _ultrasonic_packet[10].Distance1 = _ultrasonic_datas[10].STP313.TOF1 * Compensation(t);
+			 _ultrasonic_packet[10].Distance2 = _ultrasonic_datas[10].STP313.TOF2 * Compensation(t);
+			 _ultrasonic_packet[10].Level     = _ultrasonic_datas[10].STP313.Level * LEVEL_RATIO;
+			 _ultrasonic_packet[10].Width     = _ultrasonic_datas[10].STP313.Width * WIDTH_RATIO;
+			 _ultrasonic_packet[10].status    = _ultrasonic_datas[10].STP313.Status;
+			 _ultrasonic_packet[10].Time_Ms   = _ultrasonic_packet[10].Time_Tx * 5 + _ultrasonic_datas[10].STP313.TOF1 * 0.0005;
+			break;
+
+		default:
+			break;
+  }
+}

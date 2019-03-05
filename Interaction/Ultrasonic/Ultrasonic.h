@@ -76,6 +76,7 @@ public:
 	float Compensation(float temp);
 
 	void Update(uint8_t id,float t);
+	void Update(float t);
 
 	/// Property
 	uint8_t getScheduleTimeCnt();
