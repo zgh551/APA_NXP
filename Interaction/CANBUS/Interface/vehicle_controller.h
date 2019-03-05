@@ -22,7 +22,7 @@
 
 typedef enum _GearPosition
 {
-	Praking = 1,
+	Parking = 1,
 	Reverse,
 	Neutral,
 	Drive
