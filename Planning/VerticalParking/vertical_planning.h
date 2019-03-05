@@ -47,6 +47,7 @@ typedef enum _VerticalInitPointAdjustState //Initial Position Adjustment Relativ
 {
 	VerticalInitPointFrontAdjust,
 	VerticalInitPointMove,
+	VerticalInitPointDisableACC,
 	VerticalInitPoitArriveJudge,
 	VerticalWaitVehicleStop,
 }VerticalInitPointAdjustState;
@@ -56,12 +57,14 @@ typedef enum _VerticalCircleTrajectoryState
 {
 	VerticalGearShift,
 	VerticalVehicleMove,
+	VerticalDisableACC,
 	VerticalFirstTurnPoint,
 	VerticalSecondTurnPoint,
 	verticalWaitSteeringArrive,
 	VerticalWaitYawArrive,
 	VerticalWaitArrive,
-	VerticalWaitStill
+	VerticalWaitStill,
+	VerticalWaitParkingGear
 }VerticalCircleTrajectoryState;
 
 // 曲线估计段状态
@@ -213,7 +216,6 @@ private:
 
 	float _trial_margin;
 	float _ahead_distance;
-	uint8_t _acc_disable_cnt;
 	int8_t _analysis_state;
 };
 
