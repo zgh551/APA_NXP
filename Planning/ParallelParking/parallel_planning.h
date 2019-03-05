@@ -41,6 +41,7 @@ typedef enum _InitPointAdjustState //Initial Position Adjustment Relative State
 {
 	InitPointFrontAdjust,
 	InitPointMove,
+	InitPointDisableACC,
 	InitPoitArriveJudge,
 	WaitVehicleStop,
 }InitPointAdjustState;
@@ -86,7 +87,8 @@ typedef enum _ParkingCompleteState
 	RearWaitArrive,
 	FrontMoveStill,
 	RearMoveStill,
-	ParkingStill
+	ParkingStill,
+	WaitParkingGear
 }ParkingCompleteState;
 
 class ParallelPlanning : public Planning
@@ -120,7 +122,7 @@ public:
 protected:
 	VehicleBody front_trial_body,rear_trial_body;
 	Vector2d    enter_point;
-	Vector2d    parking_right_rear,parking_right_front;//库位边角点
+
 
 private:
 	ParallelPlanningState _parallel_planning_state;
@@ -135,7 +137,6 @@ private:
 	ParkingCompleteState _parking_complete_state;
 	///////////////////////////////////////////////
 	uint8_t _reverse_cnt;
-	uint8_t _acc_disable_cnt;
 	uint8_t _trial_status;
 
 //	Vector2d _parking_left_front;

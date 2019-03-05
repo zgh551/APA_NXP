@@ -100,7 +100,7 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 				ParkingStatus = 2;
 				Command = 0x00;
 				_control_command.ControlEnable.R   = 0xE0;
-				_control_command.Gear              = Praking;
+				_control_command.Gear              = Parking;
 				_control_command.SteeringAngle     = 0;
 				_control_command.SteeringAngleRate = STEERING_RATE;
 				_control_command.Acceleration      = planning_braking_acc_;
@@ -185,20 +185,28 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 	switch(_adjust_state)
 	{
 		case InitPointFrontAdjust:
-				_control_command.Gear          = Drive;
-				_control_command.SteeringAngle = 0;
-				_control_command.Acceleration  = planning_braking_acc_;
+				_control_command.Gear              = Drive;
+				_control_command.SteeringAngle     = 0;
+				_control_command.SteeringAngleRate = STEERING_RATE;
+				_control_command.Acceleration      = planning_braking_acc_;
+				_control_command.Velocity          = STRAIGHT_VELOCITY;
 				_control_command.ControlEnable.B.VelocityEnable = 0;
-
 				_adjust_state = InitPointMove;
 			break;
 
 		case InitPointMove:
-			if(msg->Gear > 0 && msg->Gear < 7)
+			if((msg->Gear > 0) && (msg->Gear < 7) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
-				_control_command.Velocity = STRAIGHT_VELOCITY;
-				_control_command.ControlEnable.B.VelocityEnable = 1;
+				_acc_disable_cnt = 0;
+				_control_command.ControlEnable.B.AccelerationEnable = 0;
+				_control_command.ControlEnable.B.DecelerationEnable = 0;
+				_adjust_state = InitPointDisableACC;
+			}
+			break;
 
+		case InitPointDisableACC:
+			if(SUCCESS == WaitVehicleStartMove(0,msg))
+			{
 				_adjust_state = InitPoitArriveJudge;
 			}
 			break;
@@ -207,8 +215,8 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			if(s->getPosition().X > _line_init_circle_right_turn.Point.getX())
 			{
 				_control_command.ControlEnable.B.VelocityEnable = 0;
+				_control_command.Velocity                       = 0;
 				_control_command.Acceleration = planning_braking_acc_;
-
 				_adjust_state = WaitVehicleStop;
 			}
 			break;
@@ -236,15 +244,17 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 	switch(_curve_state)
 	{
 		case GearShift:
-			_control_command.Gear          = Reverse;
-			_control_command.SteeringAngle = 0;
-			_control_command.Acceleration  = planning_braking_acc_;
+			_control_command.Gear              = Reverse;
+			_control_command.SteeringAngle     = 0;
+			_control_command.SteeringAngleRate = STEERING_RATE;
+			_control_command.Acceleration      = planning_braking_acc_;
+			_control_command.Velocity          = CURVE_VELOCITY;
 			_control_command.ControlEnable.B.VelocityEnable = 0;
 			_curve_state = VehicleMove;
 			break;
 
 		case VehicleMove:
-			if(0x09 == msg->Gear)
+			if( (0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 				_control_command.Velocity = STRAIGHT_VELOCITY;
 				_control_command.ControlEnable.B.VelocityEnable = 1;
@@ -255,13 +265,9 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 		case FirstTurnPoint:
 			// 考虑转向角执行延迟时间
 			// TODO 后续此处要考虑特殊处理
-//			if(SUCCESS == LineTurnningPointDetermination(s,_line_init_circle_right_turn,1))
-//			{
-//				_curve_state = SecondTurnPoint;
-//			}
 			if( (s->getPosition().getX() -_line_init_circle_right_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
 			{
-				_control_command.SteeringAngle = _line_init_circle_right_turn.SteeringAngle;
+				_control_command.SteeringAngle     = _line_init_circle_right_turn.SteeringAngle;
 				_control_command.SteeringAngleRate = s->LinearRate * RK;
 				_curve_state = SecondTurnPoint;
 			}
@@ -271,74 +277,64 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			// 根据当前车速，实时更新转向角速度
 			_control_command.SteeringAngleRate = s->LinearRate * RK;
 			// 象限点判定控制
+			// 运行过程中计算转向点
 			if( (_line_middle_circle_right_turn.Yaw - s->getYaw()) * _circle_right.Radius < K * fabs(_line_init_circle_right_turn.SteeringAngle) * 0.5 )
 			{
 				_control_command.SteeringAngle = _line_middle_circle_right_turn.SteeringAngle;
 				_curve_state = ThirdTurnPoint;
 			}
+			// 基于规划的转向点进行转向
 //			if(SUCCESS ==  CircleTurnningPointDetermination(s,_line_middle_circle_right_turn,_circle_right.Radius,1))
 //			{
-//				_curve_state = ThirdTurnPoint;
-//			}
-//			angle_vector = (s->getPosition() - _line_middle_circle_right_turn.Point).Angle();
-//			if(angle_vector > 0 && angle_vector < PI_2 )
-//			{
-//				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _line_middle_circle_right_turn.Point, _circle_right.Radius) < s->LinearRate * turnning_feedforward_time_)
-//				{
-//					_control_command.SteeringAngle = _line_middle_circle_right_turn.SteeringAngle;
-//					_curve_state = ThirdTurnPoint;
-//				}
-//			}
-//			else
-//			{
-//				_control_command.SteeringAngle = _line_middle_circle_right_turn.SteeringAngle;
 //				_curve_state = ThirdTurnPoint;
 //			}
 			break;
 
 		case ThirdTurnPoint:
+			// 根据当前车速，实时更新转向角速度
 			_control_command.SteeringAngleRate = s->LinearRate * RK;
+
+			if( (_line_middle_circle_left_tangent - s->getPosition()).Length() < K * fabs(_line_middle_circle_left_turn.SteeringAngle) * 0.5)
+			{
+				_control_command.SteeringAngle = _line_middle_circle_left_turn.SteeringAngle;
+				_curve_state = WaitArrive;
+			}
+			// 基于规划的转向点进行转向
 			if(SUCCESS == LineTurnningPointDetermination(s,_line_middle_circle_left_turn,1))
 			{
 				_curve_state = WaitArrive;
 			}
-//			angle_vector = (s->getPosition() - _line_middle_circle_left_turn.Point).Angle();
-//			if(angle_vector > 0 && angle_vector < PI_2 )
-//			{
-//				if((s->getPosition() -_line_middle_circle_left_turn.Point).Length() < s->LinearRate * turnning_feedforward_time_)
-//				{
-//					_control_command.SteeringAngle = _line_middle_circle_left_turn.SteeringAngle;
-//					_curve_state = WaitArrive;
-//				}
-//			}
-//			else
-//			{
-//				_control_command.SteeringAngle = _line_middle_circle_left_turn.SteeringAngle;
-//				_curve_state = WaitArrive;
-//			}
 			break;
 
 		case WaitArrive:
 			_control_command.SteeringAngleRate = s->LinearRate * RK;
-			_control_command.Velocity = VelocityPlanningCircle(s,_enter_parking.Center,_circle_left.Radius);
 			// TODO 判定条件需要修改
-			if(SUCCESS == ForecastYawParking(-1,_circle_left.Radius,_enter_parking.AttitudeYaw,s))
-//			if (SUCCESS == ForecastCircleParking(s,_enter_parking.Center,_circle_left.Radius,1))
-//			if (SUCCESS == ForecastCircleParkingPointMargin(s,_enter_parking.Center,_circle_left.Radius,parking_margin_,1,0))
+			if(SUCCESS == ForecastYawParking(-1,_circle_left.Radius,_enter_parking.getAttitudeYaw(),s))
 			{
 				_curve_state = WaitStill;
 			}
-			else if(SUCCESS == BoundaryCollision(-1,s))
+			else if(SUCCESS == BoundaryCollisionCircle(-1,s))//BoundaryCollision
 			{
 				_curve_state = WaitStill;
 			}
+			#if ULTRASONIC_COLLISION_ENABLE == 1
+			else if(SUCCESS == UltrasonicCollision(-1,s,u))
+			{
+				_curve_state = WaitStill;
+			}
+			if( s->Yaw < 0.02f)
+			{
+				_control_command.SteeringAngle     = 0;
+				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+			}
+			#endif
 			break;
 
 		case WaitStill:
 			if(2 == msg->WheelSpeedDirection)
 			{
 				_curve_state = GearShift;
-				if( s->Yaw < 0.01)
+				if( s->Yaw < 0.02)
 				{
 					return PARKING_FINISH;
 				}
@@ -349,9 +345,14 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			}
 			else
 			{
-				if(SUCCESS == BoundaryCollision(-1,s)){}
-				else if( SUCCESS == ForecastYawParking(-1,MIN_LEFT_TURN_RADIUS,0,s)){}
-				else{}
+//				if( SUCCESS == ForecastYawParking(-1,_circle_left.Radius,_enter_parking.AttitudeYaw,s)){}
+//				else if(SUCCESS == BoundaryCollision(-1,s)){}
+//				else{}
+				if( s->Yaw < 0.02f)
+				{
+					_control_command.SteeringAngle     = 0;
+					_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+				}
 			}
 			break;
 		default:
@@ -381,7 +382,6 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			if((msg->Gear > 0 && msg->Gear <7 ) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
 			{
 				_acc_disable_cnt = 0;
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 0;
 				_right_front_state = RightFrontTrialDisableACC;
@@ -389,12 +389,8 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case RightFrontTrialDisableACC:
-			_acc_disable_cnt++;
-			if(_acc_disable_cnt > acc_disable_time_)
+			if(SUCCESS == WaitVehicleStartMove(0,msg))
 			{
-				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
-				_control_command.ControlEnable.B.VelocityEnable     = 1;
 				_right_front_state = RightFrontTrialWaitArrive;
 			}
 			break;
@@ -404,18 +400,29 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			{
 				_right_front_state = RightFrontTrialWaitStill;
 			}
-			else if(SUCCESS == BoundaryCollision(1,s))
+			else if(SUCCESS == BoundaryCollisionCircle(1,s))//BoundaryCollision
 			{
 				_right_front_state = RightFrontTrialWaitStill;
 			}
+#if ULTRASONIC_COLLISION_ENABLE == 1
+			else if(SUCCESS == UltrasonicCollision(1,s,u))
+			{
+				_right_front_state = RightFrontTrialWaitStill;
+			}
+#endif
 			else{}
+			if( s->Yaw < 0.02f)
+			{
+				_control_command.SteeringAngle     = 0;
+				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+			}
 			break;
 
 		case RightFrontTrialWaitStill:
 			if(2 == msg->WheelSpeedDirection)
 			{
 				_right_front_state = RightFrontTrialGearShift;
-				if( s->Yaw < 0.01)
+				if( s->Yaw < 0.02)
 				{
 					return PARKING_FINISH;
 				}
@@ -426,9 +433,14 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			}
 			else
 			{
-				if(SUCCESS == BoundaryCollision(1,s)){}
-				else if( SUCCESS == ForecastYawParking(-1,MIN_RIGHT_TURN_RADIUS,0,s)){}
-				else{}
+				if( s->Yaw < 0.02f)
+				{
+					_control_command.SteeringAngle     = 0;
+					_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+				}
+//				if(SUCCESS == BoundaryCollision(1,s)){}
+//				else if( SUCCESS == ForecastYawParking(-1,MIN_RIGHT_TURN_RADIUS,0,s)){}
+//				else{}
 			}
 			break;
 		default:
@@ -466,12 +478,8 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			break;
 
 		case LeftRearTrialDisableACC:
-			_acc_disable_cnt++;
-			if(_acc_disable_cnt > acc_disable_time_)
+			if(SUCCESS == WaitVehicleStartMove(1,msg))
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 1;
-				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_left_rear_state = LeftRearTrialWaitArrive;
 			}
 			break;
@@ -481,18 +489,29 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			{
 				_left_rear_state = LeftRearTrialWaitStill;
 			}
-			else if(SUCCESS == BoundaryCollision(-1,s))
+			else if(SUCCESS == BoundaryCollisionCircle(-1,s))//BoundaryCollision
 			{
 				_left_rear_state = LeftRearTrialWaitStill;
 			}
+#if ULTRASONIC_COLLISION_ENABLE == 1
+			else if(SUCCESS == UltrasonicCollision(-1,s,u))
+			{
+				_left_rear_state = LeftRearTrialWaitStill;
+			}
+#endif
 			else{}
+			if( s->Yaw < 0.02f)
+			{
+				_control_command.SteeringAngle     = 0;
+				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+			}
 			break;
 
 		case LeftRearTrialWaitStill:
 			if(2 == msg->WheelSpeedDirection)
 			{
 				_left_rear_state = LeftRearTrialGearShift;
-				if( s->Yaw < 0.01)
+				if( s->Yaw < 0.02)
 				{
 					return PARKING_FINISH;
 				}
@@ -503,9 +522,14 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			}
 			else
 			{
-				if(SUCCESS == BoundaryCollision(-1,s)){}
-				else if(SUCCESS == ForecastYawParking(-1,MIN_LEFT_TURN_RADIUS,0,s)){}
-				else{}
+				if( s->Yaw < 0.02f)
+				{
+					_control_command.SteeringAngle     = 0;
+					_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+				}
+//				if(SUCCESS == ForecastYawParking(-1,MIN_LEFT_TURN_RADIUS,0,s)){}
+//				else if(SUCCESS == BoundaryCollision(-1,s)){}
+//				else{}
 			}
 			break;
 
@@ -519,6 +543,7 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 
 int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
 {
+	float temp_distance;
 	switch(_parking_complete_state)
 	{
 		case GearShiftJudge:
@@ -534,13 +559,13 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			}
 			else
 			{
-				_control_command.Gear =  Praking;
+				_control_command.Gear =  Parking;
 				_parking_complete_state = ParkingStill;
 			}
 			_control_command.SteeringAngle     = 0;
 			_control_command.SteeringAngleRate = STEERING_RATE;
 			_control_command.Acceleration      = planning_braking_acc_;
-			_control_command.Velocity          = 0.25;
+			_control_command.Velocity          = 0.2;
 			_control_command.ControlEnable.B.VelocityEnable = 0;
 
 			break;
@@ -566,97 +591,65 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case FrontMoveDisableACC:
-			_acc_disable_cnt++;
-			if(_acc_disable_cnt > acc_disable_time_)
+			if(SUCCESS == WaitVehicleStartMove(0,msg))
 			{
-				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
-				_control_command.ControlEnable.B.VelocityEnable     = 1;
 				_parking_complete_state = FrontWaitArrive;
 			}
 			break;
 
 		case RearMoveDisableACC:
-			_acc_disable_cnt++;
-			if(_acc_disable_cnt > acc_disable_time_)
+			if(SUCCESS == WaitVehicleStartMove(1,msg))
 			{
-				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
-				_control_command.ControlEnable.B.VelocityEnable     = 1;
 				_parking_complete_state = RearWaitArrive;
 			}
 			break;
 
 		case FrontWaitArrive:
-			// 带预测的停车
-			if( (s->getPosition() - _parking_center_point).Length() < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
-			{
-				_control_command.Acceleration  = planning_braking_acc_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_parking_complete_state = FrontMoveStill;
-			}
-			// 未能按照规划停止，需紧急停车
-			if( s->getPosition().getX() > _parking_center_point.getX() )
-			{
-				_control_command.Deceleration  = planning_braking_aeb_;
-				_control_command.Acceleration  = planning_braking_aeb_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
-				_parking_complete_state = FrontMoveStill;
-			}
-			break;
-
-		case RearWaitArrive:
-			// 带预测的停车
-			if( (s->getPosition() - _parking_center_point).Length() < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
-			{
-				_control_command.Acceleration  = planning_braking_acc_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_parking_complete_state = RearMoveStill;
-			}
-			// 未能按照规划停止，需紧急停车
-			if( s->getPosition().getX() < _parking_center_point.getX() )
-			{
-				_control_command.Deceleration  = planning_braking_aeb_;
-				_control_command.Acceleration  = planning_braking_aeb_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
-				_parking_complete_state = RearMoveStill;
-			}
-			break;
-
-		case FrontMoveStill:
 			if(2 == msg->WheelSpeedDirection)
 			{
-				_parking_complete_state = GearShiftJudge;
-				return SUCCESS;
+				_control_command.Gear   = Parking;
+				_parking_complete_state = WaitParkingGear;
 			}
 			else
 			{
-				if( s->getPosition().getX() > _parking_center_point.getX() )
+				temp_distance = _parking_center_point.getX() - s->getPosition().getX();
+				if(temp_distance >= 0)
 				{
-					_control_command.Deceleration  = planning_braking_aeb_;
-					_control_command.Acceleration  = planning_braking_aeb_;
-					_control_command.ControlEnable.B.VelocityEnable = 0;
-					_control_command.ControlEnable.B.DecelerationEnable = 1;
+					_control_command.ControlEnable.B.AccelerationEnable = 1;
+					_control_command.ControlEnable.B.VelocityEnable     = 1;
+					_control_command.Velocity                           = (temp_distance > 0.03) ? temp_distance : 0;
+				}
+				else
+				{
+					_control_command.ControlEnable.B.AccelerationEnable = 1;
+					_control_command.ControlEnable.B.VelocityEnable     = 0;
+					_control_command.Velocity                           = 0;
+					_control_command.Acceleration                       = -0.5;
 				}
 			}
 			break;
 
-		case RearMoveStill:
+		case RearWaitArrive:
 			if(2 == msg->WheelSpeedDirection)
 			{
-				_parking_complete_state = GearShiftJudge;
-				return SUCCESS;
+				_control_command.Gear   = Parking;
+				_parking_complete_state = WaitParkingGear;
 			}
 			else
 			{
-				if( s->getPosition().getX() < _parking_center_point.getX() )
+				temp_distance = s->getPosition().getX() - _parking_center_point.getX();
+				if(temp_distance >= 0)
 				{
-					_control_command.Deceleration  = planning_braking_aeb_;
-					_control_command.Acceleration  = planning_braking_aeb_;
-					_control_command.ControlEnable.B.VelocityEnable = 0;
-					_control_command.ControlEnable.B.DecelerationEnable = 1;
+					_control_command.ControlEnable.B.AccelerationEnable = 1;
+					_control_command.ControlEnable.B.VelocityEnable     = 1;
+					_control_command.Velocity                           = (temp_distance > 0.03) ? temp_distance : 0;
+				}
+				else
+				{
+					_control_command.ControlEnable.B.AccelerationEnable = 1;
+					_control_command.ControlEnable.B.VelocityEnable     = 0;
+					_control_command.Velocity                           = 0;
+					_control_command.Acceleration                       = -0.5;
 				}
 			}
 			break;
@@ -664,6 +657,15 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 		case ParkingStill:
 			if(2 == msg->WheelSpeedDirection)
 			{
+				_control_command.Gear   = Parking;
+				_parking_complete_state = WaitParkingGear;
+			}
+			break;
+
+		case WaitParkingGear:
+			if(msg->Gear == 0x0A)
+			{
+				ctl->Stop();
 				_parking_complete_state = GearShiftJudge;
 				return SUCCESS;
 			}
@@ -691,8 +693,8 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	FrontVirtualBoundary =  inf->ParkingLength - FrontMarginBoundary;
 	RearVirtualBoundary  = RearMarginBoundary;
 	// 车库点计算
-	parking_right_rear  = Vector2d(RearVirtualBoundary,InsideVirtualBoundary);
-	parking_right_front = Vector2d(FrontVirtualBoundary,InsideVirtualBoundary);
+	_parking_inside_rear_point  = Vector2d(RearVirtualBoundary,InsideVirtualBoundary);
+	_parking_inside_front_point = Vector2d(FrontVirtualBoundary,InsideVirtualBoundary);
 	_parking_outer_front_point = Vector2d(FrontVirtualBoundary,0);
 
 	// 根据车位宽度，确定车辆最终停车的横向位置
@@ -714,10 +716,11 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	if( inf->ParkingLength > (MinParkingLength + FrontMarginBoundary + RearMarginBoundary))//满足一次入库条件
 	{
 		enter_point.X = RearMarginBoundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - FrontMarginBoundary - RearMarginBoundary - MinParkingLength)*0.5;
-		_enter_parking.Center = enter_point;
-		_enter_parking.AttitudeYaw = 0;
+		_enter_parking.setCenter(enter_point);
+		_enter_parking.setAttitudeYaw(0.0f);
 		_enter_parking.RotationCenter(MIN_LEFT_TURN_RADIUS);
 
+		_trial_status = 1;
 		rear_trial_body.Center = enter_point;
 		rear_trial_body.AttitudeYaw = 0.0f;
 		m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
@@ -748,14 +751,14 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 			_reverse_cnt++;
 			if(	_reverse_cnt % 2 )// 1 3 5
 			{
-				front_trial_body.OneTrial(-MIN_RIGHT_TURN_RADIUS, parking_right_rear);
-				rear_trial_body.OneTrial(MIN_LEFT_TURN_RADIUS, parking_right_front);
+				front_trial_body.OneTrial(-MIN_RIGHT_TURN_RADIUS, _parking_inside_rear_point);
+				rear_trial_body.OneTrial(MIN_LEFT_TURN_RADIUS, _parking_inside_front_point);
 				m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
 				m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 
 				front_trial_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
 				_plan_vehilce_config.EdgeRadius(MIN_LEFT_TURN_RADIUS);
-				_trial_status = (front_trial_body.getRotation() - _parking_outer_front_point).Length() >= _plan_vehilce_config.RadiusFrontRight ? 1 : 0;
+				_trial_status = (front_trial_body.getRotation() - _parking_outer_front_point).Length() >= (_plan_vehilce_config.RadiusFrontRight + 0.3) ? 1 : 0;
 				if(_trial_status)
 				{
 					front_trial_body.EdgePoint();
@@ -764,14 +767,14 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 			}
 			else // 2 4 6
 			{
-				front_trial_body.OneTrial(MIN_LEFT_TURN_RADIUS, parking_right_front);
-				rear_trial_body.OneTrial(-MIN_RIGHT_TURN_RADIUS, parking_right_rear);
+				front_trial_body.OneTrial(MIN_LEFT_TURN_RADIUS, _parking_inside_front_point);
+				rear_trial_body.OneTrial(-MIN_RIGHT_TURN_RADIUS, _parking_inside_rear_point);
 				m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
 				m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 
 				rear_trial_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
 				_plan_vehilce_config.EdgeRadius(MIN_LEFT_TURN_RADIUS);
-				_trial_status = (rear_trial_body.getRotation() - _parking_outer_front_point).Length() >= _plan_vehilce_config.RadiusFrontRight ? 1 : 0;
+				_trial_status = (rear_trial_body.getRotation() - _parking_outer_front_point).Length() >= (_plan_vehilce_config.RadiusFrontRight + 0.3) ? 1 : 0;
 				if(_trial_status)
 				{
 					rear_trial_body.EdgePoint();
@@ -793,7 +796,7 @@ void ParallelPlanning::TransitionArc(Percaption *inf)
 	_line_init.Point.Y = inf->PositionY;
 	_line_init.Angle   = inf->AttitudeYaw;
 
-	_circle_left.Center = _enter_parking.Rotation;
+	_circle_left.Center = _enter_parking.getRotation();
 	_circle_left.Radius = MIN_LEFT_TURN_RADIUS;
 
 	_circle_right.Radius = MIN_RIGHT_TURN_RADIUS;
