@@ -35,7 +35,7 @@ public:
 	void Init(void);
 
 	virtual void VelocityUpdate(MessageManager *msg,float dt) = 0;
-	virtual void PulseUpdate(MessageManager *msg,float dt) = 0;
+	virtual void PulseUpdate(MessageManager *msg) = 0;
 
 
 
