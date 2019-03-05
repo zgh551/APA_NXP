@@ -33,6 +33,7 @@ public:
 
 	// 已知车库边界和车辆的某个边角点，求该边角点不碰撞边沿的最大旋转角度
 	float RotateAngle(Vector2d vehicle_edge,Vector2d boundary);
+	float RotateAngleCollision(Vector2d vehicle_edge,Vector2d boundary);
 	float RotateAngle(Vector2d boundary);
 	// 跟据旋转半径求旋转中心点的坐标
 	void RotationCenter(float radius);

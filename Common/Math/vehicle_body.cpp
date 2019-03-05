@@ -60,7 +60,7 @@ void VehicleBody::RotationCenter(float radius)
 	_rotation = _center + v.rotate(PI/2);
 }
 
-float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
+float VehicleBody::RotateAngle(Vector2d vehicle_edge,Vector2d boundary)
 {
 	float theta_edge,theta_x,theta_y;
 	float theta_d1,theta_d2;
@@ -68,14 +68,14 @@ float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
 	float x_axis_distance,y_axis_distance;
 	float y_axis_len,x_axis_len;
 	Vector2d boundary_x,boundary_y;
-	radius_square = (edge_points -_rotation).LengthSquare();
+	radius_square = (vehicle_edge -_rotation).LengthSquare();
 	/////////////////////////////////////////////////////////////////////////////////
 	y_axis_distance = powf(boundary.getY() - _rotation.getY(),2);
 	if(radius_square > y_axis_distance)
 	{
 		x_axis_len = sqrtf( radius_square - y_axis_distance);
 
-		boundary_x.X = (edge_points -_rotation).getX() > 0 ?  _rotation.getX() + x_axis_len : _rotation.getX() - x_axis_len;
+		boundary_x.X = (vehicle_edge -_rotation).getX() > 0 ?  _rotation.getX() + x_axis_len : _rotation.getX() - x_axis_len;
 		boundary_x.Y = boundary.getY();
 
 		theta_x = (boundary_x -_rotation).Angle();
@@ -91,7 +91,7 @@ float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
 		y_axis_len = sqrtf( radius_square - x_axis_distance);
 
 		boundary_y.X = boundary.getX();
-		boundary_y.Y = (edge_points -_rotation).getY() > 0 ? _rotation.getY() + y_axis_len : _rotation.getY() - y_axis_len;
+		boundary_y.Y = (vehicle_edge -_rotation).getY() > 0 ? _rotation.getY() + y_axis_len : _rotation.getY() - y_axis_len;
 
 		theta_y = (boundary_y -_rotation).Angle();
 	}
@@ -100,7 +100,7 @@ float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
 		theta_y = 0;
 	}
 	////////////////////////////////////////////////////////////////////////////////////
-	theta_edge = (edge_points -_rotation).Angle();
+	theta_edge = (vehicle_edge -_rotation).Angle();
 
 	theta_d1 = theta_x - theta_edge;
 	theta_d2 = theta_y - theta_edge;
@@ -116,6 +116,69 @@ float VehicleBody::RotateAngle(Vector2d edge_points,Vector2d boundary)
 	else if(theta_d1 < 0 && theta_d2 > 0)
 	{
 		return theta_d2;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+float VehicleBody::RotateAngleCollision(Vector2d vehicle_edge,Vector2d boundary)
+{
+	float theta_edge,theta_x,theta_y;
+	float theta_d1,theta_d2;
+	float radius_square;
+	float x_axis_distance,y_axis_distance;
+	float y_axis_len,x_axis_len;
+	Vector2d boundary_x,boundary_y;
+	radius_square = (vehicle_edge -_rotation).LengthSquare();
+	/////////////////////////////////////////////////////////////////////////////////
+	y_axis_distance = powf(boundary.getY() - _rotation.getY(),2);
+	if(radius_square > y_axis_distance)
+	{
+		x_axis_len = sqrtf( radius_square - y_axis_distance);
+
+		boundary_x.X = (vehicle_edge -_rotation).getX() > 0 ?  _rotation.getX() + x_axis_len : _rotation.getX() - x_axis_len;
+		boundary_x.Y = boundary.getY();
+
+		theta_x = (boundary_x -_rotation).Angle();
+	}
+	else
+	{
+		theta_x = 0;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	x_axis_distance = powf(boundary.getX() - _rotation.getX(),2);
+	if(radius_square > x_axis_distance)
+	{
+		y_axis_len = sqrtf( radius_square - x_axis_distance);
+
+		boundary_y.X = boundary.getX();
+		boundary_y.Y = (vehicle_edge -_rotation).getY() > 0 ? _rotation.getY() + y_axis_len : _rotation.getY() - y_axis_len;
+
+		theta_y = (boundary_y -_rotation).Angle();
+	}
+	else
+	{
+		theta_y = 0;
+	}
+	////////////////////////////////////////////////////////////////////////////////////
+	theta_edge = (vehicle_edge -_rotation).Angle();
+
+	theta_d1 = theta_x - theta_edge;
+	theta_d2 = theta_y - theta_edge;
+
+	if(theta_d1 < 0 && theta_d2 < 0)
+	{
+		return fabs(theta_d1) < fabs(theta_d2) ? fabs(theta_d1) : fabs(theta_d2);
+	}
+	else if(theta_d1 < 0 && theta_d2 > 0)
+	{
+		return fabs(theta_d1);
+	}
+	else if(theta_d1 > 0 && theta_d2 < 0)
+	{
+		return fabs(theta_d2);
 	}
 	else
 	{
