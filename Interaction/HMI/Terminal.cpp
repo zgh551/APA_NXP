@@ -195,7 +195,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Planning *msg)
 
         case 0x560:
         	msg->PlanningBrakingAcc      = ((int8_t)dat[0])*0.1f;
-        	msg->PlanningBrakingAccR     = 1/fabs(msg->PlanningBrakingAcc);
+        	msg->PlanningBrakingAccR     = 1/fabs(msg->PlanningBrakingAcc)/0.8f;
         	msg->PlanningBrakingAeb      = ((int8_t)dat[1])*0.1f;
         	msg->TurnningFeedforwardTime = ((uint8_t)dat[2])*0.01f;
         	msg->AccDisableTime          = (uint8_t)(50 * ((uint8_t)dat[3])*0.01f);
@@ -303,6 +303,45 @@ void Terminal::Push(VehicleState *msg)
 
 void Terminal::Push(Ultrasonic *u)
 {
+#if ULTRASONIC_PACKET == 1
+	switch(u->ReadStage)
+	{
+		case 0:
+			UltrasonicSend(1,u->UltrasonicPacket);
+			UltrasonicSend(7,u->UltrasonicPacket);
+			break;
+
+		case 1:
+		case 5:
+			UltrasonicSend(8,u->UltrasonicPacket);
+			UltrasonicSend(11,u->UltrasonicPacket);
+			break;
+
+		case 2:
+		case 6:
+			UltrasonicSend(9,u->UltrasonicPacket);
+			UltrasonicSend(10,u->UltrasonicPacket);
+			break;
+
+		case 3:
+			UltrasonicSend(3,u->UltrasonicPacket);
+			UltrasonicSend(5,u->UltrasonicPacket);
+			break;
+
+		case 4:
+			UltrasonicSend(0,u->UltrasonicPacket);
+			UltrasonicSend(6,u->UltrasonicPacket);
+			break;
+
+		case 7:
+			UltrasonicSend(2,u->UltrasonicPacket);
+			UltrasonicSend(4,u->UltrasonicPacket);
+			break;
+
+		default:
+			break;
+	}
+#else
 	switch(u->ReadStage)
 	{
 		case 0:
@@ -340,6 +379,7 @@ void Terminal::Push(Ultrasonic *u)
 		default:
 			break;
 	}
+#endif
 }
 
 void Terminal::Push(Percaption *p)
