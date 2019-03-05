@@ -216,8 +216,8 @@ void PIT0_isr(void)
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 	{
-		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
-//		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage,0.02);
+//		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 	{
@@ -225,6 +225,7 @@ void PIT0_isr(void)
 	}
 
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
+	m_Ultrasonic.Update(8);
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
@@ -334,7 +335,7 @@ Issues        : NONE
 *******************************************************************************/
 void eDMA_Channel2_Isr(void)
 {
-	m_Ultrasonic.Update(0, 8);
+//	m_Ultrasonic.Update(0, 8);
 	DMA_0.INT.B.INT2 = 1;
 }
 
@@ -350,7 +351,7 @@ Issues        : NONE
 *******************************************************************************/
 void eDMA_Channel18_Isr(void)
 {
-	m_Ultrasonic.Update(1, 8);
+//	m_Ultrasonic.Update(1, 8);
 	DMA_0.INT.B.INT18 = 1;
 }
 #ifdef __cplusplus
