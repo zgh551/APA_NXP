@@ -100,14 +100,14 @@ Planning::Planning() {
 	/**********************************************************************/
 	//边界内margin为正值
 	_outer_margin_move      =  0.0f;
-	_inside_margin_boundary =  0.2f;
-	_front_margin_boundary  =  0.2f;
-	_rear_margin_boundary   =  0.2f;
+	_inside_margin_boundary =  0.15f;
+	_front_margin_boundary  =  0.15f;
+	_rear_margin_boundary   =  0.15f;
 
 	_parking_status = 0;
 
 	planning_braking_acc_      = PLANNING_BRAKING;
-	planning_braking_acc_r_    = fabs(1/planning_braking_acc_);
+	planning_braking_acc_r_    = fabs(1/planning_braking_acc_/0.6f);
 	planning_braking_aeb_      = EMERGENCY_BRAKING;
 	turnning_feedforward_time_ = TURN_FEEDFORWARD_TIME;
 	acc_disable_time_          = ACC_DISABLE_TIME;
@@ -272,17 +272,17 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 		{
 			if((s->getPosition() - stop_point).Length() < margin)
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.Deceleration  = planning_braking_aeb_;
-				_control_command.Acceleration  = planning_braking_aeb_;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
+				_control_command.Acceleration                       = planning_braking_aeb_;
 				return SUCCESS;
 			}
 			else if(((s->getPosition() - stop_point).Length() - margin) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
 				_control_command.Acceleration                       = planning_braking_acc_;
 				return SUCCESS;
 			}
@@ -295,8 +295,9 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 		{
 			if( (s->getPosition() - stop_point).Length() < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
 				_control_command.Acceleration                       = planning_braking_acc_;
 				return SUCCESS;
 			}
@@ -316,18 +317,18 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 		{
 			if(margin < (s->getPosition() - stop_point).Length())
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
-				_control_command.Deceleration  = planning_braking_aeb_;
-				_control_command.Acceleration  = planning_braking_aeb_;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
+				_control_command.Acceleration                       = planning_braking_aeb_;
 				return SUCCESS;
 			}
 			if((margin - (s->getPosition() - stop_point).Length()) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
 			{
-				_control_command.Acceleration                       = planning_braking_acc_;
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
+				_control_command.Acceleration                       = planning_braking_acc_;
 				return SUCCESS;
 			}
 			else
@@ -337,10 +338,9 @@ int8_t Planning::ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_po
 		}
 		else
 		{
-			_control_command.ControlEnable.B.VelocityEnable     = 0;
-			_control_command.ControlEnable.B.DecelerationEnable = 1;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.Deceleration  = planning_braking_aeb_;
+			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
 			_control_command.Acceleration  = planning_braking_aeb_;
 			return SUCCESS;
 		}
@@ -476,6 +476,7 @@ int8_t Planning::ForecastYawParking(int8_t state,float radius,float target_yaw,V
 		}
 		else
 		{
+			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
 			_control_command.Acceleration  = -circle_length * 0.5;
@@ -526,6 +527,7 @@ int8_t Planning::ForecastYawParking(int8_t state,float radius,float target_yaw,V
 		}
 		else
 		{
+			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
 			_control_command.Acceleration  = -circle_length * 0.5;
@@ -544,10 +546,10 @@ int8_t Planning::ForecastYawParking(int8_t state,float radius,float target_yaw,V
 		return FAIL;
 	}
 }
-
+/**************************************************************************************************/
 int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 {
-	_boundary_collision_body.Center = s->getPosition();
+	_boundary_collision_body.Center      = s->getPosition();
 	_boundary_collision_body.AttitudeYaw = s->getYaw();
 	_boundary_collision_body.EdgePoint();
 
@@ -557,10 +559,9 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 			(_boundary_collision_body.getRearRight().getY() < InsideVirtualBoundary) )
 		{
 			_control_command.Acceleration  = planning_braking_aeb_;
-//			_control_command.Deceleration  = planning_braking_aeb_;
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-//			_control_command.ControlEnable.B.DecelerationEnable = 1;
 			return SUCCESS;
 		}
 		else
@@ -571,6 +572,7 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 			{
 				_control_command.Acceleration                       = planning_braking_acc_;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
+				_control_command.Velocity                           = 0;
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				return SUCCESS;
 			}
@@ -586,10 +588,9 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) )
 		{
 			_control_command.Acceleration  = planning_braking_aeb_;
-			_control_command.Deceleration  = planning_braking_aeb_;
-			_control_command.ControlEnable.B.VelocityEnable = 0;
+			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.ControlEnable.B.DecelerationEnable = 1;
 			return SUCCESS;
 		}
 		else
@@ -599,6 +600,7 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 			{
 				_control_command.Acceleration                       = planning_braking_acc_;
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 1;
 				return SUCCESS;
 			}
@@ -614,6 +616,259 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 	}
 }
 
+int8_t Planning::BoundaryCollisionVelocity(int8_t motion,VehicleState *s)
+{
+ 	float temp_d1,temp_d2,temp_min;
+	_boundary_collision_body.Center      = s->getPosition();
+	_boundary_collision_body.AttitudeYaw = s->getYaw();
+	_boundary_collision_body.EdgePoint();
+
+	if(-1 == motion)
+	{
+		if( (_boundary_collision_body.getRearLeft().getX()  < RearVirtualBoundary  ) ||
+			(_boundary_collision_body.getRearRight().getY() < InsideVirtualBoundary) )
+		{
+			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.ControlEnable.B.AccelerationEnable = 1;
+			// TODO 需要考虑加速度如何给定合适
+			_control_command.Acceleration                       = -0.5;
+			if(0 == s->LinearVelocity)
+			{
+				return SUCCESS;
+			}
+			else
+			{
+				return FAIL;
+			}
+		}
+		else
+		{
+			// TODO 后期可以优化到弧线判定
+			temp_d1 = _boundary_collision_body.getRearLeft().getX()  - RearVirtualBoundary;
+			temp_d2	= _boundary_collision_body.getRearRight().getY() - InsideVirtualBoundary;
+			temp_min = temp_d1 < temp_d2 ? temp_d1 : temp_d2;
+
+			_control_command.ControlEnable.B.VelocityEnable     = 1;
+			_control_command.ControlEnable.B.AccelerationEnable = 1;
+			if(temp_min > position_max_)
+			{
+				_control_command.Velocity = STRAIGHT_VELOCITY;
+				return FAIL;
+			}
+			else if(temp_min > position_min_)
+			{
+				_control_command.Velocity = CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(temp_min - position_min_)/(position_max_ - position_min_);
+				return FAIL;
+			}
+			else if(temp_min > 0.03)
+			{
+				_control_command.Velocity = temp_min * CURVE_VELOCITY / position_min_ ;
+				return FAIL;
+			}
+			else
+			{
+				_control_command.Velocity = 0;
+				if(0 == s->LinearVelocity)
+				{
+					return SUCCESS;
+				}
+				else
+				{
+					return FAIL;
+				}
+			}
+		}
+	}
+	else if(1 == motion)
+	{
+		if(( _boundary_collision_body.getFrontRight().getX() > FrontVirtualBoundary ) ||
+		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) )
+		{
+			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.ControlEnable.B.AccelerationEnable = 1;
+			// TODO 需要考虑加速度如何给定合适
+			_control_command.Acceleration                       = -0.5;
+			if(0 == s->LinearVelocity)
+			{
+				return SUCCESS;
+			}
+			else
+			{
+				return FAIL;
+			}
+		}
+		else
+		{
+			// TODO 后期可以优化到弧线判定
+			temp_d1 = -(_boundary_collision_body.getFrontRight().getX() - FrontVirtualBoundary);
+			temp_d2	=   _boundary_collision_body.getFrontRight().getY() - InsideVirtualBoundary;
+			temp_min = temp_d1 < temp_d2 ? temp_d1 : temp_d2;
+
+			_control_command.ControlEnable.B.VelocityEnable     = 1;
+			_control_command.ControlEnable.B.AccelerationEnable = 1;
+			if(temp_min > position_max_)
+			{
+				_control_command.Velocity = STRAIGHT_VELOCITY;
+				return FAIL;
+			}
+			else if(temp_min > position_min_)
+			{
+				_control_command.Velocity = CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(temp_min - position_min_)/(position_max_ - position_min_);
+				return FAIL;
+			}
+			else if(temp_min > 0.03)
+			{
+				_control_command.Velocity = temp_min * CURVE_VELOCITY / position_min_ ;
+				return FAIL;
+			}
+			else
+			{
+				_control_command.Velocity = 0;
+				if(0 == s->LinearVelocity)
+				{
+					return SUCCESS;
+				}
+				else
+				{
+					return FAIL;
+				}
+			}
+		}
+	}
+	else
+	{
+		return FAIL;
+	}
+}
+
+
+int8_t Planning::BoundaryCollisionCircle(int8_t motion,VehicleState *s)
+{
+	float theta1,theta2,theta_min;
+	_boundary_collision_body.Center      = s->getPosition();
+	_boundary_collision_body.AttitudeYaw = s->getYaw();
+
+
+	if(-1 == motion)
+	{
+		_boundary_collision_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
+		_boundary_collision_body.EdgePoint();
+
+		theta1 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearRight(), _parking_inside_rear_point);
+		theta2 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearLeft() , _parking_inside_rear_point);
+		theta_min = theta1 < theta2 ? theta1 : theta2;
+
+		if( (_boundary_collision_body.getRearLeft().getX()  < RearVirtualBoundary  ) ||
+			(_boundary_collision_body.getRearRight().getY() < InsideVirtualBoundary) )
+		{
+			_control_command.Acceleration  = planning_braking_aeb_;
+			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
+			_control_command.ControlEnable.B.AccelerationEnable = 1;
+			return SUCCESS;
+		}
+		else
+		{
+			// TODO 后期可以优化到弧线判定
+			if( ( theta_min * MIN_LEFT_TURN_RADIUS ) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_))
+			{
+				_control_command.Acceleration                       = planning_braking_acc_;
+				_control_command.ControlEnable.B.AccelerationEnable = 1;
+				_control_command.Velocity                           = 0;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				return SUCCESS;
+			}
+			else
+			{
+				return FAIL;
+			}
+		}
+	}
+	else if(1 == motion)
+	{
+		_boundary_collision_body.RotationCenter(-MIN_RIGHT_TURN_RADIUS);
+		_boundary_collision_body.EdgePoint();
+
+		theta_min = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getFrontRight(), _parking_inside_front_point);
+
+		if(( _boundary_collision_body.getFrontRight().getX() > FrontVirtualBoundary ) ||
+		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) )
+		{
+			_control_command.Acceleration  = planning_braking_aeb_;
+			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
+			_control_command.ControlEnable.B.AccelerationEnable = 1;
+			return SUCCESS;
+		}
+		else
+		{
+			// TODO 后期可以优化到弧线判定
+			if( (theta_min * MIN_RIGHT_TURN_RADIUS) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_ ) )
+			{
+				_control_command.Acceleration                       = planning_braking_acc_;
+				_control_command.ControlEnable.B.VelocityEnable     = 0;
+				_control_command.Velocity                           = 0;
+				_control_command.ControlEnable.B.AccelerationEnable = 1;
+				return SUCCESS;
+			}
+			else
+			{
+				return FAIL;
+			}
+		}
+	}
+	else
+	{
+		return FAIL;
+	}
+}
+
+int8_t Planning::UltrasonicCollision(int8_t motion,VehicleState *s,Ultrasonic *u)
+{
+	uint8_t i;
+	if(1 == motion)
+	{
+		for(i = 0;i < 4;i++)
+		{
+			if(u->UltrasonicPacket[i].Distance1 != 0.0f)
+			{
+				if( (u->UltrasonicPacket[i].Distance1 < 0.4) || (u->UltrasonicPacket[i].status == 16) )
+				{
+					_control_command.Acceleration  = planning_braking_aeb_;
+					_control_command.ControlEnable.B.VelocityEnable     = 0;
+					_control_command.Velocity                           = 0;
+					_control_command.ControlEnable.B.AccelerationEnable = 1;
+					return SUCCESS;
+				}
+			}
+		}
+		return FAIL;
+	}
+	else if(-1 == motion)
+	{
+		for(i = 4;i < 8;i++)
+		{
+			if(u->UltrasonicPacket[i].Distance1 != 0.0f)
+			{
+				if( (u->UltrasonicPacket[i].Distance1 < 0.4) || (u->UltrasonicPacket[i].status == 16))
+				{
+					_control_command.Acceleration  = planning_braking_aeb_;
+					_control_command.ControlEnable.B.VelocityEnable     = 0;
+					_control_command.Velocity                           = 0;
+					_control_command.ControlEnable.B.AccelerationEnable = 1;
+					return SUCCESS;
+				}
+			}
+		}
+		return FAIL;
+	}
+	else
+	{
+		return FAIL;
+	}
+}
+
+/**************************************************************************************************/
 float Planning::VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius)
 {
 	float distance;
@@ -753,6 +1008,32 @@ int8_t Planning::LineTurnningPointDetermination(VehicleState *s,Turn turn_point,
 		_control_command.SteeringAngle = turn_point.SteeringAngle;
 		_control_command.SteeringAngleRate = s->LinearRate * RK;
 		return SUCCESS;
+	}
+}
+/**************************************************************************************************/
+int8_t Planning::WaitVehicleStartMove(uint8_t d,MessageManager *msg)
+{
+	if(d == msg->WheelSpeedDirection)
+	{
+		_control_command.ControlEnable.B.AccelerationEnable = 1;
+		_control_command.ControlEnable.B.VelocityEnable     = 1;
+		return SUCCESS;
+	}
+	else
+	{
+		return FAIL;
+	}
+
+	_acc_disable_cnt++;
+	if(_acc_disable_cnt > acc_disable_time_)
+	{
+		_control_command.ControlEnable.B.AccelerationEnable = 1;
+		_control_command.ControlEnable.B.VelocityEnable     = 1;
+		return SUCCESS;
+	}
+	else
+	{
+		return FAIL;
 	}
 }
 /**************************************************************************************************/

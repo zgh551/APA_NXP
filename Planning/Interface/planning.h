@@ -36,20 +36,24 @@
 #define PARKING_FINISH        ( 1   ) // 泊车完成的状态标志
 //
 #define STEERING_RATE         ( 300 ) // 转向角速度
-#define EMERGENCY_BRAKING	  (-1   ) // 紧急制动的减速度
-#define PLANNING_BRAKING	  (-1  ) // 规划减速度
+#define EMERGENCY_BRAKING	  (-2   ) // 紧急制动的减速度
+#define PLANNING_BRAKING	  (-1  )  // 规划减速度
 #define PLANNING_BRAKING_R	  ( 0.1 ) // 规划减速度的倒数
 #define STRAIGHT_VELOCITY	  ( 0.5 ) // 直线段的速度
 #define CURVE_VELOCITY	      ( 0.3 ) // 曲线段的速度
 #define TURN_FEEDFORWARD_TIME ( 0.1 ) // 转向角前向反馈的补偿时间
-#define PARKING_CENTER_MARGIN ( 0.1 ) // 泊车中心点余量
+#define PARKING_CENTER_MARGIN ( 0.05 ) // 泊车中心点余量
 #define ACC_DISABLE_TIME      ( 50  ) // ACC失效时间
 /**************************速度控制******************************/
 #define POSITION_A            ( 0.4 ) // 速度控制下限点
 #define POSITION_B            ( 0.8 ) // 速度控制上限点
 /**************************泊车余量******************************/
-#define PARKING_MARGIN        ( 0.1 ) // 停车余量
-
+#define PARKING_MARGIN        ( 0.2 ) // 停车余量
+/********************是否使用超声波避障使能按钮***********************/
+#define ULTRASONIC_COLLISION_ENABLE  ( 1 ) // 超声避障使能按钮
+/************************超声发送格式按钮*************************/
+#define ULTRASONIC_PACKET  ( 0 ) // 超声包格式
+/*************************END********************************/
 //extern GeometricTrack    m_GeometricTrack;
 //extern ChangAnController m_ChangAnController;
 #define K  0.0016   //  0.8/500
@@ -102,12 +106,20 @@ public:
 	/******************** 边界障碍物碰撞判定 *****************************************************************/
 	// 边界障碍物停车
 	int8_t BoundaryCollision(int8_t motion,VehicleState *s);
+	// 通过速度控制车辆在边界处停止
+	int8_t BoundaryCollisionVelocity(int8_t motion,VehicleState *s);
+	// 通过弧线距离判定停止
+	int8_t BoundaryCollisionCircle(int8_t motion,VehicleState *s);
+	// 基于超声波的避障停车
+	int8_t UltrasonicCollision(int8_t motion,VehicleState *s,Ultrasonic *u);
 
 	/********************速度规划************************************************************************/
 	// 弧线上的速度规划 速度根据目标距离重规划
 	float VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius);
 	// 直线上的速度规划
 	float VelocityPlanningLine(VehicleState *s,Vector2d stop_point);
+	/***************************************************************************************************/
+	int8_t WaitVehicleStartMove(uint8_t d,MessageManager *msg);
 	/***************************************************************************************************/
 	float getMinParkingLength();
 	void  setMinParkingLength(float value);
@@ -205,9 +217,11 @@ protected:
 	Vector2d _parking_center_point;
 	Vector2d _parking_outer_front_point;
 	Vector2d _parking_outer_rear_point;
-
+	Vector2d _parking_inside_rear_point;
+	Vector2d _parking_inside_front_point;//库位边角点
 	ControlCommand _control_command;
 //	Terminal _vertical_planning_terminal;
+	uint8_t _acc_disable_cnt;
 	/***************************************************/
 	float planning_braking_acc_;
 	float planning_braking_acc_r_;
