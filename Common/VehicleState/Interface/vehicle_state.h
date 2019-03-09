@@ -55,11 +55,15 @@ public:
 	void  setLinearRate(float value);
 	Property<VehicleState,float,READ_WRITE> LinearRate;
 
+	float getTurnningRadius();
+	void  setTurnningRadius(float value);
+	Property<VehicleState,float,READ_WRITE> TurnningRadius;
 protected:
 	Vector2d _position;
 	float    _yaw;
 	float _linear_velocity;
 	float _linear_rate;
+	float _turnning_radius;
 };
 
 #endif /* VEHICLESTATE_VEHICLESTATE_H_ */
