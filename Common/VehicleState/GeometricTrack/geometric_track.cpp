@@ -18,6 +18,7 @@
 VehilceConfig m_GeometricVehicleConfig;
 
 GeometricTrack::GeometricTrack() {
+
 	Init();
 }
 
@@ -151,6 +152,16 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 
+	if(_delta_rear_right_pulse == _delta_rear_left_pulse)
+	{
+		_turnning_radius = 0;
+	}
+	else
+	{
+		_turnning_radius = WIDTH * 0.5 * (_delta_rear_left_pulse + _delta_rear_right_pulse)/(_delta_rear_right_pulse - _delta_rear_left_pulse);
+	}
+
+
 	if(msg->SteeringAngle != 0)
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
@@ -171,3 +182,5 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	_last_rear_right_pulse = msg->WheelPulseRearRight;
 	_last_yaw = Yaw;
 }
+/**************************************************************************************/
+

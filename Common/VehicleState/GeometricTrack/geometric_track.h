@@ -42,6 +42,7 @@ public:
 	void VelocityUpdate(MessageManager *msg,float dt) override;
 	void PulseUpdate(MessageManager *msg) override;
 
+
 private:
 	float _last_yaw;
 
