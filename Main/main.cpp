@@ -141,6 +141,10 @@ int main()
 			{
 
 			}
+			else if(0xB0 == m_Terminal_CA.Command)//停止检车位
+			{
+
+			}
 			else//车辆
 			{
 
@@ -165,7 +169,14 @@ int main()
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 3)
 				{
-					m_Terminal_CA.Push(&m_ParallelPlanning);
+					if(0x10 == m_Terminal_CA.Command)
+					{
+						m_Terminal_CA.Push(&m_ParallelPlanning);
+					}
+					else if(0x20 == m_Terminal_CA.Command)
+					{
+						m_Terminal_CA.Push(&m_VerticalPlanning);
+					}
 				}
 			}
 			// 终端应答信号
@@ -174,10 +185,6 @@ int main()
 				m_Terminal_CA.Ack();
 				m_Terminal_CA.AckValid = 0;
 			}
-//			m_ChangAnMessage.WheelSpeedDirection = 1;
-//			m_ChangAnMessage.WheelSpeedRearLeft = 5;
-//			m_ChangAnMessage.WheelSpeedRearRight = 5;
-//			m_ChangAnMessage.SteeringAngle = -430;
 		}
 }
 
