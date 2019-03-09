@@ -107,7 +107,7 @@ public:
 	// 边界障碍物停车
 	int8_t BoundaryCollision(int8_t motion,VehicleState *s);
 	// 通过速度控制车辆在边界处停止
-	int8_t BoundaryCollisionVelocity(int8_t motion,VehicleState *s);
+	int8_t BoundaryCollisionVelocity(int8_t motion,float target,VehicleState *s);
 	// 通过弧线距离判定停止
 	int8_t BoundaryCollisionCircle(int8_t motion,VehicleState *s);
 	// 基于超声波的避障停车

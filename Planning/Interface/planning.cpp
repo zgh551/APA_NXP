@@ -479,7 +479,7 @@ int8_t Planning::ForecastYawParking(int8_t state,float radius,float target_yaw,V
 			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.Acceleration  = -circle_length * 0.5;
+			_control_command.Acceleration  = -0.5;//-circle_length * 0.5;
 			if(0 == s->LinearVelocity)
 			{
 				return SUCCESS;
@@ -530,7 +530,7 @@ int8_t Planning::ForecastYawParking(int8_t state,float radius,float target_yaw,V
 			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			_control_command.Acceleration  = -circle_length * 0.5;
+			_control_command.Acceleration  = -0.5;//-circle_length * 0.5;
 			if(0 == s->LinearVelocity)
 			{
 				return SUCCESS;
@@ -616,22 +616,32 @@ int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 	}
 }
 
-int8_t Planning::BoundaryCollisionVelocity(int8_t motion,VehicleState *s)
+int8_t Planning::BoundaryCollisionVelocity(int8_t motion,float target,VehicleState *s)
 {
- 	float temp_d1,temp_d2,temp_min;
+ 	float theta1,theta2,theta3,theta_min;
+ 	float circle_length;
 	_boundary_collision_body.Center      = s->getPosition();
 	_boundary_collision_body.AttitudeYaw = s->getYaw();
-	_boundary_collision_body.EdgePoint();
 
 	if(-1 == motion)
 	{
-		if( (_boundary_collision_body.getRearLeft().getX()  < RearVirtualBoundary  ) ||
-			(_boundary_collision_body.getRearRight().getY() < InsideVirtualBoundary) )
+		_boundary_collision_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
+		_boundary_collision_body.EdgePoint();
+
+		if( (_boundary_collision_body.getRearLeft().getX()  <= RearVirtualBoundary  ) ||
+			(_boundary_collision_body.getRearRight().getY() <= InsideVirtualBoundary) ||
+			(s->getYaw() <= (target + 0.02)))
 		{
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
 			// TODO 需要考虑加速度如何给定合适
-			_control_command.Acceleration                       = -0.5;
+			_control_command.Acceleration                       = planning_braking_aeb_;
+			if(s->getYaw() <= (target + 0.02))
+			{
+				_control_command.SteeringAngle     = 0;
+				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+			}
 			if(0 == s->LinearVelocity)
 			{
 				return SUCCESS;
@@ -643,26 +653,30 @@ int8_t Planning::BoundaryCollisionVelocity(int8_t motion,VehicleState *s)
 		}
 		else
 		{
-			// TODO 后期可以优化到弧线判定
-			temp_d1 = _boundary_collision_body.getRearLeft().getX()  - RearVirtualBoundary;
-			temp_d2	= _boundary_collision_body.getRearRight().getY() - InsideVirtualBoundary;
-			temp_min = temp_d1 < temp_d2 ? temp_d1 : temp_d2;
-
 			_control_command.ControlEnable.B.VelocityEnable     = 1;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			if(temp_min > position_max_)
+
+			theta1 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearRight(), _parking_inside_rear_point);
+			theta2 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearLeft() , _parking_inside_rear_point);
+			theta3 = s->getYaw() - target ;
+			theta_min = theta1 < theta2    ? theta1 : theta2;
+			theta_min = theta3 < theta_min ? theta3 : theta_min;
+
+			circle_length = MIN_LEFT_TURN_RADIUS * theta_min;
+
+			if(circle_length > position_max_)
 			{
 				_control_command.Velocity = STRAIGHT_VELOCITY;
 				return FAIL;
 			}
-			else if(temp_min > position_min_)
+			else if(circle_length > position_min_)
 			{
-				_control_command.Velocity = CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(temp_min - position_min_)/(position_max_ - position_min_);
+				_control_command.Velocity = CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(circle_length - position_min_)/(position_max_ - position_min_);
 				return FAIL;
 			}
-			else if(temp_min > 0.03)
+			else if(circle_length > 0.05)
 			{
-				_control_command.Velocity = temp_min * CURVE_VELOCITY / position_min_ ;
+				_control_command.Velocity = circle_length * CURVE_VELOCITY / position_min_ ;
 				return FAIL;
 			}
 			else
@@ -681,13 +695,23 @@ int8_t Planning::BoundaryCollisionVelocity(int8_t motion,VehicleState *s)
 	}
 	else if(1 == motion)
 	{
+		_boundary_collision_body.RotationCenter(-MIN_RIGHT_TURN_RADIUS);
+		_boundary_collision_body.EdgePoint();
+
 		if(( _boundary_collision_body.getFrontRight().getX() > FrontVirtualBoundary ) ||
-		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) )
+		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) ||
+		   (s->getYaw() <= (target + 0.02)))
 		{
 			_control_command.ControlEnable.B.VelocityEnable     = 0;
+			_control_command.Velocity                           = 0;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
 			// TODO 需要考虑加速度如何给定合适
-			_control_command.Acceleration                       = -0.5;
+			_control_command.Acceleration                       = planning_braking_aeb_;
+			if(s->getYaw() <= (target + 0.02))
+			{
+				_control_command.SteeringAngle     = 0;
+				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+			}
 			if(0 == s->LinearVelocity)
 			{
 				return SUCCESS;
@@ -699,26 +723,30 @@ int8_t Planning::BoundaryCollisionVelocity(int8_t motion,VehicleState *s)
 		}
 		else
 		{
-			// TODO 后期可以优化到弧线判定
-			temp_d1 = -(_boundary_collision_body.getFrontRight().getX() - FrontVirtualBoundary);
-			temp_d2	=   _boundary_collision_body.getFrontRight().getY() - InsideVirtualBoundary;
-			temp_min = temp_d1 < temp_d2 ? temp_d1 : temp_d2;
-
 			_control_command.ControlEnable.B.VelocityEnable     = 1;
 			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			if(temp_min > position_max_)
+
+			theta1 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getFrontRight(), _parking_inside_front_point);
+			theta2 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getFrontLeft() , _parking_inside_front_point);
+			theta3 = s->getYaw() - target ;
+			theta_min = theta1 < theta2    ? theta1 : theta2;
+			theta_min = theta3 < theta_min ? theta3 : theta_min;
+
+			circle_length = MIN_RIGHT_TURN_RADIUS * theta_min;
+
+			if(circle_length > position_max_)
 			{
 				_control_command.Velocity = STRAIGHT_VELOCITY;
 				return FAIL;
 			}
-			else if(temp_min > position_min_)
+			else if(circle_length > position_min_)
 			{
-				_control_command.Velocity = CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(temp_min - position_min_)/(position_max_ - position_min_);
+				_control_command.Velocity = CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(circle_length - position_min_)/(position_max_ - position_min_);
 				return FAIL;
 			}
-			else if(temp_min > 0.03)
+			else if(circle_length > 0.05)
 			{
-				_control_command.Velocity = temp_min * CURVE_VELOCITY / position_min_ ;
+				_control_command.Velocity = circle_length * CURVE_VELOCITY / position_min_ ;
 				return FAIL;
 			}
 			else
@@ -741,13 +769,11 @@ int8_t Planning::BoundaryCollisionVelocity(int8_t motion,VehicleState *s)
 	}
 }
 
-
 int8_t Planning::BoundaryCollisionCircle(int8_t motion,VehicleState *s)
 {
 	float theta1,theta2,theta_min;
 	_boundary_collision_body.Center      = s->getPosition();
 	_boundary_collision_body.AttitudeYaw = s->getYaw();
-
 
 	if(-1 == motion)
 	{
