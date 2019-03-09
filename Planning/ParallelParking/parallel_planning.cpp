@@ -309,11 +309,15 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 		case WaitArrive:
 			_control_command.SteeringAngleRate = s->LinearRate * RK;
 			// TODO 判定条件需要修改
-			if(SUCCESS == ForecastYawParking(-1,_circle_left.Radius,_enter_parking.getAttitudeYaw(),s))
-			{
-				_curve_state = WaitStill;
-			}
-			else if(SUCCESS == BoundaryCollisionCircle(-1,s))//BoundaryCollision
+//			if(SUCCESS == ForecastYawParking(-1,_circle_left.Radius,_enter_parking.getAttitudeYaw(),s))
+//			{
+//				_curve_state = WaitStill;
+//			}
+//			else if(SUCCESS == BoundaryCollisionCircle(-1,s))//BoundaryCollision
+//			{
+//				_curve_state = WaitStill;
+//			}
+			if( SUCCESS == BoundaryCollisionVelocity(-1,_enter_parking.getAttitudeYaw(),s))
 			{
 				_curve_state = WaitStill;
 			}
@@ -322,11 +326,11 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			{
 				_curve_state = WaitStill;
 			}
-			if( s->Yaw < 0.02f)
-			{
-				_control_command.SteeringAngle     = 0;
-				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
-			}
+//			if( s->Yaw < 0.02f)
+//			{
+//				_control_command.SteeringAngle     = 0;
+//				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+//			}
 			#endif
 			break;
 
@@ -396,14 +400,18 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case RightFrontTrialWaitArrive:
-			if( SUCCESS == ForecastYawParking(-1,MIN_RIGHT_TURN_RADIUS,0,s))
+			if( SUCCESS == BoundaryCollisionVelocity(1,0,s))
 			{
 				_right_front_state = RightFrontTrialWaitStill;
 			}
-			else if(SUCCESS == BoundaryCollisionCircle(1,s))//BoundaryCollision
-			{
-				_right_front_state = RightFrontTrialWaitStill;
-			}
+//			if( SUCCESS == ForecastYawParking(-1,MIN_RIGHT_TURN_RADIUS,0,s))
+//			{
+//				_right_front_state = RightFrontTrialWaitStill;
+//			}
+//			else if(SUCCESS == BoundaryCollisionCircle(1,s))//BoundaryCollision
+//			{
+//				_right_front_state = RightFrontTrialWaitStill;
+//			}
 #if ULTRASONIC_COLLISION_ENABLE == 1
 			else if(SUCCESS == UltrasonicCollision(1,s,u))
 			{
@@ -411,11 +419,11 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			}
 #endif
 			else{}
-			if( s->Yaw < 0.02f)
-			{
-				_control_command.SteeringAngle     = 0;
-				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
-			}
+//			if( s->Yaw < 0.02f)
+//			{
+//				_control_command.SteeringAngle     = 0;
+//				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
+//			}
 			break;
 
 		case RightFrontTrialWaitStill:
@@ -485,14 +493,18 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			break;
 
 		case LeftRearTrialWaitArrive:
-			if( SUCCESS == ForecastYawParking(-1,MIN_LEFT_TURN_RADIUS,0,s))
+			if( SUCCESS == BoundaryCollisionVelocity(-1,0,s))
 			{
 				_left_rear_state = LeftRearTrialWaitStill;
 			}
-			else if(SUCCESS == BoundaryCollisionCircle(-1,s))//BoundaryCollision
-			{
-				_left_rear_state = LeftRearTrialWaitStill;
-			}
+//			if( SUCCESS == ForecastYawParking(-1,MIN_LEFT_TURN_RADIUS,0,s))
+//			{
+//				_left_rear_state = LeftRearTrialWaitStill;
+//			}
+//			else if(SUCCESS == BoundaryCollisionCircle(-1,s))//BoundaryCollision
+//			{
+//				_left_rear_state = LeftRearTrialWaitStill;
+//			}
 #if ULTRASONIC_COLLISION_ENABLE == 1
 			else if(SUCCESS == UltrasonicCollision(-1,s,u))
 			{
@@ -500,11 +512,6 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			}
 #endif
 			else{}
-			if( s->Yaw < 0.02f)
-			{
-				_control_command.SteeringAngle     = 0;
-				_control_command.SteeringAngleRate = MAX_STEERING_ANGLE_RATE;
-			}
 			break;
 
 		case LeftRearTrialWaitStill:
