@@ -296,8 +296,8 @@ void Terminal::Push(VehicleState *msg)
 	m_CAN_Packet.data[3] = temp_int.b[0];
 	m_CAN_Packet.data[4] = ((int16_t) (msg->Yaw * 100)) & 0xff;
 	m_CAN_Packet.data[5] = (((int16_t)(msg->Yaw * 100)) >> 8) & 0xff;
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	m_CAN_Packet.data[6] = ((int16_t) (msg->TurnningRadius * 100)) & 0xff;
+	m_CAN_Packet.data[7] = (((int16_t)(msg->TurnningRadius * 100)) >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
