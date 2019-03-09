@@ -305,6 +305,7 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			status = CircleTrajectoryMachine(ctl,msg,s,u);
 			if(PARKING_FINISH == status)
 			{
+				ParkingStatus = 3;
 				_vertical_control_state = VerticalWaitPlanningFinish;
 			}
 			break;
