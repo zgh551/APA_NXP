@@ -268,3 +268,22 @@ void AlgebraicGeometry::Tanget_CC_Margin(Circle cl,Vector2d p,float margin,Circl
 //
 
 }
+
+
+// 两圆相交求交点
+void AlgebraicGeometry::Intersection_CC(Circle c1,Circle c2,Vector2d *p1,Vector2d *p2)
+{
+	float A,B,C;
+	float theta1,theta2;
+	A = c1.Center.getX() - c2.Center.getX();
+	B = c1.Center.getY() - c2.Center.getY();
+	C = 0.5*(c2.Radius*c2.Radius - c1.Radius*c1.Radius - A*A - B*B)/c1.Radius;
+
+	_solve_equation.TrigonometricEquation(A, B, C, &theta1, &theta2);
+
+	p1->X = c1.Center.getX() + c1.Radius * cosf(theta1);
+	p1->Y = c1.Center.getY() + c1.Radius * sinf(theta1);
+
+	p2->X = c1.Center.getX() + c1.Radius * cosf(theta2);
+	p2->Y = c1.Center.getY() + c1.Radius * sinf(theta2);
+}

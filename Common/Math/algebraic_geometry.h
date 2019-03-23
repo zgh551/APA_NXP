@@ -14,6 +14,7 @@
 #include "derivative.h"
 #include "property.h"
 #include "vector_2d.h"
+#include "solve_equation.h"
 #include "math.h"
 #include "chang_an_configure.h"
 #include "common_configure.h"
@@ -68,7 +69,12 @@ public:
 	// 已知库边沿，左圆，求与左圆相切且留有余量的圆
 	void Tanget_CC_Margin(Circle cl,Vector2d p,float margin,Circle *cr,Line *t_l);
 
+	// 两圆相交求交点
+	void Intersection_CC(Circle c1,Circle c2,Vector2d *p1,Vector2d *p2);
+
+
 private:
+	SolveEquation _solve_equation;
 
 };
 
