@@ -367,7 +367,7 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case VerticalInitPointMove:
-			if((msg->Gear > 0) && (msg->Gear < 7) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if((Drive == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
@@ -415,7 +415,7 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case VerticalWaitVehicleStop:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_init_point_adjust_state = VerticalInitPointFrontAdjust;
 				return SUCCESS;
@@ -446,7 +446,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 			break;
 
 		case VerticalVehicleMove:
-			if((0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
@@ -574,7 +574,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 			break;
 
 		case VerticalWaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_control_command.Gear    = Parking;
 				_circle_trajectory_state = VerticalWaitParkingGear;
@@ -582,7 +582,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 			break;
 
 		case VerticalWaitParkingGear:
-			if(msg->Gear == 0x0A)
+			if(Parking == msg->Gear)
 			{
 				ctl->Stop();
 				_circle_trajectory_state = VerticalGearShift;
@@ -612,7 +612,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case VerticalCurveVehicleMove:
-			if( (0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if( (Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 				_control_command.Velocity = CURVE_VELOCITY;
 				_control_command.ControlEnable.B.VelocityEnable = 1;
@@ -709,7 +709,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case VerticalCurveWaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_curve_trajectory_state = VerticalCurveGearShift;
 				return PARKING_FINISH;
@@ -781,7 +781,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //			break;
 //
 //		case VerticalTrialStopWaitStill:
-//			if(2 == msg->WheelSpeedDirection)
+//			if(StandStill == msg->WheelSpeedDirection)
 //			{
 //				_trial_trajectory_state = VerticalTrialDriveGearShift;
 //			}
@@ -841,7 +841,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //			break;
 //
 //		case VerticalTrialWaitStill:
-//			if(2 == msg->WheelSpeedDirection)
+//			if(StandStill == msg->WheelSpeedDirection)
 //			{
 //				_trial_trajectory_state = VerticalTrialRearGearShift;
 //				return SUCCESS;
@@ -872,7 +872,7 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 			break;
 
 		case EnterTrialVehicleMoveRear:
-			if((0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
@@ -928,7 +928,7 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 			break;
 
 		case EnterTrialStopWaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_enter_trial_state = EnterTrialRearGearShift;
 				return SUCCESS;
@@ -968,7 +968,7 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 			break;
 
 		case OuterTrialVehicleMoveDrive:
-			if((msg->Gear > 0) && (msg->Gear < 7) && (fabs(msg->SteeringAngle - _stop_point_steering_angle) < 0.5))
+			if((Drive == msg->Gear) && (fabs(msg->SteeringAngle - _stop_point_steering_angle) < 0.5))
 			{
 				_acc_disable_cnt = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
@@ -1024,7 +1024,7 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 			break;
 
 		case OuterTrialWaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_outer_trial_state = OuterTrialDriveGearShift;
 				return SUCCESS;

@@ -50,9 +50,7 @@
 /**************************泊车余量******************************/
 #define PARKING_MARGIN        ( 0.2 ) // 停车余量
 /********************是否使用超声波避障使能按钮***********************/
-#define ULTRASONIC_COLLISION_ENABLE  ( 1 ) // 超声避障使能按钮
-/************************超声发送格式按钮*************************/
-#define ULTRASONIC_PACKET  ( 0 ) // 超声包格式
+#define ULTRASONIC_COLLISION_ENABLE  ( 0 ) // 超声避障使能按钮
 /*************************END********************************/
 //extern GeometricTrack    m_GeometricTrack;
 //extern ChangAnController m_ChangAnController;
@@ -120,6 +118,8 @@ public:
 	float VelocityPlanningLine(VehicleState *s,Vector2d stop_point);
 	/***************************************************************************************************/
 	int8_t WaitVehicleStartMove(uint8_t d,MessageManager *msg);
+	/***************************************泊车完成后的车位调整************************************************************/
+	void ParkingCenterAdjustment(VehicleState *s,Ultrasonic *u);
 	/***************************************************************************************************/
 	float getMinParkingLength();
 	void  setMinParkingLength(float value);

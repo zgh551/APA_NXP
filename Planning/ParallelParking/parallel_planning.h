@@ -78,6 +78,7 @@ typedef enum _LeftRearTrialState
 
 typedef enum _ParkingCompleteState
 {
+	ParkingCenterAdjust,
 	GearShiftJudge,
 	FrontMoveAdjust,
 	RearMoveAdjust,

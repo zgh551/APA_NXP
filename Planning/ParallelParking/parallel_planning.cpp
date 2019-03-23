@@ -35,7 +35,7 @@ void ParallelPlanning::Init()
 	_curve_state  = GearShift;
 	_right_front_state = RightFrontTrialGearShift;
 	_left_rear_state   = LeftRearTrialGearShift;
-	_parking_complete_state = GearShiftJudge;
+	_parking_complete_state = ParkingCenterAdjust;
 
 	//
 	_trial_status = 0;
@@ -195,7 +195,7 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case InitPointMove:
-			if((msg->Gear > 0) && (msg->Gear < 7) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if( (msg->Gear == Drive) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 				_acc_disable_cnt = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
@@ -222,7 +222,7 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case WaitVehicleStop:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_adjust_state = InitPointFrontAdjust;
 				return SUCCESS;
@@ -254,7 +254,7 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case VehicleMove:
-			if( (0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if( (Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
 			{
 				_control_command.Velocity = STRAIGHT_VELOCITY;
 				_control_command.ControlEnable.B.VelocityEnable = 1;
@@ -335,7 +335,7 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case WaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_curve_state = GearShift;
 				if( s->Yaw < 0.02)
@@ -383,7 +383,7 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case RightFrontTrialVehicleMove:
-			if((msg->Gear > 0 && msg->Gear <7 ) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
+			if(( msg->Gear == Drive ) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
 			{
 				_acc_disable_cnt = 0;
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
@@ -427,7 +427,7 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case RightFrontTrialWaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_right_front_state = RightFrontTrialGearShift;
 				if( s->Yaw < 0.02)
@@ -475,7 +475,7 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			break;
 
 		case LeftRearTrialVehicleMove:
-			if((0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
+			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
 			{
 				_acc_disable_cnt = 0;
 				_control_command.ControlEnable.B.VelocityEnable     = 0;
@@ -515,7 +515,7 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			break;
 
 		case LeftRearTrialWaitStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_left_rear_state = LeftRearTrialGearShift;
 				if( s->Yaw < 0.02)
@@ -553,6 +553,12 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 	float temp_distance;
 	switch(_parking_complete_state)
 	{
+		case ParkingCenterAdjust:
+			ParkingCenterAdjustment(s,u);
+			m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
+			_parking_complete_state = GearShiftJudge;
+			break;
+
 		case GearShiftJudge:
 			if(s->getPosition().getX() < ( _parking_center_point.getX() - PARKING_CENTER_MARGIN ))
 			{
@@ -578,7 +584,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case FrontMoveAdjust:
-			if((msg->Gear > 0 && msg->Gear < 7) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
+			if((Drive == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
 			{
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 0;
@@ -588,7 +594,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case RearMoveAdjust:
-			if((0x09 == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
+			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 1))
 			{
 				_control_command.ControlEnable.B.AccelerationEnable = 0;
 				_control_command.ControlEnable.B.DecelerationEnable = 0;
@@ -612,7 +618,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case FrontWaitArrive:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_control_command.Gear   = Parking;
 				_parking_complete_state = WaitParkingGear;
@@ -637,7 +643,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case RearWaitArrive:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_control_command.Gear   = Parking;
 				_parking_complete_state = WaitParkingGear;
@@ -662,7 +668,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case ParkingStill:
-			if(2 == msg->WheelSpeedDirection)
+			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_control_command.Gear   = Parking;
 				_parking_complete_state = WaitParkingGear;
@@ -670,7 +676,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 			break;
 
 		case WaitParkingGear:
-			if(msg->Gear == 0x0A)
+			if( Parking == msg->Gear)
 			{
 				ctl->Stop();
 				_parking_complete_state = GearShiftJudge;
@@ -715,7 +721,7 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	{
 		enter_point.Y = -LEFT_EDGE_TO_CENTER + MinParkingWidth - inf->ParkingWidth + InsideMarginBoundary + OuterMarginMove;
 	}
-	_parking_center_point = Vector2d( (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.Y);
+	_parking_center_point = Vector2d( RearVirtualBoundary + (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.Y);
 
 	m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	// 根据车位长度，确定车辆最终的纵向位置
