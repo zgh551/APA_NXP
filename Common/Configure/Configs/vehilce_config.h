@@ -11,8 +11,15 @@
 #include "derivative.h"
 #include "property.h"
 #include "math.h"
+#include "vector_2d.h"
 #include "chang_an_configure.h"
 #include "common_configure.h"
+
+typedef struct _Location
+{
+	Vector2d Point;
+	float Angle;
+}Location;
 
 class VehilceConfig {
 public:
@@ -62,6 +69,9 @@ public:
 	float getRadiusRearRight();
 	void  setRadiusRearRight(float value);
 	Property<VehilceConfig,float,READ_WRITE> RadiusRearRight;
+
+	Location* getUltrasonicLocationArray();
+	Property<VehilceConfig,Location*,READ_ONLY> UltrasonicLocationArray;
 private:
 	// the diagonal axis of the four edge to the center point and the angle
 	float _front_diagonal_axis;
@@ -73,6 +83,8 @@ private:
 	float _radius_front_right;
 	float _radius_rear_left;
 	float _radius_rear_right;
+
+	Location _ultrasonic_location_array[12];
 };
 
 #endif /* CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_ */

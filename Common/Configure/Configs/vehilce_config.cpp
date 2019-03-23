@@ -40,6 +40,9 @@ VehilceConfig::VehilceConfig() {
 	RadiusRearRight.getter(&VehilceConfig::getRadiusRearRight);
 	RadiusRearRight.setter(&VehilceConfig::setRadiusRearRight);
 
+	UltrasonicLocationArray.setContainer(this);
+	UltrasonicLocationArray.getter(&VehilceConfig::getUltrasonicLocationArray);
+
 	Init();
 }
 
@@ -54,6 +57,54 @@ void VehilceConfig::Init()
 
 	FrontDiagonalAngle = atanf(LEFT_EDGE_TO_CENTER/FRONT_EDGE_TO_CENTER);
 	RearDiagonalAngle  = atanf(LEFT_EDGE_TO_CENTER/REAR_EDGE_TO_CENTER);
+
+	_ultrasonic_location_array[0].Point.X = SENSOR1_X;
+	_ultrasonic_location_array[0].Point.Y = SENSOR1_Y;
+	_ultrasonic_location_array[0].Angle   = SENSOR1_ANGLE;
+
+	_ultrasonic_location_array[1].Point.X = SENSOR2_X;
+	_ultrasonic_location_array[1].Point.Y = SENSOR2_Y;
+	_ultrasonic_location_array[1].Angle   = SENSOR2_ANGLE;
+
+	_ultrasonic_location_array[2].Point.X = SENSOR3_X;
+	_ultrasonic_location_array[2].Point.Y = SENSOR3_Y;
+	_ultrasonic_location_array[2].Angle   = SENSOR3_ANGLE;
+
+	_ultrasonic_location_array[3].Point.X = SENSOR4_X;
+	_ultrasonic_location_array[3].Point.Y = SENSOR4_Y;
+	_ultrasonic_location_array[3].Angle   = SENSOR4_ANGLE;
+
+	_ultrasonic_location_array[4].Point.X = SENSOR5_X;
+	_ultrasonic_location_array[4].Point.Y = SENSOR5_Y;
+	_ultrasonic_location_array[4].Angle   = SENSOR5_ANGLE;
+
+	_ultrasonic_location_array[5].Point.X = SENSOR6_X;
+	_ultrasonic_location_array[5].Point.Y = SENSOR6_Y;
+	_ultrasonic_location_array[5].Angle   = SENSOR6_ANGLE;
+
+	_ultrasonic_location_array[6].Point.X = SENSOR7_X;
+	_ultrasonic_location_array[6].Point.Y = SENSOR7_Y;
+	_ultrasonic_location_array[6].Angle   = SENSOR7_ANGLE;
+
+	_ultrasonic_location_array[7].Point.X = SENSOR8_X;
+	_ultrasonic_location_array[7].Point.Y = SENSOR8_Y;
+	_ultrasonic_location_array[7].Angle   = SENSOR8_ANGLE;
+
+	_ultrasonic_location_array[8].Point.X = SENSOR9_X;
+	_ultrasonic_location_array[8].Point.Y = SENSOR9_Y;
+	_ultrasonic_location_array[8].Angle   = SENSOR9_ANGLE;
+
+	_ultrasonic_location_array[9].Point.X = SENSOR10_X;
+	_ultrasonic_location_array[9].Point.Y = SENSOR10_Y;
+	_ultrasonic_location_array[9].Angle   = SENSOR10_ANGLE;
+
+	_ultrasonic_location_array[10].Point.X = SENSOR11_X;
+	_ultrasonic_location_array[10].Point.Y = SENSOR11_Y;
+	_ultrasonic_location_array[10].Angle   = SENSOR11_ANGLE;
+
+	_ultrasonic_location_array[11].Point.X = SENSOR12_X;
+	_ultrasonic_location_array[11].Point.Y = SENSOR12_Y;
+	_ultrasonic_location_array[11].Angle   = SENSOR12_ANGLE;
 }
 
 // r is + and -
@@ -144,3 +195,5 @@ float VehilceConfig::getRearDiagonalAxis()           { return  _rear_diagonal_ax
 void  VehilceConfig::setRearDiagonalAxis(float value){ _rear_diagonal_axis = value;}
 float VehilceConfig::getRearDiagonalAngle()           { return  _rear_diagonal_angle;}
 void  VehilceConfig::setRearDiagonalAngle(float value){ _rear_diagonal_angle = value;}
+
+Location* VehilceConfig::getUltrasonicLocationArray() { return  _ultrasonic_location_array;}
