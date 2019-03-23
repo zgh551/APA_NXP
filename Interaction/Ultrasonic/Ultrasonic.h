@@ -20,13 +20,23 @@
 //#include "../HMI/Terminal.h"
 #include "derivative.h"
 #include "property.h"
-
+// math
+#include "math.h"
+#include "vector_2d.h"
+#include "vehilce_config.h"
+// Track
+#include "../../VehicleState/Interface/vehicle_state.h"
 
 #define FRONT_ULTRASONIC_ENABLE
 #define REAR_ULTRASONIC_ENABLE
 
 #define LEVEL_RATIO    (0.01294117647058823529411764705882)
 #define WIDTH_RATIO    (16)
+
+/************************超声发送格式按钮*************************/
+#define ULTRASONIC_PACKET         ( 1 ) // 超声包格式
+#define ULTRASONIC_SCHEDULE_MODO  ( 3 ) // 超声调度模式
+
 /*** LIN Device Data Struct ***/
 typedef struct _LIN_STP318_Packet
 {
@@ -68,15 +78,35 @@ public:
 	void ReadSensing_STP313(uint8_t id,void (*ReceiveFrame)(LIN_RAM *),LIN_RAM *m_LIN_RAM);
 
 	void InitUltrasonicSensor(uint8_t n);
+	void InitUltrasonicSensorRx(uint8_t n);
 	void ReadUltrasonicSensor(uint8_t n);
+	void ReadUltrasonicSensorRxs(uint8_t step,uint8_t n);
 
 	void UltrasonicScheduleStatusMachine(void);
 	void UltrasonicScheduleStatusMachine_V2(void);
+	void UltrasonicScheduleStatusMachine_V3(void);
 
+	void UltrasonicConvert(uint8_t type,LIN_RAM d,Ultrasonic_Packet *p,float t);
 	float Compensation(float temp);
+
 
 	void Update(uint8_t id,float t);
 	void Update(float t);
+
+	// 正常测距的坐标转换
+	void VehicleAxisAbstacleDirectCalculate(Location l,float d,Vector2d *p);
+	/*
+	 * 三角定位计算障碍物位置
+	 * */
+	void VehicleAxisAbstacleTriangleCalculate(int8_t d,Location a,Location b,float ul,float ur,Vector2d *p);
+
+	void TriangleLocation();
+
+	void DirectLocation();
+
+	void GroundAxisAbstacleTriangleCalculate(VehicleState *s,Vector2d v,Vector2d *g);
+
+	void TriangleLocationGround(VehicleState *s);
 
 	/// Property
 	uint8_t getScheduleTimeCnt();
@@ -91,14 +121,30 @@ public:
 	void     setSystemTime(uint32_t value);
 	Property<Ultrasonic,uint32_t,READ_WRITE> SystemTime;
 
-	Ultrasonic_Packet* getUltrasonicPacket();
-	void setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p);
-	Property<Ultrasonic,Ultrasonic_Packet*,READ_ONLY> UltrasonicPacket;
+
 
 	LIN_RAM* getUltrasonicDatas();
 	Property<Ultrasonic,LIN_RAM*,READ_ONLY> UltrasonicDatas;
 
+	LIN_RAM* getUltrasonicLocationDatas();
+	Property<Ultrasonic,LIN_RAM*,READ_ONLY> UltrasonicLocationDatas;
 
+	Ultrasonic_Packet* getUltrasonicPacket();
+	void setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p);
+	Property<Ultrasonic,Ultrasonic_Packet*,READ_ONLY> UltrasonicPacket;
+
+	Ultrasonic_Packet* getUltrasonicLocationPacket();
+	void setUltrasonicLocationPacket(uint8_t n,Ultrasonic_Packet p);
+	Property<Ultrasonic,Ultrasonic_Packet*,READ_ONLY> UltrasonicLocationPacket;
+
+	Vector2d* getAbstaclePositionDirect();
+	Property<Ultrasonic,Vector2d*,READ_ONLY> AbstaclePositionDirect;
+
+	Vector2d* getAbstaclePositionTriangle();
+	Property<Ultrasonic,Vector2d*,READ_ONLY> AbstaclePositionTriangle;
+
+	Vector2d* getAbstacleGroundPositionTriangle();
+	Property<Ultrasonic,Vector2d*,READ_ONLY> AbstacleGroundPositionTriangle;
 private:
 	uint32_t _system_time;
 	uint8_t  _schedule_time_cnt;
@@ -106,7 +152,19 @@ private:
 
 	LIN_RAM _ultrasonic_datas[12];
 
+	LIN_RAM _ultrasonic_location_datas[12];
+
 	Ultrasonic_Packet _ultrasonic_packet[12];
+
+	Ultrasonic_Packet _ultrasonic_location_packet[12];
+
+
+	VehilceConfig _abstacle_config;
+
+	Vector2d _abstacle_position_direct[12];
+	Vector2d _abstacle_position_triangle[8];
+
+	Vector2d _abstacle_ground_position_triangle[8];
 };
 
 #endif /* ULTRASONIC_H_ */
