@@ -26,6 +26,7 @@
 #include "Ultrasonic.h"
 #include "planning.h"
 #include "percaption.h"
+#include "ultrasonic_abstacle_percption.h"
 
 typedef union _byte2float
 {
@@ -48,9 +49,9 @@ public:
 
 	// CAN Module:Vehicle information receive
 	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl);
-	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
 	void Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg);
 
+	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
 	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,Planning *pp);
 
 	void Parse(vuint32_t id,vuint8_t dat[],Planning *msg);
@@ -67,10 +68,20 @@ public:
 
 	void Push(Percaption *p);
 
+//	void Push(UltrasonicAbstaclePercption *p);
+
 	void Push(Planning *p);
 ///////////////////////////////////////////////////////////////////////////
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
 	void UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk);
+
+	void UltrasonicLocationSend(uint8_t id,LIN_RAM *msg);
+	void UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk);
+	void UltrasonicLocationSend(uint8_t id,Vector2d v1);
+	void UltrasonicLocationSend(uint8_t id,Vector2d v1,Vector2d v2);
+
+	void UltrasonicGroundLocationSend(uint8_t id,Vector2d v1,Vector2d v2);
+
 	void Ack(void);
 
 	void VehicleInitPositionSend(VehicleBody v);
