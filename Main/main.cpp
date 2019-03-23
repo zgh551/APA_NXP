@@ -22,17 +22,22 @@
 #include "Ultrasonic.h"
 //#include "PathPlanning.h"
 #include "Terminal.h"
+#include "../Common/VehicleState/GeometricTrack/geometric_track.h"
+
 #include "ChangAn/chang_an_controller.h"
 #include "ChangAn/chang_an_message.h"
-#include "../Common/VehicleState/GeometricTrack/geometric_track.h"
+
+#include "BoRui/bo_rui_controller.h"
+#include "BoRui/bo_rui_message.h"
+
+
 #include "lon_control.h"
 #include "pid.h"
 #include "parallel_planning.h"
 #include "vertical_planning.h"
 #include "percaption.h"
-#include "vehicle_body.h"
-#include "vector_2d.h"
-//using namespace std;
+#include "ultrasonic_abstacle_percption.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,25 +46,28 @@ extern void xcptn_xmpl(void);
 #ifdef __cplusplus
 }
 #endif
-
+/****************System Configure******************/
+//#define CHANGAN
+#define BORUI
+#define SIMULATION 0
+/****************System Variable******************/
 Terminal m_Terminal_CA;
 Ultrasonic m_Ultrasonic;
-ChangAnController m_ChangAnController;
-ChangAnMessage m_ChangAnMessage;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
+
+ChangAnController m_ChangAnController;
+ChangAnMessage m_ChangAnMessage;
+
+BoRuiController m_BoRuiController;
+BoRuiMessage    m_BoRuiMessage;
 
 ParallelPlanning m_ParallelPlanning;
 VerticalPlanning m_VerticalPlanning;
 
 Percaption m_PercaptionInformation;
-VehicleBody m_VehicleBody;
-Vector2d m_Vector2d;
-Vector2d r_v;
-vuint8_t cnt;
-bool TerminalSendFlag = false;
-float temp;
+UltrasonicAbstaclePercption m_UltrasonicAbstaclePercption;
 
 __attribute__ ((section(".text")))
 int main()
@@ -82,13 +90,6 @@ int main()
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
-//		m_PercaptionInformation.AttitudeYaw = 0;
-//		m_PercaptionInformation.DetectParkingStatus = 1;
-//		m_PercaptionInformation.ParkingLength = 6.2;
-//		m_PercaptionInformation.ParkingWidth = 2.2;
-//		m_PercaptionInformation.PositionX = 10.2;
-//		m_PercaptionInformation.PositionY = 3.5;
-//		m_Terminal_CA.Push(&m_PercaptionInformation);
 		for(;;)
 		{
 			//Task 一次性的计算任务 泊车规划任务
@@ -111,7 +112,6 @@ int main()
 
 				}
 				m_ParallelPlanning.Work(&m_PercaptionInformation);
-
 			}
 			else if(0x20 == m_Terminal_CA.Command)
 			{
@@ -217,29 +217,54 @@ void PIT0_isr(void)
 	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
 		// TODO 检车位测试时可以屏蔽
+		#ifdef CHANGAN
 		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
 		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
 		m_ChangAnController.Push(0.02);
+		#endif
+
+		#ifdef BORUI
+		m_BoRuiController.Push(0.02);
+		#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 	{
-//		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+		#if 1 == SIMULATION
+		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+		#else
 		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+		#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 	{
 
 	}
 
+#if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
-	m_Ultrasonic.Update(8);
-	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
+#endif
+#if ULTRASONIC_SCHEDULE_MODO == 3
+	m_Ultrasonic.UltrasonicScheduleStatusMachine_V3();//5ms
+#endif
+	m_Ultrasonic.Update(25);
+
+	m_Ultrasonic.TriangleLocation();
+	m_Ultrasonic.DirectLocation();
+
+	m_Ultrasonic.TriangleLocationGround(&m_GeometricTrack);
+
+#if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
+#endif
+#if ULTRASONIC_SCHEDULE_MODO == 3
+	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
+#endif
+	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
+	m_Terminal_CA.PushActive = 0xA5;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
 	{
 		SYSTEM_LED = ~SYSTEM_LED;
 	}
-	m_Terminal_CA.PushActive = 0xA5;
 	PIT_0.TIMER[0].TFLG.R |= 1;  /* Clear interrupt flag. w1c */
 }
 /*******************************************************************************
@@ -256,7 +281,8 @@ void FlexCAN0_Isr(void)
 {
 	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-		m_ChangAnMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
+//		m_ChangAnMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
+		m_BoRuiMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_0.TIMER.R;
@@ -302,11 +328,19 @@ void FlexCAN2_Isr(void)
 {
 	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
+		// terminal command decode
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B);
-
+#ifdef CHANGAN
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnController);
-		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_Ultrasonic);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_ChangAnMessage);
+#endif
+
+#ifdef BORUI
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_BoRuiController);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_BoRuiMessage);
+#endif
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_Ultrasonic);
+
 
 		if(0x10 == m_Terminal_CA.Command)
 		{
