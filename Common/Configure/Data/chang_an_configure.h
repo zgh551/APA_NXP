@@ -8,6 +8,7 @@
 #ifndef _CHANG_AN_CONFIGURE_H_
 #define _CHANG_AN_CONFIGURE_H_
 
+#include "common_configure.h"
 /****************** 车辆信息 ******************/
 // 长度(m)
 #define LENGHT                           (4.445)
@@ -92,5 +93,70 @@
 // (-510,-400]
 #define FIT_RADIUS_A12 		( 0.06652)
 #define FIT_RADIUS_B12 		(-1.586)
+
+/**********************************Ultrasonic Location Information***********************************************/
+#define SENSOR1_X     ( 0.00f )
+#define SENSOR1_Y     ( 0.45f )
+#define SENSOR1_ANGLE ( 0.00f )
+
+#define SENSOR2_X     ( 0.00f )
+#define SENSOR2_Y     ( 0.18f )
+#define SENSOR2_ANGLE ( 0.00f )
+
+#define SENSOR3_X     ( 0.00f )
+#define SENSOR3_Y     (-0.18f )
+#define SENSOR3_ANGLE ( 0.00f )
+
+#define SENSOR4_X     ( 0.00f )
+#define SENSOR4_Y     (-0.50f )
+#define SENSOR4_ANGLE ( 0.00f )
+
+//#define SENSOR1_X     ( 3.42f )
+//#define SENSOR1_Y     ( 0.70f )
+//#define SENSOR1_ANGLE ( 0.00f )
+//
+//#define SENSOR2_X     ( 3.60f )
+//#define SENSOR2_Y     ( 0.30f )
+//#define SENSOR2_ANGLE ( 0.00f )
+//
+//#define SENSOR3_X     ( 3.60f )
+//#define SENSOR3_Y     (-0.30f )
+//#define SENSOR3_ANGLE ( 0.00f )
+//
+//#define SENSOR4_X     ( 3.42f )
+//#define SENSOR4_Y     (-0.70f )
+//#define SENSOR4_ANGLE ( 0.00f )
+
+#define SENSOR5_X     (-0.87f )
+#define SENSOR5_Y     ( 0.72f )
+#define SENSOR5_ANGLE ( 3.1415926535897932384626433832795 )
+
+#define SENSOR6_X     (-1.00f )
+#define SENSOR6_Y     ( 0.30f )
+#define SENSOR6_ANGLE ( 3.1415926535897932384626433832795 )
+
+#define SENSOR7_X     (-1.00f )
+#define SENSOR7_Y     (-0.30f )
+#define SENSOR7_ANGLE ( 3.1415926535897932384626433832795 )
+
+#define SENSOR8_X     (-0.87f )
+#define SENSOR8_Y     (-0.72f )
+#define SENSOR8_ANGLE ( 3.1415926535897932384626433832795 )
+
+#define SENSOR9_X     ( 2.95f )
+#define SENSOR9_Y     ( 0.90f )
+#define SENSOR9_ANGLE (1.5707963267948966192313216916398 )
+
+#define SENSOR10_X     ( 2.95f )
+#define SENSOR10_Y     (-0.90f )
+#define SENSOR10_ANGLE (-1.5707963267948966192313216916398 )
+
+#define SENSOR11_X     (-0.30f)
+#define SENSOR11_Y     ( 0.90f)
+#define SENSOR11_ANGLE (1.5707963267948966192313216916398)
+
+#define SENSOR12_X     (-0.30f)
+#define SENSOR12_Y     (-0.90f)
+#define SENSOR12_ANGLE (-1.5707963267948966192313216916398)
 
 #endif
