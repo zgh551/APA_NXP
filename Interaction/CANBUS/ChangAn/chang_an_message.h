@@ -29,7 +29,7 @@ public:
 	ChangAnMessage();
 	virtual ~ChangAnMessage();
 
-	void Init();
+	void Init() override;
 	void Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght) override;
 	// EPS
 	uint8_t getEPS_Failed();

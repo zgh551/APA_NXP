@@ -104,24 +104,24 @@ void  MessageManager::setWheelSpeedRearRight(float value){_wheel_speed_rear_righ
 float MessageManager::getWheelSpeedRearLeft()           { return _wheel_speed_rear_left;}
 void  MessageManager::setWheelSpeedRearLeft(float value){_wheel_speed_rear_left = value;}
 // wheel speed direction
-uint8_t MessageManager::getWheelSpeedDirection()             { return _wheel_speed_direction;}
-void    MessageManager::setWheelSpeedDirection(uint8_t value){_wheel_speed_direction = value;}
+DirectStatus MessageManager::getWheelSpeedDirection()                  { return _wheel_speed_direction;}
+void         MessageManager::setWheelSpeedDirection(DirectStatus value){_wheel_speed_direction = value;}
 
 // wheel pulse
-uint8_t MessageManager::getWheelPulseFrontLeft()             { return _wheel_pulse_front_left;}
-void    MessageManager::setWheelPulseFrontLeft(uint8_t value){_wheel_pulse_front_left = value;}
+uint16_t MessageManager::getWheelPulseFrontLeft()              { return _wheel_pulse_front_left;}
+void     MessageManager::setWheelPulseFrontLeft(uint16_t value){_wheel_pulse_front_left = value;}
 
-uint8_t MessageManager::getWheelPulseFrontRight()             { return _wheel_pulse_front_right;}
-void    MessageManager::setWheelPulseFrontRight(uint8_t value){_wheel_pulse_front_right = value;}
+uint16_t MessageManager::getWheelPulseFrontRight()              { return _wheel_pulse_front_right;}
+void     MessageManager::setWheelPulseFrontRight(uint16_t value){_wheel_pulse_front_right = value;}
 
-uint8_t MessageManager::getWheelPulseRearRight()             { return _wheel_pulse_rear_right;}
-void    MessageManager::setWheelPulseRearRight(uint8_t value){_wheel_pulse_rear_right = value;}
+uint16_t MessageManager::getWheelPulseRearRight()              { return _wheel_pulse_rear_right;}
+void     MessageManager::setWheelPulseRearRight(uint16_t value){_wheel_pulse_rear_right = value;}
 
-uint8_t MessageManager::getWheelPulseRearLeft()             { return _wheel_pulse_rear_left;}
-void    MessageManager::setWheelPulseRearLeft(uint8_t value){_wheel_pulse_rear_left = value;}
+uint16_t MessageManager::getWheelPulseRearLeft()              { return _wheel_pulse_rear_left;}
+void     MessageManager::setWheelPulseRearLeft(uint16_t value){_wheel_pulse_rear_left = value;}
 // wheel pulse dirction
-uint8_t MessageManager::getWheelPulseDirection()             { return _wheel_pulse_direction;}
-void    MessageManager::setWheelPulseDirection(uint8_t value){_wheel_pulse_direction = value;}
+DirectStatus MessageManager::getWheelPulseDirection()                  { return _wheel_pulse_direction;}
+void         MessageManager::setWheelPulseDirection(DirectStatus value){_wheel_pulse_direction = value;}
 
 // SAS Steering angle
 float MessageManager::getSteeringAngle()           { return _steering_angle;}
@@ -131,8 +131,8 @@ float MessageManager::getSteeringAngleRate()           { return _steering_angle_
 void  MessageManager::setSteeringAngleRate(float value){_steering_angle_rate = value;}
 
 // TCU gear
-uint8_t MessageManager::getGear()           { return _gear;}
-void    MessageManager::setGear(uint8_t value){_gear = value;}
+GearStatus MessageManager::getGear()                { return _gear;}
+void       MessageManager::setGear(GearStatus value){_gear = value;}
 
 // ESP Sensor
 float MessageManager::getYawRate()           { return _yaw_rate;}

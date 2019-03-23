@@ -48,6 +48,10 @@ VehicleController::VehicleController() {
 		Velocity.getter(&VehicleController::getVelocity);
 		Velocity.setter(&VehicleController::setVelocity);
 
+		Distance.setContainer(this);
+		Distance.getter(&VehicleController::getDistance);
+		Distance.setter(&VehicleController::setDistance);
+
 		VelocityEnable.setContainer(this);
 		VelocityEnable.getter(&VehicleController::getVelocityEnable);
 		VelocityEnable.setter(&VehicleController::setVelocityEnable);
@@ -73,6 +77,10 @@ VehicleController::VehicleController() {
 		GearEnable.setContainer(this);
 		GearEnable.getter(&VehicleController::getGearEnable);
 		GearEnable.setter(&VehicleController::setGearEnable);
+
+		APAEnable.setContainer(this);
+		APAEnable.getter(&VehicleController::getGearEnable);
+		APAEnable.setter(&VehicleController::setGearEnable);
 }
 
 VehicleController::~VehicleController() {
@@ -80,124 +88,53 @@ VehicleController::~VehicleController() {
 }
 
 /// ACC
-float VehicleController::getAcceleration()
-{
-	return _acceleration;
-}
-void  VehicleController::setAcceleration(float value)
-{
-	_acceleration = value;
-}
+float VehicleController::getAcceleration()           { return _acceleration;}
+void  VehicleController::setAcceleration(float value){_acceleration = value;}
 
-uint8_t VehicleController::getAccelerationEnable()
-{
-	return _acceleration_enable;
-}
-void    VehicleController::setAccelerationEnable(uint8_t value)
-{
-	_acceleration_enable = value;
-}
+uint8_t VehicleController::getAccelerationEnable()             { return _acceleration_enable;}
+void    VehicleController::setAccelerationEnable(uint8_t value){_acceleration_enable = value;}
 
 /// AEB
-float VehicleController::getDeceleration()
-{
-	return _deceleration;
-}
-void  VehicleController::setDeceleration(float value)
-{
-	_deceleration = value;
-}
+float VehicleController::getDeceleration()           { return _deceleration;}
+void  VehicleController::setDeceleration(float value){_deceleration = value;}
 
-uint8_t VehicleController::getDecelerationEnable()
-{
-	return _deceleration_enable;
-}
-void    VehicleController::setDecelerationEnable(uint8_t value)
-{
-	_deceleration_enable = value;
-}
+uint8_t VehicleController::getDecelerationEnable()             { return _deceleration_enable;}
+void    VehicleController::setDecelerationEnable(uint8_t value){_deceleration_enable = value;}
 
 /// Torque
-float VehicleController::getTorque()
-{
-	return _torque;
-}
-void  VehicleController::setTorque(float value)
-{
-	_torque = value;
-}
+float VehicleController::getTorque()           { return _torque;}
+void  VehicleController::setTorque(float value){_torque = value;}
 
-uint8_t VehicleController::getTorqueEnable()
-{
-	return _torque_enable;
-}
-void    VehicleController::setTorqueEnable(uint8_t value)
-{
-	_torque_enable = value;
-}
+uint8_t VehicleController::getTorqueEnable()             { return _torque_enable;}
+void    VehicleController::setTorqueEnable(uint8_t value){_torque_enable = value;}
 
 /// Velocity
-float VehicleController::getVelocity()
-{
-	return _velocity;
-}
-void  VehicleController::setVelocity(float value)
-{
-	_velocity = value;
-}
+float VehicleController::getVelocity()           { return _velocity;}
+void  VehicleController::setVelocity(float value){_velocity = value;}
+/// Distance
+float VehicleController::getDistance()           { return _distance;}
+void  VehicleController::setDistance(float value){_distance = value;}
 
-uint8_t VehicleController::getVelocityEnable()
-{
-	return _velocity_enable;
-}
-void    VehicleController::setVelocityEnable(uint8_t value)
-{
-	_velocity_enable = value;
-}
+uint8_t VehicleController::getVelocityEnable()             { return _velocity_enable;}
+void    VehicleController::setVelocityEnable(uint8_t value){_velocity_enable = value;}
 
 /// Steering Angle
-float VehicleController::getSteeringAngle()
-{
-	return _steering_angle;
-}
-void  VehicleController::setSteeringAngle(float value)
-{
-	_steering_angle = value;
-}
+float VehicleController::getSteeringAngle()           { return _steering_angle;}
+void  VehicleController::setSteeringAngle(float value){_steering_angle = value;}
 
-float VehicleController::getSteeringAngleRate()
-{
-	return _steering_angle_rate;
-}
-void  VehicleController::setSteeringAngleRate(float value)
-{
-	_steering_angle_rate = value;
-}
+float VehicleController::getSteeringAngleRate()           { return _steering_angle_rate;}
+void  VehicleController::setSteeringAngleRate(float value){_steering_angle_rate = value;}
 
-uint8_t VehicleController::getSteeringEnable()
-{
-	return _steering_enable;
-}
-void    VehicleController::setSteeringEnable(uint8_t value)
-{
-	_steering_enable = value;
-}
+uint8_t VehicleController::getSteeringEnable()             { return _steering_enable;}
+void    VehicleController::setSteeringEnable(uint8_t value){_steering_enable = value;}
 
 /// Gear
-uint8_t VehicleController::getGear()
-{
-	return _gear;
-}
-void    VehicleController::setGear(uint8_t value)
-{
-	_gear = value;
-}
+uint8_t VehicleController::getGear()             { return _gear;}
+void    VehicleController::setGear(uint8_t value){_gear = value;}
 
-uint8_t VehicleController::getGearEnable()
-{
-	return _gear_enable;
-}
-void    VehicleController::setGearEnable(uint8_t value)
-{
-	_gear_enable = value;
-}
+uint8_t VehicleController::getGearEnable()             { return _gear_enable;}
+void    VehicleController::setGearEnable(uint8_t value){_gear_enable = value;}
+
+/// APA Enable
+uint8_t VehicleController::getAPAEnable()             { return _apa_enable;}
+void    VehicleController::setAPAEnable(uint8_t value){_apa_enable = value;}

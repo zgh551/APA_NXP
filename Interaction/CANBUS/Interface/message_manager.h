@@ -20,11 +20,29 @@
 #include "derivative.h"
 #include "property.h"
 
+typedef enum _GearStatus
+{
+	None = 0,
+	Parking,
+	Reverse,
+	Neutral,
+	Drive
+}GearStatus;
+
+typedef enum _DirectStatus
+{
+	StandStill = 0,
+	Forward,
+	Backward,
+	Invalid
+}DirectStatus;
+
 class MessageManager {
 public:
 	MessageManager();
 	virtual ~MessageManager();
 
+	virtual void Init() = 0;
 	virtual void Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght) = 0;
 
 	// wheel speed
@@ -45,31 +63,31 @@ public:
 	Property<MessageManager,float,READ_WRITE> WheelSpeedRearLeft;
 
 	// wheel speed direction
-	uint8_t getWheelSpeedDirection();
-	void    setWheelSpeedDirection(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> WheelSpeedDirection;
+	DirectStatus getWheelSpeedDirection();
+	void         setWheelSpeedDirection(DirectStatus value);
+	Property<MessageManager,DirectStatus,READ_WRITE> WheelSpeedDirection;
 
 	// wheel pulse
-	uint8_t getWheelPulseFrontLeft();
-	void    setWheelPulseFrontLeft(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> WheelPulseFrontLeft;
+	uint16_t getWheelPulseFrontLeft();
+	void     setWheelPulseFrontLeft(uint16_t value);
+	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseFrontLeft;
 
-	uint8_t getWheelPulseFrontRight();
-	void    setWheelPulseFrontRight(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> WheelPulseFrontRight;
+	uint16_t getWheelPulseFrontRight();
+	void     setWheelPulseFrontRight(uint16_t value);
+	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseFrontRight;
 
-	uint8_t getWheelPulseRearRight();
-	void    setWheelPulseRearRight(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> WheelPulseRearRight;
+	uint16_t getWheelPulseRearRight();
+	void     setWheelPulseRearRight(uint16_t value);
+	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearRight;
 
-	uint8_t getWheelPulseRearLeft();
-	void    setWheelPulseRearLeft(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> WheelPulseRearLeft;
+	uint16_t getWheelPulseRearLeft();
+	void     setWheelPulseRearLeft(uint16_t value);
+	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearLeft;
 
 	// wheel pulse dirction
-	uint8_t getWheelPulseDirection();
-	void    setWheelPulseDirection(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> WheelPulseDirection;
+	DirectStatus getWheelPulseDirection();
+	void         setWheelPulseDirection(DirectStatus value);
+	Property<MessageManager,DirectStatus,READ_WRITE> WheelPulseDirection;
 
 	// SAS Steering angle
 	float getSteeringAngle();
@@ -81,9 +99,9 @@ public:
 	Property<MessageManager,float,READ_WRITE> SteeringAngleRate;
 
 	// TCU
-	uint8_t getGear();
-	void    setGear(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> Gear;
+	GearStatus getGear();
+	void       setGear(GearStatus value);
+	Property<MessageManager,GearStatus,READ_WRITE> Gear;
 
 	// ESP Sensor
 	float getYawRate();
@@ -104,22 +122,22 @@ private:
 	float _wheel_speed_rear_right ;
 	float _wheel_speed_rear_left  ;
 	// wheel speed direction
-	uint8_t _wheel_speed_direction;
+	DirectStatus _wheel_speed_direction;
 
 	// wheel pulse
-	uint8_t _wheel_pulse_front_left ;
-	uint8_t _wheel_pulse_front_right;
-	uint8_t _wheel_pulse_rear_right ;
-	uint8_t _wheel_pulse_rear_left  ;
+	uint16_t _wheel_pulse_front_left ;
+	uint16_t _wheel_pulse_front_right;
+	uint16_t _wheel_pulse_rear_right ;
+	uint16_t _wheel_pulse_rear_left  ;
 	// wheel pulse dirction
-	uint8_t _wheel_pulse_direction;
+	DirectStatus _wheel_pulse_direction;
 
 	// SAS Steering angle
 	float _steering_angle;
 	float _steering_angle_rate;
 
 	// TCU
-	uint8_t _gear;
+	GearStatus _gear;
 
 	// ESP Sensor
 	float _yaw_rate;

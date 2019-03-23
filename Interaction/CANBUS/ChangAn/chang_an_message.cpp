@@ -73,7 +73,28 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			break;
 
 		case 0x208:// wheel speed
-			WheelSpeedDirection  = (uint8_t)(dat[0] >> 5) & 0x03;
+			switch((uint8_t)(dat[0] >> 5) & 0x03)
+			{
+			case 0:
+				WheelSpeedDirection  = Forward;
+				break;
+
+			case 1:
+				WheelSpeedDirection  = Backward;
+				break;
+
+			case 2:
+				WheelSpeedDirection  = StandStill;
+				break;
+
+			case 3:
+				WheelSpeedDirection  = Invalid;
+				break;
+
+			default:
+				WheelSpeedDirection  = Invalid;
+				break;
+			}
 
 			WheelSpeedRearRight  = ((uint16_t)(((dat[0] & 0x1F) << 8) | dat[1])) * V_M_S;
 			WheelSpeedRearLeft   = ((uint16_t)(((dat[2] & 0x1F) << 8) | dat[3])) * V_M_S;
@@ -82,8 +103,28 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			break;
 
 		case 0x258://Wheel speed pulse
-			WheelPulseDirection  = (uint8_t)(dat[2] & 0x03);
+			switch((uint8_t)(dat[2] & 0x03))
+			{
+				case 0:
+					WheelPulseDirection  = Forward;
+					break;
 
+				case 1:
+					WheelPulseDirection  = Backward;
+					break;
+
+				case 2:
+					WheelPulseDirection  = StandStill;
+					break;
+
+				case 3:
+					WheelPulseDirection  = Invalid;
+					break;
+
+				default:
+					WheelPulseDirection  = Invalid;
+					break;
+			}
 			WheelPulseRearRight  = (uint8_t)dat[4];
 			WheelPulseRearLeft   = (uint8_t)dat[5];
 			WheelPulseFrontRight = (uint8_t)dat[6];
@@ -91,7 +132,33 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			break;
 
 		case 0x268:// TCU GEAR
-			Gear = (uint8_t)(dat[1] & 0x0f);
+			switch((uint8_t)(dat[1] & 0x0f))
+			{
+				case 0:
+					Gear = Neutral;
+					break;
+
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+					Gear = Drive;
+					break;
+
+				case 9:
+					Gear = Reverse;
+					break;
+
+				case 10:
+					Gear = Parking;
+					break;
+
+				default:
+					Gear = None;
+					break;
+			}
 			break;
 
 		case 0x277:// ESP

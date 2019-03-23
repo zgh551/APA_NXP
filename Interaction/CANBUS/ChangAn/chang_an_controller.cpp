@@ -104,6 +104,11 @@ void ChangAnController::Update(ControlCommand cmd)
 	Velocity          = cmd.Velocity;
 }
 
+void ChangAnController::Update(APAControlCommand cmd)
+{
+
+}
+
 void ChangAnController::Push(float dt)
 {
 	this->SteeringAngleControl(dt);

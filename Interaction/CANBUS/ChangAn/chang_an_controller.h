@@ -55,6 +55,7 @@ public:
 	   * @return error_code
 	   */
 	void Update(ControlCommand cmd) override;
+	void Update(APAControlCommand cmd) override;
 
 	// push the command to the vehicle
 	void Push(float dt);

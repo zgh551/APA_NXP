@@ -19,16 +19,9 @@
 
 #include "derivative.h"
 #include "property.h"
+#include "message_manager.h"
 
-typedef enum _GearPosition
-{
-	Parking = 1,
-	Reverse,
-	Neutral,
-	Drive
-}GearPosition;
-
-typedef struct ControlCommand
+typedef struct _ControlCommand
 {
 	union{
 		struct
@@ -43,7 +36,7 @@ typedef struct ControlCommand
 		}B;
 		uint8_t R;
 	}ControlEnable;
-	GearPosition Gear;
+	GearStatus Gear;
 	float SteeringAngle;
 	float SteeringAngleRate;
 	float Acceleration;
@@ -51,6 +44,23 @@ typedef struct ControlCommand
 	float Velocity;
 	float Torque;
 }ControlCommand;
+
+typedef struct _APAControlCommand
+{
+	union{
+		struct
+		{
+			uint8_t Invalid   : 6;
+			uint8_t APAEnable : 2;
+		}B;
+		uint8_t R;
+	}ControlEnable;
+	GearStatus Gear;
+	float SteeringAngle;
+	float SteeringAngleRate;
+	float Velocity;
+	float Distance;
+}APAControlCommand;
 
 
 class VehicleController {
@@ -80,6 +90,7 @@ public:
 	   */
 	virtual void Update(ControlCommand cmd) = 0;
 
+	virtual void Update(APAControlCommand cmd) = 0;
 
 	/* ACC */
 	float getAcceleration();
@@ -113,6 +124,10 @@ public:
 	void  setVelocity(float value);
 	Property<VehicleController,float,READ_WRITE> Velocity;
 
+	float getDistance();
+	void  setDistance(float value);
+	Property<VehicleController,float,READ_WRITE> Distance;
+
 	uint8_t getVelocityEnable();
 	void    setVelocityEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> VelocityEnable;
@@ -138,6 +153,10 @@ public:
 	uint8_t getGearEnable();
 	void    setGearEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> GearEnable;
+
+	uint8_t getAPAEnable();
+	void    setAPAEnable(uint8_t value);
+	Property<VehicleController,uint8_t,READ_WRITE> APAEnable;
 private:
 	/* ACC */
 	float _acceleration;
@@ -153,6 +172,7 @@ private:
 
 	/* Velocity */
 	float _velocity;
+	float _distance;
 	uint8_t _velocity_enable;
 
 	/* Steering System */
@@ -163,6 +183,8 @@ private:
 	/* Gear */
 	uint8_t _gear;
 	uint8_t _gear_enable;
+
+	uint8_t _apa_enable;
 	/*
 	* @brief NEUTRAL, REVERSE, DRIVE
 	*/
