@@ -8,10 +8,13 @@
 #ifndef ULTRASONICPERCAPTION_ULTRASONIC_ABSTACLE_PERCPTION_H_
 #define ULTRASONICPERCAPTION_ULTRASONIC_ABSTACLE_PERCPTION_H_
 
+#include "percaption.h"
+
 class UltrasonicAbstaclePercption {
 public:
 	UltrasonicAbstaclePercption();
 	virtual ~UltrasonicAbstaclePercption();
+
 
 private:
 

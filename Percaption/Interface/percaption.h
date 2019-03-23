@@ -10,8 +10,13 @@
 
 #include "derivative.h"
 #include "property.h"
+#include "vehilce_config.h"
+
 #include "Ultrasonic.h"
 #include "Interface/vehicle_state.h"
+// math
+#include "math.h"
+#include "vector_2d.h"
 
 class Percaption {
 public:
