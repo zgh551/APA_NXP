@@ -649,12 +649,15 @@ void Terminal::UltrasonicLocationSend(uint8_t id,LIN_RAM *msg)
 void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 {
 	CAN_Packet m_CAN_Packet;
+	uint16_t temp;
+
 	m_CAN_Packet.id = 0x400 | id;
 	m_CAN_Packet.length = 8;
 	if(id < 8)
 	{
-		m_CAN_Packet.data[0] = ((uint8_t)(msg_pk[id].Distance1*100))      & 0xff;
-		m_CAN_Packet.data[1] = ((uint8_t)(msg_pk[id].Distance1*100) >> 8) & 0xff;
+		temp = msg_pk[id].Distance1 * 100;
+		m_CAN_Packet.data[0] = (uint8_t) temp;
+		m_CAN_Packet.data[1] = (uint8_t)(temp >> 8 );
 		m_CAN_Packet.data[2] = 0;
 		m_CAN_Packet.data[3] = 0;
 		m_CAN_Packet.data[4] = 0;
@@ -664,12 +667,14 @@ void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 	}
 	else
 	{
-		m_CAN_Packet.data[0] = ((uint8_t)(msg_pk[id].Distance1 * 100)    ) & 0xff;
-		m_CAN_Packet.data[1] = ((uint8_t)(msg_pk[id].Distance1 * 100)>> 8) & 0xff;
-		m_CAN_Packet.data[2] = ((uint8_t)(msg_pk[id].Distance2 * 100)    ) & 0xff;
-		m_CAN_Packet.data[3] = ((uint8_t)(msg_pk[id].Distance2 * 100)>> 8) & 0xff;
-		m_CAN_Packet.data[4] = ((uint8_t)(msg_pk[id].Level * 10     )    ) & 0xff;
-		m_CAN_Packet.data[5] = (uint8_t)(msg_pk[id].Width);
+		temp = msg_pk[id].Distance1 * 100;
+		m_CAN_Packet.data[0] = (uint8_t) temp;
+		m_CAN_Packet.data[1] = (uint8_t)(temp >> 8 );
+		temp = msg_pk[id].Distance2 * 100;
+		m_CAN_Packet.data[2] = (uint8_t) temp;
+		m_CAN_Packet.data[3] = (uint8_t)(temp >> 8 );
+		m_CAN_Packet.data[4] = (uint8_t)( msg_pk[id].Level * 10 ) ;
+		m_CAN_Packet.data[5] = (uint8_t)( msg_pk[id].Width);
 		m_CAN_Packet.data[6] =  msg_pk[id].status;
 		m_CAN_Packet.data[7] =  0;
 	}
@@ -679,11 +684,13 @@ void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 void Terminal::UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 {
 	CAN_Packet m_CAN_Packet;
+	uint16_t temp;
 	m_CAN_Packet.id = 0x470 | id;
 	m_CAN_Packet.length = 8;
 
-	m_CAN_Packet.data[0] = ((uint8_t)(msg_pk[id].Distance1*100))      & 0xff;
-	m_CAN_Packet.data[1] = ((uint8_t)(msg_pk[id].Distance1*100) >> 8) & 0xff;
+	temp = msg_pk[id].Distance1 * 100;
+	m_CAN_Packet.data[0] = (uint8_t) temp ;
+	m_CAN_Packet.data[1] = (uint8_t)(temp >> 8 );
 	m_CAN_Packet.data[2] = 0;
 	m_CAN_Packet.data[3] = 0;
 	m_CAN_Packet.data[4] = 0;
