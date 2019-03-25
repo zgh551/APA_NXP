@@ -95,21 +95,37 @@
 #define FIT_RADIUS_B12 		(-1.586)
 
 /**********************************Ultrasonic Location Information***********************************************/
-#define SENSOR1_X     ( 0.00f )
-#define SENSOR1_Y     ( 0.45f )
+#define SENSOR1_X     (-0.20f )
+#define SENSOR1_Y     ( 0.68f )
 #define SENSOR1_ANGLE ( 0.00f )
 
 #define SENSOR2_X     ( 0.00f )
-#define SENSOR2_Y     ( 0.18f )
+#define SENSOR2_Y     ( 0.32f )
 #define SENSOR2_ANGLE ( 0.00f )
 
 #define SENSOR3_X     ( 0.00f )
-#define SENSOR3_Y     (-0.18f )
+#define SENSOR3_Y     (-0.32f )
 #define SENSOR3_ANGLE ( 0.00f )
 
-#define SENSOR4_X     ( 0.00f )
-#define SENSOR4_Y     (-0.50f )
+#define SENSOR4_X     (-0.20f )
+#define SENSOR4_Y     (-0.68f )
 #define SENSOR4_ANGLE ( 0.00f )
+//实验室测试
+//#define SENSOR1_X     ( 0.00f )
+//#define SENSOR1_Y     ( 0.45f )
+//#define SENSOR1_ANGLE ( 0.00f )
+//
+//#define SENSOR2_X     ( 0.00f )
+//#define SENSOR2_Y     ( 0.18f )
+//#define SENSOR2_ANGLE ( 0.00f )
+//
+//#define SENSOR3_X     ( 0.00f )
+//#define SENSOR3_Y     (-0.18f )
+//#define SENSOR3_ANGLE ( 0.00f )
+//
+//#define SENSOR4_X     ( 0.00f )
+//#define SENSOR4_Y     (-0.50f )
+//#define SENSOR4_ANGLE ( 0.00f )
 
 //#define SENSOR1_X     ( 3.42f )
 //#define SENSOR1_Y     ( 0.70f )
