@@ -23,38 +23,7 @@ SystemWork::SystemWork() {
 	FunctionStatus.setter(&SystemWork::setFunctionStatus);
 }
 
-SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out_lim):Vehicle(dt,kp,ki,kd,i_lim,out_lim)
-{
-	_system_working_state = Debug;
 
-	_working_module = 0;
-	_function_status = 2;
-
-	////// System Status //////
-	WorkingModule.setContainer(this);
-	WorkingModule.getter(&SystemWork::getWorkingModule);
-	WorkingModule.setter(&SystemWork::setWorkingModule);
-
-	FunctionStatus.setContainer(this);
-	FunctionStatus.getter(&SystemWork::getFunctionStatus);
-	FunctionStatus.setter(&SystemWork::setFunctionStatus);
-}
-
-SystemWork::SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold):Vehicle(dt,kp,ki,kd,i_lim,out_lim,threshold)
-{
-	_system_working_state = Debug;
-
-	_working_module = 0;
-	_function_status = 2;
-	////// System Status //////
-	WorkingModule.setContainer(this);
-	WorkingModule.getter(&SystemWork::getWorkingModule);
-	WorkingModule.setter(&SystemWork::setWorkingModule);
-
-	FunctionStatus.setContainer(this);
-	FunctionStatus.getter(&SystemWork::getFunctionStatus);
-	FunctionStatus.setter(&SystemWork::setFunctionStatus);
-}
 
 SystemWork::~SystemWork() {
 
@@ -107,11 +76,7 @@ void SystemWork::SystemWorkState(void)
 
 void SystemWork::DubugStataMahine(void)
 {
-	 VehicleContorl();//vehicle control commond
-	// SteeringAngleControlStateMachine();// steering angle active
-	SteeringAngleControlStateMachineDelay();// steering angle active
-	// SteeringAngleControlStateMachineGpio();// steering angle active
-	SteeringAngleControl(0.02);// steering angle control
+
 	switch((DubugState)_function_status)
 	{
 	case DirectControl:
@@ -119,16 +84,11 @@ void SystemWork::DubugStataMahine(void)
 		break;
 
 	case SpeedControl:
-		// VehicleSpeedControl(pidUpdate(VehicleSpeed));
-		VehicleSpeedControl(pidUpdateIntegralSeparation(VehicleSpeed));
+
 		break;
 
 	case ChangAnControl:
-		if(VehicleSpeedControlEnable)
-		{
-			// VehicleSpeedControl(pidUpdate(VehicleSpeed));
-			VehicleSpeedControl(pidUpdateIntegralSeparation(VehicleSpeed));
-		}
+
 		break;
 
 	case UltrasonicSR:

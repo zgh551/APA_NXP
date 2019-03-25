@@ -11,7 +11,6 @@
 #include "property.h"
 #include "derivative.h"
 #include "project.h"
-#include "Vehicle.h"
 
 typedef enum _WorkingState
 {
@@ -29,13 +28,11 @@ typedef enum _DubugState
 	UltrasonicSR
 }DubugState;
 
-class SystemWork : public Vehicle
+class SystemWork
 {
 
 public:
 	SystemWork();
-	SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out_lim);
-	SystemWork(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold);
 	virtual ~SystemWork();
 
 	void SystemWorkState(void);

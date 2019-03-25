@@ -18,9 +18,7 @@
 //#include <vector>
 #include "derivative.h" /* include peripheral declarations */
 
-//#include "SystemWork.h"
 #include "Ultrasonic.h"
-//#include "PathPlanning.h"
 #include "Terminal.h"
 #include "../Common/VehicleState/GeometricTrack/geometric_track.h"
 
@@ -29,7 +27,6 @@
 
 #include "BoRui/bo_rui_controller.h"
 #include "BoRui/bo_rui_message.h"
-
 
 #include "lon_control.h"
 #include "pid.h"
@@ -242,23 +239,18 @@ void PIT0_isr(void)
 
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
-#endif
-#if ULTRASONIC_SCHEDULE_MODO == 3
-	m_Ultrasonic.UltrasonicScheduleStatusMachine_V3();//5ms
-#endif
 	m_Ultrasonic.Update(25);
-
-	m_Ultrasonic.TriangleLocation();
-	m_Ultrasonic.DirectLocation();
-
-	m_Ultrasonic.TriangleLocationGround(&m_GeometricTrack);
-
-#if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 26;
 #endif
 #if ULTRASONIC_SCHEDULE_MODO == 3
+	m_Ultrasonic.UltrasonicScheduleStatusMachine_V3();//5ms
+	m_Ultrasonic.Update(25);
+	m_Ultrasonic.TriangleLocation();
+	m_Ultrasonic.DirectLocation();
+	m_Ultrasonic.TriangleLocationGround(&m_GeometricTrack);
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
+
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	m_Terminal_CA.PushActive = 0xA5;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
@@ -281,8 +273,13 @@ void FlexCAN0_Isr(void)
 {
 	if(CAN_0.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-//		m_ChangAnMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
+#ifdef CHANGAN
+		m_ChangAnMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
+#endif
+
+#ifdef BORUI
 		m_BoRuiMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
+#endif
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_0.TIMER.R;
@@ -305,7 +302,6 @@ void FlexCAN1_Isr(void)
 {
 	if(CAN_1.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-//		m_ChangAnMessage.Parse(CAN_1.MB[8].ID.B.ID_STD, CAN_1.MB[8].DATA.B, CAN_1.MB[8].CS.B.DLC);
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
 		uint32_t temp = CAN_1.TIMER.R;
