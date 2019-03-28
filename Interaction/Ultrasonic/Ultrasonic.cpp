@@ -1035,7 +1035,7 @@ void Ultrasonic::GroundTriangleCalculate(VehicleState *vehicle,Abstacle_Location
 {
 	if(Normal == body.Status)
 	{
-		ground->Position = vehicle->getPosition() + (body.Position - vehicle->getPosition()).rotate(vehicle->getYaw());
+		ground->Position = vehicle->getPosition() + body.Position.rotate(vehicle->getYaw());
 	}
 	else
 	{
