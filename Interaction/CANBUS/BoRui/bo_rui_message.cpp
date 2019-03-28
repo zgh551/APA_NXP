@@ -23,6 +23,7 @@ void BoRuiMessage::Init()
 
 void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
 {
+	uint8_t temp;
 	switch(id)
 	{
 		case 0x2A0://eps status
@@ -97,7 +98,11 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			break;
 
 		case 0x0E0://SAS
-			SteeringAngle = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
+			temp = (uint8_t)( (dat[3] >> 7) & 0x01);
+			if(temp)
+			{
+				SteeringAngle = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
+			}
 			SteeringAngleRate = dat[2]*4.0f;
 			break;
 

@@ -111,7 +111,7 @@ void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
 					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
-	if(fabs(msg->SteeringAngle) > 1)
+	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((int16_t)fabs(msg->SteeringAngle) < 520))
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + LinearVelocity * dt / radius;
@@ -175,7 +175,7 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	}
 
 
-	if( ((int16_t)msg->SteeringAngle) != 0)
+	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((int16_t)fabs(msg->SteeringAngle) < 520))
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + displacement / radius;
@@ -188,8 +188,12 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 		_position.Y = _position.Y + displacement * sinf(Yaw);
 	}
 
-	_sum_rear_left_pulse  += _delta_rear_left_pulse;
-	_sum_rear_right_pulse += _delta_rear_right_pulse;
+	if(fabs(Yaw - _last_yaw) > 10 )
+	{
+		_sum_rear_left_pulse  += _delta_rear_left_pulse;
+		_sum_rear_right_pulse += _delta_rear_right_pulse;
+	}
+
 
 	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
 	_last_rear_right_pulse = msg->WheelPulseRearRight;
