@@ -721,10 +721,10 @@ void Terminal::UltrasonicGroundLocationSend(uint8_t id,Abstacle_Location_Packet 
 	m_CAN_Packet.id = 0x490 | id;
 	m_CAN_Packet.length = 8;
 
-	temp = packet.Position.getX()*1000;
+	temp = packet.Position.getX()*100;
 	m_CAN_Packet.data[0] = (uint8_t)((temp     ) & 0xff );
 	m_CAN_Packet.data[1] = (uint8_t)((temp >> 8) & 0xff );
-	temp = packet.Position.getY()*1000;
+	temp = packet.Position.getY()*100;
 	m_CAN_Packet.data[2] = (uint8_t)((temp     ) & 0xff );
 	m_CAN_Packet.data[3] = (uint8_t)((temp >> 8) & 0xff );
 	m_CAN_Packet.data[4] = 0;
