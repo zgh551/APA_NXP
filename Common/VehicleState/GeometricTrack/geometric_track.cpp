@@ -108,8 +108,8 @@ void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 {
 	float radius;
 	LinearRate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft)*0.5;
-	LinearVelocity = msg->WheelSpeedDirection == 0 ?  LinearRate :
-					 msg->WheelSpeedDirection == 1 ? -LinearRate : 0;
+	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
+					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
 	if(fabs(msg->SteeringAngle) > 1)
 	{
@@ -132,23 +132,36 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	float radius;
 
 	LinearRate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft)*0.5;
-	LinearVelocity = msg->WheelSpeedDirection == 0 ?  LinearRate :
-					 msg->WheelSpeedDirection == 1 ? -LinearRate : 0;
+	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
+					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
-	_delta_rear_left_pulse =  msg->WheelPulseDirection == 0 ?
-							((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : 254) +
-							  msg->WheelPulseRearLeft  - _last_rear_left_pulse) :
-							  msg->WheelPulseDirection == 1 ?
-						   -((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : 254) +
-							  msg->WheelPulseRearLeft  - _last_rear_left_pulse) : 0;
+	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
+	{
+		_delta_rear_left_pulse = 0;
+	}
+	else
+	{
+		_delta_rear_left_pulse =  msg->WheelSpeedDirection == Forward ?
+								((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) :
+								  msg->WheelSpeedDirection == Backward ?
+							   -((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) : 0;
+	}
 
-
-	_delta_rear_right_pulse =  msg->WheelPulseDirection == 0 ?
-							 ((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : 254) +
-							   msg->WheelPulseRearRight  - _last_rear_right_pulse) :
-							   msg->WheelPulseDirection == 1 ?
-							-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : 254) +
-							   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
+	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
+	{
+		_delta_rear_right_pulse = 0;
+	}
+	else
+	{
+		_delta_rear_right_pulse =  msg->WheelSpeedDirection == Forward ?
+								 ((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->WheelPulseRearRight  - _last_rear_right_pulse) :
+								   msg->WheelSpeedDirection == Backward ?
+								-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
+	}
 
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 
@@ -162,7 +175,7 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	}
 
 
-	if(msg->SteeringAngle != 0)
+	if( ((int16_t)msg->SteeringAngle) != 0)
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + displacement / radius;
