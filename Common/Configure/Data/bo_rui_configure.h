@@ -45,6 +45,7 @@
 // 轮脉冲比例系数
 #define WHEEL_PUSLE_RATIO                (0.021)
 
+#define WHEEL_PUSLE_MAX                  (4095)
 /*** turn radius and the steering angle relationship ***/
 // (400,470]
 #define FIT_RADIUS_A1 		( 0.07466)
