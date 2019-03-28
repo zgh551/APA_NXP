@@ -46,11 +46,11 @@ public:
 private:
 	float _last_yaw;
 
-	uint8_t _last_rear_left_pulse;
-	uint8_t _last_rear_right_pulse;
+	uint16_t _last_rear_left_pulse;
+	uint16_t _last_rear_right_pulse;
 
-	int16_t _delta_rear_left_pulse;
-	int16_t _delta_rear_right_pulse;
+	int32_t _delta_rear_left_pulse;
+	int32_t _delta_rear_right_pulse;
 
 	int32_t _sum_rear_left_pulse;
 	int32_t _sum_rear_right_pulse;
