@@ -16,8 +16,7 @@
 #include "vector_2d.h"
 #include "solve_equation.h"
 #include "math.h"
-#include "chang_an_configure.h"
-#include "common_configure.h"
+#include "vehilce_config.h"
 
 typedef struct _Line
 {

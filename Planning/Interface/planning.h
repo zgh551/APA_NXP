@@ -21,8 +21,6 @@
 #include "algebraic_geometry.h"
 //configure
 #include "vehilce_config.h"
-#include "chang_an_configure.h"
-#include "common_configure.h"
 // Controller
 #include "Interface/vehicle_controller.h"
 #include "ChangAn/chang_an_controller.h"

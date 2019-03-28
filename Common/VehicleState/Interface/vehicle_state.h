@@ -21,10 +21,9 @@
 #include "property.h"
 #include "math.h"
 #include "vector_2d.h"
-#include "chang_an_configure.h"
-#include "common_configure.h"
-#include "Interface/message_manager.h"
 #include "vehilce_config.h"
+#include "Interface/message_manager.h"
+
 
 class VehicleState
 {

@@ -21,8 +21,6 @@
 #include "property.h"
 #include <vector_2d.h>
 #include "math.h"
-#include "chang_an_configure.h"
-#include "common_configure.h"
 #include "vehilce_config.h"
 #include "algebraic_geometry.h"
 
