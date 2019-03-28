@@ -226,11 +226,20 @@ void PIT0_isr(void)
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 	{
+#ifdef CHANGAN
 		#if 1 == SIMULATION
 		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
 		#else
 		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
 		#endif
+#endif
+#ifdef BORUI
+		#if 1 == SIMULATION
+		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
+		#else
+		m_GeometricTrack.PulseUpdate(&m_BoRuiMessage);
+#endif
+#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 	{
