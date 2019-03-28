@@ -59,12 +59,12 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			break;
 
 		case 0x124://Wheel speed pulse
-			WheelPulseDirection  = WheelSpeedDirection;
+//			WheelPulseDirection  = WheelSpeedDirection;
 
-			WheelPulseRearRight  = (uint16_t)( (dat[0] << 4) | (dat[1] >> 4));
-			WheelPulseRearLeft   = (uint16_t)( (dat[1] << 8) |  dat[2]      );
-			WheelPulseFrontRight = (uint16_t)( (dat[3] << 4) | (dat[4] >> 4));
-			WheelPulseFrontLeft  = (uint16_t)( (dat[4] << 8) |  dat[5]      );
+			WheelPulseRearRight  = (uint16_t)(( (dat[0] << 4) | (dat[1] >> 4)) & 0x0fff);
+			WheelPulseRearLeft   = (uint16_t)(( (dat[1] << 8) |  dat[2]      ) & 0x0fff);
+			WheelPulseFrontRight = (uint16_t)(( (dat[3] << 4) | (dat[4] >> 4)) & 0x0fff);
+			WheelPulseFrontLeft  = (uint16_t)(( (dat[4] << 8) |  dat[5]      ) & 0x0fff);
 			break;
 
 		case 0x113:// TCU GEAR
