@@ -684,7 +684,7 @@ float VehilceConfig::TurnRadiusCalculate(float steering_angle)
 //			steering_angle > -300 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A10,FIT_RADIUS_B10) :
 //			steering_angle > -400 ? SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A11,FIT_RADIUS_B11) :
 //					                SteeringAngle2TurnningRadius(steering_angle,FIT_RADIUS_A12,FIT_RADIUS_B12);
-	return steering_angle >  0 ? SteerAngle2Radius[(uint16_t)steering_angle][0] : SteerAngle2Radius[(uint16_t)(-steering_angle)][1];
+	return steering_angle >  0 ? SteerAngle2Radius[(uint16_t)steering_angle][0] : -SteerAngle2Radius[(uint16_t)(-steering_angle)][1];
 }
 
 float VehilceConfig::SteeringAngleCalculate(float radius)
