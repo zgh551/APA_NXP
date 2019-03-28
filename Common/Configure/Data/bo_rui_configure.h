@@ -19,8 +19,8 @@
 // 轴距(m)
 #define WHEEL_BASE                        (2.850)
 // 车辆边沿到车辆中心点的距离(m)
-#define FRONT_EDGE_TO_CENTER              (3.54)
-#define REAR_EDGE_TO_CENTER               (0.905)
+#define FRONT_EDGE_TO_CENTER              (3.886)
+#define REAR_EDGE_TO_CENTER               (1.10)
 #define LEFT_EDGE_TO_CENTER               (0.9275)
 #define RIGHT_EDGE_TO_CENTER              (0.9275)
 
