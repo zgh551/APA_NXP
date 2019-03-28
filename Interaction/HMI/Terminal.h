@@ -72,15 +72,24 @@ public:
 
 	void Push(Planning *p);
 ///////////////////////////////////////////////////////////////////////////
+	/*
+	 * 直接测量超声波原始信号
+	 * */
 	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
 	void UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk);
-
+	/*
+	 * 三角定位的短距离超声波信号
+	 * */
 	void UltrasonicLocationSend(uint8_t id,LIN_RAM *msg);
 	void UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk);
-	void UltrasonicLocationSend(uint8_t id,Vector2d v1);
-	void UltrasonicLocationSend(uint8_t id,Vector2d v1,Vector2d v2);
-
-	void UltrasonicGroundLocationSend(uint8_t id,Vector2d v1,Vector2d v2);
+	/*
+	 * 载体坐标系的数据发送
+	 * */
+	void UltrasonicBodyLocationSend(uint8_t id,Abstacle_Location_Packet packet);
+	/*
+	 * 地面坐标系的数据发送
+	 * */
+	void UltrasonicGroundLocationSend(uint8_t id,Abstacle_Location_Packet packet);
 
 	void Ack(void);
 

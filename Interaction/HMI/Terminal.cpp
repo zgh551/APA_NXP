@@ -314,36 +314,36 @@ void Terminal::Push(Ultrasonic *u)
 #if ULTRASONIC_PACKET == 1
 
 #if ULTRASONIC_SCHEDULE_MODO == 2
-	switch(u->ReadStage)
+	switch(u->ScheduleTimeCnt)
 	{
-		case 0:
+		case 7:
 			UltrasonicSend(1,u->UltrasonicPacket);
 			UltrasonicSend(7,u->UltrasonicPacket);
 			break;
 
-		case 1:
-		case 5:
+		case 10:
+		case 23:
 			UltrasonicSend(8,u->UltrasonicPacket);
 			UltrasonicSend(11,u->UltrasonicPacket);
 			break;
 
-		case 2:
-		case 6:
+		case 12:
+		case 25:
 			UltrasonicSend(9,u->UltrasonicPacket);
 			UltrasonicSend(10,u->UltrasonicPacket);
 			break;
 
-		case 3:
+		case 13:
 			UltrasonicSend(3,u->UltrasonicPacket);
 			UltrasonicSend(5,u->UltrasonicPacket);
 			break;
 
-		case 4:
+		case 20:
 			UltrasonicSend(0,u->UltrasonicPacket);
 			UltrasonicSend(6,u->UltrasonicPacket);
 			break;
 
-		case 7:
+		case 0:
 			UltrasonicSend(2,u->UltrasonicPacket);
 			UltrasonicSend(4,u->UltrasonicPacket);
 			break;
@@ -354,76 +354,35 @@ void Terminal::Push(Ultrasonic *u)
 #endif
 
 #if ULTRASONIC_SCHEDULE_MODO == 3
-	switch(u->ReadStage)
+	switch(u->ScheduleTimeCnt)
 	{
-		case 0:
+		case 9:
+			// 直接测量的传感器值
 			UltrasonicSend(1,u->UltrasonicPacket);
 			UltrasonicSend(6,u->UltrasonicPacket);
 
-			UltrasonicLocationSend(1,u->AbstaclePositionDirect[1]);
-			UltrasonicLocationSend(6,u->AbstaclePositionDirect[6]);
-
-			UltrasonicLocationSend(0,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(1,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(2,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(9,u->UltrasonicLocationPacket);
+			// 三角定位测量的传感器值
+			UltrasonicLocationSend(0 ,u->UltrasonicLocationPacket);
+			UltrasonicLocationSend(1 ,u->UltrasonicLocationPacket);
+			UltrasonicLocationSend(2 ,u->UltrasonicLocationPacket);
+			UltrasonicLocationSend(9 ,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(10,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(11,u->UltrasonicLocationPacket);
 
+			UltrasonicBodyLocationSend(0,u->AbstacleBodyPositionTriangle[0]);
+			UltrasonicBodyLocationSend(1,u->AbstacleBodyPositionTriangle[1]);
+			UltrasonicBodyLocationSend(2,u->AbstacleBodyPositionTriangle[2]);
+			UltrasonicBodyLocationSend(3,u->AbstacleBodyPositionTriangle[3]);
 
+			UltrasonicGroundLocationSend(0,u->AbstacleGroundPositionTriangle[0]);
+			UltrasonicGroundLocationSend(1,u->AbstacleGroundPositionTriangle[1]);
+			UltrasonicGroundLocationSend(2,u->AbstacleGroundPositionTriangle[2]);
+			UltrasonicGroundLocationSend(3,u->AbstacleGroundPositionTriangle[3]);
 			break;
 
-		case 1:
-			UltrasonicLocationSend(12,u->AbstaclePositionTriangle[0],u->AbstaclePositionTriangle[1]);
-			UltrasonicLocationSend(15,u->AbstaclePositionTriangle[6],u->AbstaclePositionTriangle[7]);
-
-			UltrasonicGroundLocationSend(12,u->AbstacleGroundPositionTriangle[0],u->AbstacleGroundPositionTriangle[1]);
-			UltrasonicGroundLocationSend(15,u->AbstacleGroundPositionTriangle[6],u->AbstacleGroundPositionTriangle[7]);
-
-			UltrasonicSend(8 ,u->UltrasonicPacket);
-			UltrasonicSend(10,u->UltrasonicPacket);
-
-			UltrasonicLocationSend(8,u->AbstaclePositionDirect[8]);
-			UltrasonicLocationSend(10,u->AbstaclePositionDirect[10]);
-			break;
-
-		case 5:
-			UltrasonicLocationSend(13,u->AbstaclePositionTriangle[2],u->AbstaclePositionTriangle[3]);
-			UltrasonicLocationSend(14,u->AbstaclePositionTriangle[4],u->AbstaclePositionTriangle[5]);
-
-			UltrasonicGroundLocationSend(13,u->AbstacleGroundPositionTriangle[2],u->AbstacleGroundPositionTriangle[2]);
-			UltrasonicGroundLocationSend(14,u->AbstacleGroundPositionTriangle[4],u->AbstacleGroundPositionTriangle[5]);
-
-			UltrasonicSend(8 ,u->UltrasonicPacket);
-			UltrasonicSend(10,u->UltrasonicPacket);
-
-			UltrasonicLocationSend(8,u->AbstaclePositionDirect[8]);
-			UltrasonicLocationSend(10,u->AbstaclePositionDirect[10]);
-			break;
-
-		case 2:
-		case 6:
-			UltrasonicSend(9,u->UltrasonicPacket);
-			UltrasonicSend(11,u->UltrasonicPacket);
-
-			UltrasonicLocationSend(9,u->AbstaclePositionDirect[9]);
-			UltrasonicLocationSend(11,u->AbstaclePositionDirect[11]);
-			break;
-
-		case 3:
-			UltrasonicSend(3,u->UltrasonicPacket);
-			UltrasonicSend(4,u->UltrasonicPacket);
-
-			UltrasonicLocationSend(3,u->AbstaclePositionDirect[3]);
-			UltrasonicLocationSend(4,u->AbstaclePositionDirect[4]);
-			break;
-
-		case 4:
+		case 23:
 			UltrasonicSend(2,u->UltrasonicPacket);
 			UltrasonicSend(5,u->UltrasonicPacket);
-
-			UltrasonicLocationSend(2,u->AbstaclePositionDirect[2]);
-			UltrasonicLocationSend(5,u->AbstaclePositionDirect[5]);
 
 			UltrasonicLocationSend(3,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(4,u->UltrasonicLocationPacket);
@@ -431,14 +390,38 @@ void Terminal::Push(Ultrasonic *u)
 			UltrasonicLocationSend(6,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(7,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(8,u->UltrasonicLocationPacket);
+
+			UltrasonicBodyLocationSend(4,u->AbstacleBodyPositionTriangle[4]);
+			UltrasonicBodyLocationSend(5,u->AbstacleBodyPositionTriangle[5]);
+			UltrasonicBodyLocationSend(6,u->AbstacleBodyPositionTriangle[6]);
+			UltrasonicBodyLocationSend(7,u->AbstacleBodyPositionTriangle[7]);
+
+			UltrasonicGroundLocationSend(4,u->AbstacleGroundPositionTriangle[4]);
+			UltrasonicGroundLocationSend(5,u->AbstacleGroundPositionTriangle[5]);
+			UltrasonicGroundLocationSend(6,u->AbstacleGroundPositionTriangle[6]);
+			UltrasonicGroundLocationSend(7,u->AbstacleGroundPositionTriangle[7]);
 			break;
 
-		case 7:
+		case 11:
+		case 25:
+			UltrasonicSend(8 ,u->UltrasonicPacket);
+			UltrasonicSend(10,u->UltrasonicPacket);
+		break;
+
+		case 13:
+		case 27:
+			UltrasonicSend(9,u->UltrasonicPacket);
+			UltrasonicSend(11,u->UltrasonicPacket);
+			break;
+
+		case 14:
+			UltrasonicSend(3,u->UltrasonicPacket);
+			UltrasonicSend(4,u->UltrasonicPacket);
+			break;
+
+		case 0:
 			UltrasonicSend(0,u->UltrasonicPacket);
 			UltrasonicSend(7,u->UltrasonicPacket);
-
-			UltrasonicLocationSend(0,u->AbstaclePositionDirect[0]);
-			UltrasonicLocationSend(7,u->AbstaclePositionDirect[7]);
 			break;
 
 		default:
@@ -599,6 +582,9 @@ void Terminal::Push(Planning *p)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 /**************************************************************************************/
+/*
+ * 直接测量超声波原始信号
+ * */
 void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 {
 	CAN_Packet m_CAN_Packet;
@@ -629,23 +615,6 @@ void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 	}
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-
-void Terminal::UltrasonicLocationSend(uint8_t id,LIN_RAM *msg)
-{
-	CAN_Packet m_CAN_Packet;
-	m_CAN_Packet.id = 0x470 | id;
-	m_CAN_Packet.length = 8;
-	m_CAN_Packet.data[0] =  msg[id].STP318.TOF       & 0xff;
-	m_CAN_Packet.data[1] = (msg[id].STP318.TOF >> 8) & 0xff;
-	m_CAN_Packet.data[2] = 0;
-	m_CAN_Packet.data[3] = 0;
-	m_CAN_Packet.data[4] = 0;
-	m_CAN_Packet.data[5] = 0;
-	m_CAN_Packet.data[6] =  msg[id].STP318.Status;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
 void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 {
 	CAN_Packet m_CAN_Packet;
@@ -662,8 +631,8 @@ void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 		m_CAN_Packet.data[3] = 0;
 		m_CAN_Packet.data[4] = 0;
 		m_CAN_Packet.data[5] = 0;
-		m_CAN_Packet.data[6] =  msg_pk[id].status;
-		m_CAN_Packet.data[7] = 0;
+		m_CAN_Packet.data[6] = msg_pk[id].status;
+		m_CAN_Packet.data[7] = msg_pk->Time_Tx;
 	}
 	else
 	{
@@ -676,11 +645,28 @@ void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 		m_CAN_Packet.data[4] = (uint8_t)( msg_pk[id].Level * 10 ) ;
 		m_CAN_Packet.data[5] = (uint8_t)( msg_pk[id].Width);
 		m_CAN_Packet.data[6] =  msg_pk[id].status;
-		m_CAN_Packet.data[7] =  0;
+		m_CAN_Packet.data[7] =  msg_pk->Time_Tx;
 	}
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-
+/*
+ * 三角定位的短距离超声波信号
+ * */
+void Terminal::UltrasonicLocationSend(uint8_t id,LIN_RAM *msg)
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x470 | id;
+	m_CAN_Packet.length = 8;
+	m_CAN_Packet.data[0] =  msg[id].STP318.TOF       & 0xff;
+	m_CAN_Packet.data[1] = (msg[id].STP318.TOF >> 8) & 0xff;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = msg[id].STP318.Status;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
 void Terminal::UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 {
 	CAN_Packet m_CAN_Packet;
@@ -701,70 +687,50 @@ void Terminal::UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::UltrasonicLocationSend(uint8_t id,Vector2d v1)
+/*
+ * 载体坐标系的数据发送
+ * */
+void Terminal::UltrasonicBodyLocationSend(uint8_t id,Abstacle_Location_Packet packet)
 {
 	CAN_Packet m_CAN_Packet;
 	int16_t temp;
 	m_CAN_Packet.id = 0x480 | id;
 	m_CAN_Packet.length = 8;
 
-	temp = v1.getX()*1000;
+	temp = packet.Position.getX()*1000;
 	m_CAN_Packet.data[0] = (uint8_t)((temp     ) & 0xff );
 	m_CAN_Packet.data[1] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v1.getY()*1000;
+	temp = packet.Position.getY()*1000;
 	m_CAN_Packet.data[2] = (uint8_t)((temp     ) & 0xff );
 	m_CAN_Packet.data[3] = (uint8_t)((temp >> 8) & 0xff );
 
 	m_CAN_Packet.data[4] = 0;
 	m_CAN_Packet.data[5] = 0;
 	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	m_CAN_Packet.data[7] = packet.Status;
 
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-
-void Terminal::UltrasonicLocationSend(uint8_t id,Vector2d v1,Vector2d v2)
-{
-	CAN_Packet m_CAN_Packet;
-	int16_t temp;
-	m_CAN_Packet.id = 0x480 | id;
-	m_CAN_Packet.length = 8;
-
-	temp = v1.getX()*1000;
-	m_CAN_Packet.data[0] = (uint8_t)((temp     ) & 0xff );
-	m_CAN_Packet.data[1] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v1.getY()*1000;
-	m_CAN_Packet.data[2] = (uint8_t)((temp     ) & 0xff );
-	m_CAN_Packet.data[3] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v2.getX()*1000;
-	m_CAN_Packet.data[4] = (uint8_t)((temp     ) & 0xff );
-	m_CAN_Packet.data[5] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v2.getY()*1000;
-	m_CAN_Packet.data[6] = (uint8_t)((temp     ) & 0xff );
-	m_CAN_Packet.data[7] = (uint8_t)((temp >> 8) & 0xff );
-
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::UltrasonicGroundLocationSend(uint8_t id,Vector2d v1,Vector2d v2)
+/*
+ * 地面坐标系的数据发送
+ * */
+void Terminal::UltrasonicGroundLocationSend(uint8_t id,Abstacle_Location_Packet packet)
 {
 	CAN_Packet m_CAN_Packet;
 	int16_t temp;
 	m_CAN_Packet.id = 0x490 | id;
 	m_CAN_Packet.length = 8;
 
-	temp = v1.getX()*1000;
+	temp = packet.Position.getX()*1000;
 	m_CAN_Packet.data[0] = (uint8_t)((temp     ) & 0xff );
 	m_CAN_Packet.data[1] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v1.getY()*1000;
+	temp = packet.Position.getY()*1000;
 	m_CAN_Packet.data[2] = (uint8_t)((temp     ) & 0xff );
 	m_CAN_Packet.data[3] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v2.getX()*1000;
-	m_CAN_Packet.data[4] = (uint8_t)((temp     ) & 0xff );
-	m_CAN_Packet.data[5] = (uint8_t)((temp >> 8) & 0xff );
-	temp = v2.getY()*1000;
-	m_CAN_Packet.data[6] = (uint8_t)((temp     ) & 0xff );
-	m_CAN_Packet.data[7] = (uint8_t)((temp >> 8) & 0xff );
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = packet.Status;
 
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
