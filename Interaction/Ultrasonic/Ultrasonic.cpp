@@ -43,11 +43,11 @@ Ultrasonic::Ultrasonic() {
 	UltrasonicLocationPacket.setContainer(this);
 	UltrasonicLocationPacket.getter(&Ultrasonic::getUltrasonicLocationPacket);
 
-	AbstaclePositionDirect.setContainer(this);
-	AbstaclePositionDirect.getter(&Ultrasonic::getAbstaclePositionDirect);
+	AbstacleBodyPositionDirect.setContainer(this);
+	AbstacleBodyPositionDirect.getter(&Ultrasonic::getAbstacleBodyPositionDirect);
 
-	AbstaclePositionTriangle.setContainer(this);
-	AbstaclePositionTriangle.getter(&Ultrasonic::getAbstaclePositionTriangle);
+	AbstacleBodyPositionTriangle.setContainer(this);
+	AbstacleBodyPositionTriangle.getter(&Ultrasonic::getAbstacleBodyPositionTriangle);
 
 	AbstacleGroundPositionTriangle.setContainer(this);
 	AbstacleGroundPositionTriangle.getter(&Ultrasonic::getAbstacleGroundPositionTriangle);
@@ -81,11 +81,11 @@ Ultrasonic_Packet* Ultrasonic::getUltrasonicPacket(){return _ultrasonic_packet;}
 
 Ultrasonic_Packet* Ultrasonic::getUltrasonicLocationPacket(){return _ultrasonic_location_packet;}
 
-Vector2d* Ultrasonic::getAbstaclePositionDirect(){return _abstacle_position_direct;}
+Abstacle_Location_Packet* Ultrasonic::getAbstacleBodyPositionDirect(){return _abstacle_body_position_direct;}
 
-Vector2d* Ultrasonic::getAbstaclePositionTriangle(){return _abstacle_position_triangle;}
+Abstacle_Location_Packet* Ultrasonic::getAbstacleBodyPositionTriangle(){return _abstacle_body_position_triangle;}
 
-Vector2d* Ultrasonic::getAbstacleGroundPositionTriangle(){return _abstacle_ground_position_triangle;}
+Abstacle_Location_Packet* Ultrasonic::getAbstacleGroundPositionTriangle(){return _abstacle_ground_position_triangle;}
 
 void Ultrasonic::setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p)
 {
@@ -130,6 +130,9 @@ void Ultrasonic::ReadSensing_STP313(uint8_t id,void (*ReceiveFrame)(LIN_RAM *),L
 	ReceiveFrame(m_LIN_RAM);
 }
 
+/*
+ * 激活单发单收
+ * */
 void Ultrasonic::InitUltrasonicSensor(uint8_t n)
 {
 	switch(n)
@@ -168,6 +171,9 @@ void Ultrasonic::InitUltrasonicSensor(uint8_t n)
 	}
 }
 
+/*
+ * 激活一发多收
+ * */
 void Ultrasonic::InitUltrasonicSensorRx(uint8_t n)
 {
 	switch(n)
@@ -386,6 +392,9 @@ void Ultrasonic::UltrasonicScheduleStatusMachine(void)
     }
 }
 
+/*
+ * 单发单收调度
+ * */
 void Ultrasonic::UltrasonicScheduleStatusMachine_V2(void)
 {
 	switch(_schedule_time_cnt)
@@ -498,7 +507,9 @@ void Ultrasonic::UltrasonicScheduleStatusMachine_V2(void)
 			break;
     }
 }
-
+/*
+ * 多发多收调度
+ * */
 void Ultrasonic::UltrasonicScheduleStatusMachine_V3(void)
 {
 	switch(_schedule_time_cnt)
@@ -637,16 +648,18 @@ void Ultrasonic::UltrasonicScheduleStatusMachine_V3(void)
  * */
 void Ultrasonic::UltrasonicConvert(uint8_t type,LIN_RAM d,Ultrasonic_Packet *p,float t)
 {
+	float temp;
+	temp = Compensation(t);
 	if(0 == type)
 	{
-		 p->Distance1 = d.STP318.TOF * Compensation(t);
+		 p->Distance1 = d.STP318.TOF * temp;
 		 p->status    = d.STP318.Status;
 		 p->Time_Ms   = p->Time_Tx * 5 + d.STP318.TOF * 0.0005;
 	}
 	else if(1 == type)
 	{
-		p->Distance1 = d.STP313.TOF1 * Compensation(t);
-		p->Distance2 = d.STP313.TOF2 * Compensation(t);
+		p->Distance1 = d.STP313.TOF1 * temp;
+		p->Distance2 = d.STP313.TOF2 * temp;
 		p->Level     = d.STP313.Level * LEVEL_RATIO;
 		p->Width     = d.STP313.Width * WIDTH_RATIO;
 		p->status    = d.STP313.Status;
@@ -663,6 +676,10 @@ float Ultrasonic::Compensation(float temp)
 	return (331.5 + 0.60714 * temp) * 0.0000005; // (m/us)/2
 }
 
+/*
+ * 老版本的更新状态机
+ * 基于DMA中断
+ * */
 void Ultrasonic::Update(uint8_t id,float t)
 {
 	switch(_read_stage)
@@ -776,6 +793,9 @@ void Ultrasonic::Update(uint8_t id,float t)
 	}
 }
 
+/*
+ * 基于定时器的调度更新
+ * */
 void Ultrasonic::Update(float t)
 {
 
@@ -849,7 +869,6 @@ void Ultrasonic::Update(float t)
 			UltrasonicConvert(0,_ultrasonic_location_datas[9],&_ultrasonic_location_packet[9],t);
 			UltrasonicConvert(0,_ultrasonic_location_datas[10],&_ultrasonic_location_packet[10],t);
 			UltrasonicConvert(0,_ultrasonic_location_datas[11],&_ultrasonic_location_packet[11],t);
-
 			_ultrasonic_location_packet[9].Distance1  = 2 * _ultrasonic_location_packet[9].Distance1  - _ultrasonic_location_packet[10].Distance1;
 			_ultrasonic_location_packet[11].Distance1 = 2 * _ultrasonic_location_packet[11].Distance1 - _ultrasonic_location_packet[10].Distance1;
 		break;
@@ -882,7 +901,6 @@ void Ultrasonic::Update(float t)
 			UltrasonicConvert(0,_ultrasonic_location_datas[6],&_ultrasonic_location_packet[6],t);
 			UltrasonicConvert(0,_ultrasonic_location_datas[7],&_ultrasonic_location_packet[7],t);
 			UltrasonicConvert(0,_ultrasonic_location_datas[8],&_ultrasonic_location_packet[8],t);
-
 			_ultrasonic_location_packet[6].Distance1 = 2 * _ultrasonic_location_packet[6].Distance1 - _ultrasonic_location_packet[7].Distance1;
 			_ultrasonic_location_packet[8].Distance1 = 2 * _ultrasonic_location_packet[8].Distance1 - _ultrasonic_location_packet[7].Distance1;
 		break;
@@ -904,180 +922,176 @@ void Ultrasonic::Update(float t)
 #endif
 }
 
-void Ultrasonic::VehicleAxisAbstacleDirectCalculate(Location l,float d,Vector2d *p)
+/*
+ * 直接测量数据的传感器坐标系与载体坐标系的转换
+ * position: 传感器的安装坐标
+ * data    : 超声波数据
+ * location: 障碍物相对车体的位置
+ * */
+void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,Abstacle_Location_Packet *location)
 {
 	Vector2d temp_angle;
-	temp_angle = Vector2d(d,0);
-	*p = l.Point + temp_angle.rotate(l.Angle);
+	if(0 == data.status)
+	{
+		if(0 == data.Distance1)
+		{
+			location->Position = Vector2d(0,0);
+			location->Status = OverDetection;
+		}
+		else
+		{
+			temp_angle = Vector2d(data.Distance1,0);
+			location->Position = position.Point + temp_angle.rotate(position.Angle);
+			location->Status = Normal;
+		}
+	}
+	else
+	{
+		location->Position = Vector2d(0,0);
+		if(16 == data.status)
+		{
+			location->Status = BlindZone;
+		}
+		else
+		{
+			location->Status = Noise;
+		}
+	}
 }
 
-void Ultrasonic::VehicleAxisAbstacleTriangleCalculate(int8_t d,Location a,Location b,float ul,float ur,Vector2d *p)
+/*
+ * 三角定位测量值 由传感器坐标系转到载体坐标系
+ * type:三角顶点朝向；1 -> 朝上   0 -> 朝下
+ * position_a:传感器安装位置a
+ * position_b:传感器安装位置b
+ * data_ul:三角定位测量的左边长值
+ * data_ur:三角定位测量的右边长值
+ * location:障碍物定位坐标
+ * */
+void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location position_b,
+										Ultrasonic_Packet data_ul,Ultrasonic_Packet data_ur,
+										Abstacle_Location_Packet *location)
 {
 	float bottom_edge;
 	float alpha,beta;
 	Vector2d temp_angle;
 
-	bottom_edge = ( b.Point - a.Point ).Length();
-	if( ((ul + ur) > bottom_edge) && (fabs(ul - ur) < bottom_edge) && ((fabs(ul - ur) / bottom_edge) < 0.8))
+	if( (0 == data_ul.status) && (0 == data_ur.status))
 	{
-		alpha = ( b.Point - a.Point ).Angle();
-		if(1 == d)
+		if( (0 == data_ul.Distance1) || (0 == data_ur.Distance1))
 		{
-			beta =  acosf( (bottom_edge * bottom_edge + ul * ul - ur * ur) / (2 * ul * bottom_edge));
+			location->Position = Vector2d(0,0);
+			location->Status   = OverDetection;
 		}
-		else if(-1 == d)
+		else
 		{
-			beta = -acosf( (bottom_edge * bottom_edge + ul * ul - ur * ur) / (2 * ul * bottom_edge));
+			bottom_edge = ( position_b.Point - position_a.Point ).Length();
+			if( (     (data_ul.Distance1 + data_ur.Distance1) >  bottom_edge      ) &&
+				( fabs(data_ul.Distance1 - data_ur.Distance1) <  bottom_edge      ) &&
+				( fabs(data_ul.Distance1 - data_ur.Distance1) < (bottom_edge * 0.8) )
+			)
+			{
+				alpha = ( position_b.Point - position_a.Point ).Angle();
+				if(1 == type)
+				{
+					beta =  acosf( (bottom_edge * bottom_edge + data_ul.Distance1 * data_ul.Distance1 - data_ur.Distance1 * data_ur.Distance1) / (2 * data_ul.Distance1 * bottom_edge));
+				}
+				else if(-1 == type)
+				{
+					beta = -acosf( (bottom_edge * bottom_edge + data_ul.Distance1 * data_ul.Distance1 - data_ur.Distance1 * data_ur.Distance1) / (2 * data_ul.Distance1 * bottom_edge));
+				}
+				temp_angle = Vector2d(data_ul.Distance1,0);
+				location->Position = position_a.Point + temp_angle.rotate(alpha + beta);
+				location->Status   = Normal;
+			}
+			else
+			{
+				location->Position = Vector2d(0,0);
+				location->Status   = Noise;
+			}
 		}
-		temp_angle = Vector2d(ul,0);
-
-		*p = a.Point + temp_angle.rotate(alpha + beta);
 	}
 	else
 	{
-		*p = a.Point;
+		location->Position = Vector2d(0,0);
+		if( (16 == data_ul.status) || (16 == data_ur.status))
+		{
+			location->Status = BlindZone;
+		}
+		else
+		{
+			location->Status = Noise;
+		}
 	}
 }
 
-void Ultrasonic::TriangleLocation()
+/*
+ * 三角定位地面坐标系的转换
+ * vehicle:车辆状态信息
+ * body   :障碍物相对于载体坐标系的坐标
+ * ground :障碍物相对于地面坐标系的坐标
+ * */
+void Ultrasonic::GroundTriangleCalculate(VehicleState *vehicle,Abstacle_Location_Packet body,Abstacle_Location_Packet *ground)
+{
+	if(Normal == body.Status)
+	{
+		ground->Position = vehicle->getPosition() + (body.Position - vehicle->getPosition()).rotate(vehicle->getYaw());
+	}
+	else
+	{
+		ground->Position = Vector2d(0,0);
+	}
+	ground->Status   = body.Status;
+}
+
+/*
+ * 基于直接测量值的载体坐标系转换
+ * */
+void Ultrasonic::BodyDirectLocation()
 {
 	switch(ScheduleTimeCnt)
 	{
-		case 8:
-			VehicleAxisAbstacleTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[1],
-												   _abstacle_config.UltrasonicLocationArray[2],
-												   UltrasonicLocationPacket[1].Distance1,
-												   UltrasonicLocationPacket[2].Distance1,
-												   &AbstaclePositionTriangle[1]);
-
-			VehicleAxisAbstacleTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[1],
-												   _abstacle_config.UltrasonicLocationArray[2],
-												   UltrasonicLocationPacket[3].Distance1,
-												   UltrasonicLocationPacket[4].Distance1,
-												   &AbstaclePositionTriangle[2]);
-			break;
-		case 9:
-			VehicleAxisAbstacleTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[0],
-					                               _abstacle_config.UltrasonicLocationArray[1],
-												   UltrasonicLocationPacket[0].Distance1,
-												   UltrasonicLocationPacket[1].Distance1,
-												   &AbstaclePositionTriangle[0]);
-
-			VehicleAxisAbstacleTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[2],
-												   _abstacle_config.UltrasonicLocationArray[3],
-												   UltrasonicLocationPacket[4].Distance1,
-												   UltrasonicLocationPacket[5].Distance1,
-												   &AbstaclePositionTriangle[3]);
-			break;
-
-		case 22:
-			VehicleAxisAbstacleTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[5],
-					                                _abstacle_config.UltrasonicLocationArray[6],
-												    UltrasonicLocationPacket[7].Distance1,
-												    UltrasonicLocationPacket[8].Distance1,
-												    &AbstaclePositionTriangle[5]);
-
-			VehicleAxisAbstacleTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[5],
-					                                _abstacle_config.UltrasonicLocationArray[6],
-												    UltrasonicLocationPacket[9].Distance1,
-												    UltrasonicLocationPacket[10].Distance1,
-												    &AbstaclePositionTriangle[6]);
-			break;
-
-		case 23:
-			VehicleAxisAbstacleTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[4],
-					                                _abstacle_config.UltrasonicLocationArray[5],
-												    UltrasonicLocationPacket[6].Distance1,
-												    UltrasonicLocationPacket[7].Distance1,
-												    &AbstaclePositionTriangle[4]);
-
-			VehicleAxisAbstacleTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[6],
-					                                _abstacle_config.UltrasonicLocationArray[7],
-												    UltrasonicLocationPacket[10].Distance1,
-												    UltrasonicLocationPacket[11].Distance1,
-												    &AbstaclePositionTriangle[7]);
-			break;
-	}
-
-}
-
-void Ultrasonic::DirectLocation()
-{
-	switch(_schedule_time_cnt)
-	{
 		case 0:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[0],
-												UltrasonicPacket[0].Distance1,
-												&AbstaclePositionDirect[0]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[7],
-												UltrasonicPacket[7].Distance1,
-												&AbstaclePositionDirect[7]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[0],UltrasonicPacket[0],&AbstacleBodyPositionDirect[0]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[7],UltrasonicPacket[7],&AbstacleBodyPositionDirect[7]);
 			break;
 
 
 		case 8:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[1],
-												UltrasonicPacket[1].Distance1,
-												&AbstaclePositionDirect[1]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[6],
-												UltrasonicPacket[6].Distance1,
-												&AbstaclePositionDirect[6]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[1],UltrasonicPacket[1],&AbstacleBodyPositionDirect[1]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[6],UltrasonicPacket[6],&AbstacleBodyPositionDirect[6]);
 			break;
 
 		case 11:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[8],
-												UltrasonicPacket[8].Distance1,
-												&AbstaclePositionDirect[8]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[10],
-												UltrasonicPacket[10].Distance1,
-												&AbstaclePositionDirect[10]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[8],UltrasonicPacket[8],&AbstacleBodyPositionDirect[8]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[10],UltrasonicPacket[10],&AbstacleBodyPositionDirect[10]);
 			break;
 
 		case 13:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[9],
-												UltrasonicPacket[9].Distance1,
-												&AbstaclePositionDirect[9]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[11],
-												UltrasonicPacket[11].Distance1,
-												&AbstaclePositionDirect[11]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[9],UltrasonicPacket[9],&AbstacleBodyPositionDirect[9]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[11],UltrasonicPacket[11],&AbstacleBodyPositionDirect[11]);
 			break;
 
 		case 14:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[3],
-												UltrasonicPacket[3].Distance1,
-												&AbstaclePositionDirect[3]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[4],
-												UltrasonicPacket[4].Distance1,
-												&AbstaclePositionDirect[4]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[3],UltrasonicPacket[3],&AbstacleBodyPositionDirect[3]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[4],UltrasonicPacket[4],&AbstacleBodyPositionDirect[4]);
 			break;
 
 		case 22:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[2],
-												UltrasonicPacket[2].Distance1,
-												&AbstaclePositionDirect[2]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[5],
-												UltrasonicPacket[5].Distance1,
-												&AbstaclePositionDirect[5]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[2],UltrasonicPacket[2],&AbstacleBodyPositionDirect[2]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[5],UltrasonicPacket[5],&AbstacleBodyPositionDirect[5]);
 			break;
 
 
 		case 25:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[8],
-												UltrasonicPacket[8].Distance1,
-												&AbstaclePositionDirect[8]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[10],
-												UltrasonicPacket[10].Distance1,
-												&AbstaclePositionDirect[10]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[8],UltrasonicPacket[8],&AbstacleBodyPositionDirect[8]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[10],UltrasonicPacket[10],&AbstacleBodyPositionDirect[10]);
 
 			break;
 
 		case 27:
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[9],
-												UltrasonicPacket[9].Distance1,
-												&AbstaclePositionDirect[9]);
-			VehicleAxisAbstacleDirectCalculate( _abstacle_config.UltrasonicLocationArray[11],
-												UltrasonicPacket[11].Distance1,
-												&AbstaclePositionDirect[11]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[9],UltrasonicPacket[9],&AbstacleBodyPositionDirect[9]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[11],UltrasonicPacket[11],&AbstacleBodyPositionDirect[11]);
 			break;
 
 		default:
@@ -1085,33 +1099,70 @@ void Ultrasonic::DirectLocation()
 	}
 }
 
-
-void Ultrasonic::GroundAxisAbstacleTriangleCalculate(VehicleState *s,Vector2d v,Vector2d *g)
-{
-	*g = s->getPosition() + (v - s->getPosition()).rotate(s->getYaw());
-}
-
-void Ultrasonic::TriangleLocationGround(VehicleState *s)
+void Ultrasonic::BodyTriangleLocation()
 {
 	switch(ScheduleTimeCnt)
 	{
 		case 8:
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[1],&AbstacleGroundPositionTriangle[1]);
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[2],&AbstacleGroundPositionTriangle[2]);
-			break;
-		case 9:
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[0],&AbstacleGroundPositionTriangle[0]);
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[3],&AbstacleGroundPositionTriangle[3]);
+			BodyTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[0],_abstacle_config.UltrasonicLocationArray[1],
+									UltrasonicLocationPacket[0],UltrasonicLocationPacket[1],
+									&AbstacleBodyPositionTriangle[0]);
+
+			BodyTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[1],_abstacle_config.UltrasonicLocationArray[2],
+								    UltrasonicLocationPacket[1],UltrasonicLocationPacket[2],
+									&AbstacleBodyPositionTriangle[1]);
+
+			BodyTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[1],_abstacle_config.UltrasonicLocationArray[2],
+									UltrasonicLocationPacket[3],UltrasonicLocationPacket[4],
+									&AbstacleBodyPositionTriangle[2]);
+
+			BodyTriangleCalculate(1,_abstacle_config.UltrasonicLocationArray[2],_abstacle_config.UltrasonicLocationArray[3],
+									UltrasonicLocationPacket[4],UltrasonicLocationPacket[5],
+									&AbstacleBodyPositionTriangle[3]);
 			break;
 
 		case 22:
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[5],&AbstacleGroundPositionTriangle[5]);
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[6],&AbstacleGroundPositionTriangle[6]);
+			BodyTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[4],_abstacle_config.UltrasonicLocationArray[5],
+									 UltrasonicLocationPacket[6],UltrasonicLocationPacket[7],
+									 &AbstacleBodyPositionTriangle[4]);
+
+			BodyTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[5],_abstacle_config.UltrasonicLocationArray[6],
+									 UltrasonicLocationPacket[7],UltrasonicLocationPacket[8],
+									 &AbstacleBodyPositionTriangle[5]);
+
+			BodyTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[5],_abstacle_config.UltrasonicLocationArray[6],
+									 UltrasonicLocationPacket[9],UltrasonicLocationPacket[10],
+									 &AbstacleBodyPositionTriangle[6]);
+
+			BodyTriangleCalculate(-1,_abstacle_config.UltrasonicLocationArray[6],_abstacle_config.UltrasonicLocationArray[7],
+									 UltrasonicLocationPacket[10],UltrasonicLocationPacket[11],
+									 &AbstacleBodyPositionTriangle[7]);
 			break;
 
-		case 23:
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[4],&AbstacleGroundPositionTriangle[4]);
-			GroundAxisAbstacleTriangleCalculate(s,AbstaclePositionTriangle[7],&AbstacleGroundPositionTriangle[7]);
+		default:
+			break;
+	}
+
+}
+
+void Ultrasonic::GroundTriangleLocation(VehicleState *vehicle_state)
+{
+	switch(ScheduleTimeCnt)
+	{
+		case 8:
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[0],&AbstacleGroundPositionTriangle[0]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[1],&AbstacleGroundPositionTriangle[1]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[2],&AbstacleGroundPositionTriangle[2]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[3],&AbstacleGroundPositionTriangle[3]);
+			break;
+
+		case 22:
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[4],&AbstacleGroundPositionTriangle[4]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[5],&AbstacleGroundPositionTriangle[5]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[6],&AbstacleGroundPositionTriangle[6]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[7],&AbstacleGroundPositionTriangle[7]);
+			break;
+		default:
 			break;
 	}
 }

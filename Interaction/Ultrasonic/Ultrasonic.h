@@ -38,6 +38,14 @@
 #define ULTRASONIC_SCHEDULE_MODO  ( 3 ) // 超声调度模式
 
 /*** LIN Device Data Struct ***/
+typedef enum _UltrasonicStatus
+{
+    Normal = 0,
+    BlindZone,
+    OverDetection,
+    Noise
+}UltrasonicStatus;
+
 typedef struct _LIN_STP318_Packet
 {
 	uint16_t TOF;
@@ -63,6 +71,12 @@ typedef struct _Ultrasonic_Packet
 	uint8_t status;
 	uint32_t Time_Tx;
 }Ultrasonic_Packet;
+
+typedef struct _Abstacle_Location_Packet
+{
+	Vector2d Position;
+	UltrasonicStatus  Status;
+}Abstacle_Location_Packet;
 
 class Ultrasonic {
 public:
@@ -91,22 +105,51 @@ public:
 
 
 	void Update(uint8_t id,float t);
+	/*
+	 * 数据更新 定时器触发
+	 * */
 	void Update(float t);
 
-	// 正常测距的坐标转换
-	void VehicleAxisAbstacleDirectCalculate(Location l,float d,Vector2d *p);
 	/*
-	 * 三角定位计算障碍物位置
+	 * 直接测量数据的传感器坐标系与载体坐标系的转换
+	 * position: 传感器的安装坐标
+	 * data    : 超声波数据
+	 * location: 障碍物相对车体的位置
 	 * */
-	void VehicleAxisAbstacleTriangleCalculate(int8_t d,Location a,Location b,float ul,float ur,Vector2d *p);
+	void BodyDirectCalculate(Location position,Ultrasonic_Packet data,Abstacle_Location_Packet *location);
+	/*
+	 * 三角定位测量值 由传感器坐标系转到载体坐标系
+	 * type:三角顶点朝向；1 -> 朝上   0 -> 朝下
+	 * position_a:传感器安装位置a
+	 * position_b:传感器安装位置b
+	 * data_ul:三角定位测量的左边长值
+	 * data_ur:三角定位测量的右边长值
+	 * location:障碍物定位坐标
+	 * */
+	void BodyTriangleCalculate(int8_t type,Location position_a,Location position_b,Ultrasonic_Packet data_ul,Ultrasonic_Packet data_ur,Abstacle_Location_Packet *location);
 
-	void TriangleLocation();
+	/*
+	 * 三角定位地面坐标系的转换
+	 * vehicle:车辆状态信息
+	 * body   :障碍物相对于载体坐标系的坐标
+	 * ground :障碍物相对于地面坐标系的坐标
+	 * */
+	void GroundTriangleCalculate(VehicleState *vehicle,Abstacle_Location_Packet body,Abstacle_Location_Packet *ground);
 
-	void DirectLocation();
+	/*
+	 * 直接测量数据的车辆坐标定位
+	 * */
+	void BodyDirectLocation();
 
-	void GroundAxisAbstacleTriangleCalculate(VehicleState *s,Vector2d v,Vector2d *g);
+	/*
+	 * 三角定位的车辆坐标定位
+	 * */
+	void BodyTriangleLocation();
 
-	void TriangleLocationGround(VehicleState *s);
+	/*
+	 * 地面坐标超声波数据定位
+	 * */
+	void GroundTriangleLocation(VehicleState *vehicle_state);
 
 	/// Property
 	uint8_t getScheduleTimeCnt();
@@ -137,14 +180,14 @@ public:
 	void setUltrasonicLocationPacket(uint8_t n,Ultrasonic_Packet p);
 	Property<Ultrasonic,Ultrasonic_Packet*,READ_ONLY> UltrasonicLocationPacket;
 
-	Vector2d* getAbstaclePositionDirect();
-	Property<Ultrasonic,Vector2d*,READ_ONLY> AbstaclePositionDirect;
+	Abstacle_Location_Packet* getAbstacleBodyPositionDirect();
+	Property<Ultrasonic,Abstacle_Location_Packet*,READ_ONLY> AbstacleBodyPositionDirect;
 
-	Vector2d* getAbstaclePositionTriangle();
-	Property<Ultrasonic,Vector2d*,READ_ONLY> AbstaclePositionTriangle;
+	Abstacle_Location_Packet* getAbstacleBodyPositionTriangle();
+	Property<Ultrasonic,Abstacle_Location_Packet*,READ_ONLY> AbstacleBodyPositionTriangle;
 
-	Vector2d* getAbstacleGroundPositionTriangle();
-	Property<Ultrasonic,Vector2d*,READ_ONLY> AbstacleGroundPositionTriangle;
+	Abstacle_Location_Packet* getAbstacleGroundPositionTriangle();
+	Property<Ultrasonic,Abstacle_Location_Packet*,READ_ONLY> AbstacleGroundPositionTriangle;
 private:
 	uint32_t _system_time;
 	uint8_t  _schedule_time_cnt;
@@ -158,13 +201,12 @@ private:
 
 	Ultrasonic_Packet _ultrasonic_location_packet[12];
 
+	Abstacle_Location_Packet _abstacle_body_position_direct[12];
+
+	Abstacle_Location_Packet _abstacle_body_position_triangle[8];
+	Abstacle_Location_Packet _abstacle_ground_position_triangle[8];
 
 	VehilceConfig _abstacle_config;
-
-	Vector2d _abstacle_position_direct[12];
-	Vector2d _abstacle_position_triangle[8];
-
-	Vector2d _abstacle_ground_position_triangle[8];
 };
 
 #endif /* ULTRASONIC_H_ */
