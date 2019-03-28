@@ -245,9 +245,8 @@ void PIT0_isr(void)
 #if ULTRASONIC_SCHEDULE_MODO == 3
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V3();//5ms
 	m_Ultrasonic.Update(25);
-	m_Ultrasonic.TriangleLocation();
-	m_Ultrasonic.DirectLocation();
-	m_Ultrasonic.TriangleLocationGround(&m_GeometricTrack);
+	m_Ultrasonic.BodyTriangleLocation();
+	m_Ultrasonic.GroundTriangleLocation(&m_GeometricTrack);
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
 
