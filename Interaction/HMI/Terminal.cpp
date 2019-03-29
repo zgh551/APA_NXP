@@ -369,11 +369,12 @@ void Terminal::Push(Ultrasonic *u)
 			UltrasonicLocationSend(10,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(11,u->UltrasonicLocationPacket);
 
+			// 三角定位车体坐标系
 			UltrasonicBodyLocationSend(0,u->AbstacleBodyPositionTriangle[0]);
 			UltrasonicBodyLocationSend(1,u->AbstacleBodyPositionTriangle[1]);
 			UltrasonicBodyLocationSend(2,u->AbstacleBodyPositionTriangle[2]);
 			UltrasonicBodyLocationSend(3,u->AbstacleBodyPositionTriangle[3]);
-
+			// 三角定位地面坐标系
 			UltrasonicGroundLocationSend(0,u->AbstacleGroundPositionTriangle[0]);
 			UltrasonicGroundLocationSend(1,u->AbstacleGroundPositionTriangle[1]);
 			UltrasonicGroundLocationSend(2,u->AbstacleGroundPositionTriangle[2]);
@@ -383,19 +384,19 @@ void Terminal::Push(Ultrasonic *u)
 		case 23:
 			UltrasonicSend(2,u->UltrasonicPacket);
 			UltrasonicSend(5,u->UltrasonicPacket);
-
+			// 三角定位测量的传感器值
 			UltrasonicLocationSend(3,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(4,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(5,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(6,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(7,u->UltrasonicLocationPacket);
 			UltrasonicLocationSend(8,u->UltrasonicLocationPacket);
-
+			// 三角定位车体坐标系
 			UltrasonicBodyLocationSend(4,u->AbstacleBodyPositionTriangle[4]);
 			UltrasonicBodyLocationSend(5,u->AbstacleBodyPositionTriangle[5]);
 			UltrasonicBodyLocationSend(6,u->AbstacleBodyPositionTriangle[6]);
 			UltrasonicBodyLocationSend(7,u->AbstacleBodyPositionTriangle[7]);
-
+			// 三角定位地面坐标系
 			UltrasonicGroundLocationSend(4,u->AbstacleGroundPositionTriangle[4]);
 			UltrasonicGroundLocationSend(5,u->AbstacleGroundPositionTriangle[5]);
 			UltrasonicGroundLocationSend(6,u->AbstacleGroundPositionTriangle[6]);
@@ -406,12 +407,24 @@ void Terminal::Push(Ultrasonic *u)
 		case 25:
 			UltrasonicSend(8 ,u->UltrasonicPacket);
 			UltrasonicSend(10,u->UltrasonicPacket);
+
+			UltrasonicBodyLocationSend(8,u->AbstacleBodyPositionDirect[8]);
+			UltrasonicBodyLocationSend(10,u->AbstacleBodyPositionDirect[10]);
+
+			UltrasonicGroundLocationSend(8,u->AbstacleGroundPositionTriangle[8]);
+			UltrasonicGroundLocationSend(10,u->AbstacleGroundPositionTriangle[10]);
 		break;
 
 		case 13:
 		case 27:
 			UltrasonicSend(9,u->UltrasonicPacket);
 			UltrasonicSend(11,u->UltrasonicPacket);
+
+			UltrasonicBodyLocationSend(9,u->AbstacleBodyPositionDirect[9]);
+			UltrasonicBodyLocationSend(11,u->AbstacleBodyPositionDirect[11]);
+
+			UltrasonicGroundLocationSend(9,u->AbstacleGroundPositionTriangle[9]);
+			UltrasonicGroundLocationSend(11,u->AbstacleGroundPositionTriangle[11]);
 			break;
 
 		case 14:

@@ -203,8 +203,8 @@ private:
 
 	Abstacle_Location_Packet _abstacle_body_position_direct[12];
 
-	Abstacle_Location_Packet _abstacle_body_position_triangle[8];
-	Abstacle_Location_Packet _abstacle_ground_position_triangle[8];
+	Abstacle_Location_Packet _abstacle_body_position_triangle[12];
+	Abstacle_Location_Packet _abstacle_ground_position_triangle[12];
 
 	VehilceConfig _abstacle_config;
 };

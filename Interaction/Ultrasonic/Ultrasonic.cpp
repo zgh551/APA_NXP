@@ -1156,12 +1156,33 @@ void Ultrasonic::GroundTriangleLocation(VehicleState *vehicle_state)
 			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[3],&AbstacleGroundPositionTriangle[3]);
 			break;
 
+		case 11:
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[8],&AbstacleGroundPositionTriangle[8]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[10],&AbstacleGroundPositionTriangle[10]);
+			break;
+
+		case 13:
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[9],&AbstacleGroundPositionTriangle[9]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[11],&AbstacleGroundPositionTriangle[11]);
+			break;
+
 		case 22:
 			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[4],&AbstacleGroundPositionTriangle[4]);
 			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[5],&AbstacleGroundPositionTriangle[5]);
 			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[6],&AbstacleGroundPositionTriangle[6]);
 			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionTriangle[7],&AbstacleGroundPositionTriangle[7]);
 			break;
+
+		case 25:
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[8],&AbstacleGroundPositionTriangle[8]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[10],&AbstacleGroundPositionTriangle[10]);
+			break;
+
+		case 27:
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[9],&AbstacleGroundPositionTriangle[9]);
+			GroundTriangleCalculate(vehicle_state,AbstacleBodyPositionDirect[11],&AbstacleGroundPositionTriangle[11]);
+			break;
+
 		default:
 			break;
 	}
