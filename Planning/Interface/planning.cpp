@@ -546,6 +546,42 @@ int8_t Planning::ForecastYawParking(int8_t state,float radius,float target_yaw,V
 		return FAIL;
 	}
 }
+
+float Planning::ForecastYawParkingDistance(float target_yaw,VehicleState *s)
+{
+	float circle_length;
+	float radius;
+	radius = fabs(_plan_vehilce_config.TurnRadiusCalculate(_apa_control_command.SteeringAngle));
+	// 车辆偏航角的趋势偏向于由大变小
+	if(Reverse == _apa_control_command.Gear)
+	{
+		circle_length = fabs(s->Yaw - target_yaw) * radius;
+		if(s->Yaw > target_yaw)
+		{
+			return circle_length;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else if(Drive == _apa_control_command.Gear)
+	{
+		circle_length = fabs(s->Yaw - target_yaw) * radius;
+		if(s->Yaw < target_yaw)
+		{
+			return circle_length;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
 /**************************************************************************************************/
 int8_t Planning::BoundaryCollision(int8_t motion,VehicleState *s)
 {
@@ -1069,7 +1105,7 @@ int8_t Planning::CircleTurnningPointDetermination(VehicleState *s,Turn turn_poin
 	{
 		if(_plan_algebraic_geometry.ArcLength(s->getPosition(), turn_point.Point, radius) < s->LinearRate * TURN_FEEDFORWARD_TIME)
 		{
-			_control_command.SteeringAngle = turn_point.SteeringAngle;
+			_apa_control_command.SteeringAngle = turn_point.SteeringAngle;
 			return SUCCESS;
 		}
 		else
@@ -1079,7 +1115,7 @@ int8_t Planning::CircleTurnningPointDetermination(VehicleState *s,Turn turn_poin
 	}
 	else
 	{
-		_control_command.SteeringAngle = turn_point.SteeringAngle;
+		_apa_control_command.SteeringAngle = turn_point.SteeringAngle;
 		return SUCCESS;
 	}
 }

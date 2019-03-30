@@ -44,6 +44,7 @@
 #define PARKING_CENTER_MARGIN ( 0.05 ) // 泊车中心点余量
 #define ACC_DISABLE_TIME      ( 50 ) // ACC失效时间
 #define STEER_ANGLE_ARRIVE_ERR ( 1 )  // 转向角允许的到位误差
+#define INIT_POINT_MARGIN      ( 0.3 ) // 初始位置调整的余量
 /**************************速度控制******************************/
 #define POSITION_A            ( 0.4 ) // 速度控制下限点
 #define POSITION_B            ( 0.8 ) // 速度控制上限点
@@ -99,6 +100,16 @@ public:
 	 * s : 车辆实时位置和姿态信息
 	 * */
 	int8_t ForecastYawParking(int8_t state,float radius,float target_yaw,VehicleState *s);
+
+	/**
+	 * 车辆偏航角满足要求预估停车，使车辆的偏航角满足目标值
+	 * 适用于圆弧上的停车点估计
+	 * state: -1 -> 偏航角趋势变小； 1 -> 偏航角趋势变大
+	 * radius: 圆弧的半径
+	 * target_yaw: 目标偏航角大小(弧度)
+	 * s : 车辆实时位置和姿态信息
+	 * */
+	float ForecastYawParkingDistance(float target_yaw,VehicleState *s);
 	/******************** 边界障碍物碰撞判定 *****************************************************************/
 	// 边界障碍物停车
 	int8_t BoundaryCollision(int8_t motion,VehicleState *s);
@@ -116,6 +127,9 @@ public:
 
 	/********************速度规划************************************************************************/
 	float VelocityPlanControl(float distance);
+
+
+
 	// 弧线上的速度规划 速度根据目标距离重规划
 	float VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius);
 	// 直线上的速度规划
