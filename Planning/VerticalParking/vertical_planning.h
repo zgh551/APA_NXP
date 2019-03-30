@@ -112,9 +112,9 @@ typedef enum _OuterTrialState
 {
 	OuterTrialDriveGearShift,
 	OuterTrialVehicleMoveDrive,
-	OuterTrialDisableACC,
+//	OuterTrialDisableACC,
 	OuterTrialTurnPoint,
-	OuterTrialWaitArrive,
+//	OuterTrialWaitArrive,
 	OuterTrialWaitStill
 }OuterTrialState;
 

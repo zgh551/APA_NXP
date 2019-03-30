@@ -28,7 +28,7 @@ void VerticalPlanning::Init()
 	_trial_margin = 0.3;
 
 	_vertical_planning_state = VerticalWaitStart;
-	_vertical_control_state = VerticalWaitPlanningFinish;//初始化控制状态机
+	_vertical_control_state  = VerticalWaitPlanningFinish;//初始化控制状态机
 	// low level state machine init
 	_init_point_adjust_state = VerticalInitPointFrontAdjust;
 	_circle_trajectory_state = VerticalGearShift;
@@ -241,15 +241,13 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 				// 泊车状态：控制状态
 				ParkingStatus = 2;
 				Command = 0x00;
-				_control_command.ControlEnable.R   = 0xE0;
-				_control_command.Gear              = Parking;
-				_control_command.SteeringAngle     = 0;
-				_control_command.SteeringAngleRate = STEERING_RATE;
-				_control_command.Acceleration      = planning_braking_acc_;
-				_control_command.Deceleration      = 0;
-				_control_command.Torque            = 0;
-				_control_command.Velocity          = 0;
-				ctl->Update(_control_command);
+				_apa_control_command.ControlEnable.B.APAEnable = 1;
+				_apa_control_command.Gear              = Parking;
+				_apa_control_command.SteeringAngle     = 0;
+				_apa_control_command.SteeringAngleRate = STEERING_RATE;
+				_apa_control_command.Distance          = 0;
+				_apa_control_command.Velocity          = 0;
+				ctl->Update(_apa_control_command);
 				_vertical_control_state  = VerticalInitPointJudge;
 			}
 			break;
@@ -358,63 +356,50 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 	switch(_init_point_adjust_state)
 	{
 		case VerticalInitPointFrontAdjust:
-			_control_command.Gear          = Drive;
-			_control_command.SteeringAngle = 0;
-			_control_command.Acceleration  = planning_braking_acc_;
-			_control_command.Velocity      = STRAIGHT_VELOCITY;
-			_control_command.ControlEnable.B.VelocityEnable = 0;
+			_apa_control_command.Gear              = Drive;
+			_apa_control_command.SteeringAngle     = 0;
+			_apa_control_command.SteeringAngleRate = STEERING_RATE;
+			_apa_control_command.Distance          = 0;
+			_apa_control_command.Velocity          = 0;
 			_init_point_adjust_state       = VerticalInitPointMove;
 			break;
 
 		case VerticalInitPointMove:
-			if((Drive == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if((Drive == msg->Gear) && (fabsf(msg->SteeringAngle - _apa_control_command.SteeringAngle ) < STEER_ANGLE_ARRIVE_ERR))
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
-				_control_command.ControlEnable.B.AccelerationEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 0;
-				_acc_disable_cnt = 0;
-				_init_point_adjust_state = VerticalInitPointDisableACC;
-			}
-			break;
-
-		case VerticalInitPointDisableACC:
-			if(SUCCESS == WaitVehicleStartMove(0,msg))
-			{
-				_init_point_adjust_state = VerticalInitPoitArriveJudge;
-			}
-			break;
-
-		case VerticalInitPoitArriveJudge:
-			if(1 == _analysis_state)
-			{
-				if(s->getPosition().X > _line_init_circle_parking_enter_turn.Point.getX())
-				{
-					_control_command.ControlEnable.B.VelocityEnable = 0;
-					_control_command.Velocity                       = 0;
-					_control_command.Acceleration = planning_braking_acc_;
-					_init_point_adjust_state = VerticalWaitVehicleStop;
-				}
-			}
-			else if(2 == _analysis_state)
-			{
-				if(s->getPosition().X > _line_to_circle_enter_turn.Point.getX())
-				{
-					_control_command.ControlEnable.B.VelocityEnable = 0;
-					_control_command.Velocity                       = 0;
-					_control_command.Acceleration = planning_braking_acc_;
-					_init_point_adjust_state = VerticalWaitVehicleStop;
-				}
-			}
-			else
-			{
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_control_command.Velocity                       = 0;
-				_control_command.Acceleration = planning_braking_acc_;
+				_apa_control_command.Velocity          = STRAIGHT_VELOCITY;
+				_apa_control_command.Distance          = MOTION_DISTANCE;
 				_init_point_adjust_state = VerticalWaitVehicleStop;
 			}
 			break;
 
 		case VerticalWaitVehicleStop:
+			if(1 == _analysis_state)
+			{
+				if(s->getPosition().X < (_line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN))
+				{
+					_apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+				}
+				else
+				{
+					_apa_control_command.Distance = 0;
+				}
+			}
+			else if(2 == _analysis_state)
+			{
+				if(s->getPosition().X < (_line_to_circle_enter_turn.Point.getX() + INIT_POINT_MARGIN))
+				{
+					_apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+				}
+				else
+				{
+					_apa_control_command.Distance = 0;
+				}
+			}
+			else
+			{
+				_apa_control_command.Distance = 0;
+			}
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_init_point_adjust_state = VerticalInitPointFrontAdjust;
@@ -426,40 +411,29 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 
 			break;
 	}
-	ctl->Update(_control_command);
+	ctl->Update(_apa_control_command);
 	return FAIL;
 }
 
 int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
 {
-//	float angle_vector;
 	VehicleBody motion_body;
 	switch(_circle_trajectory_state)
 	{
 		case VerticalGearShift:
-			_control_command.Gear          = Reverse;
-			_control_command.SteeringAngle = 0;
-			_control_command.Acceleration  = planning_braking_acc_;
-			_control_command.Velocity      = STRAIGHT_VELOCITY;
-			_control_command.ControlEnable.B.VelocityEnable = 0;
+			_apa_control_command.Gear              = Reverse;
+			_apa_control_command.SteeringAngle     = 0;
+			_apa_control_command.SteeringAngleRate = STEERING_RATE;
+			_apa_control_command.Distance          = 0;
+			_apa_control_command.Velocity          = 0;
 			_circle_trajectory_state = VerticalVehicleMove;
 			break;
 
 		case VerticalVehicleMove:
-			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _apa_control_command.SteeringAngle ) < STEER_ANGLE_ARRIVE_ERR))
 			{
-
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
-				_control_command.ControlEnable.B.AccelerationEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 0;
-				_acc_disable_cnt = 0;
-				_circle_trajectory_state = VerticalDisableACC;
-			}
-			break;
-
-		case VerticalDisableACC:
-			if(SUCCESS == WaitVehicleStartMove(1,msg))
-			{
+				_apa_control_command.Velocity          = STRAIGHT_VELOCITY;
+				_apa_control_command.Distance          = MOTION_DISTANCE;
 				_circle_trajectory_state = VerticalFirstTurnPoint;
 			}
 			break;
@@ -470,8 +444,8 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 				// 考虑转向角执行延迟时间
 				if( (s->getPosition().getX() -_line_init_circle_parking_enter_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
 				{
-					_control_command.SteeringAngle = _line_init_circle_parking_enter_turn.SteeringAngle;
-					_control_command.SteeringAngleRate = s->LinearRate * RK;
+					_apa_control_command.SteeringAngle = _line_init_circle_parking_enter_turn.SteeringAngle;
+					_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 					_circle_trajectory_state = VerticalSecondTurnPoint;
 				}
 			}
@@ -480,8 +454,8 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 				// 考虑转向角执行延迟时间
 				if( (s->getPosition().getX() - _line_to_circle_enter_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
 				{
-					_control_command.SteeringAngle = _line_to_circle_enter_turn.SteeringAngle;
-					_control_command.SteeringAngleRate = s->LinearRate * RK;
+					_apa_control_command.SteeringAngle = _line_to_circle_enter_turn.SteeringAngle;
+					_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 					_circle_trajectory_state = VerticalSecondTurnPoint;
 				}
 			}
@@ -493,12 +467,12 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 
 		case VerticalSecondTurnPoint:
 			// 根据当前车速，实时更新转向角速度
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
-			_control_command.Velocity = VelocityPlanningCircle(s,_line_center_circle_parking_enter_turn.Point,_circle_parking_enter.Radius);
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.Velocity = VelocityPlanningCircle(s,_line_center_circle_parking_enter_turn.Point,_circle_parking_enter.Radius);
 			// 象限点判定控制
 			if( (PI_2 - s->getYaw())*_circle_parking_enter.Radius < K * MAX_STEERING_ANGLE * 0.5 )
 			{
-				_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
+				_apa_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
 				_circle_trajectory_state = verticalWaitSteeringArrive;
 			}
 			//通过转向点判断
@@ -507,30 +481,10 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 //				_circle_trajectory_state = verticalWaitSteeringArrive;
 //			}
 
-
-//			if(s->getPosition().getY() < _line_center_circle_parking_enter_turn.Point.getY())
-//			{
-//				_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
-//
-//			}
-//			angle_vector = (s->getPosition() - _line_center_circle_parking_enter_turn.Point).Angle();
-//			if(angle_vector > 0 && angle_vector < PI_2 )
-//			{
-//				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _line_center_circle_parking_enter_turn.Point, _circle_parking_enter.Radius) < s->LinearRate * turnning_feedforward_time_)
-//				{
-//					_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
-//					_circle_trajectory_state = verticalWaitSteeringArrive;
-//				}
-//			}
-//			else
-//			{
-//				_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
-//				_circle_trajectory_state = verticalWaitSteeringArrive;
-//			}
 			break;
 
 		case verticalWaitSteeringArrive:
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 			if(fabs(msg->SteeringAngle) < 0.1)
 			{
 				_parking_center_x_middle = 0.5 * (s->getPosition().getX() + _parking_center_point.getX());
@@ -539,44 +493,35 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 			break;
 
 		case VerticalWaitYawArrive:
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 			//通过偏航角误差消除
-//			_control_command.SteeringAngle = kp_yaw_*(s->getYaw() - PI_2)*R2A;
+//			_apa_control_command.SteeringAngle = kp_yaw_*(s->getYaw() - PI_2)*R2A;
 			// 通过x坐标误差消除
-//			_control_command.SteeringAngle = kp_yaw_*(s->getPosition().getX() - _parking_center_point.getX());
+//			_apa_control_command.SteeringAngle = kp_yaw_*(s->getPosition().getX() - _parking_center_point.getX());
 
 			if((PI_2 - s->getYaw()) < 0.01)
 			{
-				_control_command.SteeringAngleRate = STEERING_RATE;
-				_control_command.SteeringAngle = 0;
+				_apa_control_command.SteeringAngleRate = STEERING_RATE;
+				_apa_control_command.SteeringAngle = 0;
 				_circle_trajectory_state = VerticalWaitArrive;
 			}
 			break;
 
-		case VerticalWaitArrive:
-			_control_command.SteeringAngleRate = MAX_STEERING_ANGLE;//STEERING_RATE;//s->LinearRate * RK;
-			// 通过x坐标误差消除
-//			_control_command.SteeringAngle = kp_yaw_*(s->getPosition().getX() - _parking_center_x_middle)*100;
-			if(s->getPosition().getY() < _parking_center_point.getY())
-			{
-				_control_command.Acceleration  = planning_braking_aeb_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_control_command.Velocity                       = 0;
-				_circle_trajectory_state = VerticalWaitStill;
-			}
-			if( (s->getPosition().getY() - _parking_center_point.getY()) < ( s->LinearRate * s->LinearRate * 0.5 * planning_braking_acc_r_ ) )
-			{
-				_control_command.Acceleration  = planning_braking_acc_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_control_command.Velocity                       = 0;
-				_circle_trajectory_state = VerticalWaitStill;
-			}
-			break;
-
 		case VerticalWaitStill:
+			_apa_control_command.SteeringAngleRate = MAX_STEERING_ANGLE;//STEERING_RATE;//s->LinearRate * RK;
+			// 通过x坐标误差消除
+//			_apa_control_command.SteeringAngle = kp_yaw_*(s->getPosition().getX() - _parking_center_x_middle)*100;
+			if(s->getPosition().getY() > _parking_center_point.getY())
+			{
+				_apa_control_command.Distance = s->getPosition().getY() - _parking_center_point.getY();
+			}
+			else
+			{
+				_apa_control_command.Distance = 0;
+			}
 			if(StandStill == msg->WheelSpeedDirection)
 			{
-				_control_command.Gear    = Parking;
+				_apa_control_command.Gear    = Parking;
 				_circle_trajectory_state = VerticalWaitParkingGear;
 			}
 			break;
@@ -594,7 +539,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 
 			break;
 	}
-	ctl->Update(_control_command);
+	ctl->Update(_apa_control_command);
 	return FAIL;
 }
 
@@ -604,18 +549,19 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 	switch(_curve_trajectory_state)
 	{
 		case VerticalCurveGearShift:
-			_control_command.Gear          = Reverse;
-			_control_command.SteeringAngle = 0;
-			_control_command.Acceleration  = planning_braking_acc_;
-			_control_command.ControlEnable.B.VelocityEnable = 0;
+			_apa_control_command.Gear              = Reverse;
+			_apa_control_command.SteeringAngle     = 0;
+			_apa_control_command.SteeringAngleRate = STEERING_RATE;
+			_apa_control_command.Distance          = 0;
+			_apa_control_command.Velocity          = 0;
 			_curve_trajectory_state = VerticalCurveVehicleMove;
 			break;
 
 		case VerticalCurveVehicleMove:
-			if( (Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if( (Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _apa_control_command.SteeringAngle ) < STEER_ANGLE_ARRIVE_ERR))
 			{
-				_control_command.Velocity = CURVE_VELOCITY;
-				_control_command.ControlEnable.B.VelocityEnable = 1;
+				_apa_control_command.Velocity = CURVE_VELOCITY;
+				_apa_control_command.Distance = MOTION_DISTANCE;
 				_curve_trajectory_state = VerticalCurveFirstTurnPoint;
 			}
 			break;
@@ -624,91 +570,82 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			// 考虑转向角执行延迟时间
 			if( (s->getPosition().getX() - _line_init_circle_transition_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
 			{
-				_control_command.SteeringAngle = _line_init_circle_transition_turn.SteeringAngle;
-				_control_command.SteeringAngleRate = s->LinearRate * RK;
+				_apa_control_command.SteeringAngle = _line_init_circle_transition_turn.SteeringAngle;
+				_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 				_curve_trajectory_state = VerticalCurveSecondTurnPoint;
 			}
 			break;
 
 		case VerticalCurveSecondTurnPoint:
 			// 根据当前车速，实时更新转向角速度
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 			// 象限点判定控制
 			angle_vector = (s->getPosition() - _line_middle_circle_transition_turn.Point).Angle();
 			if(angle_vector > -PI_2 && angle_vector < 0 )
 			{
 				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _line_middle_circle_transition_turn.Point, _circle_transition.Radius) < s->LinearRate * turnning_feedforward_time_)
 				{
-					_control_command.SteeringAngle = _line_middle_circle_transition_turn.SteeringAngle;
+					_apa_control_command.SteeringAngle = _line_middle_circle_transition_turn.SteeringAngle;
 					_curve_trajectory_state = VerticalCurveThirdTurnPoint;
 				}
 			}
 			else
 			{
-				_control_command.SteeringAngle = _line_middle_circle_transition_turn.SteeringAngle;
+				_apa_control_command.SteeringAngle = _line_middle_circle_transition_turn.SteeringAngle;
 				_curve_trajectory_state = VerticalCurveThirdTurnPoint;
 			}
 			break;
 
 		case VerticalCurveThirdTurnPoint:
 			// 根据当前车速，实时更新转向角速度
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 			// 象限点判定控制
 			angle_vector = (s->getPosition() - _line_middle_circle_parking_enter_turn.Point).Angle();
 			if(angle_vector > -PI_2 && angle_vector < 0 )
 			{
 				if((s->getPosition() -_line_middle_circle_parking_enter_turn.Point).Length() < s->LinearRate * turnning_feedforward_time_)
 				{
-					_control_command.SteeringAngle = _line_middle_circle_parking_enter_turn.SteeringAngle;
+					_apa_control_command.SteeringAngle = _line_middle_circle_parking_enter_turn.SteeringAngle;
 					_curve_trajectory_state = VerticalCurveFourthTurnPoint;
 				}
 			}
 			else
 			{
-				_control_command.SteeringAngle = _line_middle_circle_parking_enter_turn.SteeringAngle;
+				_apa_control_command.SteeringAngle = _line_middle_circle_parking_enter_turn.SteeringAngle;
 				_curve_trajectory_state = VerticalCurveFourthTurnPoint;
 			}
 			break;
 
 		case VerticalCurveFourthTurnPoint:
 			// 根据当前车速，实时更新转向角速度
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 			// 象限点判定控制
 			angle_vector = (s->getPosition() - _line_center_circle_parking_enter_turn.Point).Angle();
 			if(angle_vector > 0 && angle_vector < PI_2 )
 			{
 				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _line_center_circle_parking_enter_turn.Point, _circle_parking_enter.Radius) < s->LinearRate * turnning_feedforward_time_)
 				{
-					_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
-					_curve_trajectory_state = VerticalCurveWaitArrive;
+					_apa_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
+					_curve_trajectory_state = VerticalCurveWaitStill;
 				}
 			}
 			else
 			{
-				_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
-				_curve_trajectory_state = VerticalCurveWaitArrive;
-			}
-			break;
-
-		case VerticalCurveWaitArrive:
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
-			if(s->getPosition().getY() < _parking_center_point.getY())
-			{
-				_control_command.Deceleration  = planning_braking_aeb_;
-				_control_command.Acceleration  = planning_braking_aeb_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 1;
-				_curve_trajectory_state = VerticalCurveWaitStill;
-			}
-			if( (s->getPosition().getY() - _parking_center_point.getY()) < s->LinearRate * turnning_feedforward_time_)
-			{
-				_control_command.Acceleration  = planning_braking_acc_;
-				_control_command.ControlEnable.B.VelocityEnable = 0;
+				_apa_control_command.SteeringAngle = _line_center_circle_parking_enter_turn.SteeringAngle;
 				_curve_trajectory_state = VerticalCurveWaitStill;
 			}
 			break;
 
 		case VerticalCurveWaitStill:
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
+			if(s->getPosition().getY() > _parking_center_point.getY())
+			{
+				_apa_control_command.Distance = s->getPosition().getY() - _parking_center_point.getY();
+			}
+			else
+			{
+				_apa_control_command.Distance = 0;
+			}
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_curve_trajectory_state = VerticalCurveGearShift;
@@ -720,7 +657,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 
 			break;
 	}
-	ctl->Update(_control_command);
+	ctl->Update(_apa_control_command);
 	return FAIL;
 }
 
@@ -730,18 +667,18 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //	switch(_trial_trajectory_state)
 //	{
 //		case VerticalTrialRearGearShift:
-//			_control_command.Gear          = Reverse;
-//			_control_command.SteeringAngle = 0;
-//			_control_command.Acceleration  = planning_braking_acc_;
-//			_control_command.ControlEnable.B.VelocityEnable = 0;
+//			_apa_control_command.Gear          = Reverse;
+//			_apa_control_command.SteeringAngle = 0;
+//			_apa_control_command.Acceleration  = planning_braking_acc_;
+//			_apa_control_command.ControlEnable.B.VelocityEnable = 0;
 //			_trial_trajectory_state = VerticalTrialVehicleMoveRear;
 //			break;
 //
 //		case VerticalTrialVehicleMoveRear:
 //			if(0x09 == msg->Gear)
 //			{
-//				_control_command.Velocity = CURVE_VELOCITY;
-//				_control_command.ControlEnable.B.VelocityEnable = 1;
+//				_apa_control_command.Velocity = CURVE_VELOCITY;
+//				_apa_control_command.ControlEnable.B.VelocityEnable = 1;
 //				_trial_trajectory_state = VerticalTrialFirstTurnPoint;
 //			}
 //			break;
@@ -750,32 +687,32 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //			// 考虑转向角执行延迟时间
 //			if( (s->getPosition().getX() - _line_init_circle_enter_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
 //			{
-//				_control_command.SteeringAngle = _line_init_circle_enter_turn.SteeringAngle;
-//				_control_command.SteeringAngleRate = s->LinearRate * RK;
+//				_apa_control_command.SteeringAngle = _line_init_circle_enter_turn.SteeringAngle;
+//				_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 //				_trial_trajectory_state = VerticalTrialStopWaitArrive;
 //			}
 //			break;
 //
 //		case VerticalTrialStopWaitArrive:
 //			// 根据当前车速，实时更新转向角速度
-//			_control_command.SteeringAngleRate = s->LinearRate * RK;
+//			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 //			// 象限点判定控制
 //			angle_vector = (s->getPosition() - _stop_circle_enter_turn.Point).Angle();
 //			if(angle_vector > 0 && angle_vector < PI_2 )
 //			{
 //				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _stop_circle_enter_turn.Point, _circle_enter.Radius) < s->LinearRate * turnning_feedforward_time_)
 //				{
-//					_control_command.Acceleration  = planning_braking_acc_;
-//					_control_command.ControlEnable.B.VelocityEnable = 0;
+//					_apa_control_command.Acceleration  = planning_braking_acc_;
+//					_apa_control_command.ControlEnable.B.VelocityEnable = 0;
 //					_trial_trajectory_state = VerticalTrialStopWaitStill;
 //				}
 //			}
 //			else
 //			{
-//				_control_command.Deceleration  = planning_braking_aeb_;
-//				_control_command.Acceleration  = planning_braking_aeb_;
-//				_control_command.ControlEnable.B.VelocityEnable = 0;
-//				_control_command.ControlEnable.B.DecelerationEnable = 1;
+//				_apa_control_command.Deceleration  = planning_braking_aeb_;
+//				_apa_control_command.Acceleration  = planning_braking_aeb_;
+//				_apa_control_command.ControlEnable.B.VelocityEnable = 0;
+//				_apa_control_command.ControlEnable.B.DecelerationEnable = 1;
 //				_trial_trajectory_state = VerticalTrialStopWaitStill;
 //			}
 //			break;
@@ -787,46 +724,46 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //			}
 //			else
 //			{
-//				_control_command.Deceleration  = planning_braking_aeb_;
-//				_control_command.Acceleration  = planning_braking_aeb_;
-//				_control_command.ControlEnable.B.VelocityEnable = 0;
-//				_control_command.ControlEnable.B.DecelerationEnable = 1;
+//				_apa_control_command.Deceleration  = planning_braking_aeb_;
+//				_apa_control_command.Acceleration  = planning_braking_aeb_;
+//				_apa_control_command.ControlEnable.B.VelocityEnable = 0;
+//				_apa_control_command.ControlEnable.B.DecelerationEnable = 1;
 //			}
 //			break;
 //
 //		case VerticalTrialDriveGearShift:
-//			_control_command.Gear          = Drive;
-//			_control_command.SteeringAngle = _stop_circle_enter_turn.SteeringAngle;
-//			_control_command.Acceleration  = planning_braking_acc_;
-//			_control_command.ControlEnable.B.VelocityEnable = 0;
+//			_apa_control_command.Gear          = Drive;
+//			_apa_control_command.SteeringAngle = _stop_circle_enter_turn.SteeringAngle;
+//			_apa_control_command.Acceleration  = planning_braking_acc_;
+//			_apa_control_command.ControlEnable.B.VelocityEnable = 0;
 //			_trial_trajectory_state = VerticalTrialVehicleMoveDrive;
 //			break;
 //
 //		case VerticalTrialVehicleMoveDrive:
 //			if(msg->Gear > 0 && msg->Gear < 7 && fabs(msg->SteeringAngle - _stop_circle_enter_turn.SteeringAngle) < 1)
 //			{
-//				_control_command.Velocity = CURVE_VELOCITY;
-//				_control_command.ControlEnable.B.VelocityEnable = 1;
+//				_apa_control_command.Velocity = CURVE_VELOCITY;
+//				_apa_control_command.ControlEnable.B.VelocityEnable = 1;
 //				_trial_trajectory_state = VerticalTrialSencondTurnPoint;
 //			}
 //			break;
 //
 //		case VerticalTrialSencondTurnPoint:
 //			// 根据当前车速，实时更新转向角速度
-//			_control_command.SteeringAngleRate = s->LinearRate * RK;
+//			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 //			// 象限点判定控制
 //			angle_vector = (s->getPosition() - _circle_outer_circle_enter_turn.Point).Angle();
 //			if(angle_vector > -PI && angle_vector < -PI_2 )
 //			{
 //				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _circle_outer_circle_enter_turn.Point, _circle_outer.Radius) < s->LinearRate * turnning_feedforward_time_)
 //				{
-//					_control_command.SteeringAngle = _circle_outer_circle_enter_turn.SteeringAngle;
+//					_apa_control_command.SteeringAngle = _circle_outer_circle_enter_turn.SteeringAngle;
 //					_trial_trajectory_state = VerticalTrialWaitArrive;
 //				}
 //			}
 //			else
 //			{
-//				_control_command.SteeringAngle = _circle_outer_circle_enter_turn.SteeringAngle;
+//				_apa_control_command.SteeringAngle = _circle_outer_circle_enter_turn.SteeringAngle;
 //				_trial_trajectory_state = VerticalTrialWaitArrive;
 //			}
 //			break;
@@ -834,8 +771,8 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //		case VerticalTrialWaitArrive:
 //			if( s->getPosition().getX() > _next_stage_line_init_circle_enter_turn.Point.getX())
 //			{
-//				_control_command.Acceleration  = planning_braking_acc_;
-//				_control_command.ControlEnable.B.VelocityEnable = 0;
+//				_apa_control_command.Acceleration  = planning_braking_acc_;
+//				_apa_control_command.ControlEnable.B.VelocityEnable = 0;
 //				_trial_trajectory_state = VerticalTrialWaitStill;
 //			}
 //			break;
@@ -852,7 +789,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //
 //			break;
 //	}
-//	ctl->Update(_control_command);
+//	ctl->Update(_apa_control_command);
 //	return FAIL;
 //}
 
@@ -862,72 +799,44 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 	switch(_enter_trial_state)
 	{
 		case EnterTrialRearGearShift:
-			_control_command.Gear              = Reverse;
-			_control_command.SteeringAngle     = 0;
-			_control_command.SteeringAngleRate = STEERING_RATE;
-			_control_command.Acceleration      = planning_braking_acc_;
-			_control_command.Velocity          = CURVE_VELOCITY;
-			_control_command.ControlEnable.B.VelocityEnable = 0;
+			_apa_control_command.Gear              = Reverse;
+			_apa_control_command.SteeringAngle     = 0;
+			_apa_control_command.SteeringAngleRate = STEERING_RATE;
+			_apa_control_command.Distance          = 0;
+			_apa_control_command.Velocity          = 0;
 			_enter_trial_state = EnterTrialVehicleMoveRear;
 			break;
 
 		case EnterTrialVehicleMoveRear:
-			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _control_command.SteeringAngle ) < 0.5))
+			if((Reverse == msg->Gear) && (fabsf(msg->SteeringAngle - _apa_control_command.SteeringAngle ) < STEER_ANGLE_ARRIVE_ERR))
 			{
-				_control_command.ControlEnable.B.VelocityEnable     = 0;
-				_control_command.ControlEnable.B.AccelerationEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 0;
-				_acc_disable_cnt = 0;
+				_apa_control_command.Velocity = CURVE_VELOCITY;
+				_apa_control_command.Distance = MOTION_DISTANCE;
 				_enter_trial_state = EnterTrialDisableACC;
 			}
 			break;
 
-		case EnterTrialDisableACC:
-			if(SUCCESS == WaitVehicleStartMove(1,msg))
-			{
-				_enter_trial_state = EnterTrialTurnPoint;
-			}
-//			_acc_disable_cnt++;
-//			if(_acc_disable_cnt > acc_disable_time_)
-//			{
-//				_control_command.ControlEnable.B.VelocityEnable     = 1;
-//				_control_command.ControlEnable.B.AccelerationEnable = 1;
-//				_control_command.ControlEnable.B.DecelerationEnable = 1;
-//				_enter_trial_state = EnterTrialTurnPoint;
-//			}
-			break;
-
 		case EnterTrialTurnPoint:
 			// 直线速度规划
-//			_control_command.Velocity          = VelocityPlanningLine(s,);
+//			_apa_control_command.Velocity          = VelocityPlanningLine(s,);
 			// 考虑转向角执行延迟时间
 //			if(SUCCESS == LineTurnningPointDetermination(s,_line_to_circle_enter_turn,1))
 //			{
-//				_control_command.SteeringAngleRate = s->LinearRate * RK;
+//				_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 //				_enter_trial_state = EnterTrialStopWaitArrive;
 //			}
 			if( (s->getPosition().getX() - _line_to_circle_enter_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
 			{
-				_control_command.SteeringAngle     = _line_to_circle_enter_turn.SteeringAngle;
-				_control_command.SteeringAngleRate = s->LinearRate * RK;
-				_enter_trial_state = EnterTrialStopWaitArrive;
-			}
-			break;
-
-		case EnterTrialStopWaitArrive:
-			// 根据当前车速，实时更新转向角速度
-			_control_command.SteeringAngleRate = s->LinearRate * RK;
-//			_control_command.Velocity = VelocityPlanningCircle(s,_circle_enter_stop_point_turn.Point,_circle_enter.Radius);
-			// TODO 修改到此处 ，加入新的距离判定的
-			// TODO 将停止坐标点判定方式，修改为偏航角判定方式
-			if(SUCCESS == ForecastYawParking(1,_circle_enter.Radius,_circle_enter_stop_point_turn.Yaw,s))
-//			if(SUCCESS == ForecastCircleParkingPointMargin(s,_circle_enter_stop_point_turn.Point,_circle_enter.Radius,parking_margin_,1,-1))
-			{
+				_apa_control_command.SteeringAngle     = _line_to_circle_enter_turn.SteeringAngle;
+				_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
 				_enter_trial_state = EnterTrialStopWaitStill;
 			}
 			break;
 
 		case EnterTrialStopWaitStill:
+			// 根据当前车速，实时更新转向角速度
+			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
+			_apa_control_command.Distance = ForecastYawParkingDistance(_circle_enter_stop_point_turn.Yaw,s);
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_enter_trial_state = EnterTrialRearGearShift;
@@ -935,12 +844,7 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 			}
 			else
 			{
-//				if(SUCCESS == ForecastCircleBoundaryMargin(s,_parking_outer_rear_point,_circle_enter.Radius,0.2)){}
-//				if(SUCCESS == ForecastCircleParkingPointMargin(s,_circle_enter_stop_point_turn.Point,_circle_enter.Radius,parking_margin_,1,-1)){}
-//				_control_command.Deceleration  = planning_braking_aeb_;
-//				_control_command.Acceleration  = planning_braking_aeb_;
-//				_control_command.ControlEnable.B.VelocityEnable = 0;
-//				_control_command.ControlEnable.B.DecelerationEnable = 1;
+
 			}
 			break;
 
@@ -948,82 +852,62 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 
 			break;
 	}
-	ctl->Update(_control_command);
+	ctl->Update(_apa_control_command);
 	return FAIL;
 }
 
 int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
 {
-//	float angle_vector;
 	switch(_outer_trial_state)
 	{
 		case OuterTrialDriveGearShift:
-			_control_command.Gear              = Drive;
-			_control_command.SteeringAngle     = _stop_point_steering_angle;
-			_control_command.SteeringAngleRate = STEERING_RATE;
-			_control_command.Acceleration      = planning_braking_acc_;
-			_control_command.Velocity          = CURVE_VELOCITY;
-			_control_command.ControlEnable.B.VelocityEnable = 0;
+			_apa_control_command.Gear              = Drive;
+			_apa_control_command.SteeringAngle     = _stop_point_steering_angle;
+			_apa_control_command.SteeringAngleRate = STEERING_RATE;
+			_apa_control_command.Distance          = 0;
+			_apa_control_command.Velocity          = 0;
 			_outer_trial_state = OuterTrialVehicleMoveDrive;
 			break;
 
 		case OuterTrialVehicleMoveDrive:
-			if((Drive == msg->Gear) && (fabs(msg->SteeringAngle - _stop_point_steering_angle) < 0.5))
+			if((Drive == msg->Gear) && (fabs(msg->SteeringAngle - _stop_point_steering_angle) < STEER_ANGLE_ARRIVE_ERR))
 			{
-				_acc_disable_cnt = 0;
-				_control_command.ControlEnable.B.AccelerationEnable = 0;
-				_control_command.ControlEnable.B.DecelerationEnable = 0;
-				_outer_trial_state = OuterTrialDisableACC;
-			}
-			break;
-
-		case OuterTrialDisableACC:
-			if(SUCCESS == WaitVehicleStartMove(0,msg))
-			{
+				_apa_control_command.Velocity = CURVE_VELOCITY;
+				_apa_control_command.Distance = MOTION_DISTANCE;
 				_outer_trial_state = OuterTrialTurnPoint;
 			}
-//			_acc_disable_cnt++;
-//			if(_acc_disable_cnt > acc_disable_time_)
-//			{
-//				_control_command.ControlEnable.B.VelocityEnable     = 1;
-//				_control_command.ControlEnable.B.AccelerationEnable = 1;
-//				_control_command.ControlEnable.B.DecelerationEnable = 1;
-//				_outer_trial_state = OuterTrialTurnPoint;
-//			}
 			break;
 
 		case OuterTrialTurnPoint:
 			// 象限点判定控制
 			if(SUCCESS == CircleTurnningPointDetermination(s,_circle_outer_to_line_turn,_circle_outer.Radius,3))
 			{
-				_outer_trial_state = OuterTrialWaitArrive;
+				_outer_trial_state = OuterTrialWaitStill;
 			}
 			break;
 
-		case OuterTrialWaitArrive:
+
+		case OuterTrialWaitStill:
 			if(1 == _analysis_state)
 			{
-				// TODO
+				// TODO 请重点@@@@修改
 				if(SUCCESS == ForecastLineParkingPointMargin(s,_line_init_circle_parking_enter_turn.Point,0.3,3,1))
 				{
-					_outer_trial_state = OuterTrialWaitStill;
+//					_outer_trial_state = OuterTrialWaitStill;
 				}
+//				(s->getPosition() - _line_init_circle_parking_enter_turn.Point).Length()
 			}
 			else if(2 == _analysis_state)
 			{
 				if(SUCCESS == ForecastLineParkingPointMargin(s,_line_to_circle_enter_turn.Point,0.3,3,1))
 				{
-					_outer_trial_state = OuterTrialWaitStill;
+//					_outer_trial_state = OuterTrialWaitStill;
 				}
 			}
 			else
 			{
 
 			}
-
-			break;
-
-		case OuterTrialWaitStill:
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_outer_trial_state = OuterTrialDriveGearShift;
@@ -1031,7 +915,7 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 			}
 			break;
 	}
-	ctl->Update(_control_command);
+	ctl->Update(_apa_control_command);
 	return FAIL;
 }
 
