@@ -12,9 +12,15 @@
 #include "property.h"
 #include "math.h"
 #include "vector_2d.h"
-//#include "chang_an_configure.h"
+#include "system_config.h"
+
+#ifdef CHANGAN
+#include "chang_an_configure.h"
+#endif
+#ifdef BORUI
 #include "bo_rui_configure.h"
-//#include "common_configure.h"
+#endif
+
 
 typedef struct _Location
 {

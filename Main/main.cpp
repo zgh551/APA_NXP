@@ -14,24 +14,31 @@
 /* 1.0	 Guohua Zhu     December 28 2018    Initial Version                  */
 /*****************************************************************************/
 
-#include <math.h>
-//#include <vector>
+// 系统外设配置
 #include "derivative.h" /* include peripheral declarations */
-
+// 传感器驱动
 #include "Ultrasonic.h"
+// 终端交互
 #include "Terminal.h"
+// 车辆轨迹跟踪
 #include "../Common/VehicleState/GeometricTrack/geometric_track.h"
-
+// 车辆信息解码和控制
+#ifdef CHANGAN
 #include "ChangAn/chang_an_controller.h"
 #include "ChangAn/chang_an_message.h"
+#endif
 
+#ifdef BORUI
 #include "BoRui/bo_rui_controller.h"
 #include "BoRui/bo_rui_message.h"
-
-#include "lon_control.h"
+#endif
+// 车辆控制
 #include "pid.h"
+#include "lon_control.h"
+// 规划
 #include "parallel_planning.h"
 #include "vertical_planning.h"
+// 感知
 #include "percaption.h"
 #include "ultrasonic_abstacle_percption.h"
 
@@ -43,10 +50,7 @@ extern void xcptn_xmpl(void);
 #ifdef __cplusplus
 }
 #endif
-/****************System Configure******************/
-//#define CHANGAN
-#define BORUI
-#define SIMULATION 0
+
 /****************System Variable******************/
 Terminal m_Terminal_CA;
 Ultrasonic m_Ultrasonic;
@@ -54,11 +58,14 @@ GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
 
+#ifdef CHANGAN
 ChangAnController m_ChangAnController;
 ChangAnMessage m_ChangAnMessage;
-
+#endif
+#ifdef BORUI
 BoRuiController m_BoRuiController;
 BoRuiMessage    m_BoRuiMessage;
+#endif
 
 ParallelPlanning m_ParallelPlanning;
 VerticalPlanning m_VerticalPlanning;
@@ -100,7 +107,9 @@ int main()
 				}
 				else if(0x80 == m_ParallelPlanning.Command)//泊车结束
 				{
+#ifdef CHANGAN
 					m_ChangAnController.Stop();
+#endif
 					m_ParallelPlanning.Init();
 					m_ParallelPlanning.Command = 0x00;
 				}
@@ -120,7 +129,9 @@ int main()
 				}
 				else if(0x80 == m_VerticalPlanning.Command)//泊车结束
 				{
+#ifdef CHANGAN
 					m_ChangAnController.Stop();
+#endif
 					m_VerticalPlanning.Init();
 					m_VerticalPlanning.Command = 0x00;
 				}
@@ -154,7 +165,9 @@ int main()
 
 				if(m_Ultrasonic.SystemTime % 4 == 0)
 				{
+#ifdef CHANGAN
 					m_Terminal_CA.Push(&m_ChangAnController);
+#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)
 				{
@@ -162,7 +175,9 @@ int main()
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 2)
 				{
+#ifdef CHANGAN
 					m_Terminal_CA.Push(&m_ChangAnMessage);
+#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 3)
 				{
@@ -202,6 +217,7 @@ void PIT0_isr(void)
 {
 	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 	{
+#ifdef CHANGAN
 		if(0x10 == m_Terminal_CA.Command)
 		{
 			m_ParallelPlanning.Control(&m_ChangAnController, &m_ChangAnMessage, &m_GeometricTrack, &m_Ultrasonic);
@@ -210,6 +226,17 @@ void PIT0_isr(void)
 		{
 			m_VerticalPlanning.Control(&m_ChangAnController, &m_ChangAnMessage, &m_GeometricTrack, &m_Ultrasonic);
 		}
+#endif
+#ifdef BORUI
+		if(0x10 == m_Terminal_CA.Command)
+		{
+			m_ParallelPlanning.Control(&m_BoRuiController, &m_BoRuiMessage, &m_GeometricTrack, &m_Ultrasonic);
+		}
+		else if(0x20 == m_Terminal_CA.Command)
+		{
+			m_VerticalPlanning.Control(&m_BoRuiController, &m_BoRuiMessage, &m_GeometricTrack, &m_Ultrasonic);
+		}
+#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 	{
