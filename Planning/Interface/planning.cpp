@@ -632,11 +632,8 @@ int8_t Planning::BoundaryCollisionVelocity(int8_t motion,float target,VehicleSta
 			(_boundary_collision_body.getRearRight().getY() <= InsideVirtualBoundary) ||
 			(s->getYaw() <= (target + 0.02)))
 		{
-			_control_command.ControlEnable.B.VelocityEnable     = 0;
-			_control_command.Velocity                           = 0;
-			_control_command.ControlEnable.B.AccelerationEnable = 1;
-			// TODO 需要考虑加速度如何给定合适
-			_control_command.Acceleration                       = planning_braking_aeb_;
+			_apa_control_command.Velocity = 0;
+			_apa_control_command.Distance = 0;
 			if(s->getYaw() <= (target + 0.02))
 			{
 				_control_command.SteeringAngle     = 0;
@@ -653,9 +650,6 @@ int8_t Planning::BoundaryCollisionVelocity(int8_t motion,float target,VehicleSta
 		}
 		else
 		{
-			_control_command.ControlEnable.B.VelocityEnable     = 1;
-			_control_command.ControlEnable.B.AccelerationEnable = 1;
-
 			theta1 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearRight(), _parking_inside_rear_point);
 			theta2 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearLeft() , _parking_inside_rear_point);
 			theta3 = s->getYaw() - target ;
@@ -849,6 +843,57 @@ int8_t Planning::BoundaryCollisionCircle(int8_t motion,VehicleState *s)
 	}
 }
 
+float Planning::BoundaryCollisionDistance(float target,VehicleState *s)
+{
+ 	float theta1,theta2,theta3,theta_min;
+ 	float radius;
+
+ 	radius = _plan_vehilce_config.TurnRadiusCalculate(_apa_control_command.SteeringAngle);
+	_boundary_collision_body.Center      = s->getPosition();
+	_boundary_collision_body.AttitudeYaw = s->getYaw();
+	_boundary_collision_body.RotationCenter(radius);
+	_boundary_collision_body.EdgePoint();
+
+	if(Reverse == _apa_control_command.Gear)
+	{
+		if( (_boundary_collision_body.getRearLeft().getX()  <= RearVirtualBoundary  ) ||
+			(_boundary_collision_body.getRearRight().getY() <= InsideVirtualBoundary) )
+		{
+			return 0;
+		}
+		else
+		{
+			theta1 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearRight(), _parking_inside_rear_point);
+			theta2 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getRearLeft() , _parking_inside_rear_point);
+			theta3 = s->getYaw() - target ;
+			theta_min = theta1 < theta2    ? theta1 : theta2;
+			theta_min = theta3 < theta_min ? theta3 : theta_min;
+			return fabs(radius * theta_min);
+		}
+	}
+	else if(Drive == _apa_control_command.Gear)
+	{
+		if(( _boundary_collision_body.getFrontRight().getX() > FrontVirtualBoundary ) ||
+		   ( _boundary_collision_body.getFrontRight().getY() < InsideVirtualBoundary) )
+		{
+			return 0;
+		}
+		else
+		{
+			theta1 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getFrontRight(), _parking_inside_front_point);
+			theta2 = _boundary_collision_body.RotateAngleCollision(_boundary_collision_body.getFrontLeft() , _parking_inside_front_point);
+			theta3 = s->getYaw() - target ;
+			theta_min = theta1 < theta2    ? theta1 : theta2;
+			theta_min = theta3 < theta_min ? theta3 : theta_min;
+			return fabs(radius * theta_min);
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 int8_t Planning::UltrasonicCollision(int8_t motion,VehicleState *s,Ultrasonic *u)
 {
 	uint8_t i;
@@ -894,7 +939,63 @@ int8_t Planning::UltrasonicCollision(int8_t motion,VehicleState *s,Ultrasonic *u
 	}
 }
 
+int8_t Planning::UltrasonicCollisionDiatance(Ultrasonic *u)
+{
+	uint8_t i;
+	if(Reverse == _apa_control_command.Gear)
+	{
+		for(i = 0; i < 4; i++)
+		{
+			if(u->UltrasonicPacket[i].Distance1 != 0.0f)
+			{
+				if( (u->UltrasonicPacket[i].Distance1 < 0.4) || (u->UltrasonicPacket[i].status == 16) )
+				{
+					return SUCCESS;
+				}
+			}
+		}
+		return FAIL;
+	}
+	else if(Drive == _apa_control_command.Gear)
+	{
+		for(i = 4;i < 8;i++)
+		{
+			if(u->UltrasonicPacket[i].Distance1 != 0.0f)
+			{
+				if( (u->UltrasonicPacket[i].Distance1 < 0.4) || (u->UltrasonicPacket[i].status == 16))
+				{
+					return SUCCESS;
+				}
+			}
+		}
+		return FAIL;
+	}
+	else
+	{
+		return FAIL;
+	}
+}
 /**************************************************************************************************/
+float Planning::VelocityPlanControl(float distance)
+{
+	if(distance > position_max_)
+	{
+		return STRAIGHT_VELOCITY;
+	}
+	else if(distance > position_min_)
+	{
+		return CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(distance - position_min_)/(position_max_ - position_min_);
+	}
+	else if(distance > 0.05)
+	{
+		return distance * CURVE_VELOCITY / position_min_ ;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 float Planning::VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius)
 {
 	float distance;

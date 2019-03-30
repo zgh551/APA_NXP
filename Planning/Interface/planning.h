@@ -39,16 +39,16 @@
 #define PLANNING_BRAKING_R	  ( 0.1 ) // 规划减速度的倒数
 #define STRAIGHT_VELOCITY	  ( 0.5 ) // 直线段的速度
 #define CURVE_VELOCITY	      ( 0.3 ) // 曲线段的速度
+#define MOTION_DISTANCE       ( 1.0 ) // 车辆满足运动的距离
 #define TURN_FEEDFORWARD_TIME ( 0.1 ) // 转向角前向反馈的补偿时间
 #define PARKING_CENTER_MARGIN ( 0.05 ) // 泊车中心点余量
-#define ACC_DISABLE_TIME      ( 50  ) // ACC失效时间
+#define ACC_DISABLE_TIME      ( 50 ) // ACC失效时间
+#define STEER_ANGLE_ARRIVE_ERR ( 1 )  // 转向角允许的到位误差
 /**************************速度控制******************************/
 #define POSITION_A            ( 0.4 ) // 速度控制下限点
 #define POSITION_B            ( 0.8 ) // 速度控制上限点
 /**************************泊车余量******************************/
 #define PARKING_MARGIN        ( 0.2 ) // 停车余量
-/********************是否使用超声波避障使能按钮***********************/
-#define ULTRASONIC_COLLISION_ENABLE  ( 0 ) // 超声避障使能按钮
 /*************************END********************************/
 //extern GeometricTrack    m_GeometricTrack;
 //extern ChangAnController m_ChangAnController;
@@ -106,10 +106,16 @@ public:
 	int8_t BoundaryCollisionVelocity(int8_t motion,float target,VehicleState *s);
 	// 通过弧线距离判定停止
 	int8_t BoundaryCollisionCircle(int8_t motion,VehicleState *s);
+
+	// 车辆离障碍物的距离
+	float BoundaryCollisionDistance(float target,VehicleState *s);
 	// 基于超声波的避障停车
 	int8_t UltrasonicCollision(int8_t motion,VehicleState *s,Ultrasonic *u);
 
+	int8_t UltrasonicCollisionDiatance(Ultrasonic *u);
+
 	/********************速度规划************************************************************************/
+	float VelocityPlanControl(float distance);
 	// 弧线上的速度规划 速度根据目标距离重规划
 	float VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius);
 	// 直线上的速度规划
