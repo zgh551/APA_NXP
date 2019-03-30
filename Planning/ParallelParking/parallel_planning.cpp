@@ -194,7 +194,6 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 		case InitPointMove:
 			if( (msg->Gear == Drive) && (fabs(msg->SteeringAngle - _apa_control_command.SteeringAngle) < STEER_ANGLE_ARRIVE_ERR))
 			{
-				_acc_disable_cnt = 0;
 				_apa_control_command.Velocity          = STRAIGHT_VELOCITY;
 				_apa_control_command.Distance          = MOTION_DISTANCE;
 				_adjust_state = WaitVehicleStop;
@@ -202,9 +201,9 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case WaitVehicleStop:
-			if(s->getPosition().X < (_line_init_circle_right_turn.Point.getX() + 0.3f))
+			if(s->getPosition().X < (_line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN))
 			{
-				_apa_control_command.Distance = _line_init_circle_right_turn.Point.getX() + 0.3f - s->getPosition().X;
+				_apa_control_command.Distance = _line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
 			}
 			else
 			{
