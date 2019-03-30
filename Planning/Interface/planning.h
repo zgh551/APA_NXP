@@ -218,6 +218,7 @@ protected:
 	Vector2d _parking_inside_rear_point;
 	Vector2d _parking_inside_front_point;//库位边角点
 	ControlCommand _control_command;
+	APAControlCommand _apa_control_command;
 //	Terminal _vertical_planning_terminal;
 	uint8_t _acc_disable_cnt;
 	/***************************************************/
