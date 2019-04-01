@@ -890,23 +890,11 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 		case OuterTrialWaitStill:
 			if(1 == _analysis_state)
 			{
-				// TODO 请重点@@@@修改
-				if(SUCCESS == ForecastLineParkingPointMargin(s,_line_init_circle_parking_enter_turn.Point,0.3,3,1))
-				{
-//					_outer_trial_state = OuterTrialWaitStill;
-				}
-//				(s->getPosition() - _line_init_circle_parking_enter_turn.Point).Length()
+				_apa_control_command.Distance = ForecastLineParkingPointMarginDistance(s,_line_init_circle_parking_enter_turn.Point,0.3,3);
 			}
 			else if(2 == _analysis_state)
 			{
-				if(SUCCESS == ForecastLineParkingPointMargin(s,_line_to_circle_enter_turn.Point,0.3,3,1))
-				{
-//					_outer_trial_state = OuterTrialWaitStill;
-				}
-			}
-			else
-			{
-
+				_apa_control_command.Distance = ForecastLineParkingPointMarginDistance(s,_line_to_circle_enter_turn.Point,0.3,3);
 			}
 			if(StandStill == msg->WheelSpeedDirection)
 			{

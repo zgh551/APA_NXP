@@ -432,6 +432,75 @@ int8_t Planning::ForecastCircleBoundaryMargin(VehicleState *s,Vector2d stop_poin
 	}
 }
 
+float Planning::ForecastLineParkingPointMarginDistance(VehicleState *s,Vector2d stop_point,float margin,uint8_t quadrant)
+{
+	float angle_vector;
+	float min_value,max_value;
+	switch(quadrant)
+	{
+		case 1:
+			min_value = 0;
+			max_value = PI_2;
+			break;
+
+		case 2:
+			min_value = PI_2;
+			max_value = PI;
+			break;
+
+		case 3:
+			min_value = -PI;
+			max_value = -PI_2;
+			break;
+
+		case 4:
+			min_value = -PI_2;
+			max_value = 0;
+			break;
+
+		default:
+			min_value = 0;
+			max_value = 0;
+			break;
+	}
+	angle_vector = (s->getPosition() - stop_point).Angle();
+	if((angle_vector > min_value) && (angle_vector < max_value))//在规划区间内，执行提前规划停车控制
+	{
+		if(margin <= 0)
+		{
+			if((s->getPosition() - stop_point).Length() + margin > 0 )
+			{
+				return (s->getPosition() - stop_point).Length() + margin;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return (s->getPosition() - stop_point).Length() + margin;
+		}
+	}
+	else
+	{
+		if(margin > 0)
+		{
+			if(margin > (s->getPosition() - stop_point).Length())
+			{
+				return margin - (s->getPosition() - stop_point).Length();
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+}
 /**
  * 该函数适用于圆弧停止点的判断
  * */

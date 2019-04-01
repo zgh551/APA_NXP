@@ -85,6 +85,9 @@ public:
 	int8_t ForecastCircleParkingPointMargin(VehicleState *s,Vector2d stop_point,float radius,float margin,uint8_t quadrant,int8_t mode);
 
 	int8_t ForecastLineParkingPointMargin(VehicleState *s,Vector2d stop_point,float margin,uint8_t quadrant,int8_t mode);
+
+	// 输出距离值
+	float ForecastLineParkingPointMarginDistance(VehicleState *s,Vector2d stop_point,float margin,uint8_t quadrant);
 	/********************转向点判定************************************************************************/
 	// 弧线上的转向点判定，根据实际车辆控制延迟决定提前量
 	int8_t CircleTurnningPointDetermination(VehicleState *s,Turn turn_point,float radius,uint8_t quadrant);
