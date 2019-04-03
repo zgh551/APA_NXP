@@ -6,10 +6,11 @@
  */
 
 #include <BoRui/bo_rui_message.h>
+CRC8 crc8 (CRC8::eAUTOSAR);
 
 BoRuiMessage::BoRuiMessage() {
 	// TODO Auto-generated constructor stub
-
+//	crc8 = CRC8(CRC8::eAUTOSAR);
 }
 
 BoRuiMessage::~BoRuiMessage() {
@@ -24,6 +25,7 @@ void BoRuiMessage::Init()
 void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
 {
 	uint8_t temp;
+	uint8_t crc_temp;
 	switch(id)
 	{
 		case 0x2A0://eps status
@@ -60,12 +62,14 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			break;
 
 		case 0x124://Wheel speed pulse
-//			WheelPulseDirection  = WheelSpeedDirection;
-
-			WheelPulseRearRight  = (uint16_t)(( (dat[0] << 4) | (dat[1] >> 4)) & 0x0fff);
-			WheelPulseRearLeft   = (uint16_t)(( (dat[1] << 8) |  dat[2]      ) & 0x0fff);
-			WheelPulseFrontRight = (uint16_t)(( (dat[3] << 4) | (dat[4] >> 4)) & 0x0fff);
-			WheelPulseFrontLeft  = (uint16_t)(( (dat[4] << 8) |  dat[5]      ) & 0x0fff);
+			crc_temp = crc8.crcCompute((uint8_t*)dat, 7);
+			if(crc_temp == dat[7])
+			{
+				WheelPulseRearRight  = (uint16_t)(( (dat[0] << 4) | (dat[1] >> 4)) & 0x0fff);
+				WheelPulseRearLeft   = (uint16_t)(( (dat[1] << 8) |  dat[2]      ) & 0x0fff);
+				WheelPulseFrontRight = (uint16_t)(( (dat[3] << 4) | (dat[4] >> 4)) & 0x0fff);
+				WheelPulseFrontLeft  = (uint16_t)(( (dat[4] << 8) |  dat[5]      ) & 0x0fff);
+			}
 			break;
 
 		case 0x113:// TCU GEAR
