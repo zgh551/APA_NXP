@@ -11,8 +11,8 @@ template <typename TYPE>
 void CRC<TYPE>::crcInit(void)
 {
     TYPE remainder;
-    TYPE dividend;
-    int bit;
+    uint16_t dividend;
+    uint8_t bit;
     /* Perform binary long division, a bit at a time. */
     for(dividend = 0; dividend < 256; dividend++)
     {
