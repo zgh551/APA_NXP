@@ -10,7 +10,7 @@ CRC8 crc8 (CRC8::eAUTOSAR);
 
 BoRuiMessage::BoRuiMessage() {
 	// TODO Auto-generated constructor stub
-//	crc8 = CRC8(CRC8::eAUTOSAR);
+//	CRC8 crc8 = CRC8(CRC8::eAUTOSAR);
 }
 
 BoRuiMessage::~BoRuiMessage() {
@@ -24,7 +24,6 @@ void BoRuiMessage::Init()
 
 void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
 {
-	uint8_t temp;
 	uint8_t crc_temp;
 	switch(id)
 	{
@@ -102,12 +101,12 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			break;
 
 		case 0x0E0://SAS
-			temp = (uint8_t)( (dat[3] >> 7) & 0x01);
-			if(temp)
+			crc_temp = crc8.crcCompute((uint8_t*)dat, 7);
+			if(crc_temp == dat[7])
 			{
-				SteeringAngle = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
+				SteeringAngle     = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
+				SteeringAngleRate = dat[2]*4.0f;
 			}
-			SteeringAngleRate = dat[2]*4.0f;
 			break;
 
 		default:
