@@ -188,11 +188,8 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 		_position.Y = _position.Y + displacement * sinf(Yaw);
 	}
 
-	if(fabs(Yaw - _last_yaw) > 10 )
-	{
-		_sum_rear_left_pulse  += _delta_rear_left_pulse;
-		_sum_rear_right_pulse += _delta_rear_right_pulse;
-	}
+	_sum_rear_left_pulse  += _delta_rear_left_pulse;
+	_sum_rear_right_pulse += _delta_rear_right_pulse;
 
 
 	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
