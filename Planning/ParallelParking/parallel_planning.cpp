@@ -276,7 +276,6 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 		case ThirdTurnPoint:
 			// 根据当前车速，实时更新转向角速度
 			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-
 			if( (_line_middle_circle_left_tangent - s->getPosition()).Length() < K * fabs(_line_middle_circle_left_turn.SteeringAngle) * 0.5)
 			{
 				_apa_control_command.SteeringAngle = _line_middle_circle_left_turn.SteeringAngle;
@@ -294,6 +293,7 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			if(SUCCESS == UltrasonicCollisionDiatance(u))
 			{
 				_apa_control_command.Distance = 0;
+				_apa_control_command.Velocity = 0;
 //				_apa_control_command.Velocity = VelocityPlanControl(_apa_control_command.Distance);
 			}
 			else
