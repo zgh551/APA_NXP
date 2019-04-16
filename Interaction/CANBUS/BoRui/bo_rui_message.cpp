@@ -101,12 +101,12 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			break;
 
 		case 0x0E0://SAS
-			crc_temp = crc8.crcCompute((uint8_t*)dat, 7);
-			if(crc_temp == dat[7])
-			{
+//			crc_temp = crc8.crcCompute((uint8_t*)dat, 5);
+//			if(crc_temp == dat[5])
+//			{
 				SteeringAngle     = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
 				SteeringAngleRate = dat[2]*4.0f;
-			}
+//			}
 			break;
 
 		default:
