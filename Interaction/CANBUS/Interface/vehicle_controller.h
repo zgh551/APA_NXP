@@ -119,6 +119,19 @@ public:
 	void    setTorqueEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> TorqueEnable;
 
+	/* Turnning Torque Control Single */
+	float getTurnTorqueVal();
+	void  setTurnTorqueVal(float value);
+	Property<VehicleController,float,READ_WRITE> TurnTorqueVal;
+
+	uint8_t getTurnTorqueDir();
+	void    setTurnTorqueDir(uint8_t value);
+	Property<VehicleController,uint8_t,READ_WRITE> TurnTorqueDir;
+
+	uint8_t getTurnTorqueAct();
+	void    setTurnTorqueAct(uint8_t value);
+	Property<VehicleController,uint8_t,READ_WRITE> TurnTorqueAct;
+
 	/* Velocity */
 	float getVelocity();
 	void  setVelocity(float value);
@@ -169,6 +182,11 @@ private:
 	/* Torque */
 	float _torque;
 	uint8_t _torque_enable;
+
+	/* Turnning Torque Control Single */
+	float   _turn_torque_val;
+	uint8_t _turn_torque_dir;
+	uint8_t _turn_torque_act;
 
 	/* Velocity */
 	float _velocity;

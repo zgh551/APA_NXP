@@ -42,7 +42,18 @@ VehicleController::VehicleController() {
 		TorqueEnable.setContainer(this);
 		TorqueEnable.getter(&VehicleController::getTorqueEnable);
 		TorqueEnable.setter(&VehicleController::setTorqueEnable);
+		////// Turnning Torque Control Single //////
+		TurnTorqueVal.setContainer(this);
+		TurnTorqueVal.getter(&VehicleController::getTurnTorqueVal);
+		TurnTorqueVal.setter(&VehicleController::setTurnTorqueVal);
 
+		TurnTorqueDir.setContainer(this);
+		TurnTorqueDir.getter(&VehicleController::getTurnTorqueDir);
+		TurnTorqueDir.setter(&VehicleController::setTurnTorqueDir);
+
+		TurnTorqueAct.setContainer(this);
+		TurnTorqueAct.getter(&VehicleController::getTurnTorqueAct);
+		TurnTorqueAct.setter(&VehicleController::setTurnTorqueAct);
 		////// Velocity //////
 		Velocity.setContainer(this);
 		Velocity.getter(&VehicleController::getVelocity);
@@ -108,6 +119,15 @@ void  VehicleController::setTorque(float value){_torque = value;}
 uint8_t VehicleController::getTorqueEnable()             { return _torque_enable;}
 void    VehicleController::setTorqueEnable(uint8_t value){_torque_enable = value;}
 
+/// Turnning Torque Control Single
+float VehicleController::getTurnTorqueVal()           { return _turn_torque_val;}
+void  VehicleController::setTurnTorqueVal(float value){_turn_torque_val = value;}
+
+uint8_t VehicleController::getTurnTorqueDir()             { return _turn_torque_dir;}
+void    VehicleController::setTurnTorqueDir(uint8_t value){_turn_torque_dir = value;}
+
+uint8_t VehicleController::getTurnTorqueAct()             { return _turn_torque_act;}
+void    VehicleController::setTurnTorqueAct(uint8_t value){_turn_torque_act = value;}
 /// Velocity
 float VehicleController::getVelocity()           { return _velocity;}
 void  VehicleController::setVelocity(float value){_velocity = value;}
