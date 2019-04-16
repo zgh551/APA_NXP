@@ -42,7 +42,7 @@ public:
 	void Update(APAControlCommand cmd) override;
 
 	void VehicleContorl();
-
+	void VehicleContorlPri();
 	// Steeing angle control base on the angle speed
 	void SteeringAngleControl(float dt);
 
@@ -57,6 +57,10 @@ private:
 	int16_t _current_steering_angle_target;
 
 	uint16_t _current_distance;
+
+	uint16_t _current_turn_torque_value;
+
+	int8_t _current_acceleration;
 };
 
 #endif /* CANBUS_BORUI_BO_RUI_CONTROLLER_H_ */

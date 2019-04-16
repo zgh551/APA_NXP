@@ -82,6 +82,27 @@ void BoRuiController::VehicleContorl()
 	CAN0_TransmitMsg(m_CAN_Packet);
 }
 
+void BoRuiController::VehicleContorlPri()
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x412;
+	m_CAN_Packet.length = 8;
+
+	_current_turn_torque_value = (uint16_t)(TurnTorqueVal * 100);
+	_current_acceleration  = Acceleration * 20;
+	/// Data Mapping
+	m_CAN_Packet.data[0] = (uint8_t)((_current_turn_torque_value >> 2) & 0xFF);
+	m_CAN_Packet.data[1] = (uint8_t)(((_current_turn_torque_value << 6) & 0xC0) | ((TurnTorqueDir << 5) & 0x20));
+
+	m_CAN_Packet.data[2] = (uint8_t)((TurnTorqueAct << 7) & 0x80);
+	m_CAN_Packet.data[3] = _current_acceleration;
+
+	m_CAN_Packet.data[4] = (uint8_t)((AccelerationEnable << 4) & 0xf0);
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN0_TransmitMsg(m_CAN_Packet);
+}
 
 void BoRuiController::SteeringAngleControl(float dt)
 {
