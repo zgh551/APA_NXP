@@ -23,6 +23,7 @@
 #include "Interface/vehicle_controller.h"
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
+#include "GeometricTrack/geometric_track.h"
 #include "Ultrasonic.h"
 #include "planning.h"
 #include "percaption.h"
@@ -41,6 +42,13 @@ typedef union _Byte2Int
 	int16_t  i16;
 }Byte2Int;
 
+typedef union _Byte2Int32
+{
+	uint8_t b[4];
+	uint32_t u32;
+	int32_t  i32;
+}Byte2Int32;
+
 class Terminal
 {
 public:
@@ -57,12 +65,14 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[],Planning *msg);
 	void Parse(vuint32_t id,vuint8_t dat[]);
 	// Terminal Control
-//	void Push(MessageManager *msg);
-	void Push(ChangAnMessage *msg);
+	void Push(MessageManager *msg);
+//	void Push(ChangAnMessage *msg);
 
 	void Push(VehicleController *msg);
 
 	void Push(VehicleState *msg);
+	void Push(GeometricTrack track);
+
 
 	void Push(Ultrasonic *u);
 

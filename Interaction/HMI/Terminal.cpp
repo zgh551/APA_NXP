@@ -230,7 +230,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[])
 	}
 }
 /**************************************************************************************/
-void Terminal::Push(ChangAnMessage *msg)
+void Terminal::Push(MessageManager *msg)
 {
 	CAN_Packet m_CAN_Packet;
 	int16_t temp_int16;
@@ -238,24 +238,79 @@ void Terminal::Push(ChangAnMessage *msg)
 
 	m_CAN_Packet.id = 0x410;
 	m_CAN_Packet.length = 8;
-
-	m_CAN_Packet.data[0] = ( (msg->EMS_QEC_ACC & 0x01) << 2) | ( (msg->ESP_QDC_ACC & 0x01) << 1) | (msg->APA_EPAS_Failed & 0x01);
+	m_CAN_Packet.data[0] = 0;//( (msg->EMS_QEC_ACC & 0x01) << 2) | ( (msg->ESP_QDC_ACC & 0x01) << 1) | (msg->APA_EPAS_Failed & 0x01);
 	m_CAN_Packet.data[1] = 0;
-
 	temp_int16 = (int16_t)(msg->SteeringAngle * 10);
 	m_CAN_Packet.data[2] = temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-
 	temp_uint16 = (uint16_t)(msg->SteeringAngleRate * 100);
-	m_CAN_Packet.data[4] = temp_uint16 & 0xff;
+	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
 
-	temp_int16 = (int16_t)(msg->SteeringTorque * 100);
-	m_CAN_Packet.data[6] = temp_int16 & 0xff;
-	m_CAN_Packet.data[7] = (temp_int16 >> 8) & 0xff;
+	// 车速状态反馈
+	m_CAN_Packet.id = 0x411;
+	m_CAN_Packet.length = 8;
+	temp_uint16 = (uint16_t)(msg->WheelSpeedFrontLeft * 1000);
+	m_CAN_Packet.data[0] =  temp_uint16 & 0xff;
+	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff;
+	temp_uint16 = (uint16_t)(msg->WheelSpeedFrontRight * 1000);
+	m_CAN_Packet.data[2] = temp_uint16 & 0xff;
+	m_CAN_Packet.data[3] = (temp_uint16 >> 8) & 0xff;
+	temp_uint16 = (uint16_t)(msg->WheelSpeedRearLeft * 1000);
+	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
+	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
+	temp_uint16 = (uint16_t)(msg->WheelSpeedRearRight * 1000);
+	m_CAN_Packet.data[6] = temp_uint16 & 0xff;
+	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff;
+	CAN2_TransmitMsg(m_CAN_Packet);
 
+	// 车速状态反馈
+	m_CAN_Packet.id = 0x412;
+	m_CAN_Packet.length = 8;
+	temp_uint16 = msg->WheelPulseFrontLeft;
+	m_CAN_Packet.data[0] =  temp_uint16 & 0xff;
+	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff;
+	temp_uint16 = msg->WheelPulseFrontRight;
+	m_CAN_Packet.data[2] = temp_uint16 & 0xff;
+	m_CAN_Packet.data[3] = (temp_uint16 >> 8) & 0xff;
+	temp_uint16 = msg->WheelPulseRearLeft;
+	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
+	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
+	temp_uint16 = msg->WheelPulseRearRight;
+	m_CAN_Packet.data[6] = temp_uint16 & 0xff;
+	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
+
+//void Terminal::Push(ChangAnMessage *msg)
+//{
+//	CAN_Packet m_CAN_Packet;
+//	int16_t temp_int16;
+//	uint16_t temp_uint16;
+//
+//	m_CAN_Packet.id = 0x410;
+//	m_CAN_Packet.length = 8;
+//
+//	m_CAN_Packet.data[0] = ( (msg->EMS_QEC_ACC & 0x01) << 2) | ( (msg->ESP_QDC_ACC & 0x01) << 1) | (msg->APA_EPAS_Failed & 0x01);
+//	m_CAN_Packet.data[1] = 0;
+//
+//	temp_int16 = (int16_t)(msg->SteeringAngle * 10);
+//	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+//	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
+//
+//	temp_uint16 = (uint16_t)(msg->SteeringAngleRate * 100);
+//	m_CAN_Packet.data[4] = temp_uint16 & 0xff;
+//	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
+//
+//	temp_int16 = (int16_t)(msg->SteeringTorque * 100);
+//	m_CAN_Packet.data[6] = temp_int16 & 0xff;
+//	m_CAN_Packet.data[7] = (temp_int16 >> 8) & 0xff;
+//
+//	CAN2_TransmitMsg(m_CAN_Packet);
+//}
 
 void Terminal::Push(VehicleController *msg)
 {
@@ -263,7 +318,7 @@ void Terminal::Push(VehicleController *msg)
 	int16_t temp_int16;
 	uint16_t temp_uint16;
 
-	m_CAN_Packet.id = 0x411;
+	m_CAN_Packet.id = 0x414;
 	m_CAN_Packet.length = 8;
 
 	m_CAN_Packet.data[0] = 	 msg->AccelerationEnable 	   |
@@ -306,6 +361,26 @@ void Terminal::Push(VehicleState *msg)
 	m_CAN_Packet.data[5] = (((int16_t)(msg->Yaw * 100)) >> 8) & 0xff;
 	m_CAN_Packet.data[6] = ((int16_t) (msg->TurnningRadius * 100)) & 0xff;
 	m_CAN_Packet.data[7] = (((int16_t)(msg->TurnningRadius * 100)) >> 8) & 0xff;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::Push(GeometricTrack track)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Int32 temp_int32;
+	m_CAN_Packet.id = 0x413;
+	m_CAN_Packet.length = 8;
+
+	temp_int32.i32 = track.SumRearLeftPulse;
+	m_CAN_Packet.data[0] = temp_int32.b[3];
+	m_CAN_Packet.data[1] = temp_int32.b[2];
+	m_CAN_Packet.data[2] = temp_int32.b[1];
+	m_CAN_Packet.data[3] = temp_int32.b[0];
+	temp_int32.i32 = track.SumRearRightPulse;
+	m_CAN_Packet.data[4] = temp_int32.b[3];
+	m_CAN_Packet.data[5] = temp_int32.b[2];
+	m_CAN_Packet.data[6] = temp_int32.b[1];
+	m_CAN_Packet.data[7] = temp_int32.b[0];
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
