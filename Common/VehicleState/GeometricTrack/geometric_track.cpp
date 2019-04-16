@@ -19,6 +19,14 @@ VehilceConfig m_GeometricVehicleConfig;
 
 GeometricTrack::GeometricTrack() {
 
+	SumRearLeftPulse.setContainer(this);
+	SumRearLeftPulse.getter(&GeometricTrack::getSumRearLeftPulse);
+	SumRearLeftPulse.setter(&GeometricTrack::setSumRearLeftPulse);
+
+	SumRearRightPulse.setContainer(this);
+	SumRearRightPulse.getter(&GeometricTrack::getSumRearRightPulse);
+	SumRearRightPulse.setter(&GeometricTrack::setSumRearRightPulse);
+
 	Init();
 }
 
@@ -175,7 +183,7 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	}
 
 
-	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((int16_t)fabs(msg->SteeringAngle) < 520))
+	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((uint16_t)fabs(msg->SteeringAngle) < 520))
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + displacement / radius;
@@ -197,4 +205,8 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	_last_yaw = Yaw;
 }
 /**************************************************************************************/
+int32_t GeometricTrack::getSumRearLeftPulse()             { return _sum_rear_left_pulse;}
+void    GeometricTrack::setSumRearLeftPulse(int32_t value){_sum_rear_left_pulse = value;}
 
+int32_t GeometricTrack::getSumRearRightPulse()             { return _sum_rear_right_pulse;}
+void    GeometricTrack::setSumRearRightPulse(int32_t value){_sum_rear_right_pulse = value;}
