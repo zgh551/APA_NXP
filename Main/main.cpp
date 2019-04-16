@@ -168,15 +168,22 @@ int main()
 #ifdef CHANGAN
 					m_Terminal_CA.Push(&m_ChangAnController);
 #endif
+#ifdef BORUI
+					m_Terminal_CA.Push(&m_BoRuiController);
+#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)
 				{
 					m_Terminal_CA.Push(&m_GeometricTrack);
+					m_Terminal_CA.Push(m_GeometricTrack);
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 2)
 				{
 #ifdef CHANGAN
 					m_Terminal_CA.Push(&m_ChangAnMessage);
+#endif
+#ifdef BORUI
+					m_Terminal_CA.Push(&m_BoRuiMessage);
 #endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 3)
