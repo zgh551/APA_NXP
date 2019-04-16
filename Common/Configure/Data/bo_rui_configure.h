@@ -43,12 +43,15 @@
 // 速度修正比例系数
 #define SPEED_REVISE_RATIO               (1.01)
 // 轮脉冲比例系数
-#define WHEEL_PUSLE_RATIO                (0.02162621)
+#define WHEEL_PUSLE_RATIO                (0.021654)
 /****/
 // 1530 -> 33.2    :0.02169935
 // 2060 -> 44.55   :0.02162621
 // 2145 -> 46.8    :0.02181818
 // 2090 -> 45.17   :0.02161244
+/****************4.12标定***************/
+// 1682 -> 36.43   :0.02165874
+// 2146 -> 46.46   :0.02164958
 /****/
 #define WHEEL_PUSLE_MAX                  (4095)
 /*** turn radius and the steering angle relationship ***/
