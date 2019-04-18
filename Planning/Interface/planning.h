@@ -39,11 +39,11 @@
 #define PLANNING_BRAKING_R	  ( 0.1 ) // 规划减速度的倒数
 #define STRAIGHT_VELOCITY	  ( 0.5 ) // 直线段的速度
 #define CURVE_VELOCITY	      ( 0.3 ) // 曲线段的速度
-#define MOTION_DISTANCE       ( 1.0 ) // 车辆满足运动的距离
+#define MOTION_DISTANCE       ( 5.0 ) // 车辆满足运动的距离
 #define TURN_FEEDFORWARD_TIME ( 0.1 ) // 转向角前向反馈的补偿时间
 #define PARKING_CENTER_MARGIN ( 0.05 ) // 泊车中心点余量
 #define ACC_DISABLE_TIME      ( 50 ) // ACC失效时间
-#define STEER_ANGLE_ARRIVE_ERR ( 1 )  // 转向角允许的到位误差
+#define STEER_ANGLE_ARRIVE_ERR ( 5 )  // 转向角允许的到位误差
 #define INIT_POINT_MARGIN      ( 0.3 ) // 初始位置调整的余量
 /**************************速度控制******************************/
 #define POSITION_A            ( 0.4 ) // 速度控制下限点
