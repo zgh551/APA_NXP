@@ -93,12 +93,20 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			break;
 
 		case 0x518:
-			ctl->SteeringAngle 		= ((int16_t)((dat[1] << 8) | dat[0])) * 0.1f;
-			ctl->SteeringAngleRate 	= dat[2] * 4.0f;
-			ctl->Velocity		    = dat[3] * 0.1f;
-			ctl->Distance           = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f;
-			ctl->Gear 				= (uint8_t)dat[6];
-			ctl->APAEnable          = (uint8_t)dat[7];
+			check_sum =0 ;
+			for(i=0;i<7;i++){
+				check_sum += dat[i];
+			}
+			check_sum = check_sum ^ 0xFF;
+			if(check_sum == dat[7])
+			{
+				ctl->SteeringAngle 		= ((int16_t)((dat[1] << 8) | dat[0])) * 0.1f;
+				ctl->SteeringAngleRate 	= dat[2] * 4.0f;
+				ctl->Velocity		    = dat[3] * 0.1f;
+				ctl->Distance           = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f;
+				ctl->Gear 				= (uint8_t)(dat[6] & 0x0f);
+				ctl->APAEnable          = (uint8_t)((dat[6]>>4) & 0x03);
+			}
 			break;
 		default:
 
