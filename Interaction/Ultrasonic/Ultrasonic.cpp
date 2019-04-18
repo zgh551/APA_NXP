@@ -935,7 +935,7 @@ void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,Ab
 	{
 		if(0 == data.Distance1)
 		{
-			location->Position = Vector2d(0,0);
+			location->Position = position.Point;
 			location->Status = OverDetection;
 		}
 		else
@@ -947,7 +947,7 @@ void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,Ab
 	}
 	else
 	{
-		location->Position = Vector2d(0,0);
+		location->Position = position.Point;
 		if(16 == data.status)
 		{
 			location->Status = BlindZone;
@@ -980,7 +980,7 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
 	{
 		if( (0 == data_ul.Distance1) || (0 == data_ur.Distance1))
 		{
-			location->Position = Vector2d(0,0);
+			location->Position = position_a.Point;// Vector2d(0,0);
 			location->Status   = OverDetection;
 		}
 		else
@@ -1006,14 +1006,14 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
 			}
 			else
 			{
-				location->Position = Vector2d(0,0);
+				location->Position = position_a.Point;
 				location->Status   = Noise;
 			}
 		}
 	}
 	else
 	{
-		location->Position = Vector2d(0,0);
+		location->Position = position_a.Point;
 		if( (16 == data_ul.status) || (16 == data_ur.status))
 		{
 			location->Status = BlindZone;
@@ -1033,14 +1033,14 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
  * */
 void Ultrasonic::GroundTriangleCalculate(VehicleState *vehicle,Abstacle_Location_Packet body,Abstacle_Location_Packet *ground)
 {
-	if(Normal == body.Status)
-	{
+//	if(Normal == body.Status)
+//	{
 		ground->Position = vehicle->getPosition() + body.Position.rotate(vehicle->getYaw());
-	}
-	else
-	{
-		ground->Position = Vector2d(0,0);
-	}
+//	}
+//	else
+//	{
+//		ground->Position = Vector2d(0,0);
+//	}
 	ground->Status   = body.Status;
 }
 
