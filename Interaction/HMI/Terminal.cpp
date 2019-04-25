@@ -106,6 +106,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 				ctl->Distance           = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f;
 				ctl->Gear 				= (uint8_t)(dat[6] & 0x0f);
 				ctl->APAEnable          = (uint8_t)((dat[6]>>4) & 0x03);
+				AckValid = 0xa5;
 			}
 			break;
 		default:
