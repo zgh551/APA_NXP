@@ -27,7 +27,7 @@
 #include "Ultrasonic.h"
 #include "planning.h"
 #include "percaption.h"
-#include "ultrasonic_abstacle_percption.h"
+#include "ultrasonic_obstacle_percption.h"
 
 typedef union _byte2float
 {
@@ -62,6 +62,8 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
 	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,Planning *pp);
 
+	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pct);
+
 	void Parse(vuint32_t id,vuint8_t dat[],Planning *msg);
 	void Parse(vuint32_t id,vuint8_t dat[]);
 	// Terminal Control
@@ -78,7 +80,7 @@ public:
 
 	void Push(Percaption *p);
 
-//	void Push(UltrasonicAbstaclePercption *p);
+	void Push(UltrasonicObstaclePercption *p);
 
 	void Push(Planning *p);
 ///////////////////////////////////////////////////////////////////////////
@@ -95,11 +97,11 @@ public:
 	/*
 	 * 载体坐标系的数据发送
 	 * */
-	void UltrasonicBodyLocationSend(uint8_t id,Abstacle_Location_Packet packet);
+	void UltrasonicBodyLocationSend(uint8_t id,ObstacleLocationPacket packet);
 	/*
 	 * 地面坐标系的数据发送
 	 * */
-	void UltrasonicGroundLocationSend(uint8_t id,Abstacle_Location_Packet packet);
+	void UltrasonicGroundLocationSend(uint8_t id,ObstacleLocationPacket packet);
 
 	void Ack(void);
 
@@ -116,6 +118,10 @@ public:
 	uint8_t getAckValid();
 	void setAckValid(uint8_t value);
 	Property<Terminal,uint8_t,READ_WRITE> AckValid;
+
+	uint8_t getAckEcho();
+	void    setAckEcho(uint8_t value);
+	Property<Terminal,uint8_t,READ_WRITE> AckEcho;
 
 	// Commond
 	uint8_t getCommand();
@@ -140,7 +146,7 @@ private:
 	uint8_t _frame_id,_frame_length,_frame_cnt,_check_sum;
 	uint8_t _frame_err_cnt;
 	uint8_t _ack_valid;
-
+	uint8_t _ack_echo;
 	/// data type conversion
 	Byte2Float _data_temp,_speed_data_temp;
 };
