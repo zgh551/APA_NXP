@@ -1,0 +1,80 @@
+/*
+ * link_list.cpp
+ *
+ *  Created on: 2019年4月25日
+ *      Author: zhuguohua
+ */
+
+#include "link_list.h"
+
+
+LinkList::LinkList() {
+	HeadNode.setContainer(this);
+	HeadNode.getter(&LinkList::getHeadNode);
+
+	// TODO Auto-generated constructor stub
+	_list_length = 0;
+	_head_node = NULL;//头节点
+	_end_node  = NULL;//尾节点
+	_node      = NULL;//
+}
+
+LinkList::~LinkList() {
+	// TODO Auto-generated destructor stub
+	_list_length = 0;
+	delete _head_node;//头节点
+	delete _end_node;//尾节点
+	delete _node;//
+
+	_head_node = NULL;
+	_end_node  = NULL;
+	_node      = NULL;
+}
+
+void LinkList::Add(ObstacleLocationPacket dat)
+{
+	uint32_t add_new;
+	_node = new Node;//申请一个新的节点
+	add_new = (uint32_t)((uint32_t)_node & 0xffff);
+
+	if( (_node != NULL) && (add_new < 0x9900))
+	{
+		_node->next = NULL;
+		_node->data = dat;
+		if(_end_node == NULL)
+		{
+			_head_node = _node;//头节点
+			_end_node  = _node;//尾节点
+		}
+		else
+		{
+			_end_node->next = _node;
+			_end_node = _node;
+		}
+		_list_length++;
+	}
+	else
+	{
+		delete _node;
+	}
+}
+
+void LinkList::Delete(void)
+{
+	Node* _free_node;//
+	while(_head_node->next != NULL)
+	{
+		_free_node = _head_node;
+		_head_node = _head_node->next;
+		delete _free_node;
+	}
+	delete _head_node;
+}
+
+uint32_t LinkList::Length()//返回链表个数
+{
+	return _list_length;
+}
+
+
+Node* LinkList::getHeadNode()           { return  _head_node;}
