@@ -31,10 +31,26 @@ Percaption::Percaption() {
 	DetectParkingStatus.setContainer(this);
 	DetectParkingStatus.getter(&Percaption::getDetectParkingStatus);
 	DetectParkingStatus.setter(&Percaption::setDetectParkingStatus);
+
+	Command.setContainer(this);
+	Command.getter(&Percaption::getCommand);
+	Command.setter(&Percaption::setCommand);
+
+	Init();
 }
 
 Percaption::~Percaption() {
 
+}
+void Percaption::Init(void)
+{
+	_position_x = 0.0f;
+	_position_y = 0.0f;
+	_attitude_yaw = 0.0f;
+	_parking_length = 0.0f;
+	_parking_width  = 0.0f;
+	_detect_parking_status = false;
+	_command = 0;
 }
 
 float Percaption::getPositionX()           { return  _position_x;}
@@ -55,3 +71,5 @@ void  Percaption::setParkingWidth(float value){ _parking_width = value;}
 bool Percaption::getDetectParkingStatus()           { return  _detect_parking_status;}
 void Percaption::setDetectParkingStatus(bool value) { _detect_parking_status = value;}
 
+uint8_t Percaption::getCommand()              { return  _command;}
+void    Percaption::setCommand(uint8_t value) { _command = value;}

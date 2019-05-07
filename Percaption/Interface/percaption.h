@@ -23,6 +23,8 @@ public:
 	Percaption();
 	virtual ~Percaption();
 
+	void Init(void);
+
 //	virtual uint8_t Work(Ultrasonic *u,VehicleState *v) = 0;
 	// wheel speed
 	float getPositionX();
@@ -49,6 +51,9 @@ public:
 	void setDetectParkingStatus(bool value);
 	Property<Percaption,bool,READ_WRITE> DetectParkingStatus;
 
+	uint8_t getCommand();
+	void setCommand(uint8_t value);
+	Property<Percaption,uint8_t,READ_WRITE> Command;
 private:
 	float _position_x;
 	float _position_y;
@@ -56,6 +61,7 @@ private:
 	float _parking_length;
 	float _parking_width;
 	bool  _detect_parking_status;
+	uint8_t _command;
 };
 
 #endif /* INTERFACE_PERCAPTION_INFORMATION_H_ */
