@@ -40,8 +40,9 @@
 #include "vertical_planning.h"
 // 感知
 #include "percaption.h"
-#include "ultrasonic_abstacle_percption.h"
-
+#include "ultrasonic_obstacle_percption.h"
+//
+#include "link_list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,8 +72,17 @@ ParallelPlanning m_ParallelPlanning;
 VerticalPlanning m_VerticalPlanning;
 
 Percaption m_PercaptionInformation;
-UltrasonicAbstaclePercption m_UltrasonicAbstaclePercption;
+UltrasonicObstaclePercption m_UltrasonicObstaclePercption;
 
+
+LinkList *test_list = new LinkList();
+//UltrasonicList etsts;
+ObstacleLocationPacket dfd,get_value_test;
+ObstacleLocationPacket rear_test_dat;
+
+Node* test_node;
+
+uint8_t UpdateUtrasonicFlag = 0;
 __attribute__ ((section(".text")))
 int main()
 {
@@ -94,6 +104,57 @@ int main()
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
+
+//		rear_test_dat.Position.X = 3.21;
+//		rear_test_dat.Position.Y = 3.32;
+//		rear_test_dat.Status = Normal;
+//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
+//
+//		rear_test_dat.Position.X = 3.23;
+//		rear_test_dat.Position.Y = 3.31;
+//		rear_test_dat.Status = Normal;
+//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
+//
+//
+//		rear_test_dat.Position.X = 3.22;
+//		rear_test_dat.Position.Y = 3.34;
+//		rear_test_dat.Status = Normal;
+//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
+//
+//		rear_test_dat.Position.X = 3.32;
+//		rear_test_dat.Position.Y = 3.45;
+//		rear_test_dat.Status = Normal;
+//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
+//
+//		rear_test_dat.Position.X = 3.2;
+//		rear_test_dat.Position.Y = 3.3;
+//		rear_test_dat.Status = Normal;
+//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
+//
+//		m_UltrasonicObstaclePercption.ValueDistributed();
+
+//		dfd.Position = Vector2d(1,2);
+//		dfd.Status   = Noise;
+//		test_list->Add(dfd);
+//		dfd.Position = Vector2d(2.4f,3.14);
+//		dfd.Status   = OverDetection;
+//		test_list->Add(dfd);
+//		test_node = test_list->HeadNode;
+//
+//		get_value_test = test_node->data;
+//
+//		delete test_list;
+//
+//		dfd.Position = Vector2d(1,2);
+//		dfd.Status   = Noise;
+//		test_list->Add(dfd);
+//		dfd.Position = Vector2d(2.4f,3.14);
+//		dfd.Status   = OverDetection;
+//		test_list->Add(dfd);
+//		test_node = test_list->HeadNode;
+//
+//		get_value_test = test_node->data;
+//		test_list
 		for(;;)
 		{
 			//Task 一次性的计算任务 泊车规划任务
@@ -153,9 +214,21 @@ int main()
 			{
 
 			}
+			else if(0xC0 == m_Terminal_CA.Command)//障碍物定位
+			{
+				if(SUCCESS == m_UltrasonicObstaclePercption.ObstacleLocationCalculateStateMachine())
+				{
+					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
+				}
+			}
 			else//车辆
 			{
 
+			}
+
+			if(0xA5 == m_Terminal_CA.AckValid)
+			{
+				m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(m_Ultrasonic.UltrasonicPacket, m_Ultrasonic.AbstacleGroundPositionTriangle);
 			}
 
 			if(0xA5 == m_Terminal_CA.PushActive)
@@ -202,7 +275,11 @@ int main()
 			if(0xA5 == m_Terminal_CA.AckValid)
 			{
 				m_Terminal_CA.Ack();
-				m_Terminal_CA.AckValid = 0;
+				if(0x5A == m_Terminal_CA.AckEcho)
+				{
+					m_Terminal_CA.AckEcho = 0;
+					m_Terminal_CA.AckValid = 0;
+				}
 			}
 		}
 }
@@ -255,7 +332,7 @@ void PIT0_isr(void)
 		#endif
 
 		#ifdef BORUI
-		m_BoRuiController.Push(0.02);
+//		m_BoRuiController.Push(0.02);
 		#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
@@ -280,6 +357,12 @@ void PIT0_isr(void)
 
 	}
 
+	if(m_Ultrasonic.SystemTime % 10 == 0)//50ms
+	{
+		//障碍定位数据推送
+//		m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(m_Ultrasonic.UltrasonicPacket, m_Ultrasonic.AbstacleGroundPositionTriangle);
+	}
+
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
 	m_Ultrasonic.Update(25);
@@ -291,6 +374,7 @@ void PIT0_isr(void)
 	m_Ultrasonic.BodyDirectLocation();
 	m_Ultrasonic.BodyTriangleLocation();
 	m_Ultrasonic.GroundTriangleLocation(&m_GeometricTrack);
+
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
 
@@ -367,6 +451,7 @@ void FlexCAN2_Isr(void)
 {
 	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
+//		UpdateUtrasonicFlag = 0xAC;
 		// terminal command decode
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B);
 #ifdef CHANGAN
@@ -378,6 +463,7 @@ void FlexCAN2_Isr(void)
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_BoRuiController);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_BoRuiMessage);
 #endif
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_UltrasonicObstaclePercption);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_Ultrasonic);
 
 
