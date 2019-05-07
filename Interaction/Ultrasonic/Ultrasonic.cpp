@@ -81,11 +81,11 @@ Ultrasonic_Packet* Ultrasonic::getUltrasonicPacket(){return _ultrasonic_packet;}
 
 Ultrasonic_Packet* Ultrasonic::getUltrasonicLocationPacket(){return _ultrasonic_location_packet;}
 
-Abstacle_Location_Packet* Ultrasonic::getAbstacleBodyPositionDirect(){return _abstacle_body_position_direct;}
+ObstacleLocationPacket* Ultrasonic::getAbstacleBodyPositionDirect(){return _abstacle_body_position_direct;}
 
-Abstacle_Location_Packet* Ultrasonic::getAbstacleBodyPositionTriangle(){return _abstacle_body_position_triangle;}
+ObstacleLocationPacket* Ultrasonic::getAbstacleBodyPositionTriangle(){return _abstacle_body_position_triangle;}
 
-Abstacle_Location_Packet* Ultrasonic::getAbstacleGroundPositionTriangle(){return _abstacle_ground_position_triangle;}
+ObstacleLocationPacket* Ultrasonic::getAbstacleGroundPositionTriangle(){return _abstacle_ground_position_triangle;}
 
 void Ultrasonic::setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p)
 {
@@ -95,6 +95,11 @@ void Ultrasonic::setUltrasonicPacket(uint8_t n,Ultrasonic_Packet p)
 void Ultrasonic::setUltrasonicLocationPacket(uint8_t n,Ultrasonic_Packet p)
 {
 	_ultrasonic_location_packet[n] = p;
+}
+
+void Ultrasonic::setAbstacleGroundPositionTriangle(uint8_t n,ObstacleLocationPacket p)
+{
+	_abstacle_ground_position_triangle[n] = p;
 }
 
 void Ultrasonic::InitSensing_STP318(uint8_t tx,uint8_t rx,void (*TransmitFrame)(LIN_RAM))
@@ -928,7 +933,7 @@ void Ultrasonic::Update(float t)
  * data    : 超声波数据
  * location: 障碍物相对车体的位置
  * */
-void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,Abstacle_Location_Packet *location)
+void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,ObstacleLocationPacket *location)
 {
 	Vector2d temp_angle;
 	if(0 == data.status)
@@ -970,7 +975,7 @@ void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,Ab
  * */
 void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location position_b,
 										Ultrasonic_Packet data_ul,Ultrasonic_Packet data_ur,
-										Abstacle_Location_Packet *location)
+										ObstacleLocationPacket *location)
 {
 	float bottom_edge;
 	float alpha,beta;
@@ -1031,7 +1036,7 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
  * body   :障碍物相对于载体坐标系的坐标
  * ground :障碍物相对于地面坐标系的坐标
  * */
-void Ultrasonic::GroundTriangleCalculate(VehicleState *vehicle,Abstacle_Location_Packet body,Abstacle_Location_Packet *ground)
+void Ultrasonic::GroundTriangleCalculate(VehicleState *vehicle,ObstacleLocationPacket body,ObstacleLocationPacket *ground)
 {
 //	if(Normal == body.Status)
 //	{
