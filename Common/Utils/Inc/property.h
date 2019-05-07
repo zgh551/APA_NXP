@@ -9,7 +9,7 @@
 #ifndef _PROPERTY_H_
 #define _PROPERTY_H_
 
-#define READ_ONLY 1
+#define READ_ONLY  1
 #define WRITE_ONLY 2
 #define READ_WRITE 3
 
