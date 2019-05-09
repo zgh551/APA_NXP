@@ -10,7 +10,6 @@
 static Vector2d _last_point;
 static float _last_x_value;
 static float _last_triangle_x_value;
-static uint8_t time_ms_cnt;
 
 UltrasonicObstaclePercption::UltrasonicObstaclePercption() {
 
@@ -100,6 +99,10 @@ void  UltrasonicObstaclePercption::EdgeFinding()
 	ObstacleInformationPacket parking_position_temp;
 	ObstacleInformationPacket vehicle_position_temp;
 
+	if(_ultrasonic_position_list->HeadNode == NULL)
+	{
+		return;
+	}
 	_current_node = _ultrasonic_position_list->HeadNode;//当前节点
 	_last_node    = _ultrasonic_position_list->HeadNode;//上一节点
 
@@ -267,6 +270,10 @@ void  UltrasonicObstaclePercption::ValueDistributed()
 	float min_y,max_y;
 	uint8_t  x_group_number,y_group_number;
 
+	if(_ultrasonic_triangle_location_list->HeadNode == NULL)
+	{
+		return;
+	}
 	_current_node_triangle = _ultrasonic_triangle_location_list->HeadNode;
 	min_x = _current_node_triangle->data.Position.getX();
 	max_x = _current_node_triangle->data.Position.getX();
@@ -364,7 +371,7 @@ void  UltrasonicObstaclePercption::ValueDistributed()
 //	}
 //}
 
-void  UltrasonicObstaclePercption::ObstacleLocationPushStateMachine(Ultrasonic_Packet* u_dat,ObstacleLocationPacket* p_dat)
+void  UltrasonicObstaclePercption::ObstacleLocationPushStateMachine(Ultrasonic* u_dat)
 {
 	switch(_location_push_state)
 	{
@@ -378,13 +385,15 @@ void  UltrasonicObstaclePercption::ObstacleLocationPushStateMachine(Ultrasonic_P
 			break;
 
 		case UltrasonicDataPush_LRU:
-			time_ms_cnt = (time_ms_cnt + 1) % 3;
-			Push(u_dat[11],p_dat[11]);
-//			if(0 == time_ms_cnt)
-//			{
-				Push(p_dat[5]);
-				Push(p_dat[6]);
-//			}
+			if( (0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
+			{
+				Push(u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
+			}
+			if(23 == u_dat->ScheduleTimeCnt)
+			{
+				Push(u_dat->AbstacleGroundPositionTriangle[5]);
+				Push(u_dat->AbstacleGroundPositionTriangle[6]);
+			}
 			if(0x60 == Command)
 			{
 				Command = 0x70;
@@ -437,3 +446,12 @@ int8_t UltrasonicObstaclePercption::ObstacleLocationCalculateStateMachine()
 	return FAIL;
 }
 
+uint16_t UltrasonicObstaclePercption::getPositionListLength()
+{
+	return (uint16_t)_ultrasonic_position_list->Length();
+}
+
+uint16_t UltrasonicObstaclePercption::getLocationListLength()
+{
+	return (uint16_t)_ultrasonic_triangle_location_list->Length();
+}

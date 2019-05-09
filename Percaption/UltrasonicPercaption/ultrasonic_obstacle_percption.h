@@ -79,9 +79,12 @@ public:
 	float HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value);
 	void  ValueDistributed();
 
-	void ObstacleLocationPushStateMachine(Ultrasonic_Packet* u_dat,ObstacleLocationPacket* p_dat);
+	void ObstacleLocationPushStateMachine(Ultrasonic* u_dat);
 	int8_t ObstacleLocationCalculateStateMachine();
 
+	uint16_t getPositionListLength();
+	uint16_t getLocationListLength();
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	LocationStatus getUltrasonicLocationStatus();
 	void    setUltrasonicLocationStatus(LocationStatus value);
 	Property<UltrasonicObstaclePercption,LocationStatus,READ_WRITE> UltrasonicLocationStatus;
