@@ -747,10 +747,10 @@ void Terminal::Push(UltrasonicObstaclePercption *p)
 	m_CAN_Packet.data[2] = 0;
 	m_CAN_Packet.data[3] = 0;
 
-	m_CAN_Packet.data[4] = 0;
-	m_CAN_Packet.data[5] = 0;
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	m_CAN_Packet.data[4] = (uint8_t)(p->getPositionListLength() & 0xff);
+	m_CAN_Packet.data[5] = (uint8_t)((p->getPositionListLength() >> 8 ) & 0xff);
+	m_CAN_Packet.data[6] = (uint8_t)(p->getLocationListLength() & 0xff);
+	m_CAN_Packet.data[7] = (uint8_t)((p->getLocationListLength() >> 8 ) & 0xff);
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
