@@ -104,57 +104,6 @@ int main()
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
-
-//		rear_test_dat.Position.X = 3.21;
-//		rear_test_dat.Position.Y = 3.32;
-//		rear_test_dat.Status = Normal;
-//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
-//
-//		rear_test_dat.Position.X = 3.23;
-//		rear_test_dat.Position.Y = 3.31;
-//		rear_test_dat.Status = Normal;
-//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
-//
-//
-//		rear_test_dat.Position.X = 3.22;
-//		rear_test_dat.Position.Y = 3.34;
-//		rear_test_dat.Status = Normal;
-//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
-//
-//		rear_test_dat.Position.X = 3.32;
-//		rear_test_dat.Position.Y = 3.45;
-//		rear_test_dat.Status = Normal;
-//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
-//
-//		rear_test_dat.Position.X = 3.2;
-//		rear_test_dat.Position.Y = 3.3;
-//		rear_test_dat.Status = Normal;
-//		m_UltrasonicObstaclePercption.Push(rear_test_dat);
-//
-//		m_UltrasonicObstaclePercption.ValueDistributed();
-
-//		dfd.Position = Vector2d(1,2);
-//		dfd.Status   = Noise;
-//		test_list->Add(dfd);
-//		dfd.Position = Vector2d(2.4f,3.14);
-//		dfd.Status   = OverDetection;
-//		test_list->Add(dfd);
-//		test_node = test_list->HeadNode;
-//
-//		get_value_test = test_node->data;
-//
-//		delete test_list;
-//
-//		dfd.Position = Vector2d(1,2);
-//		dfd.Status   = Noise;
-//		test_list->Add(dfd);
-//		dfd.Position = Vector2d(2.4f,3.14);
-//		dfd.Status   = OverDetection;
-//		test_list->Add(dfd);
-//		test_node = test_list->HeadNode;
-//
-//		get_value_test = test_node->data;
-//		test_list
 		for(;;)
 		{
 			//Task 一次性的计算任务 泊车规划任务
@@ -218,7 +167,7 @@ int main()
 			{
 				if(SUCCESS == m_UltrasonicObstaclePercption.ObstacleLocationCalculateStateMachine())
 				{
-					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
+
 				}
 			}
 			else//车辆
@@ -226,10 +175,10 @@ int main()
 
 			}
 
-			if(0xA5 == m_Terminal_CA.AckValid)
-			{
-				m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(m_Ultrasonic.UltrasonicPacket, m_Ultrasonic.AbstacleGroundPositionTriangle);
-			}
+//			if(0xA5 == m_Terminal_CA.AckValid)
+//			{
+//				m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(&m_Ultrasonic);
+//			}
 
 			if(0xA5 == m_Terminal_CA.PushActive)
 			{
@@ -269,6 +218,8 @@ int main()
 					{
 						m_Terminal_CA.Push(&m_VerticalPlanning);
 					}
+					//推送障碍物检测信息
+					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
 				}
 			}
 			// 终端应答信号
@@ -357,12 +308,6 @@ void PIT0_isr(void)
 
 	}
 
-	if(m_Ultrasonic.SystemTime % 10 == 0)//50ms
-	{
-		//障碍定位数据推送
-//		m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(m_Ultrasonic.UltrasonicPacket, m_Ultrasonic.AbstacleGroundPositionTriangle);
-	}
-
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
 	m_Ultrasonic.Update(25);
@@ -374,6 +319,8 @@ void PIT0_isr(void)
 	m_Ultrasonic.BodyDirectLocation();
 	m_Ultrasonic.BodyTriangleLocation();
 	m_Ultrasonic.GroundTriangleLocation(&m_GeometricTrack);
+
+	m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(&m_Ultrasonic);
 
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
