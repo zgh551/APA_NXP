@@ -24,7 +24,8 @@ void BoRuiMessage::Init()
 
 void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
 {
-	uint8_t crc_temp;
+	uint8_t crc_temp,i;
+	uint8_t dat_temp[7];
 	switch(id)
 	{
 		case 0x2A0://eps status
@@ -71,8 +72,33 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			}
 			break;
 
-		case 0x113:// TCU GEAR
-			switch((uint8_t)(dat[5] >> 3))
+//		case 0x113:// TCU GEAR
+//			switch((uint8_t)(dat[5] >> 3))
+//			{
+//				case 0:
+//					Gear = None;
+//					break;
+//
+//				case 1:
+//					Gear = Parking;
+//					break;
+//
+//				case 2:
+//					Gear = Reverse;
+//					break;
+//
+//				case 3:
+//					Gear = Neutral;
+//					break;
+//
+//				default:
+//					Gear = Drive;
+//					break;
+//			}
+//			break;
+
+		case 0x165:
+			switch((uint8_t)(dat[1] & 0x1f))
 			{
 				case 0:
 					Gear = None;
@@ -90,23 +116,31 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 					Gear = Neutral;
 					break;
 
-				default:
+				case 4:
 					Gear = Drive;
+					break;
+
+				default:
+					Gear = None;
 					break;
 			}
 			break;
-
 		case 0x125:// ESC
 
 			break;
 
 		case 0x0E0://SAS
-//			crc_temp = crc8.crcCompute((uint8_t*)dat, 5);
-//			if(crc_temp == dat[5])
-//			{
+			for(i=0;i<7;i++)
+			{
+				dat_temp[i] = dat[i];
+			}
+			dat_temp[5] = 0x4A;
+			crc_temp = crc8.crcCompute(dat_temp, 7);
+			if(crc_temp == dat[7])
+			{
 				SteeringAngle     = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
 				SteeringAngleRate = dat[2]*4.0f;
-//			}
+			}
 			break;
 
 		default:
