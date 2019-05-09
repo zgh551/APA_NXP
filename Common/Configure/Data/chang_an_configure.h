@@ -45,6 +45,8 @@
 // 轮脉冲比例系数
 #define WHEEL_PUSLE_RATIO                (0.02540618132391610878926842900878)
 
+#define WHEEL_PUSLE_MAX                  (255)
+
 /*** turn radius and the steering angle relationship ***/
 // (400,470]
 #define FIT_RADIUS_A1 		( 0.07466)
@@ -95,21 +97,21 @@
 #define FIT_RADIUS_B12 		(-1.586)
 
 /**********************************Ultrasonic Location Information***********************************************/
-#define SENSOR1_X     (-0.20f )
-#define SENSOR1_Y     ( 0.68f )
-#define SENSOR1_ANGLE ( 0.00f )
-
-#define SENSOR2_X     ( 0.00f )
-#define SENSOR2_Y     ( 0.32f )
-#define SENSOR2_ANGLE ( 0.00f )
-
-#define SENSOR3_X     ( 0.00f )
-#define SENSOR3_Y     (-0.32f )
-#define SENSOR3_ANGLE ( 0.00f )
-
-#define SENSOR4_X     (-0.20f )
-#define SENSOR4_Y     (-0.68f )
-#define SENSOR4_ANGLE ( 0.00f )
+//#define SENSOR1_X     (-0.20f )
+//#define SENSOR1_Y     ( 0.68f )
+//#define SENSOR1_ANGLE ( 0.00f )
+//
+//#define SENSOR2_X     ( 0.00f )
+//#define SENSOR2_Y     ( 0.32f )
+//#define SENSOR2_ANGLE ( 0.00f )
+//
+//#define SENSOR3_X     ( 0.00f )
+//#define SENSOR3_Y     (-0.32f )
+//#define SENSOR3_ANGLE ( 0.00f )
+//
+//#define SENSOR4_X     (-0.20f )
+//#define SENSOR4_Y     (-0.68f )
+//#define SENSOR4_ANGLE ( 0.00f )
 //实验室测试
 //#define SENSOR1_X     ( 0.00f )
 //#define SENSOR1_Y     ( 0.45f )
@@ -127,21 +129,21 @@
 //#define SENSOR4_Y     (-0.50f )
 //#define SENSOR4_ANGLE ( 0.00f )
 
-//#define SENSOR1_X     ( 3.42f )
-//#define SENSOR1_Y     ( 0.70f )
-//#define SENSOR1_ANGLE ( 0.00f )
-//
-//#define SENSOR2_X     ( 3.60f )
-//#define SENSOR2_Y     ( 0.30f )
-//#define SENSOR2_ANGLE ( 0.00f )
-//
-//#define SENSOR3_X     ( 3.60f )
-//#define SENSOR3_Y     (-0.30f )
-//#define SENSOR3_ANGLE ( 0.00f )
-//
-//#define SENSOR4_X     ( 3.42f )
-//#define SENSOR4_Y     (-0.70f )
-//#define SENSOR4_ANGLE ( 0.00f )
+#define SENSOR1_X     ( 3.42f )
+#define SENSOR1_Y     ( 0.70f )
+#define SENSOR1_ANGLE ( 0.00f )
+
+#define SENSOR2_X     ( 3.60f )
+#define SENSOR2_Y     ( 0.30f )
+#define SENSOR2_ANGLE ( 0.00f )
+
+#define SENSOR3_X     ( 3.60f )
+#define SENSOR3_Y     (-0.30f )
+#define SENSOR3_ANGLE ( 0.00f )
+
+#define SENSOR4_X     ( 3.42f )
+#define SENSOR4_Y     (-0.70f )
+#define SENSOR4_ANGLE ( 0.00f )
 
 #define SENSOR5_X     (-0.87f )
 #define SENSOR5_Y     ( 0.72f )
