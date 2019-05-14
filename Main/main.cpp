@@ -74,15 +74,8 @@ VerticalPlanning m_VerticalPlanning;
 Percaption m_PercaptionInformation;
 UltrasonicObstaclePercption m_UltrasonicObstaclePercption;
 
+VehilceConfig test_config;
 
-LinkList *test_list = new LinkList();
-//UltrasonicList etsts;
-ObstacleLocationPacket dfd,get_value_test;
-ObstacleLocationPacket rear_test_dat;
-
-Node* test_node;
-
-uint8_t UpdateUtrasonicFlag = 0;
 __attribute__ ((section(".text")))
 int main()
 {
@@ -107,7 +100,7 @@ int main()
 		for(;;)
 		{
 			//Task 一次性的计算任务 泊车规划任务
-			if(0x10 == m_Terminal_CA.Command)
+			if(0x10 == m_Terminal_CA.Command)//平行泊车
 			{
 				if(0x50 == m_ParallelPlanning.Command)
 				{
@@ -129,7 +122,7 @@ int main()
 				}
 				m_ParallelPlanning.Work(&m_PercaptionInformation);
 			}
-			else if(0x20 == m_Terminal_CA.Command)
+			else if(0x20 == m_Terminal_CA.Command)//垂直泊车
 			{
 				if(0x50 == m_VerticalPlanning.Command)
 				{
@@ -149,6 +142,11 @@ int main()
 				{
 
 				}
+				if(SUCCESS == m_UltrasonicObstaclePercption.ObstacleLocationCalculateStateMachine())
+				{
+					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
+					m_VerticalPlanning.Command = 0x61;
+				}
 				m_VerticalPlanning.Work(&m_PercaptionInformation,&m_GeometricTrack);
 			}
 			else if(0x30 == m_Terminal_CA.Command)//斜向泊车
@@ -167,25 +165,23 @@ int main()
 			{
 				if(SUCCESS == m_UltrasonicObstaclePercption.ObstacleLocationCalculateStateMachine())
 				{
-
+					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
+				}
+				if(0xA5 == m_Terminal_CA.AckValid)
+				{
+					m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(&m_Ultrasonic);
 				}
 			}
 			else//车辆
 			{
 
 			}
-
-//			if(0xA5 == m_Terminal_CA.AckValid)
-//			{
-//				m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(&m_Ultrasonic);
-//			}
-
-			if(0xA5 == m_Terminal_CA.PushActive)
+			if(0xA5 == m_Terminal_CA.PushActive)//数据推送内容,5ms进行一次推送
 			{
 				m_Terminal_CA.PushActive = 0;
-				m_Terminal_CA.Push(&m_Ultrasonic);
+				m_Terminal_CA.Push(&m_Ultrasonic);//5ms
 
-				if(m_Ultrasonic.SystemTime % 4 == 0)
+				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 				{
 #ifdef CHANGAN
 					m_Terminal_CA.Push(&m_ChangAnController);
@@ -194,12 +190,12 @@ int main()
 					m_Terminal_CA.Push(&m_BoRuiController);
 #endif
 				}
-				if(m_Ultrasonic.SystemTime % 4 == 1)
+				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 				{
 					m_Terminal_CA.Push(&m_GeometricTrack);
 					m_Terminal_CA.Push(m_GeometricTrack);
 				}
-				if(m_Ultrasonic.SystemTime % 4 == 2)
+				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 				{
 #ifdef CHANGAN
 					m_Terminal_CA.Push(&m_ChangAnMessage);
@@ -208,7 +204,7 @@ int main()
 					m_Terminal_CA.Push(&m_BoRuiMessage);
 #endif
 				}
-				if(m_Ultrasonic.SystemTime % 4 == 3)
+				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 				{
 					if(0x10 == m_Terminal_CA.Command)
 					{
@@ -219,7 +215,7 @@ int main()
 						m_Terminal_CA.Push(&m_VerticalPlanning);
 					}
 					//推送障碍物检测信息
-					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
+					m_Terminal_CA.Push(m_UltrasonicObstaclePercption);
 				}
 			}
 			// 终端应答信号
@@ -269,7 +265,7 @@ void PIT0_isr(void)
 		}
 		else if(0x20 == m_Terminal_CA.Command)
 		{
-			m_VerticalPlanning.Control(&m_BoRuiController, &m_BoRuiMessage, &m_GeometricTrack, &m_Ultrasonic);
+			m_VerticalPlanning.Control(&m_BoRuiController, &m_BoRuiMessage, &m_GeometricTrack, &m_UltrasonicObstaclePercption);
 		}
 #endif
 	}
@@ -283,7 +279,7 @@ void PIT0_isr(void)
 		#endif
 
 		#ifdef BORUI
-//		m_BoRuiController.Push(0.02);
+		m_BoRuiController.Push(0.02);
 		#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
@@ -300,6 +296,8 @@ void PIT0_isr(void)
 		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
 		#else
 		m_GeometricTrack.PulseUpdate(&m_BoRuiMessage);
+		// 超声波避障功能
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_BoRuiMessage);
 #endif
 #endif
 	}
@@ -319,9 +317,10 @@ void PIT0_isr(void)
 	m_Ultrasonic.BodyDirectLocation();
 	m_Ultrasonic.BodyTriangleLocation();
 	m_Ultrasonic.GroundTriangleLocation(&m_GeometricTrack);
-
+	/*
+	 * 障碍物检测的库位定位状态机
+	 * */
 	m_UltrasonicObstaclePercption.ObstacleLocationPushStateMachine(&m_Ultrasonic);
-
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
 
@@ -398,7 +397,6 @@ void FlexCAN2_Isr(void)
 {
 	if(CAN_2.IFLAG1.B.BUF31TO8I & 0x000001)
 	{
-//		UpdateUtrasonicFlag = 0xAC;
 		// terminal command decode
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B);
 #ifdef CHANGAN
@@ -412,7 +410,6 @@ void FlexCAN2_Isr(void)
 #endif
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_UltrasonicObstaclePercption);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_Ultrasonic);
-
 
 		if(0x10 == m_Terminal_CA.Command)
 		{
