@@ -42,6 +42,13 @@ public:
 	float SteeringAngle2TurnningRadius(float steer,float a,float b);
 	float TurnningRadius2SteeringAngle(float radius,float a,float b);
 
+	float TurnRadiusCurveFitting(float steering_angle);
+	float TurnRadiusFindingTable(float steering_angle);
+
+	float SteeringAngleCurveFitting(float radius);
+	float SteeringAngleFindingCallback(uint16_t left_id,uint16_t right_id,float radius);
+	float SteeringAngleFindingLoop(uint16_t left_id,uint16_t right_id,float radius);
+
 	float TurnRadiusCalculate(float steering_angle);
 	float SteeringAngleCalculate(float radius);
 	/**********************************************************************/
