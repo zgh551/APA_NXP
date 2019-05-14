@@ -36,6 +36,14 @@ Percaption::Percaption() {
 	Command.getter(&Percaption::getCommand);
 	Command.setter(&Percaption::setCommand);
 
+	ValidParkingPosition.setContainer(this);
+	ValidParkingPosition.getter(&Percaption::getValidParkingPosition);
+	ValidParkingPosition.setter(&Percaption::setValidParkingPosition);
+
+	ObstacleDistance.setContainer(this);
+	ObstacleDistance.getter(&Percaption::getObstacleDistance);
+	ObstacleDistance.setter(&Percaption::setObstacleDistance);
+
 	Init();
 }
 
@@ -73,3 +81,9 @@ void Percaption::setDetectParkingStatus(bool value) { _detect_parking_status = v
 
 uint8_t Percaption::getCommand()              { return  _command;}
 void    Percaption::setCommand(uint8_t value) { _command = value;}
+
+ObstacleInformationPacket Percaption::getValidParkingPosition()           { return  _valid_parking_position;}
+void  Percaption::setValidParkingPosition(ObstacleInformationPacket value){ _valid_parking_position = value;}
+
+ObstacleDistancePacket Percaption::getObstacleDistance()           { return  _obstacle_distance;}
+void  Percaption::setObstacleDistance(ObstacleDistancePacket value){ _obstacle_distance = value;}

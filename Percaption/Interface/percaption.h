@@ -18,6 +18,19 @@
 #include "math.h"
 #include "vector_2d.h"
 
+typedef struct _ObstacleInformationPacket
+{
+	Vector2d First_Position;
+	Vector2d Second_Position;
+	float    Length;
+}ObstacleInformationPacket;
+
+typedef struct _ObstacleDistancePacket
+{
+	float            distance;
+	UltrasonicStatus status;
+}ObstacleDistancePacket;
+
 class Percaption {
 public:
 	Percaption();
@@ -54,6 +67,20 @@ public:
 	uint8_t getCommand();
 	void setCommand(uint8_t value);
 	Property<Percaption,uint8_t,READ_WRITE> Command;
+
+	ObstacleInformationPacket getValidParkingPosition();
+	void    setValidParkingPosition(ObstacleInformationPacket value);
+	Property<Percaption,ObstacleInformationPacket,READ_WRITE> ValidParkingPosition;
+
+	ObstacleDistancePacket getObstacleDistance();
+	void    setObstacleDistance(ObstacleDistancePacket value);
+	Property<Percaption,ObstacleDistancePacket,READ_WRITE> ObstacleDistance;
+protected:
+	// 最终输出的障碍物重新定位的库位信息
+	ObstacleInformationPacket _valid_parking_position;
+
+	// 输出障碍物离车辆边沿的距离
+	ObstacleDistancePacket _obstacle_distance;
 private:
 	float _position_x;
 	float _position_y;
