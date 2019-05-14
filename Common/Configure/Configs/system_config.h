@@ -7,6 +7,11 @@
 
 #ifndef CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_
 #define CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_
+/****************Task Shedule Priority Level******************/
+#define TIME_5MS_TASK (1)
+#define CAN0_TASK     (2)
+#define CAN1_TASK     (3)
+#define CAN2_TASK     (4)
 
 /****************System Configure******************/
 //#define CHANGAN
