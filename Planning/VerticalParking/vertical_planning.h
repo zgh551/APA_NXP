@@ -118,6 +118,11 @@ typedef enum _OuterTrialState
 	OuterTrialWaitStill
 }OuterTrialState;
 
+typedef enum _ParkingCorrectStatus
+{
+	StepOneParkingLocation,
+	StepTwoEnterParkingRight
+}ParkingCorrectStatus;
 
 class VerticalPlanning : public Planning
 {
@@ -129,15 +134,20 @@ public:
 	void Work(Percaption *p) override;
 	void Work(Percaption *p,VehicleState *s);
 	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u) override;
+	/*
+	 * 基于感知的
+	 * */
+	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
 	/************************************************************************************************/
 	/************************************ branch state machine **************************************/
 	/************************************************************************************************/
-	int8_t InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	int8_t CircleTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	int8_t CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-//	int8_t TrialTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	int8_t EnterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	int8_t OuterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
+	int8_t InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
+	int8_t CircleTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
+	// 不加修正的版本
+	int8_t CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
+//	int8_t TrialTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
+	int8_t EnterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
+	int8_t OuterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
 	/************************************************************************************************/
 	// Planning function
 	int8_t ParkingAnalysis(Percaption *inf);
@@ -147,11 +157,9 @@ public:
 	void PlanningArc(Line l_init);
 	void TransitionCurve(Percaption *inf);
 
-
 	Line getLineInit();
 	void setLineInit(Line value);
 	Property<VerticalPlanning,Line,READ_WRITE> LineInit;
-
 private:
 	// Overall state machine
 	VerticalPlanningState _vertical_planning_state;
@@ -217,6 +225,8 @@ private:
 	float _trial_margin;
 	float _ahead_distance;
 	int8_t _analysis_state;
+
+	ParkingCorrectStatus _vertical_parking_correct;
 };
 
 #endif /* VERTICALPARKING_VERTICAL_PLANNING_H_ */

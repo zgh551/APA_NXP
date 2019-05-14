@@ -47,6 +47,7 @@ void VerticalPlanning::Work(Percaption *p)
 			{
 				//泊车状态：规划
 				ParkingStatus = 1;
+				_vertical_parking_correct = StepOneParkingLocation;
 				_vertical_planning_state = ParkingAnalysisState;
 			}
 			break;
@@ -189,6 +190,11 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			break;
 
 		case EnterOuterTrialPlanning:
+			//TODO 实现库位的矫正
+			if(p->getValidParkingPosition().Length > 3)
+			{
+				_line_center.Point.X = (p->getValidParkingPosition().First_Position.getX() + p->getValidParkingPosition().Second_Position.getX()) * 0.5;
+			}
 			temp_line.Point.X = s->getPosition().getX();
 			temp_line.Point.Y = s->getPosition().getY();
 			temp_line.Angle   = s->getYaw();
@@ -231,6 +237,127 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 }
 
 void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+{
+//	int8_t status;
+//	switch(_vertical_control_state)
+//	{
+//		case VerticalWaitPlanningFinish:
+//			if( 0x70 == Command )
+//			{
+//				// 泊车状态：控制状态
+//				ParkingStatus = 2;
+//				Command = 0x00;
+//				_apa_control_command.ControlEnable.B.APAEnable = 1;
+//				_apa_control_command.Gear              = Parking;
+//				_apa_control_command.SteeringAngle     = 0;
+//				_apa_control_command.SteeringAngleRate = STEERING_RATE;
+//				_apa_control_command.Distance          = 0;
+//				_apa_control_command.Velocity          = 0;
+//				ctl->Update(_apa_control_command);
+//				_vertical_control_state  = VerticalInitPointJudge;
+//			}
+//			break;
+//
+//		case VerticalInitPointJudge:
+//			if(1 == _analysis_state)
+//			{
+//				if(s->getPosition().getX() < _line_init_circle_parking_enter_turn.Point.getX())
+//				{
+//					_vertical_control_state = VerticalInitPointAdjust;
+//				}
+//				else
+//				{
+//					_vertical_control_state = VerticalCircleTrajectory;
+//				}
+//			}
+//			else if(2 == _analysis_state)
+//			{
+//				if(s->getPosition().getX() < _line_to_circle_enter_turn.Point.getX())
+//				{
+//					_vertical_control_state = VerticalInitPointAdjust;
+//				}
+//				else
+//				{
+//					_vertical_control_state = VerticalEnterTrial;
+//				}
+//			}
+//			else
+//			{
+//				_vertical_control_state = VerticalWaitPlanningFinish;
+//			}
+//			break;
+//
+//		case VerticalInitPointAdjust:
+//			if(SUCCESS == InitPositionAdjustMachine(ctl,msg,s,u))
+//			{
+//				if(1 == _analysis_state)
+//				{
+//					_vertical_control_state = VerticalCircleTrajectory;
+//				}
+//				else if(2 == _analysis_state)
+//				{
+//					_vertical_control_state = VerticalEnterTrial;
+//				}
+//				else
+//				{
+//
+//				}
+//			}
+//			break;
+//
+//		case VerticalCircleTrajectory://一次入库的状态控制
+//			status = CircleTrajectoryMachine(ctl,msg,s,u);
+//			if(PARKING_FINISH == status)
+//			{
+//				ParkingStatus = 3;
+//				_vertical_control_state = VerticalWaitPlanningFinish;
+//			}
+//			break;
+//
+//		case VerticalEnterTrial:
+//			status = EnterTrialMachine(ctl,msg,s,u);
+//			if(SUCCESS == status)
+//			{
+//				Command = 0x61;
+//				_vertical_control_state = VerticalWaitMarginPlanFinish;
+//			}
+//			break;
+//
+//		case VerticalWaitMarginPlanFinish:
+//			if(0x71 == Command)
+//			{
+//				_vertical_control_state = VerticalOuterTrial;
+//			}
+//			break;
+//
+//		case VerticalOuterTrial:
+//			status = OuterTrialMachine(ctl,msg,s,u);
+//			if(SUCCESS == status)
+//			{
+//				Command = 0x62;
+//				_vertical_control_state = VerticalWaitPlanningFinish;
+//			}
+//			break;
+//
+//		case VerticalCurveTrajectory://保留
+//			status = CurveTrajectoryMachine(ctl,msg,s,u);
+//			if(PARKING_FINISH == status)
+//			{
+//				_vertical_control_state = VerticalWaitPlanningFinish;
+//			}
+//			break;
+//
+//		case VerticalParkingComplete:
+//
+//			break;
+//
+//		default:
+//
+//			break;
+//	}
+}
+
+void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	int8_t status;
 	switch(_vertical_control_state)
@@ -282,7 +409,7 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case VerticalInitPointAdjust:
-			if(SUCCESS == InitPositionAdjustMachine(ctl,msg,s,u))
+			if(SUCCESS == InitPositionAdjustMachine(ctl,msg,s,p))
 			{
 				if(1 == _analysis_state)
 				{
@@ -300,7 +427,7 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case VerticalCircleTrajectory://一次入库的状态控制
-			status = CircleTrajectoryMachine(ctl,msg,s,u);
+			status = CircleTrajectoryMachine(ctl,msg,s,p);
 			if(PARKING_FINISH == status)
 			{
 				ParkingStatus = 3;
@@ -309,10 +436,17 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case VerticalEnterTrial:
-			status = EnterTrialMachine(ctl,msg,s,u);
+			status = EnterTrialMachine(ctl,msg,s,p);
 			if(SUCCESS == status)
 			{
-				Command = 0x61;
+				if(_vertical_parking_correct == StepOneParkingLocation)
+				{
+
+				}
+				else
+				{
+					Command = 0x61;
+				}
 				_vertical_control_state = VerticalWaitMarginPlanFinish;
 			}
 			break;
@@ -325,7 +459,7 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case VerticalOuterTrial:
-			status = OuterTrialMachine(ctl,msg,s,u);
+			status = OuterTrialMachine(ctl,msg,s,p);
 			if(SUCCESS == status)
 			{
 				Command = 0x62;
@@ -334,7 +468,7 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case VerticalCurveTrajectory://保留
-			status = CurveTrajectoryMachine(ctl,msg,s,u);
+			status = CurveTrajectoryMachine(ctl,msg,s,p);
 			if(PARKING_FINISH == status)
 			{
 				_vertical_control_state = VerticalWaitPlanningFinish;
@@ -351,7 +485,7 @@ void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 	}
 }
 
-int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_init_point_adjust_state)
 	{
@@ -415,7 +549,7 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 	return FAIL;
 }
 
-int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	VehicleBody motion_body;
 	switch(_circle_trajectory_state)
@@ -543,7 +677,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 	return FAIL;
 }
 
-int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	float angle_vector;
 	switch(_curve_trajectory_state)
@@ -562,6 +696,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			{
 				_apa_control_command.Velocity = CURVE_VELOCITY;
 				_apa_control_command.Distance = MOTION_DISTANCE;
+				p->Command = 0x50;
 				_curve_trajectory_state = VerticalCurveFirstTurnPoint;
 			}
 			break;
@@ -648,6 +783,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			}
 			if(StandStill == msg->WheelSpeedDirection)
 			{
+				p->Command = 0x60;
 				_curve_trajectory_state = VerticalCurveGearShift;
 				return PARKING_FINISH;
 			}
@@ -661,7 +797,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 	return FAIL;
 }
 
-//int8_t VerticalPlanning::TrialTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+//int8_t VerticalPlanning::TrialTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 //{
 //	float angle_vector;
 //	switch(_trial_trajectory_state)
@@ -793,9 +929,8 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 //	return FAIL;
 //}
 
-int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
-//	float angle_vector;
 	switch(_enter_trial_state)
 	{
 		case EnterTrialRearGearShift:
@@ -812,13 +947,15 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 			{
 				_apa_control_command.Velocity = CURVE_VELOCITY;
 				_apa_control_command.Distance = MOTION_DISTANCE;
-				_enter_trial_state = EnterTrialDisableACC;
+				if(_vertical_parking_correct == StepOneParkingLocation)
+				{
+					p->Command  = 0x50;
+				}
+				_enter_trial_state = EnterTrialTurnPoint;
 			}
 			break;
 
 		case EnterTrialTurnPoint:
-			// 直线速度规划
-//			_apa_control_command.Velocity          = VelocityPlanningLine(s,);
 			// 考虑转向角执行延迟时间
 //			if(SUCCESS == LineTurnningPointDetermination(s,_line_to_circle_enter_turn,1))
 //			{
@@ -836,9 +973,15 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 		case EnterTrialStopWaitStill:
 			// 根据当前车速，实时更新转向角速度
 			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-			_apa_control_command.Distance = ForecastYawParkingDistance(_circle_enter_stop_point_turn.Yaw,s);
+//			_apa_control_command.Distance = ForecastYawParkingDistance(_circle_enter_stop_point_turn.Yaw,s);
+			_apa_control_command.Distance = p->getObstacleDistance().distance;
 			if(StandStill == msg->WheelSpeedDirection)
 			{
+				if(_vertical_parking_correct == StepOneParkingLocation)
+				{
+					p->Command = 0x60;
+					_vertical_parking_correct = StepTwoEnterParkingRight;
+				}
 				_enter_trial_state = EnterTrialRearGearShift;
 				return SUCCESS;
 			}
@@ -856,7 +999,7 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 	return FAIL;
 }
 
-int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_outer_trial_state)
 	{

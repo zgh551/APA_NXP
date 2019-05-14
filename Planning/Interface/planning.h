@@ -130,9 +130,6 @@ public:
 
 	/********************速度规划************************************************************************/
 	float VelocityPlanControl(float distance);
-
-
-
 	// 弧线上的速度规划 速度根据目标距离重规划
 	float VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius);
 	// 直线上的速度规划
