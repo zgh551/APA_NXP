@@ -35,7 +35,7 @@ public:
 
 	virtual void VelocityUpdate(MessageManager *msg,float dt) = 0;
 	virtual void PulseUpdate(MessageManager *msg) = 0;
-
+	virtual void PulseTrackUpdate(MessageManager *msg) = 0;
 
 
 	Vector2d getPosition();
