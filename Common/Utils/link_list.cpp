@@ -33,11 +33,8 @@ LinkList::~LinkList() {
 
 void LinkList::Add(ObstacleLocationPacket dat)
 {
-	uint32_t add_new;
 	_node = new Node;//申请一个新的节点
-	add_new = (uint32_t)((uint32_t)_node & 0xffff);
-
-	if( (_node != NULL) && (add_new < 0x9900))
+	if( _node != NULL)
 	{
 		_node->next = NULL;
 		_node->data = dat;
