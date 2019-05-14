@@ -12,23 +12,16 @@ static float _last_x_value;
 static float _last_triangle_x_value;
 
 UltrasonicObstaclePercption::UltrasonicObstaclePercption() {
-
 	UltrasonicLocationStatus.setContainer(this);
 	UltrasonicLocationStatus.getter(&UltrasonicObstaclePercption::getUltrasonicLocationStatus);
 	UltrasonicLocationStatus.setter(&UltrasonicObstaclePercption::setUltrasonicLocationStatus);
 
-	ValidParkingPosition.setContainer(this);
-	ValidParkingPosition.getter(&UltrasonicObstaclePercption::getValidParkingPosition);
-	ValidParkingPosition.setter(&UltrasonicObstaclePercption::setValidParkingPosition);
-
 	Init();
 }
+
 ////////////////////////////////////////////////////////////////////////
 LocationStatus UltrasonicObstaclePercption::getUltrasonicLocationStatus()           { return  _ultrasonic_location_sts;}
 void  UltrasonicObstaclePercption::setUltrasonicLocationStatus(LocationStatus value){ _ultrasonic_location_sts = value;}
-
-ObstacleInformationPacket UltrasonicObstaclePercption::getValidParkingPosition()           { return  _valid_parking_position;}
-void  UltrasonicObstaclePercption::setValidParkingPosition(ObstacleInformationPacket value){ _valid_parking_position = value;}
 ////////////////////////////////////////////////////////////////////////
 UltrasonicObstaclePercption::~UltrasonicObstaclePercption() {
 	delete _ultrasonic_position_list;
@@ -81,7 +74,6 @@ void UltrasonicObstaclePercption::Push(Ultrasonic_Packet u_dat,ObstacleLocationP
 void UltrasonicObstaclePercption::Push(ObstacleLocationPacket p_dat)
 {
 	if( (p_dat.Status == 0) && (fabs(p_dat.Position.getX() - _last_triangle_x_value) > 0.001))
-//	if( p_dat.Status == 0 )
 	{
 		_ultrasonic_triangle_location_list->Add(p_dat);
 	}
@@ -328,6 +320,7 @@ void  UltrasonicObstaclePercption::ValueDistributed()
 		}
 		_current_node_triangle = _current_node_triangle->next;
 	}
+
 	_valid_parking_position.Second_Position.setX(HighestDistribution(x_group_number,distribute_number_x,min_x));
 	_valid_parking_position.Second_Position.setY(HighestDistribution(y_group_number,distribute_number_y,min_y));
 
@@ -335,42 +328,9 @@ void  UltrasonicObstaclePercption::ValueDistributed()
 	delete []distribute_number_y;
 }
 
-
-//void  UltrasonicObstaclePercption::ObstacleLocationPushStateMachine(Ultrasonic_Packet* u_dat,ObstacleLocationPacket* p_dat)
-//{
-//	switch(_location_push_state)
-//	{
-//		case StateInit:
-//			if(LocationStart == Command)
-//			{
-//				Init();
-//				_location_push_state = UltrasonicDataPush_LRU;
-//			}
-//			break;
-//
-//		case UltrasonicDataPush_LRU:
-//			Push(u_dat[11],p_dat[11]);
-//			if(VehicleStop == Command)
-//			{
-//				_location_push_state = UltrasonicDataPushSRU;
-//			}
-//			break;
-//
-//		case UltrasonicDataPushSRU:
-//			Push(p_dat[5]);
-//			Push(p_dat[6]);
-//			if(_ultrasonic_triangle_location_list->Length() > 200)
-//			{
-//				_location_push_state = StateInit;
-//			}
-//			break;
-//
-//		default:
-//
-//			break;
-//	}
-//}
-
+/*
+ * 运行于定时器中，5ms运行一次
+ * */
 void  UltrasonicObstaclePercption::ObstacleLocationPushStateMachine(Ultrasonic* u_dat)
 {
 	switch(_location_push_state)
@@ -394,7 +354,7 @@ void  UltrasonicObstaclePercption::ObstacleLocationPushStateMachine(Ultrasonic* 
 				Push(u_dat->AbstacleGroundPositionTriangle[5]);
 				Push(u_dat->AbstacleGroundPositionTriangle[6]);
 			}
-			if(0x60 == Command)
+			if( (0x60 == Command) && (getLocationListLength() > 200))
 			{
 				Command = 0x70;
 				_location_push_state = StateInit;
@@ -445,7 +405,117 @@ int8_t UltrasonicObstaclePercption::ObstacleLocationCalculateStateMachine()
 	}
 	return FAIL;
 }
+/***********************************************************************************************/
 
+int8_t UltrasonicObstaclePercption::UltrasonicCollisionStatus(Ultrasonic *u,MessageManager *msg)
+{
+	uint8_t i;
+	if(Reverse == msg->Gear)
+	{
+		for(i = 0; i < 4; i++)
+		{
+			if(u->UltrasonicPacket[i].Distance1 != 0.0f)
+			{
+				if( (u->UltrasonicPacket[i].Distance1 < 0.4) || (u->UltrasonicPacket[i].status == 16) )
+				{
+					return SUCCESS;
+				}
+			}
+		}
+		return FAIL;
+	}
+	else if(Drive == msg->Gear)
+	{
+		for(i = 4;i < 8;i++)
+		{
+			if(u->UltrasonicPacket[i].Distance1 != 0.0f)
+			{
+				if( (u->UltrasonicPacket[i].Distance1 < 0.4) || (u->UltrasonicPacket[i].status == 16))
+				{
+					return SUCCESS;
+				}
+			}
+		}
+		return FAIL;
+	}
+	else
+	{
+		return FAIL;
+	}
+}
+
+void UltrasonicObstaclePercption::UltrasonicCollisionDiatance(Ultrasonic *u,MessageManager *msg)
+{
+	uint8_t i;
+	float distance,current_distance;
+	uint8_t over_detection_cnt;
+	if(Reverse == msg->Gear)
+	{
+		distance = 0;
+		over_detection_cnt = 0;
+		for(i = 0; i < 4; i++)
+		{
+			if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
+			{
+				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX());
+				distance = current_distance < distance ? current_distance : distance;
+				_obstacle_distance.status = Normal;
+
+			}
+			else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
+			{
+				distance = 0;
+				_obstacle_distance.status = BlindZone;
+				break;
+			}
+			else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
+			{
+				over_detection_cnt++;
+			}
+			else
+			{
+				distance                  = 0;
+				_obstacle_distance.status = Noise;
+			}
+		}
+	}
+	else if(Drive == msg->Gear)
+	{
+		distance = 0;
+		over_detection_cnt = 0;
+		for(i = 4;i < 8;i++)
+		{
+			if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
+			{
+				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX());
+				distance = current_distance < distance ? current_distance : distance;
+				_obstacle_distance.status = Normal;
+			}
+			else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
+			{
+				distance = 0;
+				_obstacle_distance.status = BlindZone;
+				break;
+			}
+			else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
+			{
+				over_detection_cnt++;
+			}
+			else
+			{
+				distance                  = 0;
+				_obstacle_distance.status = Noise;
+			}
+		}
+	}
+	if(4 == over_detection_cnt)
+	{
+		distance                  = 3;
+		_obstacle_distance.status = OverDetection;
+	}
+	_obstacle_distance.distance = distance;
+}
+/***********************************************************************************************/
 uint16_t UltrasonicObstaclePercption::getPositionListLength()
 {
 	return (uint16_t)_ultrasonic_position_list->Length();

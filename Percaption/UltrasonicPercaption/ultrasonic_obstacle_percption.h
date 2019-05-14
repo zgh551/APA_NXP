@@ -15,12 +15,7 @@
 #define DISTANCE_THRESHOLD    (0.3f)
 #define STEP_DISTANCE         (0.1f)
 
-typedef struct _ObstacleInformationPacket
-{
-	Vector2d First_Position;
-	Vector2d Second_Position;
-	float    Length;
-}ObstacleInformationPacket;
+
 
 // 平行泊车控制总体状态
 typedef enum _EdgeFindingState
@@ -55,13 +50,6 @@ typedef enum _UltrasonicLocationCalculateState
 	RearEdgeCalculate
 }UltrasonicLocationCalculateState;
 
-//typedef enum _StateControlCommand
-//{
-//	LocationStart= 1,
-//	VehicleStop,
-//	FrontEdgeCalculateStart,
-//	RearEdgeCalculateStart
-//}StateControlCommand;
 
 class UltrasonicObstaclePercption : public Percaption
 {
@@ -81,7 +69,11 @@ public:
 
 	void ObstacleLocationPushStateMachine(Ultrasonic* u_dat);
 	int8_t ObstacleLocationCalculateStateMachine();
+	/*********************************************超声避障相关函数***************************************/
+	int8_t UltrasonicCollisionStatus(Ultrasonic *u,MessageManager *msg);
 
+	void UltrasonicCollisionDiatance(Ultrasonic *u,MessageManager *msg);
+	/*********************************************基础函数***************************************/
 	uint16_t getPositionListLength();
 	uint16_t getLocationListLength();
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,9 +81,7 @@ public:
 	void    setUltrasonicLocationStatus(LocationStatus value);
 	Property<UltrasonicObstaclePercption,LocationStatus,READ_WRITE> UltrasonicLocationStatus;
 
-	ObstacleInformationPacket getValidParkingPosition();
-	void    setValidParkingPosition(ObstacleInformationPacket value);
-	Property<UltrasonicObstaclePercption,ObstacleInformationPacket,READ_WRITE> ValidParkingPosition;
+
 private:
 	LocationStatus _ultrasonic_location_sts;
 
@@ -105,13 +95,14 @@ private:
 
 	ObstacleInformationPacket _parking_position;
 	ObstacleInformationPacket _vehicle_position;
-	// 最终输出的库位信息
-	ObstacleInformationPacket _valid_parking_position;
+
 	/******************************************/
 	Node* _current_node;//当前节点
 	Node* _last_node;//上一节点
 	Node* _current_node_triangle;//当前节点零时变量
 	float _err_distance;
+	/******************************************/
+	VehilceConfig _ultrasonic_obstacle_config;
 };
 
 #endif /* ULTRASONICPERCAPTION_ULTRASONIC_ABSTACLE_PERCPTION_H_ */
