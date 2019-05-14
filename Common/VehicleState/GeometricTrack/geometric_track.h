@@ -41,6 +41,7 @@ public:
 
 	void VelocityUpdate(MessageManager *msg,float dt) override;
 	void PulseUpdate(MessageManager *msg) override;
+	void PulseTrackUpdate(MessageManager *msg) override;
 
 	int32_t getSumRearLeftPulse();
 	void    setSumRearLeftPulse(int32_t value);
@@ -50,7 +51,7 @@ public:
 	void    setSumRearRightPulse(int32_t value);
 	Property<GeometricTrack,int32_t,READ_WRITE> SumRearRightPulse;
 private:
-	float _last_yaw;
+	float _last_yaw,_delta_yaw;
 
 	uint16_t _last_rear_left_pulse;
 	uint16_t _last_rear_right_pulse;

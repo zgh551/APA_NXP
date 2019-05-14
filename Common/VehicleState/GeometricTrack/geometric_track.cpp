@@ -204,6 +204,54 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	_last_rear_right_pulse = msg->WheelPulseRearRight;
 	_last_yaw = Yaw;
 }
+
+void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
+{
+	float displacement;
+
+	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
+	{
+		_delta_rear_left_pulse = 0;
+	}
+	else
+	{
+		_delta_rear_left_pulse =  msg->WheelSpeedDirection == Forward ?
+								((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) :
+								  msg->WheelSpeedDirection == Backward ?
+							   -((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) : 0;
+	}
+
+	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
+	{
+		_delta_rear_right_pulse = 0;
+	}
+	else
+	{
+		_delta_rear_right_pulse =  msg->WheelSpeedDirection == Forward ?
+								 ((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->WheelPulseRearRight  - _last_rear_right_pulse) :
+								   msg->WheelSpeedDirection == Backward ?
+								-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
+	}
+
+	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+	if(_delta_rear_right_pulse == _delta_rear_left_pulse)
+	{
+		_position.X = _position.X + displacement * cosf(Yaw);
+		_position.Y = _position.Y + displacement * sinf(Yaw);
+	}
+	else
+	{
+		_delta_yaw = (_delta_rear_right_pulse - _delta_rear_left_pulse)/WIDTH;
+		Yaw  = _last_yaw + _delta_yaw;
+		_position.X = _position.X + displacement * cosf(_last_yaw + _delta_yaw*0.5);
+		_position.Y = _position.Y + displacement * sinf(_last_yaw + _delta_yaw*0.5);
+	}
+	_last_yaw = Yaw;
+}
 /**************************************************************************************/
 int32_t GeometricTrack::getSumRearLeftPulse()             { return _sum_rear_left_pulse;}
 void    GeometricTrack::setSumRearLeftPulse(int32_t value){_sum_rear_left_pulse = value;}
