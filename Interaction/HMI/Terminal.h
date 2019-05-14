@@ -79,8 +79,7 @@ public:
 	void Push(Ultrasonic *u);
 
 	void Push(Percaption *p);
-
-	void Push(UltrasonicObstaclePercption *p);
+	void Push(UltrasonicObstaclePercption p);
 
 	void Push(Planning *p);
 ///////////////////////////////////////////////////////////////////////////

@@ -377,6 +377,9 @@ void Terminal::Push(MessageManager *msg)
 //	CAN2_TransmitMsg(m_CAN_Packet);
 //}
 
+/*
+ * 控制信号
+ * */
 void Terminal::Push(VehicleController *msg)
 {
 	CAN_Packet m_CAN_Packet;
@@ -385,7 +388,6 @@ void Terminal::Push(VehicleController *msg)
 
 	m_CAN_Packet.id = 0x414;
 	m_CAN_Packet.length = 8;
-
 	m_CAN_Packet.data[0] = 	 msg->AccelerationEnable 	   |
 							(msg->DecelerationEnable << 1) |
 							(msg->TorqueEnable       << 2) |
@@ -393,19 +395,27 @@ void Terminal::Push(VehicleController *msg)
 							(msg->SteeringEnable     << 4) |
 							(msg->GearEnable         << 6) ;
 	m_CAN_Packet.data[1] = msg->Gear ;
-
 	temp_int16 = (int16_t)(msg->Acceleration * 100);
 	m_CAN_Packet.data[2] = temp_int16 & 0xff ;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff ;
-
 	temp_int16 = (int16_t)(msg->Deceleration * 100);
 	m_CAN_Packet.data[4] = temp_int16 & 0xff ;
 	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff ;
-
 	temp_uint16 = (uint16_t)(msg->Velocity * 100);
 	m_CAN_Packet.data[6] =  temp_uint16 & 0xff ;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff ;
+	CAN2_TransmitMsg(m_CAN_Packet);
 
+	m_CAN_Packet.id = 0x415;
+	temp_int16 = (uint16_t)(msg->Distance * 1000);
+	m_CAN_Packet.data[0] =  temp_int16 & 0xff ;
+	m_CAN_Packet.data[1] = (temp_int16 >> 8) & 0xff ;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
@@ -681,26 +691,10 @@ void Terminal::Push(Percaption *p)
 {
 	CAN_Packet m_CAN_Packet;
 	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x441;
+
 	m_CAN_Packet.length = 8;
-
-	temp_int.u16 = (uint16_t)(p->ParkingLength * 1000);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(p->ParkingWidth * 1000);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-
-	m_CAN_Packet.data[4] = 0;
-	m_CAN_Packet.data[5] = 0;
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x440;
-	m_CAN_Packet.length = 8;
-
 	temp_int.i16 = (int16_t)(p->PositionX * 100);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
@@ -710,27 +704,30 @@ void Terminal::Push(Percaption *p)
 	temp_int.i16 = (int16_t)(p->AttitudeYaw * 100);
 	m_CAN_Packet.data[4] = temp_int.b[1];
 	m_CAN_Packet.data[5] = temp_int.b[0];
-
 	m_CAN_Packet.data[6] = p->DetectParkingStatus;
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
-}
 
-void Terminal::Push(UltrasonicObstaclePercption *p)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
+	m_CAN_Packet.id = 0x441;
+	temp_int.u16 = (uint16_t)(p->ParkingLength * 1000);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(p->ParkingWidth * 1000);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x449;
-	m_CAN_Packet.length = 8;
-
 	temp_int.i16 = (int16_t)(p->getValidParkingPosition().First_Position.getX() * 1000);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
 	temp_int.i16 = (int16_t)(p->getValidParkingPosition().First_Position.getY() * 1000);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
-
 	temp_int.i16 = (int16_t)(p->getValidParkingPosition().Second_Position.getX() * 1000);
 	m_CAN_Packet.data[4] = temp_int.b[1];
 	m_CAN_Packet.data[5] = temp_int.b[0];
@@ -738,19 +735,24 @@ void Terminal::Push(UltrasonicObstaclePercption *p)
 	m_CAN_Packet.data[6] = temp_int.b[1];
 	m_CAN_Packet.data[7] = temp_int.b[0];
 	CAN2_TransmitMsg(m_CAN_Packet);
+}
+
+void Terminal::Push(UltrasonicObstaclePercption p)
+{
+	CAN_Packet m_CAN_Packet;
 
 	m_CAN_Packet.id = 0x44A;
 	m_CAN_Packet.length = 8;
 
-	m_CAN_Packet.data[0] = (uint8_t)p->UltrasonicLocationStatus;
+	m_CAN_Packet.data[0] = (uint8_t)p.UltrasonicLocationStatus;
 	m_CAN_Packet.data[1] = 0;
 	m_CAN_Packet.data[2] = 0;
 	m_CAN_Packet.data[3] = 0;
 
-	m_CAN_Packet.data[4] = (uint8_t)(p->getPositionListLength() & 0xff);
-	m_CAN_Packet.data[5] = (uint8_t)((p->getPositionListLength() >> 8 ) & 0xff);
-	m_CAN_Packet.data[6] = (uint8_t)(p->getLocationListLength() & 0xff);
-	m_CAN_Packet.data[7] = (uint8_t)((p->getLocationListLength() >> 8 ) & 0xff);
+	m_CAN_Packet.data[4] = (uint8_t)(p.getPositionListLength() & 0xff);
+	m_CAN_Packet.data[5] = (uint8_t)((p.getPositionListLength() >> 8 ) & 0xff);
+	m_CAN_Packet.data[6] = (uint8_t)(p.getLocationListLength() & 0xff);
+	m_CAN_Packet.data[7] = (uint8_t)((p.getLocationListLength() >> 8 ) & 0xff);
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
