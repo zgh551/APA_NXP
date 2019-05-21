@@ -17,6 +17,14 @@
 // math
 #include "math.h"
 #include "vector_2d.h"
+#include "link_list.h"
+#include "curve_fitting.h"
+
+typedef struct _EdgeInformationPacket
+{
+	Vector2d position;
+	float    angle;
+}EdgeInformationPacket;
 
 typedef struct _ObstacleInformationPacket
 {
@@ -68,17 +76,22 @@ public:
 	void setCommand(uint8_t value);
 	Property<Percaption,uint8_t,READ_WRITE> Command;
 
-	ObstacleInformationPacket getValidParkingPosition();
-	void    setValidParkingPosition(ObstacleInformationPacket value);
-	Property<Percaption,ObstacleInformationPacket,READ_WRITE> ValidParkingPosition;
+	ObstacleInformationPacket getValidParkingEdgePosition();
+	void    setValidParkingEdgePosition(ObstacleInformationPacket value);
+	Property<Percaption,ObstacleInformationPacket,READ_WRITE> ValidParkingEdgePosition;
+
+	EdgeInformationPacket getValidParkingCenterPosition();
+	void    setValidParkingCenterPosition(EdgeInformationPacket value);
+	Property<Percaption,EdgeInformationPacket,READ_WRITE> ValidParkingCenterPosition;
 
 	ObstacleDistancePacket getObstacleDistance();
 	void    setObstacleDistance(ObstacleDistancePacket value);
 	Property<Percaption,ObstacleDistancePacket,READ_WRITE> ObstacleDistance;
 protected:
 	// 最终输出的障碍物重新定位的库位信息
-	ObstacleInformationPacket _valid_parking_position;
-
+	ObstacleInformationPacket _valid_parking_edge_position;
+	// 输出最终的库位边沿定位库位中心位置
+	EdgeInformationPacket _valid_parking_center_position;
 	// 输出障碍物离车辆边沿的距离
 	ObstacleDistancePacket _obstacle_distance;
 private:
