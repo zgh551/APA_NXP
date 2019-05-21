@@ -722,18 +722,32 @@ void Terminal::Push(Percaption *p)
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x449;
-	temp_int.i16 = (int16_t)(p->getValidParkingPosition().First_Position.getX() * 1000);
+	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().First_Position.getX() * 1000);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingPosition().First_Position.getY() * 1000);
+	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().First_Position.getY() * 1000);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingPosition().Second_Position.getX() * 1000);
+	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().Second_Position.getX() * 1000);
 	m_CAN_Packet.data[4] = temp_int.b[1];
 	m_CAN_Packet.data[5] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingPosition().Second_Position.getY() * 1000);
+	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().Second_Position.getY() * 1000);
 	m_CAN_Packet.data[6] = temp_int.b[1];
 	m_CAN_Packet.data[7] = temp_int.b[0];
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x44B;
+	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().position.getX() * 1000);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().position.getY() * 1000);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().angle * 10000);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
@@ -749,10 +763,10 @@ void Terminal::Push(UltrasonicObstaclePercption p)
 	m_CAN_Packet.data[2] = 0;
 	m_CAN_Packet.data[3] = 0;
 
-	m_CAN_Packet.data[4] = (uint8_t)(p.getPositionListLength() & 0xff);
-	m_CAN_Packet.data[5] = (uint8_t)((p.getPositionListLength() >> 8 ) & 0xff);
-	m_CAN_Packet.data[6] = (uint8_t)(p.getLocationListLength() & 0xff);
-	m_CAN_Packet.data[7] = (uint8_t)((p.getLocationListLength() >> 8 ) & 0xff);
+	m_CAN_Packet.data[4] = (uint8_t)(p.getPositionListLength()  & 0xff);
+	m_CAN_Packet.data[5] = (uint8_t)(p.getLocationListLength()  & 0xff);
+	m_CAN_Packet.data[6] = (uint8_t)(p.getLeftEdgeListLength()  & 0xff);
+	m_CAN_Packet.data[7] = (uint8_t)(p.getRightEdgeListLength() & 0xff);
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
