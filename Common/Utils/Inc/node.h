@@ -17,7 +17,7 @@ public:
 	virtual ~Node();
 
 	ObstacleLocationPacket data;//值域
-	Node* next;//指针域，指向下一个节点的指针
+	Node *next;//指针域，指向下一个节点的指针
 };
 
 #endif /* UTILS_NODE_H_ */
