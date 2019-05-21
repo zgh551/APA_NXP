@@ -2,8 +2,8 @@
 ENTRY(_start)
 
 /* define heap and stack size */
-__HEAP_SIZE            = 0xA000 ;
-__STACK_SIZE           = 0x4000 ;
+__HEAP_SIZE            = 0x0000 ;
+__STACK_SIZE           = 0x8000 ;
 
 SRAM_SIZE =  384K;    
 /* Define SRAM Base Address */
