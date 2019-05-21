@@ -191,9 +191,9 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 
 		case EnterOuterTrialPlanning:
 			//TODO 实现库位的矫正
-			if(p->getValidParkingPosition().Length > 3)
+			if(p->getValidParkingEdgePosition().Length > 3)
 			{
-				_line_center.Point.X = (p->getValidParkingPosition().First_Position.getX() + p->getValidParkingPosition().Second_Position.getX()) * 0.5;
+				_line_center.Point.X = (p->getValidParkingEdgePosition().First_Position.getX() + p->getValidParkingEdgePosition().Second_Position.getX()) * 0.5;
 			}
 			temp_line.Point.X = s->getPosition().getX();
 			temp_line.Point.Y = s->getPosition().getY();
