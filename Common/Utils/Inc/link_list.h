@@ -23,6 +23,10 @@ public:
 
 	Node* getHeadNode();
 	Property<LinkList,Node*,READ_ONLY> HeadNode;
+
+	Node* getEndNode();
+	Property<LinkList,Node*,READ_ONLY> EndNode;
+
 private:
 	uint32_t _list_length;
 	Node* _head_node;//头节点

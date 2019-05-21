@@ -12,8 +12,11 @@ LinkList::LinkList() {
 	HeadNode.setContainer(this);
 	HeadNode.getter(&LinkList::getHeadNode);
 
+	EndNode.setContainer(this);
+	EndNode.getter(&LinkList::getEndNode);
 	// TODO Auto-generated constructor stub
 	_list_length = 0;
+
 	_head_node = NULL;//头节点
 	_end_node  = NULL;//尾节点
 	_node      = NULL;//
@@ -36,7 +39,6 @@ void LinkList::Add(ObstacleLocationPacket dat)
 	_node = new Node;//申请一个新的节点
 	if( _node != NULL)
 	{
-		_node->next = NULL;
 		_node->data = dat;
 		if(_end_node == NULL)
 		{
@@ -50,10 +52,6 @@ void LinkList::Add(ObstacleLocationPacket dat)
 		}
 		_list_length++;
 	}
-	else
-	{
-		delete _node;
-	}
 }
 
 void LinkList::Delete(void)
@@ -65,6 +63,7 @@ void LinkList::Delete(void)
 		_head_node = _head_node->next;
 		delete _free_node;
 	}
+	_list_length = 0;
 	delete _head_node;
 }
 
@@ -73,5 +72,5 @@ uint32_t LinkList::Length()//返回链表个数
 	return _list_length;
 }
 
-
-Node* LinkList::getHeadNode()           { return  _head_node;}
+Node* LinkList::getHeadNode() { return  _head_node;}
+Node* LinkList::getEndNode()  { return  _end_node; }
