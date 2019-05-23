@@ -746,8 +746,24 @@ void Terminal::Push(Percaption *p)
 	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().angle * 10000);
 	m_CAN_Packet.data[4] = temp_int.b[1];
 	m_CAN_Packet.data[5] = temp_int.b[0];
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	temp_int.i16 = (int16_t)(p->getCenterFitLinePacket().offset * 1000);
+	m_CAN_Packet.data[6] = temp_int.b[1];
+	m_CAN_Packet.data[7] = temp_int.b[0];
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x44C;
+	temp_int.i16 = (int16_t)(p->getLeftFitLinePacket().angle * 10000);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->getLeftFitLinePacket().offset * 1000);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->getRightFitLinePacket().angle * 10000);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+	temp_int.i16 = (int16_t)(p->getRightFitLinePacket().offset * 1000);
+	m_CAN_Packet.data[6] = temp_int.b[1];
+	m_CAN_Packet.data[7] = temp_int.b[0];
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
