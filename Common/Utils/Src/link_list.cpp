@@ -62,9 +62,15 @@ void LinkList::Delete(void)
 		_free_node = _head_node;
 		_head_node = _head_node->next;
 		delete _free_node;
+		_free_node = NULL;
 	}
 	_list_length = 0;
 	delete _head_node;
+	delete _end_node;
+	delete _node;
+	_head_node = NULL;
+	_end_node  = NULL;
+	_node      = NULL;
 }
 
 uint32_t LinkList::Length()//返回链表个数
