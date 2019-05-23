@@ -34,9 +34,9 @@ void CurveFitting::LineFitting(LinkList *l,float *a,float *b)
 		sum_y += current_node->data.Position.getY();
 		sum_xy += current_node->data.Position.getX()*current_node->data.Position.getY();
 		sum_x2 += current_node->data.Position.getX()*current_node->data.Position.getX();
+		sum_n++;
 		current_node = current_node->next;
 	}
-	sum_n = l->Length();
 	denominator = sum_n * sum_x2 - sum_x * sum_x;
 	if(denominator == 0)
 	{
@@ -45,7 +45,7 @@ void CurveFitting::LineFitting(LinkList *l,float *a,float *b)
 	else
 	{
 		molecule_a  = sum_n * sum_xy - sum_x * sum_y;
-		molecule_b  = sum_x2 * sum_y - sum_x * sum_y;
+		molecule_b  = sum_x2 * sum_y - sum_x * sum_xy;
 		*a = atanf(molecule_a/denominator);
 		*b = molecule_b/denominator;
 	}
