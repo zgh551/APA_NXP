@@ -20,6 +20,12 @@
 #include "link_list.h"
 #include "curve_fitting.h"
 
+typedef struct _LineFitInformationPacket
+{
+	float angle;
+	float offset;
+}LineFitInformationPacket;
+
 typedef struct _EdgeInformationPacket
 {
 	Vector2d position;
@@ -87,6 +93,18 @@ public:
 	ObstacleDistancePacket getObstacleDistance();
 	void    setObstacleDistance(ObstacleDistancePacket value);
 	Property<Percaption,ObstacleDistancePacket,READ_WRITE> ObstacleDistance;
+
+	LineFitInformationPacket getLeftFitLinePacket();
+	void setLeftFitLinePacket(LineFitInformationPacket value);
+	Property<Percaption,LineFitInformationPacket,READ_WRITE> LeftFitLinePacket;
+
+	LineFitInformationPacket getRightFitLinePacket();
+	void setRightFitLinePacket(LineFitInformationPacket value);
+	Property<Percaption,LineFitInformationPacket,READ_WRITE> RightFitLinePacket;
+
+	LineFitInformationPacket getCenterFitLinePacket();
+	void setCenterFitLinePacket(LineFitInformationPacket value);
+	Property<Percaption,LineFitInformationPacket,READ_WRITE> CenterFitLinePacket;
 protected:
 	// 最终输出的障碍物重新定位的库位信息
 	ObstacleInformationPacket _valid_parking_edge_position;
@@ -94,6 +112,10 @@ protected:
 	EdgeInformationPacket _valid_parking_center_position;
 	// 输出障碍物离车辆边沿的距离
 	ObstacleDistancePacket _obstacle_distance;
+
+	LineFitInformationPacket _left_fit_line_packet;
+	LineFitInformationPacket _right_fit_line_packet;
+	LineFitInformationPacket _center_fit_line_packet;
 private:
 	float _position_x;
 	float _position_y;
