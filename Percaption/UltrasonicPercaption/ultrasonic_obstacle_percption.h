@@ -10,13 +10,20 @@
 
 #include "percaption.h"
 
+#define Embedded_PLATFORM              (0)
+#define PC_PLATFORM                    (1)
+#define RUNNING_PLATFORM               PC_PLATFORM
 
-#define LEVEL_THRESHOLD       (2.2f)
-#define DISTANCE_THRESHOLD    (0.3f)
-#define STEP_DISTANCE         (0.1f)
-//#define STEP_DISTANCE         (0.1f)
-
-
+// 入库过程库位调整相关参数
+#define LEVEL_THRESHOLD               (2.2f)
+#define DISTANCE_THRESHOLD            (0.3f)
+#define STEP_DISTANCE                 (0.1f)
+#define MIN_LOCATION_NUM              (50)
+// 进库后的相关参数调整
+#define FIT_LINE_STEP_DISTANCE        (0.05f)
+#define FIT_LINE_STEP_LEVEL_THRESHOLD (3.0f)
+#define MIN_FIT_NUM                   (15)
+#define MIN_FIT_DISTANCE              (0.8)
 // 平行泊车控制总体状态
 typedef enum _EdgeFindingState
 {
@@ -58,26 +65,23 @@ public:
 	virtual ~UltrasonicObstaclePercption();
 
 	void Init();
-	void Push(Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
-	void Push(ObstacleLocationPacket p_dat);
 
-	void LeftPush(Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
-	void RightPush(Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
-	void SpaceDelete();
-
-	void EdgeFinding();
-
+	void Push(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
+	void Push(LinkList *list,ObstacleLocationPacket p_dat);
+	void ParkingCenterPush(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	void EdgeFinding(LinkList *list);
 	// 求取最高分布值的最优解
 	float HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value);
 	// 求取最高分布的索引值
 	uint8_t HighestDistributionBase(uint8_t group_number,uint16_t* group_value_array);
-	void ValueDistributed();
+	void ValueDistributed(LinkList *valid_list);
 	/*
 	 * 数值分布求取
 	 * valid_list：原始的分布数据集，
 	 * fit_list：分布最高的数据集
 	 * */
-	void ValueDistributed(LinkList *valid_list,LinkList *fit_list);
+	void ValueDistributedFilter(LinkList *valid_list,LinkList *fit_list);
 	// 根据有效数据拟合车库边沿
 	void EdgeLineFitParkingCenterCalculate();
 	/******************************库位重新定位的状态机***************************************/
@@ -108,8 +112,6 @@ public:
 	LocationStatus getUltrasonicLocationStatus();
 	void    setUltrasonicLocationStatus(LocationStatus value);
 	Property<UltrasonicObstaclePercption,LocationStatus,READ_WRITE> UltrasonicLocationStatus;
-
-
 private:
 	LocationStatus _ultrasonic_location_sts;
 	EdgeFindingState _edge_finding_state;
@@ -120,19 +122,17 @@ private:
 	LinkList *_ultrasonic_position_list;
 	LinkList *_ultrasonic_triangle_location_list;
 
-//	LinkList *_left_edge_position_list;
-//	LinkList *_right_edge_position_list;
-//
-//	LinkList *_left_fit_edge_list;
-//	LinkList *_right_fit_edge_list;
+	LinkList *_left_edge_position_list;
+	LinkList *_right_edge_position_list;
+
+	LinkList *_left_fit_edge_list;
+	LinkList *_right_fit_edge_list;
 
 	ObstacleInformationPacket _parking_position;
 	ObstacleInformationPacket _vehicle_position;
+
+	uint8_t _push_cnt;
 	/******************************************/
-	Node* _current_node;//当前节点
-	Node* _last_node;//上一节点
-	Node* _current_node_triangle;//当前节点零时变量
-	float _err_distance;
 	/////////////////////////////////////////////
 	CurveFitting _line_fit;
 	/******************************************/
