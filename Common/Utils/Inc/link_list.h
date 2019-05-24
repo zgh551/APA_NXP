@@ -33,9 +33,4 @@ private:
 	Node* _end_node;//尾节点
 	Node* _node;//
 };
-
-//class UltrasonicList:public LinkList<ObstacleLocationPacket>
-//{
-//
-//};
 #endif /* UTILS_LINK_LIST_H_ */
