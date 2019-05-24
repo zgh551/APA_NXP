@@ -101,7 +101,8 @@ void UltrasonicObstaclePercption::ParkingCenterPush(LinkList *list,Ultrasonic_Pa
 	}
 	else
 	{
-		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.LengthSquare() != list->getEndNode()->data.Position.LengthSquare()))
+		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getX() < list->getEndNode()->data.Position.getX()))
+//		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getY() < list->getEndNode()->data.Position.getY()))
 		{
 			list->Add(p_dat);
 		}
@@ -540,7 +541,7 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic* u_dat)
 				Push(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[6]);
 			}
 #endif
-			if( (0x60 == Command) && (getLocationListLength() > MIN_LOCATION_NUM))
+			if(getLocationListLength() > MIN_LOCATION_NUM)
 			{
 				Command = 0x70;//库位计算命令
 				_data_push_state = WaitPushStart;
@@ -563,8 +564,8 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic* u_dat)
 #endif
 			if((_left_edge_position_list->EndNode != NULL) && (_right_edge_position_list->EndNode != NULL))
 			{
-				if(((_left_edge_position_list->getHeadNode()->data.Position - _left_edge_position_list->getEndNode()->data.Position).LengthSquare() > MIN_FIT_DISTANCE)  &&
-				   ((_right_edge_position_list->getHeadNode()->data.Position - _right_edge_position_list->getEndNode()->data.Position).LengthSquare() > MIN_FIT_DISTANCE) &&
+				if(((_left_edge_position_list->getHeadNode()->data.Position - _left_edge_position_list->getEndNode()->data.Position).Length() > MIN_FIT_DISTANCE)  &&
+				   ((_right_edge_position_list->getHeadNode()->data.Position - _right_edge_position_list->getEndNode()->data.Position).Length() > MIN_FIT_DISTANCE) &&
 				   (getLeftEdgeListLength() > MIN_FIT_NUM) &&
 				   (getRightEdgeListLength() > MIN_FIT_NUM))
 				{

@@ -10,9 +10,9 @@
 
 #include "percaption.h"
 
-#define Embedded_PLATFORM              (0)
+#define EMBEDDED_PLATFORM              (0)
 #define PC_PLATFORM                    (1)
-#define RUNNING_PLATFORM               PC_PLATFORM
+#define RUNNING_PLATFORM               EMBEDDED_PLATFORM
 
 // 入库过程库位调整相关参数
 #define LEVEL_THRESHOLD               (2.2f)
