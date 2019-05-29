@@ -101,8 +101,11 @@ void UltrasonicObstaclePercption::ParkingCenterPush(LinkList *list,Ultrasonic_Pa
 	}
 	else
 	{
+#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getX() < list->getEndNode()->data.Position.getX()))
-//		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getY() < list->getEndNode()->data.Position.getY()))
+#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getY() < list->getEndNode()->data.Position.getY()))
+#endif
 		{
 			list->Add(p_dat);
 		}
@@ -448,12 +451,16 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 		}
 		current_node = current_node->next;
 	}
-//	max_distribute_number_id = HighestDistributionBase(x_group_number,distribute_number_x);
+#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 	max_distribute_number_id = HighestDistributionBase(y_group_number,distribute_number_y);
-//	treshold_down = min_x + FIT_LINE_STEP_DISTANCE * max_distribute_number_id     ;
-//	treshold_up   = min_x + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
 	treshold_down = min_y + FIT_LINE_STEP_DISTANCE * max_distribute_number_id     ;
 	treshold_up   = min_y + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
+#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+	max_distribute_number_id = HighestDistributionBase(x_group_number,distribute_number_x);
+	treshold_down = min_x + FIT_LINE_STEP_DISTANCE * max_distribute_number_id     ;
+	treshold_up   = min_x + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
+#endif
+
 	current_node = valid_list->HeadNode;
 	if(fit_list->Length() != 0)
 	{
@@ -461,8 +468,11 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 	}
 	while(current_node->next != NULL)
 	{
-//		if((current_node->data.Position.getX() >= treshold_down) && (current_node->data.Position.getX() < treshold_up))
+#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 		if((current_node->data.Position.getY() >= treshold_down) && (current_node->data.Position.getY() < treshold_up))
+#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+		if((current_node->data.Position.getX() >= treshold_down) && (current_node->data.Position.getX() < treshold_up))
+#endif
 		{
 			fit_list->Add(current_node->data);
 		}
@@ -523,15 +533,15 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic* u_dat)
 
 		case ParkingEdgeUltrasonicDataPush:
 #if RUNNING_PLATFORM == Embedded_PLATFORM
-			if( (0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
-			{
+//			if( (0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
+//			{
 				Push(_ultrasonic_position_list,u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
-			}
-			if(23 == u_dat->ScheduleTimeCnt)
-			{
+//			}
+//			if(23 == u_dat->ScheduleTimeCnt)
+//			{
 				Push(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[5]);
 				Push(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[6]);
-			}
+//			}
 #elif RUNNING_PLATFORM == PC_PLATFORM
 			_push_cnt = (_push_cnt + 1)%3;
 			Push(_ultrasonic_position_list,u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
@@ -550,14 +560,14 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic* u_dat)
 
 		case ParkingCenterUltrasonicDataPush:
 #if RUNNING_PLATFORM == Embedded_PLATFORM
-			if((26 == u_dat->ScheduleTimeCnt) || (12 == u_dat->ScheduleTimeCnt))
-			{
+//			if((26 == u_dat->ScheduleTimeCnt) || (12 == u_dat->ScheduleTimeCnt))
+//			{
 				ParkingCenterPush(_left_edge_position_list,u_dat->UltrasonicPacket[10],u_dat->AbstacleGroundPositionTriangle[10]);
-			}
-			if((0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
-			{
+//			}
+//			if((0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
+//			{
 				ParkingCenterPush(_right_edge_position_list,u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
-			}
+//			}
 #elif RUNNING_PLATFORM == PC_PLATFORM
 			ParkingCenterPush(_left_edge_position_list,u_dat->UltrasonicPacket[10],u_dat->AbstacleGroundPositionTriangle[10]);
 			ParkingCenterPush(_right_edge_position_list,u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
@@ -589,6 +599,7 @@ int8_t UltrasonicObstaclePercption::ParkingCalculateStateMachine(void)
 			{
 				_ultrasonic_location_sts = LocationCalculate;
 				_parking_calculate_state = FrontEdgeCalculate;
+				_edge_finding_state      = ObstacleWaitEdge;
 			}
 			else if(0x75 == Command)
 			{
