@@ -165,10 +165,10 @@ int main()
 				{
 					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
 				}
-				if(0xA5 == m_Terminal_CA.AckValid)
-				{
-					m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
-				}
+//				if(0xA5 == m_Terminal_CA.AckValid)
+//				{
+//					m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
+//				}
 			}
 			else//车辆
 			{
@@ -277,7 +277,7 @@ void PIT0_isr(void)
 		#endif
 
 		#ifdef BORUI
-//		m_BoRuiController.Push(0.02);
+		m_BoRuiController.Push(0.02);
 		#endif
 	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
@@ -318,7 +318,7 @@ void PIT0_isr(void)
 	/*
 	 * 障碍物检测的库位定位状态机
 	 * */
-//	m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
+	m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
 
