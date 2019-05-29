@@ -10,9 +10,14 @@
 
 #include "percaption.h"
 
+// 选择运行的平台：嵌入式 -> 0 ; PC -> 1;
 #define EMBEDDED_PLATFORM              (0)
 #define PC_PLATFORM                    (1)
 #define RUNNING_PLATFORM               EMBEDDED_PLATFORM
+// 选择车辆入库的方向，可选的是x轴还是y轴
+#define X_AXIS_ENTER				   (0)
+#define Y_AXIS_ENTER				   (1)
+#define ENTER_PARK_DIRECTION           (X_AXIS_ENTER)
 
 // 入库过程库位调整相关参数
 #define LEVEL_THRESHOLD               (2.2f)
@@ -22,8 +27,9 @@
 // 进库后的相关参数调整
 #define FIT_LINE_STEP_DISTANCE        (0.05f)
 #define FIT_LINE_STEP_LEVEL_THRESHOLD (3.0f)
-#define MIN_FIT_NUM                   (15)
-#define MIN_FIT_DISTANCE              (0.8)
+#define MIN_FIT_NUM                   (20)
+#define MIN_FIT_DISTANCE              (1.0)
+
 // 平行泊车控制总体状态
 typedef enum _EdgeFindingState
 {
