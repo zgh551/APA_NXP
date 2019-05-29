@@ -57,20 +57,20 @@ void LinkList::Add(ObstacleLocationPacket dat)
 void LinkList::Delete(void)
 {
 	Node* _free_node;//
-	while(_head_node->next != NULL)
+	if(_list_length > 0)
 	{
-		_free_node = _head_node;
-		_head_node = _head_node->next;
-		delete _free_node;
-		_free_node = NULL;
+		while(_head_node->next != NULL)
+		{
+			_free_node = _head_node;
+			_head_node = _head_node->next;
+			delete _free_node;
+			_free_node = NULL;
+		}
+		_list_length = 0;
+		delete _head_node;
+		_head_node = NULL;
+		_end_node  = NULL;
 	}
-	_list_length = 0;
-	delete _head_node;
-	delete _end_node;
-	delete _node;
-	_head_node = NULL;
-	_end_node  = NULL;
-	_node      = NULL;
 }
 
 uint32_t LinkList::Length()//返回链表个数
