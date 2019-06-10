@@ -24,6 +24,7 @@
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
 #include "GeometricTrack/geometric_track.h"
+#include "pid.h"
 #include "Ultrasonic.h"
 #include "planning.h"
 #include "percaption.h"
@@ -65,6 +66,9 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pct);
 
 	void Parse(vuint32_t id,vuint8_t dat[],Planning *msg);
+
+	void Parse(vuint32_t id,vuint8_t dat[],PID *msg);
+
 	void Parse(vuint32_t id,vuint8_t dat[]);
 	// Terminal Control
 	void Push(MessageManager *msg);

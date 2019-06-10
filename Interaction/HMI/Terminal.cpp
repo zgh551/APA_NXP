@@ -278,6 +278,42 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Planning *msg)
 	}
 }
 
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID *msg)
+{
+	Byte2Float temp_float;
+	switch(id)
+	{
+		case 0x550:
+			temp_float.b[0] = dat[0];
+			temp_float.b[1] = dat[1];
+			temp_float.b[2] = dat[2];
+			temp_float.b[3] = dat[3];
+			msg->KP = temp_float.f;
+			temp_float.b[0] = dat[4];
+			temp_float.b[1] = dat[5];
+			temp_float.b[2] = dat[6];
+			temp_float.b[3] = dat[7];
+			msg->KI = temp_float.f;
+			break;
+
+		case 0x551:
+			temp_float.b[0] = dat[0];
+			temp_float.b[1] = dat[1];
+			temp_float.b[2] = dat[2];
+			temp_float.b[3] = dat[3];
+			msg->KD = temp_float.f;
+			temp_float.b[0] = dat[4];
+			temp_float.b[1] = dat[5];
+			temp_float.b[2] = dat[6];
+			temp_float.b[3] = dat[7];
+			msg->Threshold = temp_float.f;
+			break;
+
+		default:
+			break;
+	}
+}
+
 void Terminal::Parse(vuint32_t id,vuint8_t dat[])
 {
 	switch(id)
