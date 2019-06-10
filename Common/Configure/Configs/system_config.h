@@ -14,8 +14,8 @@
 #define CAN2_TASK     (4)
 
 /****************System Configure******************/
-//#define CHANGAN
-#define BORUI
+#define CHANGAN
+//#define BORUI
 #define SIMULATION 0
 /********************是否使用超声波避障使能按钮***********************/
 #define ULTRASONIC_COLLISION_ENABLE  ( 1 ) // 超声避障使能按钮

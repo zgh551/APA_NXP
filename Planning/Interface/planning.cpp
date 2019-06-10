@@ -1081,26 +1081,6 @@ int8_t Planning::UltrasonicCollisionDiatance(Ultrasonic *u)
 	}
 }
 /**************************************************************************************************/
-float Planning::VelocityPlanControl(float distance)
-{
-	if(distance > position_max_)
-	{
-		return STRAIGHT_VELOCITY;
-	}
-	else if(distance > position_min_)
-	{
-		return CURVE_VELOCITY + (STRAIGHT_VELOCITY - CURVE_VELOCITY)*(distance - position_min_)/(position_max_ - position_min_);
-	}
-	else if(distance > 0.05)
-	{
-		return distance * CURVE_VELOCITY / position_min_ ;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
 float Planning::VelocityPlanningCircle(VehicleState *s,Vector2d stop_point,float radius)
 {
 	float distance;
