@@ -57,8 +57,8 @@ void LonControl::Proc(MessageManager *msg,VehicleController *ctl,PID *pid)
 	if(ctl->VelocityEnable)
 	{
 		float v = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
-//		pid->Desired = ctl->Velocity;
-		pid->Desired = VelocityControl(ctl->Velocity,ctl->Distance);
+		pid->Desired = ctl->Velocity;
+//		pid->Desired = VelocityControl(ctl->Velocity,ctl->Distance);
 		ctl->Acceleration = pid->pidUpdateIntegralSeparation(v);
 	}
 }
