@@ -56,21 +56,64 @@ void UltrasonicObstaclePercption::Push(LinkList *list,Ultrasonic_Packet u_dat,Ob
 	// 时间序列的数据
 	if(list->HeadNode == NULL)
 	{
-		if( u_dat.Level > LEVEL_THRESHOLD )
+		if (u_dat.Distance2 > u_dat.Distance1)
+		{
+			if( (u_dat.Distance2 - u_dat.Distance1) < DISTANCE_ERR_THRESHOLD )
+			{
+				list->Add(p_dat);
+			}
+		}
+		else
+		{
+			if((u_dat.Level > LEVEL_THRESHOLD) && (u_dat.Width > WIDTH_THRESHOLD))
+			{
+				list->Add(p_dat);
+			}
+		}
+	}
+	else
+	{
+		if(p_dat.Position.getX() < list->getEndNode()->data.Position.getX())
+		{
+			if (u_dat.Distance2 > u_dat.Distance1)
+			{
+				if( (u_dat.Distance2 - u_dat.Distance1) < DISTANCE_ERR_THRESHOLD )
+				{
+					list->Add(p_dat);
+				}
+			}
+			else
+			{
+				if((u_dat.Level > LEVEL_THRESHOLD) && (u_dat.Width > WIDTH_THRESHOLD))
+				{
+					list->Add(p_dat);
+				}
+			}
+		}
+	}
+}
+
+void UltrasonicObstaclePercption::OrderedPush(LinkList *list,ObstacleLocationPacket p_dat)
+{
+	// 时间序列的数据
+	if(list->HeadNode == NULL)
+	{
+		if(p_dat.Status == 0)
 		{
 			list->Add(p_dat);
 		}
 	}
 	else
 	{
-		if((u_dat.Level > LEVEL_THRESHOLD) && (p_dat.Position.getX() < list->getEndNode()->data.Position.getX()))
+		if( (p_dat.Status == 0) && (p_dat.Position.getX() < list->getEndNode()->data.Position.getX()))
 		{
 			list->Add(p_dat);
 		}
 	}
 }
 
-void UltrasonicObstaclePercption::Push(LinkList *list,ObstacleLocationPacket p_dat)
+// 无序列的数据
+void UltrasonicObstaclePercption::DisorderPush(LinkList *list,ObstacleLocationPacket p_dat)
 {
 	// 无序数据
 	if(list->getHeadNode() == NULL)
@@ -111,8 +154,43 @@ void UltrasonicObstaclePercption::ParkingCenterPush(LinkList *list,Ultrasonic_Pa
 		}
 	}
 }
+/******************************************************************************************************************************/
+float UltrasonicObstaclePercption::WeightCalculation(float d)
+{
+	if(d < 0.5)
+	{
+		return 4*(d - 0.5)*(d - 0.5);
+	}
+	else
+	{
+		return 0;
+	}
+}
 
-void  UltrasonicObstaclePercption::EdgeFinding(LinkList *list)
+void UltrasonicObstaclePercption::DataCredibilityCalculate(LinkList *list)
+{
+//	float weigth_array_buffer[4];
+//	uint8_t i;
+//	uint16_t index_cnt;
+//	Node* _current_node;//当前节点
+//
+//	if(list->HeadNode == NULL)
+//	{
+//		return;
+//	}
+//
+//	for(i=0;i<4;i++){weigth_array_buffer[i] = 0;}
+//	_current_node = list->HeadNode;//当前节点
+//	float *weight_array = new float[list->Length()];
+//	index_cnt = 0;
+//	while(_current_node->next != NULL)
+//	{
+//		if(_current_node)
+//	}
+
+}
+/******************************************************************************************************************************/
+void UltrasonicObstaclePercption::EdgeFinding(LinkList *list)
 {
 	Node* _current_node;//当前节点
 	Node* _last_node;//上一节点
@@ -202,6 +280,71 @@ void  UltrasonicObstaclePercption::EdgeFinding(LinkList *list)
 	_valid_parking_edge_position.First_Position.setX( _vehicle_position.Second_Position.getX() );
 	_valid_parking_edge_position.First_Position.setY( max_y_axis_value );
 	list->Delete();
+}
+
+void UltrasonicObstaclePercption::EdgeFinding_V1_0(LinkList *list)
+{
+	Node* _current_node;//当前节点
+	Node* _last_node;//上一节点
+	ObstacleInformationPacket vehicle_position_temp;
+	float max_y_axis_value;
+	float _err_distance;
+
+	if(list->HeadNode == NULL)
+	{
+		return;
+	}
+
+	_last_node    = list->HeadNode;//上一节点
+	_current_node = _last_node->next;//当前节点
+
+	while(_current_node->next != NULL)
+	{
+		_err_distance = (_current_node->data.Position - _last_node->data.Position).Length();
+		switch(_edge_finding_state_v1_0)
+		{
+			case EdgeJudge:
+				if(_err_distance > DISTANCE_THRESHOLD)
+				{
+					vehicle_position_temp.First_Position = _current_node->data.Position;
+				}
+				else
+				{
+					vehicle_position_temp.First_Position = _last_node->data.Position;
+				}
+				max_y_axis_value = vehicle_position_temp.First_Position.getY();
+				_edge_finding_state_v1_0 = EdgeLooking;
+				break;
+
+			case EdgeLooking:
+				if(_err_distance > DISTANCE_THRESHOLD)
+				{
+					vehicle_position_temp.Second_Position = _last_node->data.Position;
+
+					_valid_parking_edge_position.First_Position.setX( vehicle_position_temp.Second_Position.getX() );
+					_valid_parking_edge_position.First_Position.setY( max_y_axis_value );
+
+					vehicle_position_temp.First_Position = _current_node->data.Position;
+					max_y_axis_value = vehicle_position_temp.First_Position.getY();
+				}
+				else
+				{
+					vehicle_position_temp.Second_Position = _current_node->data.Position;
+					max_y_axis_value = _current_node->data.Position.getY() > max_y_axis_value ? _current_node->data.Position.getY() : max_y_axis_value;
+				}
+				break;
+
+			default:
+				break;
+		}
+		if(_err_distance < DISTANCE_THRESHOLD)
+		{
+			_valid_parking_edge_position.First_Position.setX( vehicle_position_temp.Second_Position.getX() );
+			_valid_parking_edge_position.First_Position.setY( max_y_axis_value );
+		}
+		_last_node = _current_node;
+		_current_node = _current_node->next;
+	}
 }
 
 float UltrasonicObstaclePercption::HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value)
@@ -535,12 +678,12 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic* u_dat)
 #if RUNNING_PLATFORM == Embedded_PLATFORM
 //			if( (0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
 //			{
-				Push(_ultrasonic_position_list,u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
+				Push(_ultrasonic_position_list,u_dat->UltrasonicPacket[11], u_dat->AbstacleGroundPositionTriangle[11]);
 //			}
 //			if(23 == u_dat->ScheduleTimeCnt)
 //			{
-				Push(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[5]);
-				Push(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[6]);
+				DisorderPush(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[5]);
+				DisorderPush(_ultrasonic_triangle_location_list,u_dat->AbstacleGroundPositionTriangle[6]);
 //			}
 #elif RUNNING_PLATFORM == PC_PLATFORM
 			_push_cnt = (_push_cnt + 1)%3;
@@ -613,7 +756,8 @@ int8_t UltrasonicObstaclePercption::ParkingCalculateStateMachine(void)
 			break;
 
 		case FrontEdgeCalculate:
-			EdgeFinding(_ultrasonic_position_list);
+//			EdgeFinding(_ultrasonic_position_list);
+			EdgeFinding_V1_0(_ultrasonic_position_list);
 			_parking_calculate_state = RearEdgeCalculate;
 			break;
 

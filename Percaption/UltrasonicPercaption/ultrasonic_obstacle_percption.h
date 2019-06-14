@@ -20,8 +20,10 @@
 #define ENTER_PARK_DIRECTION           (X_AXIS_ENTER)
 
 // 入库过程库位调整相关参数
+#define DISTANCE_ERR_THRESHOLD        (0.6f)
 #define LEVEL_THRESHOLD               (2.2f)
-#define DISTANCE_THRESHOLD            (0.3f)
+#define WIDTH_THRESHOLD               (30.0f)
+#define DISTANCE_THRESHOLD            (0.5f)
 #define STEP_DISTANCE                 (0.1f)
 #define MIN_LOCATION_NUM              (50)
 // 进库后的相关参数调整
@@ -30,7 +32,7 @@
 #define MIN_FIT_NUM                   (20)
 #define MIN_FIT_DISTANCE              (1.0)
 
-// 平行泊车控制总体状态
+// 库位边沿查找算法
 typedef enum _EdgeFindingState
 {
 	ObstacleWaitEdge= 0,
@@ -39,6 +41,12 @@ typedef enum _EdgeFindingState
 	JudgeParkingValid,
 	waitParking
 }EdgeFindingState;
+
+typedef enum _EdgeFindingStateV1_0
+{
+	EdgeJudge= 0,
+	EdgeLooking
+}EdgeFindingStateV1_0;
 
 typedef enum _LocationStatus
 {
@@ -73,10 +81,24 @@ public:
 	void Init();
 
 	void Push(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
-	void Push(LinkList *list,ObstacleLocationPacket p_dat);
+	/*
+	 * 有序数据的推送
+	 * */
+	void OrderedPush(LinkList *list,ObstacleLocationPacket p_dat);
+	/*
+	 * 无序数据的推送
+	 * */
+	void DisorderPush(LinkList *list,ObstacleLocationPacket p_dat);
+
 	void ParkingCenterPush(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
+	/*******************************************************************************************/
+	float WeightCalculation(float d);
+
+	void DataCredibilityCalculate(LinkList *list);
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	void EdgeFinding(LinkList *list);
+	void EdgeFinding_V1_0(LinkList *list);
 	// 求取最高分布值的最优解
 	float HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value);
 	// 求取最高分布的索引值
@@ -121,6 +143,7 @@ public:
 private:
 	LocationStatus _ultrasonic_location_sts;
 	EdgeFindingState _edge_finding_state;
+	EdgeFindingStateV1_0 _edge_finding_state_v1_0;
 
 	UltrasonicLocationPushState      _data_push_state;
 	UltrasonicLocationCalculateState _parking_calculate_state;
