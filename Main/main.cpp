@@ -165,10 +165,10 @@ int main()
 				{
 					m_Terminal_CA.Push(&m_UltrasonicObstaclePercption);
 				}
-//				if(0xA5 == m_Terminal_CA.AckValid)
-//				{
-//					m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
-//				}
+				if(0xA5 == m_Terminal_CA.AckValid)
+				{
+					m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
+				}
 			}
 			else//车辆
 			{
@@ -190,6 +190,11 @@ int main()
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 				{
+//					#ifdef CHANGAN
+//					m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+//					m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+//					m_ChangAnController.Push(0.02);
+//					#endif
 					m_Terminal_CA.Push(&m_GeometricTrack);
 					m_Terminal_CA.Push(m_GeometricTrack);
 				}
@@ -220,11 +225,11 @@ int main()
 			if(0xA5 == m_Terminal_CA.AckValid)
 			{
 				m_Terminal_CA.Ack();
-				if(0x5A == m_Terminal_CA.AckEcho)
-				{
-					m_Terminal_CA.AckEcho = 0;
+//				if(0x5A == m_Terminal_CA.AckEcho)
+//				{
+//					m_Terminal_CA.AckEcho = 0;
 					m_Terminal_CA.AckValid = 0;
-				}
+//				}
 			}
 		}
 }
@@ -271,9 +276,9 @@ void PIT0_isr(void)
 	{
 		// TODO 检车位测试时可以屏蔽
 		#ifdef CHANGAN
-//		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
-//		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
-//		m_ChangAnController.Push(0.02);
+		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+		m_ChangAnController.Push(0.02);
 		#endif
 
 		#ifdef BORUI
@@ -318,7 +323,7 @@ void PIT0_isr(void)
 	/*
 	 * 障碍物检测的库位定位状态机
 	 * */
-	m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
+//	m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
 
