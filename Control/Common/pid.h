@@ -20,7 +20,8 @@ public:
 	virtual ~PID();
 	float pidUpdate(float measured);
 	float pidUpdateIntegralSeparation(float measured);
-
+	float pidUpdateIntegralSeparation_V1_0(float measured);
+	float pidUpdateIntegralSeparation_V1_1(float measured);
     /*** Variabel Property ***/
     /* KP */
     float getKP();

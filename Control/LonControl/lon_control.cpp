@@ -52,13 +52,49 @@ float LonControl::VelocityControl(float distance,float velocity)
 	return velocity < temp_v ? velocity :temp_v;
 }
 
-void LonControl::Proc(MessageManager *msg,VehicleController *ctl,PID *pid)
+void LonControl::Proc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid)
 {
 	if(ctl->VelocityEnable)
 	{
 		float v = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
-		pid->Desired = ctl->Velocity;
+		velocity_pid->Desired = ctl->Velocity;
 //		pid->Desired = VelocityControl(ctl->Velocity,ctl->Distance);
-		ctl->Acceleration = pid->pidUpdateIntegralSeparation(v);
+//		ctl->Acceleration = velocity_pid->pidUpdateIntegralSeparation(v);
+		ctl->Torque = velocity_pid->pidUpdate(v);
+	}
+}
+
+void LonControl::Proc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid,PID *acc_pid)
+{
+	if(ctl->VelocityEnable)
+	{
+		float v = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
+		velocity_pid->Desired = ctl->Velocity;
+		acc_pid->Desired = velocity_pid->pidUpdateIntegralSeparation(v);
+		if(acc_pid->Desired > 0)
+		{
+			if(msg->Gear == Drive)
+			{
+				ctl->Acceleration = acc_pid->pidUpdateIntegralSeparation(msg->LonAcc);
+			}
+			else if(msg->Gear == Reverse)
+			{
+				ctl->Acceleration = acc_pid->pidUpdateIntegralSeparation(-msg->LonAcc);
+			}
+		}
+		else
+		{
+			ctl->Acceleration = acc_pid->Desired;
+		}
+
+	}
+}
+
+void LonControl::AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid)
+{
+	if(ctl->AccelerationEnable)
+	{
+		acc_pid->Desired = ctl->TargetAcceleration;
+		ctl->Acceleration = acc_pid->pidUpdateIntegralSeparation(msg->LonAcc);
 	}
 }

@@ -27,7 +27,11 @@ public:
 
 	void Init() override;
 
-	void Proc(MessageManager *msg,VehicleController *ctl,PID *pid) override;
+	void Proc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid) override;
+
+	void Proc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid,PID *acc_pid);
+
+	void AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid);
 
 	float VelocityPlanningControl(float distance);
 	float VelocityControl(float distance,float velocity);

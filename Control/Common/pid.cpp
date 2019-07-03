@@ -290,6 +290,48 @@ float PID::pidUpdateIntegralSeparation(float measured)
     	_integ += _error * _dt;
     }
 
+    // Constrain the integral (unless the iLimit is zero)
+    if(_iLimit != 0)
+    {
+    	_integ = fmin(_iLimit,fmax(-_iLimit,_integ));
+    }
+    _outI = _ki * _integ * index;
+    output += _outI;
+
+    // Constrain the total PID output (unless the outputLimit is zero)
+    if(_outputLimit != 0)
+    {
+    	output = fmin(_outputLimit,fmax(-_outputLimit,output));
+    }
+
+    _prevError = _error;
+
+    return output;
+}
+
+float PID::pidUpdateIntegralSeparation_V1_0(float measured)
+{
+    float output = 0.0f;
+    uint8_t index = 0;
+    _error = _desired - measured;
+
+    _outP = _kp * _error;
+    output += _outP;
+
+    _deriv = (_error - _prevError) / _dt;
+    _outD = _kd * _deriv;
+    output += _outD;
+
+    //Integral separation
+    if(_error > _threshold)
+    {
+    	index = 0;
+    }
+    else
+    {
+    	index = 1;
+    	_integ += _error * _dt;
+    }
 
     // Constrain the integral (unless the iLimit is zero)
     if(_iLimit != 0)
@@ -310,4 +352,37 @@ float PID::pidUpdateIntegralSeparation(float measured)
     return output;
 }
 
+float PID::pidUpdateIntegralSeparation_V1_1(float measured)
+{
+    float output = 0.0f;
 
+    _error = _desired - measured;
+
+    _outP = _kp * _error;
+    output += _outP;
+
+    _deriv = (_error - _prevError) / _dt;
+    _outD = _kd * _deriv;
+    output += _outD;
+
+    //Integral separation
+    _integ += _ki * _error * _dt;
+
+    // Constrain the integral (unless the iLimit is zero)
+    if(_iLimit != 0)
+    {
+    	_integ = fmin(_iLimit,fmax(-_iLimit,_integ));
+    }
+    _outI = _integ;
+    output += _outI;
+
+    // Constrain the total PID output (unless the outputLimit is zero)
+    if(_outputLimit != 0)
+    {
+    	output = fmin(_outputLimit,fmax(-_outputLimit,output));
+    }
+
+    _prevError = _error;
+
+    return output;
+}
