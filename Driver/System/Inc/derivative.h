@@ -15,4 +15,5 @@
 #include "uart.h"
 #include "gpio.h"
 #include "linflexd.h"
+#include "etimer.h"
 #include "mode_entry.h"
