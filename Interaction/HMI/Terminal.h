@@ -19,7 +19,7 @@
 
 #include "property.h"
 #include "derivative.h"
-#include "ChangAn/chang_an_message.h"
+//#include "ChangAn/chang_an_message.h"
 #include "Interface/vehicle_controller.h"
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
