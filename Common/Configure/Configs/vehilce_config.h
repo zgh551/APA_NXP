@@ -20,7 +20,9 @@
 #ifdef BORUI
 #include "bo_rui_configure.h"
 #endif
-
+#ifdef DONG_FENG_E70
+#include "dong_feng_configure.h"
+#endif
 
 typedef struct _Location
 {
