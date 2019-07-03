@@ -165,6 +165,12 @@ void ChangAnMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t
 			ESP_QDC_ACC = (uint8_t)( (dat[3] >> 1) & 0x03);
 			break;
 
+		case 0x278:
+			LonAcc = ((uint16_t)((dat[3] << 2) | (dat[4] >> 6)))*0.03125 - 16;
+			LatAcc = dat[2] * 0.1f - 12.7f;
+			YawRate = (((dat[4] & 0x3f) << 8) | dat[5]) * 0.01 - 81.91;
+			break;
+
 		case 0x26A:// EMS
 			EMS_QEC_ACC = (uint8_t)( (dat[0] >> 1) & 0x03);
 			break;
