@@ -17,81 +17,89 @@
 
 VehicleController::VehicleController() {
 	////// ACC //////
-		Acceleration.setContainer(this);
-		Acceleration.getter(&VehicleController::getAcceleration);
-		Acceleration.setter(&VehicleController::setAcceleration);
+	TargetAcceleration.setContainer(this);
+	TargetAcceleration.getter(&VehicleController::getTargetAcceleration);
+	TargetAcceleration.setter(&VehicleController::setTargetAcceleration);
 
-		AccelerationEnable.setContainer(this);
-		AccelerationEnable.getter(&VehicleController::getAccelerationEnable);
-		AccelerationEnable.setter(&VehicleController::setAccelerationEnable);
+	Acceleration.setContainer(this);
+	Acceleration.getter(&VehicleController::getAcceleration);
+	Acceleration.setter(&VehicleController::setAcceleration);
 
-		////// AEB //////
-		Deceleration.setContainer(this);
-		Deceleration.getter(&VehicleController::getDeceleration);
-		Deceleration.setter(&VehicleController::setDeceleration);
+	AccelerationEnable.setContainer(this);
+	AccelerationEnable.getter(&VehicleController::getAccelerationEnable);
+	AccelerationEnable.setter(&VehicleController::setAccelerationEnable);
 
-		DecelerationEnable.setContainer(this);
-		DecelerationEnable.getter(&VehicleController::getDecelerationEnable);
-		DecelerationEnable.setter(&VehicleController::setDecelerationEnable);
+	////// AEB //////
+	Deceleration.setContainer(this);
+	Deceleration.getter(&VehicleController::getDeceleration);
+	Deceleration.setter(&VehicleController::setDeceleration);
 
-		////// Torque //////
-		Torque.setContainer(this);
-		Torque.getter(&VehicleController::getTorque);
-		Torque.setter(&VehicleController::setTorque);
+	DecelerationEnable.setContainer(this);
+	DecelerationEnable.getter(&VehicleController::getDecelerationEnable);
+	DecelerationEnable.setter(&VehicleController::setDecelerationEnable);
 
-		TorqueEnable.setContainer(this);
-		TorqueEnable.getter(&VehicleController::getTorqueEnable);
-		TorqueEnable.setter(&VehicleController::setTorqueEnable);
-		////// Turnning Torque Control Single //////
-		TurnTorqueVal.setContainer(this);
-		TurnTorqueVal.getter(&VehicleController::getTurnTorqueVal);
-		TurnTorqueVal.setter(&VehicleController::setTurnTorqueVal);
+	////// Torque //////
+	Torque.setContainer(this);
+	Torque.getter(&VehicleController::getTorque);
+	Torque.setter(&VehicleController::setTorque);
 
-		TurnTorqueDir.setContainer(this);
-		TurnTorqueDir.getter(&VehicleController::getTurnTorqueDir);
-		TurnTorqueDir.setter(&VehicleController::setTurnTorqueDir);
+	TorqueEnable.setContainer(this);
+	TorqueEnable.getter(&VehicleController::getTorqueEnable);
+	TorqueEnable.setter(&VehicleController::setTorqueEnable);
+	////// Turnning Torque Control Single //////
+	TurnTorqueVal.setContainer(this);
+	TurnTorqueVal.getter(&VehicleController::getTurnTorqueVal);
+	TurnTorqueVal.setter(&VehicleController::setTurnTorqueVal);
 
-		TurnTorqueAct.setContainer(this);
-		TurnTorqueAct.getter(&VehicleController::getTurnTorqueAct);
-		TurnTorqueAct.setter(&VehicleController::setTurnTorqueAct);
-		////// Velocity //////
-		Velocity.setContainer(this);
-		Velocity.getter(&VehicleController::getVelocity);
-		Velocity.setter(&VehicleController::setVelocity);
+	TurnTorqueDir.setContainer(this);
+	TurnTorqueDir.getter(&VehicleController::getTurnTorqueDir);
+	TurnTorqueDir.setter(&VehicleController::setTurnTorqueDir);
 
-		Distance.setContainer(this);
-		Distance.getter(&VehicleController::getDistance);
-		Distance.setter(&VehicleController::setDistance);
+	TurnTorqueAct.setContainer(this);
+	TurnTorqueAct.getter(&VehicleController::getTurnTorqueAct);
+	TurnTorqueAct.setter(&VehicleController::setTurnTorqueAct);
+	////// Velocity //////
+	Velocity.setContainer(this);
+	Velocity.getter(&VehicleController::getVelocity);
+	Velocity.setter(&VehicleController::setVelocity);
 
-		VelocityEnable.setContainer(this);
-		VelocityEnable.getter(&VehicleController::getVelocityEnable);
-		VelocityEnable.setter(&VehicleController::setVelocityEnable);
+	Distance.setContainer(this);
+	Distance.getter(&VehicleController::getDistance);
+	Distance.setter(&VehicleController::setDistance);
 
-		////// Steering Angle //////
-		SteeringAngle.setContainer(this);
-		SteeringAngle.getter(&VehicleController::getSteeringAngle);
-		SteeringAngle.setter(&VehicleController::setSteeringAngle);
+	VelocityEnable.setContainer(this);
+	VelocityEnable.getter(&VehicleController::getVelocityEnable);
+	VelocityEnable.setter(&VehicleController::setVelocityEnable);
 
-		SteeringAngleRate.setContainer(this);
-		SteeringAngleRate.getter(&VehicleController::getSteeringAngleRate);
-		SteeringAngleRate.setter(&VehicleController::setSteeringAngleRate);
+	////// Steering Angle //////
+	SteeringAngle.setContainer(this);
+	SteeringAngle.getter(&VehicleController::getSteeringAngle);
+	SteeringAngle.setter(&VehicleController::setSteeringAngle);
 
-		SteeringEnable.setContainer(this);
-		SteeringEnable.getter(&VehicleController::getSteeringEnable);
-		SteeringEnable.setter(&VehicleController::setSteeringEnable);
+	SteeringAngleRate.setContainer(this);
+	SteeringAngleRate.getter(&VehicleController::getSteeringAngleRate);
+	SteeringAngleRate.setter(&VehicleController::setSteeringAngleRate);
 
-		////// Gear //////
-		Gear.setContainer(this);
-		Gear.getter(&VehicleController::getGear);
-		Gear.setter(&VehicleController::setGear);
+	SteeringEnable.setContainer(this);
+	SteeringEnable.getter(&VehicleController::getSteeringEnable);
+	SteeringEnable.setter(&VehicleController::setSteeringEnable);
 
-		GearEnable.setContainer(this);
-		GearEnable.getter(&VehicleController::getGearEnable);
-		GearEnable.setter(&VehicleController::setGearEnable);
+	////// Gear //////
+	Gear.setContainer(this);
+	Gear.getter(&VehicleController::getGear);
+	Gear.setter(&VehicleController::setGear);
 
-		APAEnable.setContainer(this);
-		APAEnable.getter(&VehicleController::getGearEnable);
-		APAEnable.setter(&VehicleController::setGearEnable);
+	GearEnable.setContainer(this);
+	GearEnable.getter(&VehicleController::getGearEnable);
+	GearEnable.setter(&VehicleController::setGearEnable);
+
+	APAEnable.setContainer(this);
+	APAEnable.getter(&VehicleController::getGearEnable);
+	APAEnable.setter(&VehicleController::setGearEnable);
+
+	EPBEnable.setContainer(this);
+	EPBEnable.getter(&VehicleController::getEPBEnable);
+	EPBEnable.setter(&VehicleController::setEPBEnable);
 }
 
 VehicleController::~VehicleController() {
@@ -99,6 +107,9 @@ VehicleController::~VehicleController() {
 }
 
 /// ACC
+float VehicleController::getTargetAcceleration()           { return _target_acceleration;}
+void  VehicleController::setTargetAcceleration(float value){_target_acceleration = value;}
+
 float VehicleController::getAcceleration()           { return _acceleration;}
 void  VehicleController::setAcceleration(float value){_acceleration = value;}
 
@@ -158,3 +169,7 @@ void    VehicleController::setGearEnable(uint8_t value){_gear_enable = value;}
 /// APA Enable
 uint8_t VehicleController::getAPAEnable()             { return _apa_enable;}
 void    VehicleController::setAPAEnable(uint8_t value){_apa_enable = value;}
+
+/// EPB Enable
+uint8_t VehicleController::getEPBEnable()             { return _epb_enable;}
+void    VehicleController::setEPBEnable(uint8_t value){_epb_enable = value;}

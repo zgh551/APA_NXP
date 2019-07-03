@@ -93,6 +93,10 @@ public:
 	virtual void Update(APAControlCommand cmd) = 0;
 
 	/* ACC */
+	float getTargetAcceleration();
+	void  setTargetAcceleration(float value);
+	Property<VehicleController,float,READ_WRITE> TargetAcceleration;
+
 	float getAcceleration();
 	void  setAcceleration(float value);
 	Property<VehicleController,float,READ_WRITE> Acceleration;
@@ -170,8 +174,14 @@ public:
 	uint8_t getAPAEnable();
 	void    setAPAEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> APAEnable;
+
+	uint8_t getEPBEnable();
+	void    setEPBEnable(uint8_t value);
+	Property<VehicleController,uint8_t,READ_WRITE> EPBEnable;
+
 private:
 	/* ACC */
+	float _target_acceleration;
 	float _acceleration;
 	uint8_t _acceleration_enable;
 
@@ -202,7 +212,12 @@ private:
 	uint8_t _gear;
 	uint8_t _gear_enable;
 
+	/* APA */
 	uint8_t _apa_enable;
+
+	/* EPB */
+	uint8_t _epb_enable;
+
 	/*
 	* @brief NEUTRAL, REVERSE, DRIVE
 	*/
