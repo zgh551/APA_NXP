@@ -93,9 +93,10 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			if(check_sum == dat[7])
 			{
 				ctl->Acceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+//				ctl->TargetAcceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
 				ctl->Deceleration	= (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.001);
 				ctl->Velocity		= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001);
-				ctl->Torque			= (float)(dat[6] * 0.5);
+				ctl->Torque			= (float)(dat[6] * 2);
 			}
 			break;
 
@@ -306,7 +307,20 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID *msg)
 			temp_float.b[1] = dat[5];
 			temp_float.b[2] = dat[6];
 			temp_float.b[3] = dat[7];
+			msg->OutputLimit = temp_float.f;
+			break;
+
+		case 0x552:
+			temp_float.b[0] = dat[0];
+			temp_float.b[1] = dat[1];
+			temp_float.b[2] = dat[2];
+			temp_float.b[3] = dat[3];
 			msg->Threshold = temp_float.f;
+			temp_float.b[0] = dat[4];
+			temp_float.b[1] = dat[5];
+			temp_float.b[2] = dat[6];
+			temp_float.b[3] = dat[7];
+			msg->ILimit = temp_float.f;
 			break;
 
 		default:
@@ -384,6 +398,20 @@ void Terminal::Push(MessageManager *msg)
 	m_CAN_Packet.data[6] = temp_uint16 & 0xff;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x417;
+	temp_int16 = (int16_t)(msg->LonAcc * 1000);
+	m_CAN_Packet.data[0] =  temp_uint16 & 0xff ;
+	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff ;
+	temp_int16 = (int16_t)(msg->LatAcc * 1000);
+	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
+	temp_int16 = (int16_t)(msg->YawRate * 100);
+	m_CAN_Packet.data[4] = temp_int16 & 0xff;
+	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
 //void Terminal::Push(ChangAnMessage *msg)
@@ -443,11 +471,13 @@ void Terminal::Push(VehicleController *msg)
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x415;
-	temp_int16 = (uint16_t)(msg->Distance * 1000);
-	m_CAN_Packet.data[0] =  temp_int16 & 0xff ;
-	m_CAN_Packet.data[1] = (temp_int16 >> 8) & 0xff ;
-	m_CAN_Packet.data[2] = 0;
-	m_CAN_Packet.data[3] = 0;
+	temp_uint16 = (uint16_t)(msg->Distance * 1000);
+	m_CAN_Packet.data[0] =  temp_uint16 & 0xff ;
+	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff ;
+	temp_int16 = (int16_t)(msg->TargetAcceleration * 1000);
+	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
+
 	m_CAN_Packet.data[4] = 0;
 	m_CAN_Packet.data[5] = 0;
 	m_CAN_Packet.data[6] = 0;
