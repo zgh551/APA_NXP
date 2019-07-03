@@ -29,6 +29,8 @@ extern void FlexCAN2_Isr(void);
 
 extern void FlexLin0_Uart_Isr(void);
 extern void FlexLin1_Uart_Isr(void);
+
+extern void eTimer1_Channel5_Isr(void);
 /*========================================================================*/
 /*	GLOBAL VARIABLES						                              */
 /*========================================================================*/
@@ -668,7 +670,7 @@ const uint32_t __attribute__ ((section (".intc_vector_table"))) IntcIsrVectorTab
 (uint32_t) &dummy, /* Vector # 624 TC2IR eTimer_1 */
 (uint32_t) &dummy, /* Vector # 625 TC3IR eTimer_1 */
 (uint32_t) &dummy, /* Vector # 626 TC4IR eTimer_1 */
-(uint32_t) &dummy, /* Vector # 627 TC5IR eTimer_1 */
+(uint32_t) &eTimer1_Channel5_Isr, /* Vector # 627 TC5IR eTimer_1 */
 (uint32_t) &dummy, /* Vector # 628 Not used Reserved eTimer_1 */
 (uint32_t) &dummy, /* Vector # 629 Not used Reserved eTimer_1 */
 (uint32_t) &dummy, /* Vector # 630 Not used Reserved eTimer_1 */
