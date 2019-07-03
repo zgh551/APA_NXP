@@ -37,7 +37,7 @@ extern "C" {
 
 
 #define SYSTEM_LED SIUL2.GPDO[PG5].B.PDO
-// #define CAN_WAKE   SIUL2.GPDO[PC6].B.PDO
+#define PULSE_TEST SIUL2.GPDO[PA6].B.PDO
 
 #define LED_ON 0
 #define LED_OFF 1

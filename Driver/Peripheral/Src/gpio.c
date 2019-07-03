@@ -6,7 +6,6 @@
  */
 /*****************************************************************************/
 /* FILE NAME: gpio.c                          COPYRIGHT (c) Motovis 2018      */
-
 /*                                                      All Rights Reserved  */
 /* DESCRIPTION: Transmit & receive LIN messages using LINflexD modules.      */
 /*****************************************************************************/
@@ -106,6 +105,13 @@ void initGPIO(void)
 	SIUL2.MSCR[PG5].B.OBE = 1;      /* Output Buffer Enable on */
 	SIUL2.MSCR[PG5].B.IBE = 0;			/* Input Buffer Enable off */
 	SIUL2.GPDO[PG5].B.PDO = 1;			/* Inialize Hight */
+
+
+	/// Test pulse
+	SIUL2.MSCR[PA6].B.SSS = 0;			/* PD3: Pin functionality as GPIO */
+	SIUL2.MSCR[PA6].B.OBE = 1;      /* Output Buffer Enable on */
+	SIUL2.MSCR[PA6].B.IBE = 0;			/* Input Buffer Enable off */
+	SIUL2.GPDO[PA6].B.PDO = 1;			/* Inialize Hight */
 }
 
 void GPIO_toggle(uint16_t GPIO, uint32_t TOGGLES, uint32_t DELAY)
