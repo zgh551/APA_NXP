@@ -34,6 +34,10 @@ void PeripheralClockGating(void)
   /// LIN Module
   MC_ME.PCTL91.B.RUN_CFG  = 0b001; //LINFlexD_1: Select peripheral config RUN_PC[1].
   MC_ME.PCTL204.B.RUN_CFG = 0b001; //LINFlexD_0: Select peripheral config RUN_PC[1].
+  // eTimer module
+  MC_ME.PCTL247.B.RUN_CFG = 0b001; //eTimer0
+  MC_ME.PCTL137.B.RUN_CFG = 0b001; //eTimer1
+  MC_ME.PCTL245.B.RUN_CFG = 0b001; //eTimer2
   /// PIT time module
   MC_ME.PCTL30.B.RUN_CFG  = 0b001; //PCTL30 is PIT0 Peripheral Control Registers for Panther
   /// DMA module
@@ -92,6 +96,15 @@ void PLL_200MHz(void)
 
 	MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
 
+	/*
+	 * MOTC_CLK
+	 * */
+    MC_CGM.AC0_SC.B.SELCTL = 2;    // Select PLL0 for auxiliary clock 0
+    MC_CGM.AC0_DC0.R = 0x80010000;    // MOTC_CLK : Enable aux clk 0 div by 2 ?(100 MHz)
+
+    /*
+     * CAN_PLL_CLK
+     * */
 //	MC_CGM.AC2_DC0.B.DIV = 1;// set the divider division value
 //	MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
 
