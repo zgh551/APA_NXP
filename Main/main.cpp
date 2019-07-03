@@ -32,6 +32,11 @@
 #include "BoRui/bo_rui_controller.h"
 #include "BoRui/bo_rui_message.h"
 #endif
+
+#ifdef DONG_FENG_E70
+#include "DongFengE70/dong_feng_e70_controller.h"
+#include "DongFengE70/dong_feng_e70_message.h"
+#endif
 // 车辆控制
 #include "pid.h"
 #include "lon_control.h"
@@ -57,8 +62,15 @@ Terminal m_Terminal_CA;
 Ultrasonic m_Ultrasonic;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
-PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
+//原始版本的PID参数
+//PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.3,1,0.1);
+//正向PID取消积分项
+//PID m_VehicleVelocityControlPID = PID(0.02,3.5,0.1,0.1,0.06,0.1,0.0);
 
+//PID m_AccelerateControlPID = PID(0.02,3.5,0.1,0.1,0.5,0.5,0.1);
+
+
+PID m_VehicleVelocityControlPID = PID(0.02,0.0,1,0.0,300,300);
 #ifdef CHANGAN
 ChangAnController m_ChangAnController;
 ChangAnMessage m_ChangAnMessage;
@@ -66,6 +78,10 @@ ChangAnMessage m_ChangAnMessage;
 #ifdef BORUI
 BoRuiController m_BoRuiController;
 BoRuiMessage    m_BoRuiMessage;
+#endif
+#ifdef DONG_FENG_E70
+DongFengE70Controller m_DongFengE70Controller;
+DongFengE70Message    m_DongFengE70Message;
 #endif
 
 ParallelPlanning m_ParallelPlanning;
@@ -92,11 +108,18 @@ int main()
 		/* Init LinFlexD Module */
 		LINFlexD_Configure();
 
+		/* Init eTimer Module */
+//		eTimer2_Init();
+//		eTimer2_OutputInit();
+		eTimer1_OutputInit();
 		/* Init PIT Module */
 		PIT_Configure();
+
+//		eTimer2_StartInputCapture();
 		/* Loop forever */
 		for(;;)
 		{
+//			eTimer2_CalculatePulse();
 			//Task 一次性的计算任务 泊车规划任务
 			if(0x10 == m_Terminal_CA.Command)//平行泊车
 			{
@@ -187,6 +210,9 @@ int main()
 #ifdef BORUI
 					m_Terminal_CA.Push(&m_BoRuiController);
 #endif
+#ifdef DONG_FENG_E70
+					m_Terminal_CA.Push(&m_DongFengE70Controller);
+#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 				{
@@ -205,6 +231,9 @@ int main()
 #endif
 #ifdef BORUI
 					m_Terminal_CA.Push(&m_BoRuiMessage);
+#endif
+#ifdef DONG_FENG_E70
+					m_Terminal_CA.Push(&m_DongFengE70Message);
 #endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
@@ -276,7 +305,9 @@ void PIT0_isr(void)
 	{
 		// TODO 检车位测试时可以屏蔽
 		#ifdef CHANGAN
-		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+//		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VehicleVelocityControlPID);//20ms
+		m_LonControl.AccProc(&m_ChangAnMessage, &m_ChangAnController, &m_AccelerateControlPID);//测试acc回路
+
 		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
 		m_ChangAnController.Push(0.02);
 		#endif
@@ -284,7 +315,19 @@ void PIT0_isr(void)
 		#ifdef BORUI
 		m_BoRuiController.Push(0.02);
 		#endif
+
+#ifdef DONG_FENG_E70
+//		m_LonControl.Proc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VehicleVelocityControlPID);//20ms
+//		m_LonControl.AccProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_AccelerateControlPID);//测试acc回路
+
+
+#endif
 	}
+//	if(m_Ultrasonic.SystemTime % 2 == 1)
+//	{
+//		m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(), m_DongFengE70Message.getESP_AvailabStatus());
+//		m_DongFengE70Controller.Push(0.01);
+//	}
 	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 	{
 #ifdef CHANGAN
@@ -304,9 +347,9 @@ void PIT0_isr(void)
 #endif
 #endif
 	}
-	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
+	if(m_Ultrasonic.SystemTime % 20 == 0)//20ms
 	{
-
+		eTimer1Channel5OutputStart();
 	}
 
 #if ULTRASONIC_SCHEDULE_MODO == 2
@@ -333,6 +376,7 @@ void PIT0_isr(void)
 	{
 		SYSTEM_LED = ~SYSTEM_LED;
 	}
+	PULSE_TEST = ~PULSE_TEST;
 	PIT_0.TIMER[0].TFLG.R |= 1;  /* Clear interrupt flag. w1c */
 }
 /*******************************************************************************
@@ -355,6 +399,9 @@ void FlexCAN0_Isr(void)
 
 #ifdef BORUI
 		m_BoRuiMessage.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
+#endif
+#ifdef DONG_FENG_E70
+		m_DongFengE70Message.Parse(CAN_0.MB[8].ID.B.ID_STD, CAN_0.MB[8].DATA.B, CAN_0.MB[8].CS.B.DLC);
 #endif
 		/* release the internal lock for all Rx MBs
 		 * by reading the TIMER */
@@ -413,6 +460,12 @@ void FlexCAN2_Isr(void)
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_BoRuiController);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_BoRuiMessage);
 #endif
+
+#ifdef DONG_FENG_E70
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_DongFengE70Controller);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_DongFengE70Message);
+#endif
+
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_UltrasonicObstaclePercption);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, &m_Ultrasonic);
 
