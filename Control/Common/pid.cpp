@@ -301,7 +301,7 @@ float PID::pidUpdateIntegralSeparation(float measured)
     // Constrain the total PID output (unless the outputLimit is zero)
     if(_outputLimit != 0)
     {
-    	output = fmin(_outputLimit,fmax(-_outputLimit,output));
+    	output = fmin(_outputLimit,fmax(-0.2,output));
     }
 
     _prevError = _error;
