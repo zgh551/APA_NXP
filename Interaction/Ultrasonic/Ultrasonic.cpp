@@ -957,7 +957,7 @@ void Ultrasonic::BodyDirectCalculate(Location position,Ultrasonic_Packet data,Ob
 		{
 			location->Status = BlindZone;
 		}
-		else
+		else if(2 == data.status)
 		{
 			location->Status = Noise;
 		}
@@ -1012,7 +1012,7 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
 			else
 			{
 				location->Position = position_a.Point;
-				location->Status   = Noise;
+				location->Status   = InvalidPoint;
 			}
 		}
 	}
@@ -1023,9 +1023,13 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
 		{
 			location->Status = BlindZone;
 		}
-		else
+		else if((2 == data_ul.status) || (2 == data_ur.status))
 		{
 			location->Status = Noise;
+		}
+		else
+		{
+			location->Status = InvalidPoint;
 		}
 	}
 }
@@ -1038,14 +1042,7 @@ void Ultrasonic::BodyTriangleCalculate(int8_t type,Location position_a,Location 
  * */
 void Ultrasonic::GroundTriangleCalculate(VehicleState *vehicle,ObstacleLocationPacket body,ObstacleLocationPacket *ground)
 {
-//	if(Normal == body.Status)
-//	{
-		ground->Position = vehicle->getPosition() + body.Position.rotate(vehicle->getYaw());
-//	}
-//	else
-//	{
-//		ground->Position = Vector2d(0,0);
-//	}
+	ground->Position = vehicle->getPosition() + body.Position.rotate(vehicle->getYaw());
 	ground->Status   = body.Status;
 }
 
