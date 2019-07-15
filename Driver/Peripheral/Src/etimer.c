@@ -21,6 +21,11 @@ uint16_t cmp_value_array[5][2]={
 		{4999,9999},
 		{9999,4999},
 		{9999,4999}
+//		{4999,24999},
+//		{9999,4999},
+//		{9999,4999},
+//		{4999,9999},
+//		{4999,9999}
 };
 
 uint8_t cmp1_cnt = 0,cmp2_cnt;
@@ -338,26 +343,29 @@ void eTimer1_OutputInit(void)
 {
     ETIMER_1.ENBL.R = 0x0;					// disable Timer1 channels
 
-    ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+    ETIMER_1.CH[5].COMP1.R  = 24999;
+    ETIMER_1.CH[5].COMP2.R  = 3999;
+
+    ETIMER_1.CH[5].CMPLD1.R = 5999;
+    ETIMER_1.CH[5].CMPLD2.R = 8999;
+
+    ETIMER_1.CH[5].CCCTRL.B.CLC1 = 2;
+    ETIMER_1.CH[5].CCCTRL.B.CLC2 = 5;
+
+
     ETIMER_1.CH[5].CTRL1.B.PRISRC = 0x18;
     ETIMER_1.CH[5].CTRL1.B.ONCE = 0;
     ETIMER_1.CH[5].CTRL1.B.DIR = 0;
     ETIMER_1.CH[5].CTRL1.B.LENGTH = 1;
+
+    ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
 
     ETIMER_1.CH[5].CTRL2.B.OEN = 1;
     ETIMER_1.CH[5].CTRL2.B.OUTMODE = 4;
 
     ETIMER_1.CH[5].CTRL3.B.DBGEN   = 1;
 
-    ETIMER_1.CH[5].COMP1.R  = 24999;
-    ETIMER_1.CH[5].COMP2.R  = 4999;
-
-    ETIMER_1.CH[5].CMPLD1.R = 4999;
-    ETIMER_1.CH[5].CMPLD2.R = 9999;
-
-    ETIMER_1.CH[5].CCCTRL.B.CLC1 = 2;
-    ETIMER_1.CH[5].CCCTRL.B.CLC2 = 5;
-
+    ETIMER_1.CH[5].STS.R = 0xffff;
     /*
      * Interrupt an DMA Enable
      * */
@@ -370,6 +378,9 @@ void eTimer1_OutputInit(void)
     SIUL2.MSCR[PA5].B.OBE = 1;    /* PA5: Enable pad for output - eTimer1 ch5 */
     SIUL2.MSCR[PA5].B.SRC = 3;    //Maximum slew rate
     SIUL2.MSCR[PA5].B.SSS = 2;    /* eTimer0 ch5: connected to pad PA5 */
+
+	cmp1_cnt = 1;
+	cmp2_cnt = 1;
 
     ETIMER_1.ENBL.R = 0x0020;			// Enable Timer1 channel 0 5
 
@@ -420,62 +431,188 @@ void eTimer2_OutputInit(void)
 
 void eTimer1Channel5OutputStart(void)
 {
-//	ETIMER_1.CH[5].CNTR.R = 0;
-//    ETIMER_1.CH[5].COMP1.R  = 9999;
-//    ETIMER_1.CH[5].COMP2.R  = 4999;
+    ETIMER_1.CH[5].COMP1.R  = cmp_value_array[0][0];
+    ETIMER_1.CH[5].COMP2.R  = cmp_value_array[0][1];
+	ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[1][0];
+	ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[1][1];
 
+	ETIMER_1.CH[5].CTRL1.B.ONCE = 0;
     ETIMER_1.CH[5].CTRL2.B.OEN = 1;
     ETIMER_1.CH[5].CTRL2.B.OUTMODE = 4;
 	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
 
     SIUL2.MSCR[PA5].B.OBE = 1;    /* PA5: Enable pad for output - eTimer1 ch5 */
-    SIUL2.MSCR[PA5].B.SRC = 1;    //Maximum slew rate
+    SIUL2.MSCR[PA5].B.SRC = 3;    //Maximum slew rate
     SIUL2.MSCR[PA5].B.SSS = 2;    /* eTimer0 ch5: connected to pad PA5 */
     SIUL2.MSCR[PA5].B.IBE = 0;    /* PA5: Enable pad for input - eTimer1 ch5 */
 	SIUL2.MSCR[PA5].B.PUS = 0;
 	SIUL2.MSCR[PA5].B.PUE = 0;
-//
+
 //    ETIMER_1.CH[5].CMPLD1.R = 4999;
 //    ETIMER_1.CH[5].CMPLD2.R = 9999;
+	cmp1_cnt = 0;
+	cmp2_cnt = 0;
+
 }
 
 void eTimer1Channel5OutputStop(void)
 {
 	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 0;
+
     ETIMER_1.CH[5].CTRL2.B.OEN = 0;
     ETIMER_1.CH[5].CTRL2.B.OUTMODE = 0;
 
-	SIUL2.MSCR[PA5].B.OBE = 0;    /* PA5: Enable pad for output - eTimer1 ch5 */
-	SIUL2.MSCR[PA5].B.IBE = 1;    /* PA5: Enable pad for input - eTimer1 ch5 */
+//	SIUL2.MSCR[PA5].B.OBE = 0;    /* PA5: Enable pad for output - eTimer1 ch5 */
+//	SIUL2.MSCR[PA5].B.IBE = 1;    /* PA5: Enable pad for input - eTimer1 ch5 */
 //	SIUL2.MSCR[PA5].B.PUS = 1;
 //	SIUL2.MSCR[PA5].B.PUE = 1;
-	SIUL2.MSCR[PA5].B.SSS = 0;    /* eTimer0 ch5: connected to pad PA5 */
+	SIUL2.MSCR[PA5].B.SSS = 0;  /* eTimer0 ch5: connected to pad PA5 */
+	SIUL2.GPDO[PA5].B.PDO = 1;
     SIUL2.IMCR[70].B.SSS = 1;   /* eTimer0 ch1: connected to pad PA5 */
-//	ETIMER_1.CH[5].CTRL2.B.OEN = 0;
 }
 
+/*
+ * Wait finish send ,this function ocupy the cpu time
+ * */
+void eTimer1_Channel5SendWakeUp(void)//ONce moudle
+{
+
+    SIUL2.MSCR[PA5].B.OBE = 1;    /* PA5: Enable pad for output - eTimer1 ch5 */
+    SIUL2.MSCR[PA5].B.SRC = 3;    //Maximum slew rate
+    SIUL2.MSCR[PA5].B.SSS = 2;    /* eTimer0 ch5: connected to pad PA5 */
+    SIUL2.MSCR[PA5].B.IBE = 0;    /* PA5: Enable pad for input - eTimer1 ch5 */
+	SIUL2.MSCR[PA5].B.PUS = 0;
+	SIUL2.MSCR[PA5].B.PUE = 0;
+
+    ETIMER_1.CH[5].COMP1.R  = cmp_value_array[0][0];
+    ETIMER_1.CH[5].COMP2.R  = cmp_value_array[0][1];
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[1][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[1][1];
+
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[2][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[2][1];
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[2][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[2][1];
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[4][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[4][1];
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+//	SIUL2.MSCR[PA5].B.OBE = 0;    /* PA5: Enable pad for output - eTimer1 ch5 */
+//	SIUL2.MSCR[PA5].B.IBE = 1;    /* PA5: Enable pad for input - eTimer1 ch5 */
+//	SIUL2.MSCR[PA5].B.PUS = 1;
+//	SIUL2.MSCR[PA5].B.PUE = 1;
+	SIUL2.MSCR[PA5].B.SSS = 0;  /* eTimer0 ch5: connected to pad PA5 */
+	SIUL2.GPDO[PA5].B.PDO = 1;
+    SIUL2.IMCR[70].B.SSS = 1;   /* eTimer0 ch1: connected to pad PA5 */
+}
+
+
+void eTimer1_Channel5Send_ID(void)//ONce moudle
+{
+
+    SIUL2.MSCR[PA5].B.OBE = 1;    /* PA5: Enable pad for output - eTimer1 ch5 */
+    SIUL2.MSCR[PA5].B.SRC = 3;    //Maximum slew rate
+    SIUL2.MSCR[PA5].B.SSS = 2;    /* eTimer0 ch5: connected to pad PA5 */
+    SIUL2.MSCR[PA5].B.IBE = 0;    /* PA5: Enable pad for input - eTimer1 ch5 */
+	SIUL2.MSCR[PA5].B.PUS = 0;
+	SIUL2.MSCR[PA5].B.PUE = 0;
+
+    ETIMER_1.CH[5].COMP1.R  = cmp_value_array[0][0];
+    ETIMER_1.CH[5].COMP2.R  = cmp_value_array[0][1];
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[1][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[1][1];
+
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[2][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[2][1];
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[3][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[3][1];
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[4][0];
+    ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[4][1];
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+	ETIMER_1.CH[5].CTRL1.B.CNTMODE = 1;
+	while(ETIMER_1.CH[5].STS.B.TCF2 != 1);
+	ETIMER_1.CH[5].STS.B.TCF2 = 1;
+
+	SIUL2.MSCR[PA5].B.OBE = 0;    /* PA5: Enable pad for output - eTimer1 ch5 */
+	SIUL2.MSCR[PA5].B.IBE = 1;    /* PA5: Enable pad for input - eTimer1 ch5 */
+	SIUL2.MSCR[PA5].B.PUS = 1;
+	SIUL2.MSCR[PA5].B.PUE = 1;
+	SIUL2.MSCR[PA5].B.SSS = 0;  /* eTimer0 ch5: connected to pad PA5 */
+//	SIUL2.GPDO[PA5].B.PDO = 0;
+    SIUL2.IMCR[70].B.SSS = 1;   /* eTimer0 ch1: connected to pad PA5 */
+}
 void eTimer1_Channel5_Isr(void)
 {
-	if(ETIMER_1.CH[5].STS.B.TCF1 == 1)
+	if(ETIMER_1.CH[5].STS.B.TCF == 1)
 	{
-//		cmp1_cnt = (cmp1_cnt + 1) % 2;
-//	    ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[cmp1_cnt][0];
-//		pulse_sum_cnt++;
-
-		ETIMER_1.CH[5].STS.B.TCF1 = 1;
-	}
-	else if(ETIMER_1.CH[5].STS.B.TCF2 == 1)
-	{
-		if(cmp2_cnt == 0)
+		cmp2_cnt++;
+		if( cmp2_cnt % 2 )//comp1
 		{
-			eTimer1Channel5OutputStop();
+			if(cmp2_cnt < 6)// 1 3 5
+			{
+				ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[(cmp2_cnt + 1) / 2 + 1][0];
+			}
+			else if(cmp2_cnt == 7)
+			{
+				ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[0][0];
+			}
 		}
-		cmp2_cnt = (cmp2_cnt + 1) % 5;
+		else
+		{
+			if(cmp2_cnt < 7)// 2 4 6
+			{
+				ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[cmp2_cnt/2 + 1][1];
+			}
+			else if(cmp2_cnt == 8)
+			{
+				ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[0][1];
+				ETIMER_1.CH[5].CTRL1.B.ONCE = 1;
+			}
+			else if(cmp2_cnt == 10)
+			{
+				eTimer1Channel5OutputStop();
+			}
+			else
+			{
 
-		ETIMER_1.CH[5].CMPLD2.R = cmp_value_array[cmp2_cnt][1];
-		ETIMER_1.CH[5].CMPLD1.R = cmp_value_array[cmp2_cnt][0];
-
-		ETIMER_1.CH[5].STS.B.TCF2 = 1;
+			}
+		}
+		ETIMER_1.CH[5].STS.B.TCF = 1;
 	}
 
 }
