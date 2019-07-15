@@ -65,6 +65,11 @@ public:
 	uint8_t getEMS_QEC_ACC();
 	void    setEMS_QEC_ACC(uint8_t value);
 	Property<ChangAnMessage,uint8_t,READ_WRITE> EMS_QEC_ACC;
+
+	// EMS
+	uint8_t getACM_APA_RequestEnable();
+	void    setACM_APA_RequestEnable(uint8_t value);
+	Property<ChangAnMessage,uint8_t,READ_WRITE> ACM_APA_RequestEnable;
 private:
 	/*** Receive messege form vehicle ***/
 	//
@@ -85,6 +90,10 @@ private:
 
 	// EMS
 	uint8_t ems_qec_acc;
+
+	// ACM
+	uint8_t _acm_apa_request_enable;
+
 };
 
 #endif /* CANBUS_CHANGAN_CHANG_AN_MESSAGE_H_ */
