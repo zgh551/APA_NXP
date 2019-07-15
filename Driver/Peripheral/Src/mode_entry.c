@@ -138,9 +138,63 @@ void PLL_200MHz(void)
   while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
 }
 
+static void PLL_200MHz_DEVKIT(void)
+{
+	/* PBRIDGEx_CLK Divide */
+	MC_CGM.SC_DC0.B.DIV = 3;  /* Freq = sysclk / (0+1) = sysclk */
+	MC_CGM.SC_DC0.B.DE  = 1;  /* Enable divided clock */
+
+	/* Connect XOSC to PLL. We ultimately use the output of PLL1. PLL1 must be fed the output of PLL0 */
+	MC_CGM.AC3_SC.B.SELCTL = 1; //8 MHz XOSC selected as input of PLL0
+
+	MC_CGM.AC4_SC.B.SELCTL=0b11; //PLL0_PHI1 selected as input of PHI1
+
+	/*
+	 * MOTC_CLK
+	 * */
+    MC_CGM.AC0_SC.B.SELCTL = 2;    // Select PLL0 for auxiliary clock 0
+    MC_CGM.AC0_DC0.R = 0x80010000;    // MOTC_CLK : Enable aux clk 0 div by 2 ?(100 MHz)
+
+    /*
+     * CAN_PLL_CLK
+     * */
+//	MC_CGM.AC2_DC0.B.DIV = 1;// set the divider division value
+//	MC_CGM.AC2_DC0.B.DE = 1; // Enable the auxiliary clock2 divider 0
+
+	PeripheralClockGating();
+  /* Configure PLL0 Dividers - 200MHz from 8Mhx XOSC */
+  /* PLL input = FXOSC = 8MHz
+     VCO range = 18 - 2032MHz
+     MPC5744P uses PLL1 for fractional divide options.
+     Configure PLL1 first, because it depends on PLL0. So configure while
+     PLL0 still off
+  */
+
+  /* Program PLL1 to same frequency as PLL0.
+   * MFD multiplies input by at least 16. So multiply by 16 and divide by 32.
+   * 10/10 = 1, so same frequency as PLL0
+   */
+  PLLDIG.PLL1DV.B.RFDPHI = 16;
+  PLLDIG.PLL1DV.B.MFD = 16;
+
+  /* Configure PLL0 to 200 MHz. */
+  PLLDIG.PLL0DV.B.RFDPHI1 = 4 ;
+  PLLDIG.PLL0DV.B.RFDPHI  = 4 ;
+  PLLDIG.PLL0DV.B.PREDIV  = 1 ;
+  PLLDIG.PLL0DV.B.MFD     = 20;
+
+  /* switch to PLL */
+  MC_ME.DRUN_MC.R = 0x00130072;
+  MC_ME.MCTL.R = 0x30005AF0;
+  MC_ME.MCTL.R = 0x3000A50F;
+  while(!MC_ME.GS.B.S_PLL0);      //ME_GS Wait for PLL stabilization.
+  while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
+}
+
 void SystemClockConfigure(void)
 {
-  PLL_200MHz();
+//  PLL_200MHz();
+	PLL_200MHz_DEVKIT();
 
   AIPS_0.MPRA.R |= 0x77777770;       /* All masters have RW & user level access */
   AIPS_1.MPRA.R |= 0x77777770;       /* All masters have RW & user level access */
