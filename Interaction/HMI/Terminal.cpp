@@ -836,6 +836,7 @@ void Terminal::Push(Percaption *p)
 void Terminal::Push(UltrasonicObstaclePercption p)
 {
 	CAN_Packet m_CAN_Packet;
+	uint16_t temp_uint16;
 
 	m_CAN_Packet.id = 0x44A;
 	m_CAN_Packet.length = 8;
@@ -849,6 +850,19 @@ void Terminal::Push(UltrasonicObstaclePercption p)
 	m_CAN_Packet.data[5] = (uint8_t)(p.getLocationListLength()  & 0xff);
 	m_CAN_Packet.data[6] = (uint8_t)(p.getLeftEdgeListLength()  & 0xff);
 	m_CAN_Packet.data[7] = (uint8_t)(p.getRightEdgeListLength() & 0xff);
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x44D;
+	temp_uint16 = p.getObstacleDistance().distance * 10000;
+	m_CAN_Packet.data[0] = (uint8_t)( temp_uint16       & 0xff);
+	m_CAN_Packet.data[1] = (uint8_t)((temp_uint16 >> 8) & 0xff);
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = (uint8_t)p.getObstacleDistance().status;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
