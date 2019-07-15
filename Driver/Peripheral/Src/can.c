@@ -196,7 +196,7 @@ void FlexCAN2_Init(void) {              /* General init. No MB IDs iniialized */
 	CAN_2.MCR.B.HALT = 0;
 	while (CAN_2.MCR.B.FRZACK & CAN_2.MCR.B.NOTRDY) {} /* Wait to clear */
 	/* Good practice: wait for FRZACK on freeze mode entry/exit */
-	INTC_0.PSR[550].R = 0x800B;
+	INTC_0.PSR[550].R = 0x800F;
 }
 
 void CAN_Configure()
@@ -208,48 +208,48 @@ void CAN_Configure()
 
 void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
 {
-	vuint8_t i;
-	CAN_0.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
-	CAN_0.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
-	CAN_0.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
-	for (i=0; i<m_CAN_Packet.length; i++)
-	{
-		CAN_0.MB[0].DATA.B[i] = m_CAN_Packet.data[i];      /* Data to be transmitted */
-	}
-	CAN_0.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
-	CAN_0.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
-	CAN_0.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
-	while(CAN_0.MB[0].CS.B.CODE != 0x8 ){}
+//	vuint8_t i;
+//	CAN_0.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
+//	CAN_0.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
+//	CAN_0.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
+//	for (i=0; i<m_CAN_Packet.length; i++)
+//	{
+//		CAN_0.MB[0].DATA.B[i] = m_CAN_Packet.data[i];      /* Data to be transmitted */
+//	}
+//	CAN_0.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
+//	CAN_0.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
+//	CAN_0.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
+//	while(CAN_0.MB[0].CS.B.CODE != 0x8 ){}
 }
 
 void CAN1_TransmitMsg(CAN_Packet m_CAN_Packet)
 {
-	vuint8_t i;
-	CAN_1.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
-	CAN_1.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
-	CAN_1.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
-	for (i=0; i<m_CAN_Packet.length; i++)
-	{
-		CAN_1.MB[0].DATA.B[i] = m_CAN_Packet.data[i];      /* Data to be transmitted */
-	}
-	CAN_1.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
-	CAN_1.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
-	CAN_1.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
-	while(CAN_1.MB[0].CS.B.CODE != 0x8 ){}
+//	vuint8_t i;
+//	CAN_1.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
+//	CAN_1.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
+//	CAN_1.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
+//	for (i=0; i<m_CAN_Packet.length; i++)
+//	{
+//		CAN_1.MB[0].DATA.B[i] = m_CAN_Packet.data[i];      /* Data to be transmitted */
+//	}
+//	CAN_1.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
+//	CAN_1.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
+//	CAN_1.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
+//	while(CAN_1.MB[0].CS.B.CODE != 0x8 ){}
 }
 
 void CAN2_TransmitMsg(CAN_Packet m_CAN_Packet)
 {
-	vuint8_t i;
-	CAN_2.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
-	CAN_2.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
-	CAN_2.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
-	for (i=0; i<m_CAN_Packet.length; i++)
-	{
-		CAN_2.MB[0].DATA.B[i] = m_CAN_Packet.data[i];      /* Data to be transmitted */
-	}
-	CAN_2.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
-	CAN_2.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
-	CAN_2.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
-	while(CAN_2.MB[0].CS.B.CODE != 0x8 ){}
+//	vuint8_t i;
+//	CAN_2.MB[0].CS.B.IDE = 0;       /* Use standard ID length */
+//	CAN_2.MB[0].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
+//	CAN_2.MB[0].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
+//	for (i=0; i<m_CAN_Packet.length; i++)
+//	{
+//		CAN_2.MB[0].DATA.B[i] = m_CAN_Packet.data[i];      /* Data to be transmitted */
+//	}
+//	CAN_2.MB[0].CS.B.DLC = m_CAN_Packet.length; /*#bytes to transmit w/o null*/
+//	CAN_2.MB[0].CS.B.SRR = 1;     /* Tx frame (not req'd for standard frame)*/
+//	CAN_2.MB[0].CS.B.CODE =0xC;   /* Activate msg. buf. to transmit data frame */
+//	while(CAN_2.MB[0].CS.B.CODE != 0x8 ){}
 }
