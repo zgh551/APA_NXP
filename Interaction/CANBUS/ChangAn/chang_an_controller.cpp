@@ -109,10 +109,10 @@ void ChangAnController::Update(APAControlCommand cmd)
 
 }
 
-void ChangAnController::Push(float dt)
+void ChangAnController::Push(void)
 {
-	this->SteeringAngleControl(dt);
-	this->VehicleContorl();
+	VehicleContorlNew();
+//	VehicleContorl();
 }
 
 void ChangAnController::VehicleContorlStep1()
@@ -229,6 +229,75 @@ void ChangAnController::VehicleContorlStep3()
 	CAN1_TransmitMsg(m_CAN_Packet);
 }
 
+void ChangAnController::VehicleContorlNew()
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x111;
+	m_CAN_Packet.length = 8;
+	/// data buffer
+	/* ACC */
+	_current_target_acceleration_ACC = (uint8_t)((Acceleration + 5.0)*20);
+	_current_target_acceleration_enable_single = AccelerationEnable;
+	/* AEB */
+	_current_target_deceleration_AEB = (uint16_t)((Deceleration + 16.0) * 2000);
+	_current_target_deceleration_enable_single = DecelerationEnable;
+	/* Torque */
+	_current_torque = (uint16_t)(Torque * 10.22);
+	_current_torque_enable_single = TorqueEnable;
+	/* Steering Angle */
+	_current_steering_angle_target = (int16_t)(_steering_angle_set * 10);
+	_current_steering_angle_target_active_single = SteeringEnable;
+
+	/// Data Mapping
+	m_CAN_Packet.data[0] = _current_target_acceleration_ACC;
+	m_CAN_Packet.data[1] = (uint8_t)((_current_target_deceleration_AEB >> 8) & 0xFF);
+	m_CAN_Packet.data[2] = (uint8_t)((_current_target_deceleration_AEB     ) & 0xFF);
+	m_CAN_Packet.data[3] = (uint8_t)( _rolling_counter_torque_AEB & 0x0F);
+	m_CAN_Packet.data[3] = _current_target_acceleration_enable_single ?
+						   (uint8_t) ( m_CAN_Packet.data[3] | 0x80 ) :
+						   (uint8_t) ( m_CAN_Packet.data[3] & 0x7F ) ;
+	m_CAN_Packet.data[3] = _current_target_deceleration_enable_single ?
+						   (uint8_t) ( m_CAN_Packet.data[3] | 0x40 ) :
+						   (uint8_t) ( m_CAN_Packet.data[3] & 0xBF ) ;
+	m_CAN_Packet.data[4] = (uint8_t)((_current_torque >> 2) & 0xFF);
+	m_CAN_Packet.data[5] = (uint8_t)((_current_torque << 6) & 0xC0);
+	m_CAN_Packet.data[5] = _current_torque_enable_single              ?
+						   (uint8_t) ( m_CAN_Packet.data[5] | 0x20 ) :
+						   (uint8_t) ( m_CAN_Packet.data[5] & 0xDF ) ;
+
+	m_CAN_Packet.data[5] = (uint8_t) ((m_CAN_Packet.data[5] & 0xFC ) |
+									  ( _current_steering_angle_target_active_single & 0x03));
+	m_CAN_Packet.data[6] = (uint8_t)((_current_steering_angle_target >> 8) & 0xFF);
+	m_CAN_Packet.data[7] = (uint8_t)((_current_steering_angle_target     ) & 0xFF);
+	CAN0_TransmitMsg(m_CAN_Packet);
+
+
+	m_CAN_Packet.id = 0x112;
+	m_CAN_Packet.length = 8;
+	/// data buffer
+	_current_gear = Gear;
+	_current_gear_enable_single = GearEnable;
+//	_current_gear_valid_single = GearEnable;
+	/// data mapping
+	m_CAN_Packet.data[0] = 0;
+	m_CAN_Packet.data[1] = 0;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+	m_CAN_Packet.data[4] = 0;
+
+	m_CAN_Packet.data[5] = (uint8_t)((_current_gear << 4 ) & 0x70);
+	m_CAN_Packet.data[5] = _current_gear_enable_single          ?
+						   (uint8_t) ( m_CAN_Packet.data[5] | 0x80 ) :
+						   (uint8_t) ( m_CAN_Packet.data[5] & 0x7F ) ;
+	m_CAN_Packet.data[5] = _current_gear_valid_single          ?
+						   (uint8_t) ( m_CAN_Packet.data[5] | 0x08 ) :
+						   (uint8_t) ( m_CAN_Packet.data[5] & 0xF7 ) ;
+
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN0_TransmitMsg(m_CAN_Packet);
+}
+
 void ChangAnController::VehicleContorl()
 {
 	VehicleContorlStep1();
@@ -240,7 +309,7 @@ void ChangAnController::VehicleContorl()
 	_rolling_counter_gear_control++;
 }
 
-void ChangAnController::SteeringAngleControl(float dt)
+void ChangAnController::SteeringAngleControl(float dt,float steer_angle)
 {
     float da = SteeringAngleRate * dt;
     float left_target_angle = SteeringAngle - da;
@@ -249,10 +318,12 @@ void ChangAnController::SteeringAngleControl(float dt)
     if(_steering_angle_set < left_target_angle)
     {
     	_steering_angle_set += da;
+//    	_steering_angle_set = steer_angle + da;
     }
     else if(_steering_angle_set > right_target_angle)
     {
     	_steering_angle_set -= da;
+//    	_steering_angle_set = steer_angle - da;
     }
     else
     {
@@ -280,7 +351,7 @@ void ChangAnController::SteeringAngleControlStateMachine(uint8_t fd)
 			break;
 
 		case WaitExistState:
-			if( (!fd) | ( 0 == SteeringEnable ))
+			if( (!fd) || ( 0 == SteeringEnable ))
 			{
 				_steerig_angle_active_control_state = WaitSteeringAngleControlSingleState;
 			}
@@ -289,5 +360,58 @@ void ChangAnController::SteeringAngleControlStateMachine(uint8_t fd)
 		default:
 			_steerig_angle_active_control_state = WaitSteeringAngleControlSingleState;
 			break;
+	}
+}
+
+void ChangAnController::GearControlStateMachine(uint8_t fd)
+{
+	switch(_gear_active_control_state)
+	{
+	case WaitGearControlState:
+		if(GearEnable == 1)
+		{
+			_gear_active_control_state = WaitGearFeedbackSingleState;
+		}
+		break;
+
+	case WaitGearFeedbackSingleState:
+		if(fd == 1)
+		{
+			_current_gear_valid_single = 1;
+			_gear_active_control_state = WaitGearExistState;
+		}
+		break;
+
+	case WaitGearExistState:
+		if((GearEnable == 0) || (!fd))
+		{
+			_gear_active_control_state = WaitGearControlState;
+		}
+		break;
+
+	default:
+
+		break;
+
+	}
+}
+
+void ChangAnController::EnableControl()
+{
+	if(APAEnable)
+	{
+		if(0 == SteeringEnable)
+		{
+			SteeringEnable  = 1;
+		}
+		GearEnable 	        = 1;
+		AccelerationEnable  = 1;
+//		DecelerationEnable  = 1;
+		TorqueEnable 	    = 1;
+		VelocityEnable      = 1;
+	}
+	else
+	{
+		Stop();
 	}
 }

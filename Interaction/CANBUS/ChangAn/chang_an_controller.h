@@ -28,6 +28,12 @@ typedef enum _SteeringAngleActiveControl
 	WaitExistState
 }SteeringAngleActiveControl;
 
+typedef enum _GearActiveControlState
+{
+	WaitGearControlState = 0,
+	WaitGearFeedbackSingleState,
+	WaitGearExistState
+}GearActiveControlState;
 
 class ChangAnController : public VehicleController
 {
@@ -57,24 +63,30 @@ public:
 	void Update(ControlCommand cmd) override;
 	void Update(APAControlCommand cmd) override;
 
-	// push the command to the vehicle
-	void Push(float dt);
+	// push the command to the vehiclevoid
+	void Push();
 
 	/*** Function ***/
 	// Vehicle control command function
 	void VehicleContorlStep1();
 	void VehicleContorlStep2();
 	void VehicleContorlStep3();
+
+	void VehicleContorlNew();
 	void VehicleContorl();
 
 	// Steeing angle control base on the angle speed
-	void SteeringAngleControl(float dt);
+	void SteeringAngleControl(float dt,float steer_angle);
 
 	// Steering Angle control state machine
 	void SteeringAngleControlStateMachine(uint8_t fd);
 
+	void GearControlStateMachine(uint8_t fd);
+
+	void EnableControl();
 private:
 	SteeringAngleActiveControl _steerig_angle_active_control_state;
+	GearActiveControlState     _gear_active_control_state;
 	/*** Send to Vehicle Messege ***/
 	/* Roolling Counter */
 	uint8_t _rolling_counter_torque_AEB;
