@@ -172,6 +172,9 @@ void eTimer2_OutputInit(void);
 
 void eTimer1Channel5OutputStart(void);
 
+void eTimer1_Channel5SendWakeUp(void);
+void eTimer1_Channel5Send_ID();
+
 #ifdef __cplusplus
 }
 #endif
