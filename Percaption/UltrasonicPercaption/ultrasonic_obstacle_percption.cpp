@@ -826,19 +826,34 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatance(Ultrasonic *u,Mess
 {
 	uint8_t i;
 	float distance,current_distance;
+//	float direct_distance,direct_current_distance;
 	uint8_t over_detection_cnt;
-	if(Reverse == msg->Gear)
+	Vector2d LF_P,RF_P,LR_P,RR_P;
+
+	if((Drive == msg->Gear) || (Neutral == msg->Gear))
 	{
-		distance = 0;
+		distance = 6;
 		over_detection_cnt = 0;
+		LF_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX(), LEFT_EDGE_TO_CENTER);
+		RF_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX(),-RIGHT_EDGE_TO_CENTER);
 		for(i = 0; i < 4; i++)
 		{
 			if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
 			{
-				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX());
+				if(u->AbstacleBodyPositionTriangle[i].Position.getY() > 0.93)
+				{
+					current_distance = (u->AbstacleBodyPositionTriangle[i].Position - LF_P).Length();
+				}
+				else if(u->AbstacleBodyPositionTriangle[i].Position.getY() < -0.93)
+				{
+					current_distance = (u->AbstacleBodyPositionTriangle[i].Position - RF_P).Length();
+				}
+				else
+				{
+					current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX());
+				}
 				distance = current_distance < distance ? current_distance : distance;
 				_obstacle_distance.status = Normal;
-
 			}
 			else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
 			{
@@ -850,22 +865,42 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatance(Ultrasonic *u,Mess
 			{
 				over_detection_cnt++;
 			}
-			else
+			else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
 			{
 				distance                  = 0;
 				_obstacle_distance.status = Noise;
 			}
+//			direct_distance = 6;
+//			if(Normal == u->UltrasonicPacket[i].status)
+//			{
+//				direct_current_distance = u->UltrasonicPacket[i].Distance1;
+//				direct_distance = direct_current_distance < direct_distance ? direct_current_distance : direct_distance;
+//			}
 		}
 	}
-	else if(Drive == msg->Gear)
+	else if(Reverse == msg->Gear)
 	{
-		distance = 0;
+		distance = 6;
 		over_detection_cnt = 0;
+		LR_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX(), LEFT_EDGE_TO_CENTER);
+		RR_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX(),-RIGHT_EDGE_TO_CENTER);
 		for(i = 4;i < 8;i++)
 		{
+
 			if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
 			{
-				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX());
+				if(u->AbstacleBodyPositionTriangle[i].Position.getY() > 0.93)
+				{
+					current_distance = (u->AbstacleBodyPositionTriangle[i].Position - LR_P).Length();
+				}
+				else if(u->AbstacleBodyPositionTriangle[i].Position.getY() < -0.93)
+				{
+					current_distance = (u->AbstacleBodyPositionTriangle[i].Position - RR_P).Length();
+				}
+				else
+				{
+					current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX());
+				}
 				distance = current_distance < distance ? current_distance : distance;
 				_obstacle_distance.status = Normal;
 			}
@@ -879,7 +914,7 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatance(Ultrasonic *u,Mess
 			{
 				over_detection_cnt++;
 			}
-			else
+			else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
 			{
 				distance                  = 0;
 				_obstacle_distance.status = Noise;
