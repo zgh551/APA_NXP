@@ -69,24 +69,29 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			_vcu_apa_control_st = (uint8_t)(( data[0] >> 5 ) & 0x03);
 			break;
 
-			case 0xA3://ESC
-				if( 0 == ((data[0] >> 7) & 0x01))
-				{
-					WheelSpeedFrontLeft  = ((uint16_t)(((data[0] & 0x7F) << 8) | data[1])) * V_M_S;
-				}
-				if( 0 == ((data[2] >> 7) & 0x01))
-				{
-					WheelSpeedFrontRight  = ((uint16_t)(((data[2] & 0x7F) << 8) | data[3])) * V_M_S;
-				}
-				if( 0 == ((data[4] >> 7) & 0x01))
-				{
-					WheelSpeedRearLeft  = ((uint16_t)(((data[4] & 0x7F) << 8) | data[5])) * V_M_S;
-				}
-				if( 0 == ((data[6] >> 7) & 0x01))
-				{
-					WheelSpeedRearRight  = ((uint16_t)(((data[6] & 0x7F) << 8) | data[7])) * V_M_S;
-				}
-				break;
+		case 0xA0:
+			VehicleMiddleSpeed      = (uint16_t)((data[6] << 8) | data[7]) * V_M_S;
+			VehicleMiddleSpeedValid = (uint8_t)((data[3] >> 1) & 0x01);
+			break;
+
+		case 0xA3://ESC
+			if( 0 == ((data[0] >> 7) & 0x01))
+			{
+				WheelSpeedFrontLeft  = ((uint16_t)(((data[0] & 0x7F) << 8) | data[1])) * V_M_S;
+			}
+			if( 0 == ((data[2] >> 7) & 0x01))
+			{
+				WheelSpeedFrontRight  = ((uint16_t)(((data[2] & 0x7F) << 8) | data[3])) * V_M_S;
+			}
+			if( 0 == ((data[4] >> 7) & 0x01))
+			{
+				WheelSpeedRearLeft  = ((uint16_t)(((data[4] & 0x7F) << 8) | data[5])) * V_M_S;
+			}
+			if( 0 == ((data[6] >> 7) & 0x01))
+			{
+				WheelSpeedRearRight  = ((uint16_t)(((data[6] & 0x7F) << 8) | data[7])) * V_M_S;
+			}
+			break;
 
 			case 0xA6://ESC
 				if( 0 == ((data[5] >> 7) & 0x01))
@@ -95,11 +100,11 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 				}
 				if( 0 == ((data[5] >> 6) & 0x01))
 				{
-					WheelPulseRearLeft   = (uint16_t)(((data[1] & 0x3f) << 4) | ((data[2] >> 4) & 0x0f));
+					WheelPulseFrontRight  = (uint16_t)(((data[1] & 0x3f) << 4) | ((data[2] >> 4) & 0x0f));
 				}
 				if( 0 == ((data[5] >> 5) & 0x01))
 				{
-					WheelPulseFrontRight = (uint16_t)(((data[2] & 0x0f) << 6) | ((data[3] >> 2) & 0x3f));
+					WheelPulseRearLeft = (uint16_t)(((data[2] & 0x0f) << 6) | ((data[3] >> 2) & 0x3f));
 				}
 				if( 0 == ((data[5] >> 4) & 0x01))
 				{
