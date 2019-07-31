@@ -1,1 +1,0 @@
-The SWLIBS_DEFAULT_IMPLEMENTATION macro should be defined in the SWLIBS_Config.h file located in $project_name/include directory
