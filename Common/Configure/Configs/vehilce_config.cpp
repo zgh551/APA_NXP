@@ -52,6 +52,21 @@ VehilceConfig::VehilceConfig() {
 	UltrasonicLocationArray.setContainer(this);
 	UltrasonicLocationArray.getter(&VehilceConfig::getUltrasonicLocationArray);
 
+	AccelerateTable.setContainer(this);
+	AccelerateTable.getter(&VehilceConfig::getAccelerateTable);
+
+	VelocityTable.setContainer(this);
+	VelocityTable.getter(&VehilceConfig::getVelocityTable);
+
+	TorqueTable.setContainer(this);
+	TorqueTable.getter(&VehilceConfig::getTorqueTable);
+
+	AccNum.setContainer(this);
+	AccNum.getter(&VehilceConfig::getAccNum);
+
+	VlcNum.setContainer(this);
+	VlcNum.getter(&VehilceConfig::getVlcNum);
+
 	Init();
 }
 
@@ -61,6 +76,8 @@ VehilceConfig::~VehilceConfig() {
 
 void VehilceConfig::Init()
 {
+	uint8_t i;
+
 	FrontDiagonalAxis = sqrtf( powf(LEFT_EDGE_TO_CENTER,2) + powf(FRONT_EDGE_TO_CENTER,2));
 	RearDiagonalAxis  = sqrtf( powf(LEFT_EDGE_TO_CENTER,2) + powf(REAR_EDGE_TO_CENTER,2));
 
@@ -114,6 +131,25 @@ void VehilceConfig::Init()
 	_ultrasonic_location_array[11].Point.X = SENSOR12_X;
 	_ultrasonic_location_array[11].Point.Y = SENSOR12_Y;
 	_ultrasonic_location_array[11].Angle   = SENSOR12_ANGLE;
+
+	/*
+	 * 初始化扭矩标定表
+	 * */
+
+	_acc_num = ACC_ARRAY_NUM;
+	_vlc_num  = VELOCITY_ARRAY_NUM;
+	for(i=0;i<ACC_ARRAY_NUM;i++)
+	{
+		_accelerate_table[i] = acc_table[i];
+	}
+	for(i=0;i<VELOCITY_ARRAY_NUM;i++)
+	{
+		_velocity_table[i] = velocity_table[i];
+	}
+	for(i=0;i< (ACC_ARRAY_NUM * VELOCITY_ARRAY_NUM);i++)
+	{
+		_torque_table[i] = torque_table[i/VELOCITY_ARRAY_NUM][i%VELOCITY_ARRAY_NUM];
+	}
 }
 
 // r is + and -
@@ -317,3 +353,11 @@ float VehilceConfig::getRearDiagonalAngle()           { return  _rear_diagonal_a
 void  VehilceConfig::setRearDiagonalAngle(float value){ _rear_diagonal_angle = value;}
 
 Location* VehilceConfig::getUltrasonicLocationArray() { return  _ultrasonic_location_array;}
+
+float* VehilceConfig::getAccelerateTable() { return  _accelerate_table;}
+float* VehilceConfig::getVelocityTable() { return  _velocity_table;}
+float* VehilceConfig::getTorqueTable() { return  _torque_table;}
+
+uint16_t VehilceConfig::getAccNum() { return  _acc_num;}
+uint16_t VehilceConfig::getVlcNum() { return  _vlc_num;}
+

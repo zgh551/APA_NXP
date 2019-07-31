@@ -88,6 +88,21 @@ public:
 
 	Location* getUltrasonicLocationArray();
 	Property<VehilceConfig,Location*,READ_ONLY> UltrasonicLocationArray;
+
+	float* getAccelerateTable();
+	Property<VehilceConfig,float*,READ_ONLY> AccelerateTable;
+
+	float* getVelocityTable();
+	Property<VehilceConfig,float*,READ_ONLY> VelocityTable;
+
+	float* getTorqueTable();
+	Property<VehilceConfig,float*,READ_ONLY> TorqueTable;
+
+	uint16_t getAccNum();
+	Property<VehilceConfig,uint16_t,READ_ONLY> AccNum;
+
+	uint16_t getVlcNum();
+	Property<VehilceConfig,uint16_t,READ_ONLY> VlcNum;
 private:
 	// the diagonal axis of the four edge to the center point and the angle
 	float _front_diagonal_axis;
@@ -101,6 +116,11 @@ private:
 	float _radius_rear_right;
 
 	Location _ultrasonic_location_array[12];
+
+	uint16_t _acc_num,_vlc_num;
+	float _accelerate_table[ACC_ARRAY_NUM];
+	float _velocity_table[VELOCITY_ARRAY_NUM];
+	float _torque_table[ACC_ARRAY_NUM * VELOCITY_ARRAY_NUM];
 };
 
 #endif /* CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_ */
