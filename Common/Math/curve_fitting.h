@@ -1,10 +1,12 @@
-/*
- * curve_fitting.h
- *
- *  Created on: 2019年5月20日
- *      Author: zhuguohua
- */
-
+/*****************************************************************************/
+/* FILE NAME: curve_fitting.h                     COPYRIGHT (c) Motovis 2019 */
+/*                                                       All Rights Reserved */
+/* DESCRIPTION: this class using to fit the curve line  			         */
+/*****************************************************************************/
+/* REV      AUTHOR        DATE              DESCRIPTION OF CHANGE            */
+/* ---   -----------    ----------------    ---------------------            */
+/* 1.0	 Guohua Zhu     May 20 2019         Initial Version                  */
+/*****************************************************************************/
 #ifndef MATH_CURVE_FITTING_H_
 #define MATH_CURVE_FITTING_H_
 
