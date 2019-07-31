@@ -65,36 +65,6 @@ void GeometricTrack::Init(float x,float y,float yaw)
 	_delta_rear_left_pulse  = 0;
 	_delta_rear_right_pulse = 0;
 }
-void GeometricTrack::Init(VehicleBody v)
-{
-	_position.X = v.getCenter().getX();
-	_position.Y = v.getCenter().getY();
-	Yaw = v.AttitudeYaw;
-	_last_yaw = Yaw;
-	LinearVelocity = 0.0f;
-
-	_last_rear_left_pulse   = 0;
-	_last_rear_right_pulse  = 0;
-	_sum_rear_left_pulse    = 0;
-	_sum_rear_right_pulse   = 0;
-	_delta_rear_left_pulse  = 0;
-	_delta_rear_right_pulse = 0;
-}
-void GeometricTrack::Init(Line l)
-{
-	_position.X = l.Point.getX();
-	_position.Y = l.Point.getY();
-	Yaw = l.Angle;
-	_last_yaw = Yaw;
-	LinearVelocity = 0.0f;
-
-	_last_rear_left_pulse   = 0;
-	_last_rear_right_pulse  = 0;
-	_sum_rear_left_pulse    = 0;
-	_sum_rear_right_pulse   = 0;
-	_delta_rear_left_pulse  = 0;
-	_delta_rear_right_pulse = 0;
-}
 
 void GeometricTrack::Init(Percaption *p)
 {
@@ -110,6 +80,11 @@ void GeometricTrack::Init(Percaption *p)
 	_sum_rear_right_pulse   = 0;
 	_delta_rear_left_pulse  = 0;
 	_delta_rear_right_pulse = 0;
+
+	 _cumulation_rear_left_pulse  = 0;
+	 _cumulation_rear_right_pulse = 0;
+
+	_wait_time_cnt = 0;
 }
 
 void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
@@ -136,12 +111,7 @@ void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 
 void GeometricTrack::PulseUpdate(MessageManager *msg)
 {
-	float displacement;
-	float radius;
-
-	LinearRate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft)*0.5;
-	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
-					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
+	float displacement,radius;
 
 	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
 	{
@@ -170,18 +140,51 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 								-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
 								   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
 	}
-
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 
-	if(_delta_rear_right_pulse == _delta_rear_left_pulse)
+	// 速度判定
+	_velocity_line_rate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
+	if(_velocity_line_rate < 0.2f)//低速情形
 	{
-		_turnning_radius = 0;
+		// 累积脉冲达到指定
+		if(msg->WheelSpeedDirection == Forward)
+		{
+
+		}
+		else if(msg->WheelSpeedDirection == Backward)
+		{
+
+		}
+		else if(msg->WheelSpeedDirection == StandStill)
+		{
+
+		}
+		else
+		{
+
+		}
+		 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
+		 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
+		 _cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+		 if(_cumulation_middle_displacement >= 4.0f)
+		 {
+			 LinearVelocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
+		 }
+		 else
+		 {
+			 _wait_time_cnt++;
+		 }
 	}
-	else
+	else// 高速情形
 	{
-		_turnning_radius = WIDTH * 0.5 * (_delta_rear_left_pulse + _delta_rear_right_pulse)/(_delta_rear_right_pulse - _delta_rear_left_pulse);
+		LinearRate = _velocity_line_rate;
 	}
 
+
+
+
+	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
+					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
 	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((uint16_t)fabs(msg->SteeringAngle) < 520))
 	{
@@ -251,6 +254,73 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 		_position.Y = _position.Y + displacement * sinf(_last_yaw + _delta_yaw*0.5);
 	}
 	_last_yaw = Yaw;
+}
+
+void GeometricTrack::df_PulseUpdate(MessageManager *msg)
+{
+//	float displacement;
+
+	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
+	{
+		_delta_rear_left_pulse = 0;
+	}
+	else
+	{
+		_delta_rear_left_pulse =(msg->WheelPulseRearLeft >= _last_rear_left_pulse ? 0 : WHEEL_PUSLE_MAX) +
+								 msg->WheelPulseRearLeft  - _last_rear_left_pulse ;
+	}
+
+	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
+	{
+		_delta_rear_right_pulse = 0;
+	}
+	else
+	{
+		_delta_rear_right_pulse = (msg->WheelPulseRearRight >= _last_rear_right_pulse ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->WheelPulseRearRight  - _last_rear_right_pulse ;
+	}
+
+	// 速度判定
+	_velocity_line_rate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
+	if(_velocity_line_rate < 0.2f)//低速情形
+	{
+		// 累积脉冲达到指定
+		 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
+		 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
+		 _cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+		 if(_cumulation_middle_displacement >= 0.04f)
+		 {
+			 _wait_time_cnt++;
+			 LinearRate = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
+
+			 _cumulation_rear_left_pulse  = 0;
+			 _cumulation_rear_right_pulse = 0;
+			 _wait_time_cnt               = 0;
+		 }
+		 else if(_wait_time_cnt >= 200)
+		 {
+			 LinearRate = 0;
+
+			 _cumulation_rear_left_pulse  = 0;
+			 _cumulation_rear_right_pulse = 0;
+			 _wait_time_cnt               = 0;
+		 }
+		 else
+		 {
+			 _wait_time_cnt++;
+		 }
+	}
+	else// 高速情形
+	{
+		LinearRate = _velocity_line_rate;
+	}
+
+	_sum_rear_left_pulse  += _delta_rear_left_pulse;
+	_sum_rear_right_pulse += _delta_rear_right_pulse;
+
+
+	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
+	_last_rear_right_pulse = msg->WheelPulseRearRight;
 }
 /**************************************************************************************/
 int32_t GeometricTrack::getSumRearLeftPulse()             { return _sum_rear_left_pulse;}
