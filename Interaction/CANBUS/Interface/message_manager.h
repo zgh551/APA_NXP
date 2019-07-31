@@ -62,6 +62,15 @@ public:
 	void  setWheelSpeedRearLeft(float value);
 	Property<MessageManager,float,READ_WRITE> WheelSpeedRearLeft;
 
+	// the middle speed of the vehicle
+	float getVehicleMiddleSpeed();
+	void  setVehicleMiddleSpeed(float value);
+	Property<MessageManager,float,READ_WRITE> VehicleMiddleSpeed;
+
+	// the middle speed valid single
+	uint8_t getVehicleMiddleSpeedValid();
+	void    setVehicleMiddleSpeedValid(uint8_t value);
+	Property<MessageManager,uint8_t,READ_WRITE> VehicleMiddleSpeedValid;
 	// wheel speed direction
 	DirectStatus getWheelSpeedDirection();
 	void         setWheelSpeedDirection(DirectStatus value);
@@ -121,6 +130,9 @@ private:
 	float _wheel_speed_front_right;
 	float _wheel_speed_rear_right ;
 	float _wheel_speed_rear_left  ;
+	// vehicle speed base pulse,calculate by self
+	float   _vehicle_middle_speed;
+	uint8_t _vehicle_middle_speed_valid;
 	// wheel speed direction
 	DirectStatus _wheel_speed_direction;
 

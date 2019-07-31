@@ -33,6 +33,15 @@ MessageManager::MessageManager() {
 	WheelSpeedRearLeft.setContainer(this);
 	WheelSpeedRearLeft.getter(&MessageManager::getWheelSpeedRearLeft);
 	WheelSpeedRearLeft.setter(&MessageManager::setWheelSpeedRearLeft);
+
+	VehicleMiddleSpeed.setContainer(this);
+	VehicleMiddleSpeed.getter(&MessageManager::getVehicleMiddleSpeed);
+	VehicleMiddleSpeed.setter(&MessageManager::setVehicleMiddleSpeed);
+
+	VehicleMiddleSpeedValid.setContainer(this);
+	VehicleMiddleSpeedValid.getter(&MessageManager::getVehicleMiddleSpeedValid);
+	VehicleMiddleSpeedValid.setter(&MessageManager::setVehicleMiddleSpeedValid);
+
 	// wheel speed direction
 	WheelSpeedDirection.setContainer(this);
 	WheelSpeedDirection.getter(&MessageManager::getWheelSpeedDirection);
@@ -103,6 +112,12 @@ void  MessageManager::setWheelSpeedRearRight(float value){_wheel_speed_rear_righ
 
 float MessageManager::getWheelSpeedRearLeft()           { return _wheel_speed_rear_left;}
 void  MessageManager::setWheelSpeedRearLeft(float value){_wheel_speed_rear_left = value;}
+
+float MessageManager::getVehicleMiddleSpeed()           { return _vehicle_middle_speed;}
+void  MessageManager::setVehicleMiddleSpeed(float value){_vehicle_middle_speed = value;}
+
+uint8_t MessageManager::getVehicleMiddleSpeedValid()             { return _vehicle_middle_speed_valid;}
+void    MessageManager::setVehicleMiddleSpeedValid(uint8_t value){_vehicle_middle_speed_valid = value;}
 // wheel speed direction
 DirectStatus MessageManager::getWheelSpeedDirection()                  { return _wheel_speed_direction;}
 void         MessageManager::setWheelSpeedDirection(DirectStatus value){_wheel_speed_direction = value;}
