@@ -73,7 +73,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 				ctl->DecelerationEnable = (dat[0] >> 4) & 0x01;
 				ctl->TorqueEnable       = (dat[0] >> 5) & 0x01;
 				ctl->VelocityEnable     = (dat[0] >> 3) & 0x01;
-				if( (0 == ctl->SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
+				if((0 == ctl->SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
 				{
 					ctl->SteeringEnable 	= (dat[0] >> 1) & 0x01;
 				}
@@ -115,6 +115,44 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 				ctl->Gear 				= (uint8_t)(dat[6] & 0x0f);
 				ctl->APAEnable          = (uint8_t)((dat[6]>>4) & 0x03);
 				AckValid = 0xa5;
+			}
+			break;
+
+		case 0x519://eps status
+			check_sum =0 ;
+			for(i=0;i<7;i++){
+				check_sum += dat[i];
+			}
+			check_sum = check_sum ^ 0xFF;
+			if(check_sum == dat[7])
+			{
+				ctl->SteeringAngle 		= (float)(((int16_t)((dat[1] << 8) | dat[0])) * 0.1);
+				ctl->SteeringAngleRate 	= (float)(((uint16_t)((dat[3] << 8) | dat[2])) * 0.01);
+				ctl->Torque			    = (float)(((uint16_t)((dat[5] << 8) | dat[4])));
+
+				ctl->GearEnable 		=  dat[6]       & 0x01;
+				ctl->SteeringEnable 	= (dat[6] >> 1) & 0x01;
+				ctl->AccelerationEnable = (dat[6] >> 2) & 0x01;
+				ctl->VelocityEnable     = (dat[6] >> 3) & 0x01;
+				ctl->DecelerationEnable = (dat[6] >> 4) & 0x01;
+				ctl->TorqueEnable       = (dat[6] >> 5) & 0x01;
+				AckValid = 0xa5;
+			}
+			break;
+
+		case 0x51A://eps status
+			check_sum =0 ;
+			for(i=0;i<7;i++){
+				check_sum += dat[i];
+			}
+			check_sum = check_sum ^ 0xFF;
+			if(check_sum == dat[7])
+			{
+				ctl->Acceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+//				ctl->TargetAcceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+				ctl->Deceleration	= (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.001);
+				ctl->Velocity		= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001);
+				ctl->Gear 			= (uint8_t)dat[6];
 			}
 			break;
 		default:
@@ -201,46 +239,6 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,Planning *pp)
-{
-	Byte2Int temp_int;
-	switch(id)
-	{
-        case 0x540:
-        	temp_int.b[1] = dat[0];
-        	temp_int.b[0] = dat[1];
-        	pi->PositionX = temp_int.i16 * 0.01;
-        	temp_int.b[1] = dat[2];
-        	temp_int.b[0] = dat[3];
-        	pi->PositionY = temp_int.i16 * 0.01;
-        	temp_int.b[1] = dat[4];
-        	temp_int.b[0] = dat[5];
-        	pi->AttitudeYaw = temp_int.i16 * 0.01;
-        	temp_int.b[1] = dat[6];
-        	temp_int.b[0] = dat[7];
-        	pp->OuterMarginMove = temp_int.i16 * 0.01;
-        	break;
-
-        case 0x541:
-        	temp_int.b[1] = dat[0];
-        	temp_int.b[0] = dat[1];
-        	pi->ParkingLength = temp_int.u16 * 0.001;
-        	temp_int.b[1] = dat[2];
-        	temp_int.b[0] = dat[3];
-        	pi->ParkingWidth = temp_int.u16 * 0.001;
-        	temp_int.b[1] = dat[4];
-        	temp_int.b[0] = dat[5];
-        	pp->FrontMarginBoundary = temp_int.u16 * 0.001;
-        	temp_int.b[1] = dat[6];
-        	temp_int.b[0] = dat[7];
-        	pp->RearMarginBoundary = temp_int.u16 * 0.001;
-        	break;
-		default:
-
-			break;
-	}
-}
-
 void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pct)
 {
 	switch(id)
@@ -252,30 +250,6 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pct)
 
 
 			break;
-	}
-}
-
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],Planning *msg)
-{
-	switch(id)
-	{
-        case 0x532:
-        	msg->Command = (uint8_t)dat[0];
-        	break;
-
-        case 0x560:
-        	msg->PlanningBrakingAcc      = ((int8_t)dat[0])*0.1f;
-        	msg->PlanningBrakingAccR     = 1/fabs(msg->PlanningBrakingAcc)/0.8f;
-        	msg->PlanningBrakingAeb      = ((int8_t)dat[1])*0.1f;
-        	msg->TurnningFeedforwardTime = ((uint8_t)dat[2])*0.01f;
-        	msg->AccDisableTime          = (uint8_t)(50 * ((uint8_t)dat[3])*0.01f);
-        	msg->PositionMin             = ((uint8_t)dat[4])*0.01f;
-        	msg->PositionMax             = ((uint8_t)dat[5])*0.01f;
-        	msg->ParkingMargin           = ((uint8_t)dat[6])*0.01f;
-        	msg->KpYaw                   = (uint8_t)dat[7];
-        	break;
-        default:
-        	break;
 	}
 }
 
@@ -401,8 +375,8 @@ void Terminal::Push(MessageManager *msg)
 
 	m_CAN_Packet.id = 0x417;
 	temp_int16 = (int16_t)(msg->LonAcc * 1000);
-	m_CAN_Packet.data[0] =  temp_uint16 & 0xff ;
-	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff ;
+	m_CAN_Packet.data[0] =  temp_int16 & 0xff ;
+	m_CAN_Packet.data[1] = (temp_int16 >> 8) & 0xff ;
 	temp_int16 = (int16_t)(msg->LatAcc * 1000);
 	m_CAN_Packet.data[2] = temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
@@ -414,32 +388,6 @@ void Terminal::Push(MessageManager *msg)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-//void Terminal::Push(ChangAnMessage *msg)
-//{
-//	CAN_Packet m_CAN_Packet;
-//	int16_t temp_int16;
-//	uint16_t temp_uint16;
-//
-//	m_CAN_Packet.id = 0x410;
-//	m_CAN_Packet.length = 8;
-//
-//	m_CAN_Packet.data[0] = ( (msg->EMS_QEC_ACC & 0x01) << 2) | ( (msg->ESP_QDC_ACC & 0x01) << 1) | (msg->APA_EPAS_Failed & 0x01);
-//	m_CAN_Packet.data[1] = 0;
-//
-//	temp_int16 = (int16_t)(msg->SteeringAngle * 10);
-//	m_CAN_Packet.data[2] = temp_int16 & 0xff;
-//	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-//
-//	temp_uint16 = (uint16_t)(msg->SteeringAngleRate * 100);
-//	m_CAN_Packet.data[4] = temp_uint16 & 0xff;
-//	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
-//
-//	temp_int16 = (int16_t)(msg->SteeringTorque * 100);
-//	m_CAN_Packet.data[6] = temp_int16 & 0xff;
-//	m_CAN_Packet.data[7] = (temp_int16 >> 8) & 0xff;
-//
-//	CAN2_TransmitMsg(m_CAN_Packet);
-//}
 
 /*
  * 控制信号
@@ -460,13 +408,13 @@ void Terminal::Push(VehicleController *msg)
 							(msg->GearEnable         << 6) ;
 	m_CAN_Packet.data[1] = msg->Gear ;
 	temp_int16 = (int16_t)(msg->Acceleration * 100);
-	m_CAN_Packet.data[2] = temp_int16 & 0xff ;
+	m_CAN_Packet.data[2] =  temp_int16       & 0xff ;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff ;
-	temp_int16 = (int16_t)(msg->Deceleration * 100);
-	m_CAN_Packet.data[4] = temp_int16 & 0xff ;
-	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff ;
+	temp_uint16 = (uint16_t)msg->Torque;
+	m_CAN_Packet.data[4] =  temp_uint16       & 0xff ;
+	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff ;
 	temp_uint16 = (uint16_t)(msg->Velocity * 100);
-	m_CAN_Packet.data[6] =  temp_uint16 & 0xff ;
+	m_CAN_Packet.data[6] =  temp_uint16       & 0xff ;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff ;
 	CAN2_TransmitMsg(m_CAN_Packet);
 
@@ -492,16 +440,18 @@ void Terminal::Push(VehicleState *msg)
 	m_CAN_Packet.id = 0x442;
 	m_CAN_Packet.length = 8;
 
-	temp_int.i16 = (int16_t) (msg->getPosition().X * 100);
+	temp_int.i16 = (int16_t)(msg->getPosition().X * 100);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t) (msg->getPosition().Y * 100);
+	temp_int.i16 = (int16_t)(msg->getPosition().Y * 100);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
-	m_CAN_Packet.data[4] = ((int16_t) (msg->Yaw * 100)) & 0xff;
-	m_CAN_Packet.data[5] = (((int16_t)(msg->Yaw * 100)) >> 8) & 0xff;
-	m_CAN_Packet.data[6] = ((int16_t) (msg->TurnningRadius * 100)) & 0xff;
-	m_CAN_Packet.data[7] = (((int16_t)(msg->TurnningRadius * 100)) >> 8) & 0xff;
+	temp_int.i16 = (int16_t)(msg->Yaw * 100);
+	m_CAN_Packet.data[4] = temp_int.b[1];
+	m_CAN_Packet.data[5] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(msg->LinearRate * 1000);
+	m_CAN_Packet.data[6] = temp_int.b[1];
+	m_CAN_Packet.data[7] = temp_int.b[0];
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
@@ -836,6 +786,7 @@ void Terminal::Push(Percaption *p)
 void Terminal::Push(UltrasonicObstaclePercption p)
 {
 	CAN_Packet m_CAN_Packet;
+	uint16_t temp_uint16;
 
 	m_CAN_Packet.id = 0x44A;
 	m_CAN_Packet.length = 8;
@@ -850,24 +801,18 @@ void Terminal::Push(UltrasonicObstaclePercption p)
 	m_CAN_Packet.data[6] = (uint8_t)(p.getLeftEdgeListLength()  & 0xff);
 	m_CAN_Packet.data[7] = (uint8_t)(p.getRightEdgeListLength() & 0xff);
 	CAN2_TransmitMsg(m_CAN_Packet);
-}
 
-void Terminal::Push(Planning *p)
-{
-	CAN_Packet m_CAN_Packet;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x448;
-	m_CAN_Packet.length = 8;
-
-	m_CAN_Packet.data[0] = p->ParkingStatus;
-	m_CAN_Packet.data[1] = 0;
+	m_CAN_Packet.id = 0x44D;
+	temp_uint16 = p.getObstacleDistance().distance * 10000;
+	m_CAN_Packet.data[0] = (uint8_t)( temp_uint16       & 0xff);
+	m_CAN_Packet.data[1] = (uint8_t)((temp_uint16 >> 8) & 0xff);
 	m_CAN_Packet.data[2] = 0;
 	m_CAN_Packet.data[3] = 0;
 
 	m_CAN_Packet.data[4] = 0;
 	m_CAN_Packet.data[5] = 0;
 	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	m_CAN_Packet.data[7] = (uint8_t)p.getObstacleDistance().status;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 /**************************************************************************************/
@@ -1040,30 +985,6 @@ void Terminal::Ack(void)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::VehicleInitPositionSend(VehicleBody v)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x440;
-	m_CAN_Packet.length = 8;
-
-	temp_v = v.Center;
-	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
 void Terminal::ParkingMsgSend(Percaption *p,float fm,float rm)
 {
 	CAN_Packet m_CAN_Packet;
@@ -1087,101 +1008,7 @@ void Terminal::ParkingMsgSend(Percaption *p,float fm,float rm)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::FrontTrialPositionSend(VehicleBody v,uint8_t cnt)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x443;
-	m_CAN_Packet.length = 8;
 
-	temp_v = v.Center;
-	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-
-	m_CAN_Packet.data[6] = cnt;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::RearTrialPositionSend(VehicleBody v,uint8_t cnt)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x444;
-	m_CAN_Packet.length = 8;
-
-	temp_v = v.Center;
-	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-
-	m_CAN_Packet.data[6] = cnt;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::EnterParkingPositionSend(VehicleBody v,uint8_t cnt,uint8_t s)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x445;
-	m_CAN_Packet.length = 8;
-
-	temp_v = v.Center;
-	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(v.AttitudeYaw * 100);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-
-	m_CAN_Packet.data[6] = cnt;
-	m_CAN_Packet.data[7] = s;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::TurnPointSend(Turn v,uint8_t cnt)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x446;
-	m_CAN_Packet.length = 8;
-
-	temp_v = v.Point;
-	temp_int.i16 = (int16_t)(temp_v.getX() * 100);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(temp_v.getY() * 100);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(v.SteeringAngle * 10);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-
-	m_CAN_Packet.data[6] = cnt;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
 
 void Terminal::ParkingCenterPointSend(Vector2d v)
 {

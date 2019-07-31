@@ -26,7 +26,6 @@
 #include "GeometricTrack/geometric_track.h"
 #include "pid.h"
 #include "Ultrasonic.h"
-#include "planning.h"
 #include "percaption.h"
 #include "ultrasonic_obstacle_percption.h"
 
@@ -61,11 +60,11 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg);
 
 	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
-	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pi,Planning *pp);
+
 
 	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pct);
 
-	void Parse(vuint32_t id,vuint8_t dat[],Planning *msg);
+
 
 	void Parse(vuint32_t id,vuint8_t dat[],PID *msg);
 
@@ -85,7 +84,6 @@ public:
 	void Push(Percaption *p);
 	void Push(UltrasonicObstaclePercption p);
 
-	void Push(Planning *p);
 ///////////////////////////////////////////////////////////////////////////
 	/*
 	 * 直接测量超声波原始信号
@@ -108,12 +106,7 @@ public:
 
 	void Ack(void);
 
-	void VehicleInitPositionSend(VehicleBody v);
 	void ParkingMsgSend(Percaption *pi,float fm,float rm);
-	void FrontTrialPositionSend(VehicleBody v,uint8_t cnt);
-	void RearTrialPositionSend(VehicleBody v,uint8_t cnt);
-	void EnterParkingPositionSend(VehicleBody v,uint8_t cnt,uint8_t s);
-	void TurnPointSend(Turn v,uint8_t cnt);
 	void ParkingCenterPointSend(Vector2d v);
 
 	/*** Property ***/
