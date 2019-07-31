@@ -227,7 +227,7 @@
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.debug.714873228.Project_Settings/Debugger/APA_NXP_Debug_RAM.launch" name="APA_NXP_Debug_RAM.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/APA_NXP_Debug_RAM.launch" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Common"/>
+						<entry excluding="Math/solve_equation.h|Math/solve_equation.cpp|Math/vehicle_body.h|Math/vehicle_body.cpp|Math/algebraic_geometry.h|Math/algebraic_geometry.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Common"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Control"/>
 						<entry excluding="Peripheral/Src/uart.c|Peripheral/Inc/uart.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Driver"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Interaction"/>
