@@ -59,7 +59,9 @@ public:
 	void APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts);
 
 	// push the command to the vehicle
-	void Push(float dt);
+	void Push();
+
+	void EnableControl();
 private:
 	APA_TorqueControlState _apa_torque_control_state;
 	APA_TurnControlState   _apa_turn_control_state;
