@@ -256,10 +256,8 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 	_last_yaw = Yaw;
 }
 
-void GeometricTrack::df_PulseUpdate(MessageManager *msg)
+void GeometricTrack::df_PulseUpdate(MessageManager *msg,PID *velocity)
 {
-//	float displacement;
-
 	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
 	{
 		_delta_rear_left_pulse = 0;
@@ -281,39 +279,51 @@ void GeometricTrack::df_PulseUpdate(MessageManager *msg)
 	}
 
 	// 速度判定
-	_velocity_line_rate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
-	if(_velocity_line_rate < 0.2f)//低速情形
-	{
-		// 累积脉冲达到指定
-		 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
-		 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
-		 _cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
-		 if(_cumulation_middle_displacement >= 0.04f)
-		 {
-			 _wait_time_cnt++;
-			 LinearRate = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
+	/*********************************************************************************************************/
+	// 累积脉冲达到指定
+	 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
+	 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
+	 _cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+	 if(_cumulation_middle_displacement >= 0.04f)
+	 {
+		 _velocity_lock = 0;
+		 _wait_time_cnt++;
+		 _velocity_line_rate = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
+		 velocity->Desired = _velocity_line_rate;
+		 velocity->pidUpdate(LinearRate);
+		 LinearRate = LinearRate + (msg->LonAcc + velocity->pidUpdate(LinearRate)) * 0.02f;
 
-			 _cumulation_rear_left_pulse  = 0;
-			 _cumulation_rear_right_pulse = 0;
-			 _wait_time_cnt               = 0;
-		 }
-		 else if(_wait_time_cnt >= 200)
+		 _cumulation_rear_left_pulse  = 0;
+		 _cumulation_rear_right_pulse = 0;
+		 _wait_time_cnt               = 0;
+	 }
+	 else if(_wait_time_cnt >= 50)
+	 {
+		 _velocity_lock = 0xff;
+		 LinearRate = 0;
+		 _cumulation_rear_left_pulse  = 0;
+		 _cumulation_rear_right_pulse = 0;
+		 _wait_time_cnt               = 0;
+	 }
+	 else
+	 {
+		 _wait_time_cnt++;
+		 if(0xff == _velocity_lock)
 		 {
 			 LinearRate = 0;
-
-			 _cumulation_rear_left_pulse  = 0;
-			 _cumulation_rear_right_pulse = 0;
-			 _wait_time_cnt               = 0;
 		 }
 		 else
 		 {
-			 _wait_time_cnt++;
+			 LinearRate = LinearRate + msg->LonAcc * 0.02f;
+			 if(LinearRate < 0)
+			 {
+				 _velocity_lock = 0xff;
+				 LinearRate = 0;
+			 }
 		 }
-	}
-	else// 高速情形
-	{
-		LinearRate = _velocity_line_rate;
-	}
+	 }
+
+	_last_velocity_line_rate = _velocity_line_rate;
 
 	_sum_rear_left_pulse  += _delta_rear_left_pulse;
 	_sum_rear_right_pulse += _delta_rear_right_pulse;

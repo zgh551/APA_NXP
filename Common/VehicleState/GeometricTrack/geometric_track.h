@@ -20,6 +20,8 @@
 
 #include "../Interface/vehicle_state.h"
 #include <percaption.h>
+#include "pid.h"
+
 //#include <vehicle_body.h>
 typedef struct _fit_ratio
 {
@@ -41,7 +43,7 @@ public:
 	void PulseUpdate(MessageManager *msg) override;
 	void PulseTrackUpdate(MessageManager *msg) override;
 
-	void df_PulseUpdate(MessageManager *msg);
+	void df_PulseUpdate(MessageManager *msg,PID *velocity);
 	int32_t getSumRearLeftPulse();
 	void    setSumRearLeftPulse(int32_t value);
 	Property<GeometricTrack,int32_t,READ_WRITE> SumRearLeftPulse;
@@ -62,7 +64,10 @@ private:
 	int16_t _cumulation_rear_right_pulse;
 	float _cumulation_middle_displacement;
 	float _velocity_line_rate;
+	float _last_velocity_line_rate;
+	float _err_velocity;
 	uint8_t _wait_time_cnt;
+	uint8_t _velocity_lock;
 
 	int32_t _sum_rear_left_pulse;
 	int32_t _sum_rear_right_pulse;

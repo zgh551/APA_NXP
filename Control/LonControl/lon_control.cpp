@@ -66,7 +66,7 @@ void LonControl::Proc(MessageManager *msg,VehicleController *ctl,PID *velocity_p
 	{
 		_vehicle_velocity = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
 //		velocity_pid->Desired = ctl->Velocity;
-		velocity_pid->Desired = VelocityControl(ctl->Velocity,ctl->Distance);
+		velocity_pid->Desired = VelocityControl(ctl->Distance,ctl->Velocity);
 		ctl->Acceleration = velocity_pid->pidUpdateIntegralSeparation(_vehicle_velocity);
 		if((ctl->getAcceleration() < 1.0e-6) && (velocity_pid->Desired < 1.0e-6))
 		{
@@ -117,27 +117,41 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 	if(ctl->VelocityEnable)
 	{
 		_vehicle_velocity = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
+//		_vehicle_velocity = msg->VehicleMiddleSpeed;
 //		velocity_pid->Desired = ctl->Velocity;
-		velocity_pid->Desired   = VelocityControl(ctl->Velocity,ctl->Distance);
-		ctl->TargetAcceleration = velocity_pid->pidUpdateIntegralSeparation(_vehicle_velocity);
+		velocity_pid->Desired   = VelocityControl(ctl->Distance,ctl->Velocity);
+		ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
 
-		if(ctl->TargetAcceleration >= 0)
+		if(ctl->TargetAcceleration > 0)
 		{
 			ctl->TorqueEnable       = 1;
-			ctl->AccelerationEnable = 0;
 			_calibration_value = _lon_Interpolation.Interpolation2D(ctl->TargetAcceleration, _vehicle_velocity,
 																	_lon_VehilceConfig.AccelerateTable, _lon_VehilceConfig.AccNum,
 																	_lon_VehilceConfig.VelocityTable, _lon_VehilceConfig.VlcNum,
 																	_lon_VehilceConfig.TorqueTable);
-			if(_calibration_value >= 0)
+
+			if(ctl->TargetAcceleration >= 1.0e-2)
 			{
+				ctl->AccelerationEnable = 0;
 				ctl->Torque = fmax(_calibration_value,_throttle_lowerbound);//添加最小死区的判断
+				ctl->Acceleration = 0;
 			}
 			else
 			{
-				ctl->Torque = _throttle_lowerbound;
+				if(velocity_pid->Desired < 1.0e-6)
+				{
+					ctl->Torque = 0;
+					ctl->Acceleration = -0.5;
+					ctl->AccelerationEnable = 1;
+				}
+				else
+				{
+					ctl->Torque = _throttle_lowerbound;
+					ctl->Acceleration = 0;
+				}
+
 			}
-			ctl->Acceleration = 0;
+//			ctl->Acceleration = 0;
 		}
 		else
 		{
@@ -146,7 +160,14 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 			_calibration_value = ctl->TargetAcceleration;
 			if(_calibration_value >= 0)
 			{
-				ctl->Acceleration = _brake_lowerbound;
+				if(velocity_pid->Desired < 1.0e-6)
+				{
+					ctl->Acceleration = -0.1;
+				}
+				else
+				{
+					ctl->Acceleration = _brake_lowerbound;
+				}
 			}
 			else
 			{

@@ -27,8 +27,8 @@ void DongFengE70Controller::Init()
 void DongFengE70Controller::Start()
 {
 	SteeringEnable  	= 1;
-	AccelerationEnable  = 1;
-	TorqueEnable 	    = 1;
+//	AccelerationEnable  = 1;
+//	TorqueEnable 	    = 1;
 	VelocityEnable      = 1;
 }
 

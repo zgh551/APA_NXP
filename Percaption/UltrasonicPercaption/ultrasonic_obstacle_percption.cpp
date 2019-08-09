@@ -134,24 +134,36 @@ void UltrasonicObstaclePercption::DisorderPush(LinkList *list,ObstacleLocationPa
 
 void UltrasonicObstaclePercption::ParkingCenterPush(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat)
 {
+	ObstacleLocationPacket temp_packet;
 	// 有序数据集
 	if(list->getEndNode() == NULL)
 	{
 		if( u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD )
 		{
+#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 			list->Add(p_dat);
+#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+			temp_packet.Position = Vector2d(p_dat.Position.getY(),-p_dat.Position.getX());
+			temp_packet.Status   = p_dat.Status;
+			list->Add(temp_packet);
+#endif
 		}
 	}
 	else
 	{
 #if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getX() < list->getEndNode()->data.Position.getX()))
-#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
-		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getY() < list->getEndNode()->data.Position.getY()))
-#endif
 		{
 			list->Add(p_dat);
 		}
+#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+		if((u_dat.Level > FIT_LINE_STEP_LEVEL_THRESHOLD) && (p_dat.Position.getY() < list->getEndNode()->data.Position.getY()))
+		{
+			temp_packet.Position = Vector2d(p_dat.Position.getY(),-p_dat.Position.getX());
+			temp_packet.Status   = p_dat.Status;
+			list->Add(temp_packet);
+		}
+#endif
 	}
 }
 /******************************************************************************************************************************/
@@ -224,7 +236,7 @@ void UltrasonicObstaclePercption::EdgeFinding(LinkList *list)
 				if(_err_distance > DISTANCE_THRESHOLD)
 				{
 					vehicle_position_temp.Second_Position = _last_node->data.Position;
-					parking_position_temp.First_Position  = _last_node->data.Position;
+					parking_position_temp.First_Position  = _current_node->data.Position;
 
 					_vehicle_position.Length          = fabs(vehicle_position_temp.First_Position.getX() - vehicle_position_temp.Second_Position.getX());
 					_vehicle_position.First_Position  = vehicle_position_temp.First_Position;
@@ -536,39 +548,40 @@ void  UltrasonicObstaclePercption::ValueDistributed(LinkList *valid_list)
 void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,LinkList *fit_list)
 {
 	uint8_t i,max_distribute_number_id;
-	uint8_t x_group_number,y_group_number;
-	float min_x,max_x;
+//	uint8_t x_group_number;
+	uint8_t y_group_number;
+//	float min_x,max_x;
 	float min_y,max_y;
 	float treshold_down,treshold_up;
 	Node* current_node;
 
 	if(valid_list->HeadNode == NULL){return;}
 	current_node = valid_list->HeadNode;
-	min_x = current_node->data.Position.getX();
-	max_x = current_node->data.Position.getX();
+//	min_x = current_node->data.Position.getX();
+//	max_x = current_node->data.Position.getX();
 	min_y = current_node->data.Position.getY();
 	max_y = current_node->data.Position.getY();
 
 	while(current_node->next != NULL)
 	{
-		min_x = current_node->data.Position.getX() < min_x ? current_node->data.Position.getX() : min_x;
-		max_x = current_node->data.Position.getX() > max_x ? current_node->data.Position.getX() : max_x;
+//		min_x = current_node->data.Position.getX() < min_x ? current_node->data.Position.getX() : min_x;
+//		max_x = current_node->data.Position.getX() > max_x ? current_node->data.Position.getX() : max_x;
 		min_y = current_node->data.Position.getY() < min_y ? current_node->data.Position.getY() : min_y;
 		max_y = current_node->data.Position.getY() > max_y ? current_node->data.Position.getY() : max_y;
 		current_node = current_node->next;
 	}
-	x_group_number = (uint8_t)((max_x - min_x)/FIT_LINE_STEP_DISTANCE) + 1;
+//	x_group_number = (uint8_t)((max_x - min_x)/FIT_LINE_STEP_DISTANCE) + 1;
 	y_group_number = (uint8_t)((max_y - min_y)/FIT_LINE_STEP_DISTANCE) + 1;
 
 	current_node = valid_list->HeadNode;
 	// create the array
-	uint16_t *distribute_number_x = new uint16_t[x_group_number];
+//	uint16_t *distribute_number_x = new uint16_t[x_group_number];
 	uint16_t *distribute_number_y = new uint16_t[y_group_number];
 	// initialize the array
-	for(i = 0;i<x_group_number;i++)
-	{
-		distribute_number_x[i] = 0;
-	}
+//	for(i = 0;i<x_group_number;i++)
+//	{
+//		distribute_number_x[i] = 0;
+//	}
 	for(i = 0;i<y_group_number;i++)
 	{
 		distribute_number_y[i] = 0;
@@ -576,14 +589,14 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 	// distribute calculate
 	while(current_node->next != NULL)
 	{
-		for(i = 0;i<x_group_number;i++)
-		{
-			if( (current_node->data.Position.getX() >= (min_x + FIT_LINE_STEP_DISTANCE*i)) && (current_node->data.Position.getX() < (min_x + FIT_LINE_STEP_DISTANCE*(i + 1))))
-			{
-				distribute_number_x[i]++;
-				break;
-			}
-		}
+//		for(i = 0;i<x_group_number;i++)
+//		{
+//			if( (current_node->data.Position.getX() >= (min_x + FIT_LINE_STEP_DISTANCE*i)) && (current_node->data.Position.getX() < (min_x + FIT_LINE_STEP_DISTANCE*(i + 1))))
+//			{
+//				distribute_number_x[i]++;
+//				break;
+//			}
+//		}
 		for(i = 0;i<y_group_number;i++)
 		{
 			if( (current_node->data.Position.getY() >= (min_y + FIT_LINE_STEP_DISTANCE*i)) && (current_node->data.Position.getY() < (min_y + FIT_LINE_STEP_DISTANCE*(i + 1))))
@@ -594,15 +607,15 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 		}
 		current_node = current_node->next;
 	}
-#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
+//#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 	max_distribute_number_id = HighestDistributionBase(y_group_number,distribute_number_y);
 	treshold_down = min_y + FIT_LINE_STEP_DISTANCE * max_distribute_number_id     ;
 	treshold_up   = min_y + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
-#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
-	max_distribute_number_id = HighestDistributionBase(x_group_number,distribute_number_x);
-	treshold_down = min_x + FIT_LINE_STEP_DISTANCE * max_distribute_number_id     ;
-	treshold_up   = min_x + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
-#endif
+//#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+//	max_distribute_number_id = HighestDistributionBase(x_group_number,distribute_number_x);
+//	treshold_down = min_x + FIT_LINE_STEP_DISTANCE * max_distribute_number_id     ;
+//	treshold_up   = min_x + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
+//#endif
 
 	current_node = valid_list->HeadNode;
 	if(fit_list->Length() != 0)
@@ -611,17 +624,17 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 	}
 	while(current_node->next != NULL)
 	{
-#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
+//#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 		if((current_node->data.Position.getY() >= treshold_down) && (current_node->data.Position.getY() < treshold_up))
-#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
-		if((current_node->data.Position.getX() >= treshold_down) && (current_node->data.Position.getX() < treshold_up))
-#endif
+//#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+//		if((current_node->data.Position.getX() >= treshold_down) && (current_node->data.Position.getX() < treshold_up))
+//#endif
 		{
 			fit_list->Add(current_node->data);
 		}
 		current_node = current_node->next;
 	}
-	delete []distribute_number_x;
+//	delete []distribute_number_x;
 	delete []distribute_number_y;
 	valid_list->Delete();
 }
@@ -629,10 +642,12 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 // 车辆进库，通过库位边界，测定库位的中心位置，准确的前提是车辆基本垂直进入
 void UltrasonicObstaclePercption::EdgeLineFitParkingCenterCalculate()
 {
-	float left_x,right_y;
+	float left,right;
+	if(_left_fit_edge_list->Length() != 0){_left_fit_edge_list->Delete();}
+	if(_right_fit_edge_list->Length() != 0){_right_fit_edge_list->Delete();}
+
 	ValueDistributedFilter(_left_edge_position_list,_left_fit_edge_list);
 	ValueDistributedFilter(_right_edge_position_list,_right_fit_edge_list);
-
 
 	_line_fit.LineFitting(_left_fit_edge_list,&_left_fit_line_packet.angle,&_left_fit_line_packet.offset);
 	_line_fit.LineFitting(_right_fit_edge_list,&_right_fit_line_packet.angle,&_right_fit_line_packet.offset);
@@ -640,12 +655,17 @@ void UltrasonicObstaclePercption::EdgeLineFitParkingCenterCalculate()
 	_center_fit_line_packet.angle  = 0.5 * (_left_fit_line_packet.angle + _right_fit_line_packet.angle);
 	_center_fit_line_packet.offset = 0.5 * (_left_fit_line_packet.offset + _right_fit_line_packet.offset);
 
+	left = _left_fit_edge_list->getHeadNode()->data.Position.getX();
+	right = _right_fit_edge_list->getHeadNode()->data.Position.getX();
+#if ENTER_PARK_DIRECTION == X_AXIS_ENTER
 	_valid_parking_center_position.angle        = _center_fit_line_packet.angle;
-	left_x = _left_fit_edge_list->getHeadNode()->data.Position.getX();
-	right_y = _right_fit_edge_list->getHeadNode()->data.Position.getX();
-	_valid_parking_center_position.position.setX((left_x > right_y) ? left_x : right_y);
+	_valid_parking_center_position.position.setX((left > right) ? left : right);
 	_valid_parking_center_position.position.setY(tanf(_center_fit_line_packet.angle) * _valid_parking_center_position.position.getX() + _center_fit_line_packet.offset);
-
+#elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
+	_valid_parking_center_position.angle        = _center_fit_line_packet.angle + PI_2;
+	_valid_parking_center_position.position.setY((left > right) ? left : right);
+	_valid_parking_center_position.position.setX(-tanf(_center_fit_line_packet.angle) * _valid_parking_center_position.position.getX() - _center_fit_line_packet.offset);
+#endif
 	_left_fit_edge_list->Delete();
 	_right_fit_edge_list->Delete();
 }
@@ -927,6 +947,152 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatance(Ultrasonic *u,Mess
 		_obstacle_distance.status = OverDetection;
 	}
 	_obstacle_distance.distance = distance;
+}
+
+void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,MessageManager *msg)
+{
+	uint8_t i;
+	float distance,current_distance;
+	UltrasonicStatus status;
+	uint8_t over_detection_cnt;
+	Vector2d LF_P,RF_P,LR_P,RR_P;
+/////////////////////////////////////////////////////////////////////////////////////////////
+	distance = 6;
+	status   = Normal;
+	over_detection_cnt = 0;
+	LF_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX(), LEFT_EDGE_TO_CENTER);
+	RF_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX(),-RIGHT_EDGE_TO_CENTER);
+	for(i = 0; i < 4; i++)
+	{
+		if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			if(u->AbstacleBodyPositionTriangle[i].Position.getY() > 0.93)
+			{
+				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - LF_P).Length();
+			}
+			else if(u->AbstacleBodyPositionTriangle[i].Position.getY() < -0.93)
+			{
+				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - RF_P).Length();
+			}
+			else
+			{
+				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX());
+			}
+			distance = current_distance < distance ? current_distance : distance;
+			status = Normal;
+		}
+		else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			distance = 0;
+			status = BlindZone;
+			break;
+		}
+		else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			over_detection_cnt++;
+		}
+		else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			distance = 0;
+			status   = Noise;
+		}
+		else if(InvalidPoint == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			if(0 == u->UltrasonicPacket[i].status)
+			{
+				current_distance = u->UltrasonicPacket[i].Distance1;
+				distance = current_distance < distance ? current_distance : distance;
+				status = Normal;
+			}
+			else if(16 == u->UltrasonicPacket[i].status)
+			{
+				distance = 0;
+				status = BlindZone;
+				break;
+			}
+			else if(2 == u->UltrasonicPacket[i].status)
+			{
+				distance = u->UltrasonicPacket[i].Distance1;
+				status = Noise;
+			}
+		}
+	}
+	if(4 == over_detection_cnt)
+	{
+		distance = 3;
+		status   = OverDetection;
+	}
+	_front_obstacle_distance.distance = distance;
+	_front_obstacle_distance.status   = status ;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+	distance = 6;
+	status   = Normal;
+	over_detection_cnt = 0;
+	LR_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX(), LEFT_EDGE_TO_CENTER);
+	RR_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX(),-RIGHT_EDGE_TO_CENTER);
+	for(i = 4;i < 8;i++)
+	{
+		if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			if(u->AbstacleBodyPositionTriangle[i].Position.getY() > 0.93)
+			{
+				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - LR_P).Length();
+			}
+			else if(u->AbstacleBodyPositionTriangle[i].Position.getY() < -0.93)
+			{
+				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - RR_P).Length();
+			}
+			else
+			{
+				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX());
+			}
+			distance = current_distance < distance ? current_distance : distance;
+			status = Normal;
+		}
+		else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			distance = 0;
+			status = BlindZone;
+			break;
+		}
+		else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			over_detection_cnt++;
+		}
+		else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			distance                  = 0;
+			status = Noise;
+		}
+		else if(InvalidPoint == u->AbstacleBodyPositionTriangle[i].Status)
+		{
+			if(0 == u->UltrasonicPacket[i].status)
+			{
+				current_distance = u->UltrasonicPacket[i].Distance1;
+				distance = current_distance < distance ? current_distance : distance;
+				status = Normal;
+			}
+			else if(16 == u->UltrasonicPacket[i].status)
+			{
+				distance = 0;
+				status = BlindZone;
+				break;
+			}
+			else if(2 == u->UltrasonicPacket[i].status)
+			{
+				distance = u->UltrasonicPacket[i].Distance1;
+				status = Noise;
+			}
+		}
+	}
+	if(4 == over_detection_cnt)
+	{
+		distance = 3;
+		status   = OverDetection;
+	}
+	_rear_obstacle_distance.distance = distance;
+	_rear_obstacle_distance.status   = status ;
 }
 /***********************************************************************************************/
 uint16_t UltrasonicObstaclePercption::getPositionListLength()

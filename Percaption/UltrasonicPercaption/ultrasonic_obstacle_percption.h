@@ -17,7 +17,7 @@
 // 选择车辆入库的方向，可选的是x轴还是y轴
 #define X_AXIS_ENTER				   (0)
 #define Y_AXIS_ENTER				   (1)
-#define ENTER_PARK_DIRECTION           (X_AXIS_ENTER)
+#define ENTER_PARK_DIRECTION           (Y_AXIS_ENTER)
 
 // 入库过程库位调整相关参数
 #define DISTANCE_ERR_THRESHOLD        (0.6f)
@@ -131,6 +131,8 @@ public:
 	int8_t UltrasonicCollisionStatus(Ultrasonic *u,MessageManager *msg);
 
 	void UltrasonicCollisionDiatance(Ultrasonic *u,MessageManager *msg);
+
+	void UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,MessageManager *msg);
 	/*********************************************基础函数***************************************/
 	uint16_t getPositionListLength();
 	uint16_t getLocationListLength();

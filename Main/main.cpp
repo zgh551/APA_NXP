@@ -70,8 +70,8 @@ PID m_VelocityControlPID = PID(0.02,3.5,0.2,0.1,8,2,0.15);
 
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
-PID m_VelocityControlPID = PID(0.02,3.5,0.1,0.1,0.005,0.5,0.2);
-PID m_AccelerateControlPID = PID(0.02,400,20.0,20.0,10,300,0.2);
+PID m_VelocityControlPID = PID(0.02,3.5,0.0,0.4,0.5,0.5,0.2);
+PID m_VelocityUpdatePID = PID(0.02,0.001f,0.0f,0.0f,0.0f,1,0.2);
 #endif
 /**********************************************************************/
 #ifdef CHANGAN
@@ -326,7 +326,7 @@ void PIT0_isr(void)
 		#if 1 == SIMULATION
 		m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
 		#else
-		m_GeometricTrack.df_PulseUpdate(&m_DongFengE70Message);
+		m_GeometricTrack.df_PulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
 #endif
 #endif
 	}
@@ -458,8 +458,8 @@ void FlexCAN2_Isr(void)
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
 #endif
 #ifdef DONG_FENG_E70
-		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
-//		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_AccelerateControlPID);
+//		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityUpdatePID);
 #endif
 
 #ifdef CHANGAN

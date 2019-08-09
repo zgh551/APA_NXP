@@ -191,8 +191,11 @@ static void PLL_200MHz_DEVKIT(void)
   while(MC_ME.GS.B.S_MTRANS == 1);      /* Wait for mode transition complete */
 }
 
+
+
 void SystemClockConfigure(void)
 {
+//	enter_STOP_mode();
   PLL_200MHz();
 //	PLL_200MHz_DEVKIT();
 

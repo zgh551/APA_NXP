@@ -94,6 +94,14 @@ public:
 	void    setObstacleDistance(ObstacleDistancePacket value);
 	Property<Percaption,ObstacleDistancePacket,READ_WRITE> ObstacleDistance;
 
+	ObstacleDistancePacket getFrontObstacleDistance();
+	void    setFrontObstacleDistance(ObstacleDistancePacket value);
+	Property<Percaption,ObstacleDistancePacket,READ_WRITE> FrontObstacleDistance;
+
+	ObstacleDistancePacket getRearObstacleDistance();
+	void    setRearObstacleDistance(ObstacleDistancePacket value);
+	Property<Percaption,ObstacleDistancePacket,READ_WRITE> RearObstacleDistance;
+
 	LineFitInformationPacket getLeftFitLinePacket();
 	void setLeftFitLinePacket(LineFitInformationPacket value);
 	Property<Percaption,LineFitInformationPacket,READ_WRITE> LeftFitLinePacket;
@@ -112,6 +120,9 @@ protected:
 	EdgeInformationPacket _valid_parking_center_position;
 	// 输出障碍物离车辆边沿的距离
 	ObstacleDistancePacket _obstacle_distance;
+
+	ObstacleDistancePacket _front_obstacle_distance;
+	ObstacleDistancePacket _rear_obstacle_distance;
 
 	LineFitInformationPacket _left_fit_line_packet;
 	LineFitInformationPacket _right_fit_line_packet;
