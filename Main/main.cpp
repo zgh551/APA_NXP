@@ -312,7 +312,7 @@ void PIT0_isr(void)
 		#if 1 == SIMULATION
 		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
 		#else
-		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+//		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
 		#endif
 #endif
 #ifdef BORUI
@@ -334,7 +334,7 @@ void PIT0_isr(void)
 	{
 	// 超声波避障功能
 #ifdef CHANGAN
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_ChangAnMessage);
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_0(&m_Ultrasonic,&m_ChangAnMessage);
 #endif
 
 #ifdef BORUI
