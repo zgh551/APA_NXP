@@ -989,6 +989,7 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,
 		}
 		else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
 		{
+			distance = 3;
 			over_detection_cnt++;
 		}
 		else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
@@ -1058,12 +1059,13 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,
 		}
 		else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
 		{
+			distance = 3;
 			over_detection_cnt++;
 		}
 		else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance                  = 0;
-			status = Noise;
+			distance = 0;
+			status   = Noise;
 		}
 		else if(InvalidPoint == u->AbstacleBodyPositionTriangle[i].Status)
 		{
@@ -1076,13 +1078,13 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,
 			else if(16 == u->UltrasonicPacket[i].status)
 			{
 				distance = 0;
-				status = BlindZone;
+				status   = BlindZone;
 				break;
 			}
 			else if(2 == u->UltrasonicPacket[i].status)
 			{
 				distance = u->UltrasonicPacket[i].Distance1;
-				status = Noise;
+				status   = Noise;
 			}
 		}
 	}
