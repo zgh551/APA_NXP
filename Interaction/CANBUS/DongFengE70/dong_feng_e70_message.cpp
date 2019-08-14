@@ -40,10 +40,6 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			_esp_availab_status = (data[0] >> 6) & 0x03;
 			break;
 
-//		case 0x176:
-
-//			break;
-
 		case 0x176://VCU 10
 			_vcu_apa_control_st = (uint8_t)(( data[0] >> 5 ) & 0x03);
 			switch((uint8_t)( data[0] & 0x07))
