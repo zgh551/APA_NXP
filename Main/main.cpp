@@ -114,60 +114,9 @@ int main()
 		/* Init LinFlexD Module */
 		LINFlexD_Configure();
 
-		/* Init eTimer Module */
-//		eTimer2_Init();
-//		eTimer2_OutputInit();
-//		eTimer1_OutputInit();
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.AccelerateTable, 10, 0.12,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.AccelerateTable, 10, 0.22,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.AccelerateTable, 10, 0.07,&m_before,&m_after);
-//
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.12,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.32,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.52,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.62,&m_before,&m_after);
-//
-//		int_value = m_Interpolation.InterpolateValue(4, 3, 6, 5, 7);
-//		int_value = m_Interpolation.InterpolateValue(7, 3, 6, 5, 7);
-//		int_value = m_Interpolation.InterpolateValue(2, 3, 6, 5, 7);
-//
-//		int_value = m_Interpolation.InterpolationYZ(0.12, m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum, m_VehilceConfig.TorqueTable);
-//		int_value = m_Interpolation.InterpolationYZ(0.62, m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum, m_VehilceConfig.TorqueTable);
-//		int_value = m_Interpolation.InterpolationYZ(0.12, m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum, m_VehilceConfig.TorqueTable + m_VehilceConfig.VlcNum);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.08, 0.34,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.18, 0.34,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.04, 0.05,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.08, 0.8,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.32, 0.05,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.32, 0.9,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-
 		for(;;)
 		{
 			//Task 一次性的计算任务 泊车规划任务
@@ -312,7 +261,7 @@ void PIT0_isr(void)
 		#if 1 == SIMULATION
 		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
 		#else
-//		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
 		#endif
 #endif
 #ifdef BORUI
@@ -338,13 +287,12 @@ void PIT0_isr(void)
 #endif
 
 #ifdef BORUI
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_BoRuiMessage);
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_0(&m_Ultrasonic,&m_BoRuiMessage);
 #endif
 
 #ifdef DONG_FENG_E70
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_DongFengE70Message);
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_0(&m_Ultrasonic,&m_DongFengE70Message);
 #endif
-
 	}
 
 //	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
@@ -354,7 +302,6 @@ void PIT0_isr(void)
 ////		eTimer1Channel5OutputStart();
 ////		eTimer1_Channel5Send();
 //	}
-
 
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
