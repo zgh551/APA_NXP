@@ -20,6 +20,13 @@
 #include "link_list.h"
 #include "curve_fitting.h"
 
+typedef enum _ObstacleRegion
+{
+	LeftRegion = 0,
+    CenterRegion,
+	RightRegion
+}ObstacleRegion;
+
 typedef struct _LineFitInformationPacket
 {
 	float angle;
@@ -42,6 +49,7 @@ typedef struct _ObstacleInformationPacket
 typedef struct _ObstacleDistancePacket
 {
 	float            distance;
+	ObstacleRegion   region;
 	UltrasonicStatus status;
 }ObstacleDistancePacket;
 

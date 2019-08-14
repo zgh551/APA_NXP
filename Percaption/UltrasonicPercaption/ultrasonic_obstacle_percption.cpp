@@ -954,14 +954,17 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,
 	uint8_t i;
 	float distance,current_distance;
 	UltrasonicStatus status;
+	ObstacleRegion region;
 	uint8_t over_detection_cnt;
 	Vector2d LF_P,RF_P,LR_P,RR_P;
 /////////////////////////////////////////////////////////////////////////////////////////////
-	distance = 6;
+	distance = MAX_DETECT_RANGE;
 	status   = Normal;
+	region   = CenterRegion;
 	over_detection_cnt = 0;
 	LF_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX(), LEFT_EDGE_TO_CENTER);
 	RF_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX(),-RIGHT_EDGE_TO_CENTER);
+
 	for(i = 0; i < 4; i++)
 	{
 		if(Normal == u->AbstacleBodyPositionTriangle[i].Status)
@@ -969,66 +972,105 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,
 			if(u->AbstacleBodyPositionTriangle[i].Position.getY() > 0.93)
 			{
 				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - LF_P).Length();
+				region = current_distance < distance ? LeftRegion : region;
 			}
 			else if(u->AbstacleBodyPositionTriangle[i].Position.getY() < -0.93)
 			{
 				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - RF_P).Length();
+				region = current_distance < distance ? RightRegion : region;
 			}
 			else
 			{
 				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[1].Point.getX());
+				region = current_distance < distance ? CenterRegion : region;
 			}
 			distance = current_distance < distance ? current_distance : distance;
 			status = Normal;
 		}
 		else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance = 0;
-			status = BlindZone;
+			distance = MIN_DETECT_RANGE;
+			region   = CenterRegion;
+			status   = BlindZone;
 			break;
 		}
 		else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance = 3;
 			over_detection_cnt++;
 		}
 		else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance = 0;
+			distance = MAX_DETECT_RANGE;
+			region   = CenterRegion;
 			status   = Noise;
 		}
 		else if(InvalidPoint == u->AbstacleBodyPositionTriangle[i].Status)
 		{
 			if(0 == u->UltrasonicPacket[i].status)
 			{
-				current_distance = u->UltrasonicPacket[i].Distance1;
-				distance = current_distance < distance ? current_distance : distance;
-				status = Normal;
+				if(0 == u->UltrasonicPacket[i].Distance1)
+				{
+					distance = MAX_DETECT_RANGE;
+					region   = CenterRegion;
+					status   = OverDetection;
+				}
+				else
+				{
+					current_distance = u->UltrasonicPacket[i].Distance1;
+					if(current_distance < distance)
+					{
+						switch(i)
+						{
+							case 0:
+								region   = LeftRegion;
+							break;
+
+							case 1:
+							case 2:
+								region   = CenterRegion;
+							break;
+
+							case 3:
+								region   = RightRegion;
+							break;
+
+							default:
+								break;
+						}
+					}
+					distance = current_distance < distance ? current_distance : distance;
+					status = Normal;
+				}
 			}
 			else if(16 == u->UltrasonicPacket[i].status)
 			{
-				distance = 0;
-				status = BlindZone;
+				distance = MIN_DETECT_RANGE;
+				region   = CenterRegion;
+				status   = BlindZone;
 				break;
 			}
 			else if(2 == u->UltrasonicPacket[i].status)
 			{
-				distance = u->UltrasonicPacket[i].Distance1;
-				status = Noise;
+				distance = MAX_DETECT_RANGE;
+				region   = CenterRegion;
+				status   = Noise;
 			}
 		}
 	}
 	if(4 == over_detection_cnt)
 	{
-		distance = 3;
+		distance = MAX_DETECT_RANGE;
+		region   = CenterRegion;
 		status   = OverDetection;
 	}
 	_front_obstacle_distance.distance = distance;
+	_front_obstacle_distance.region   = region;
 	_front_obstacle_distance.status   = status ;
 
 /////////////////////////////////////////////////////////////////////////////////////////
-	distance = 6;
+	distance = MAX_DETECT_RANGE;
 	status   = Normal;
+	region   = CenterRegion;
 	over_detection_cnt = 0;
 	LR_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX(), LEFT_EDGE_TO_CENTER);
 	RR_P = Vector2d(_ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX(),-RIGHT_EDGE_TO_CENTER);
@@ -1039,62 +1081,100 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,
 			if(u->AbstacleBodyPositionTriangle[i].Position.getY() > 0.93)
 			{
 				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - LR_P).Length();
+				region = current_distance < distance ? LeftRegion : region;
 			}
 			else if(u->AbstacleBodyPositionTriangle[i].Position.getY() < -0.93)
 			{
 				current_distance = (u->AbstacleBodyPositionTriangle[i].Position - RR_P).Length();
+				region = current_distance < distance ? RightRegion : region;
 			}
 			else
 			{
 				current_distance = fabs(u->AbstacleBodyPositionTriangle[i].Position.getX() - _ultrasonic_obstacle_config.UltrasonicLocationArray[5].Point.getX());
+				region = current_distance < distance ? CenterRegion : region;
 			}
 			distance = current_distance < distance ? current_distance : distance;
 			status = Normal;
 		}
 		else if(BlindZone == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance = 0;
-			status = BlindZone;
+			distance = MIN_DETECT_RANGE;
+			region   = CenterRegion;
+			status   = BlindZone;
 			break;
 		}
 		else if(OverDetection == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance = 3;
 			over_detection_cnt++;
 		}
 		else if(Noise == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			distance = 0;
+			distance = MAX_DETECT_RANGE;
+			region   = CenterRegion;
 			status   = Noise;
 		}
 		else if(InvalidPoint == u->AbstacleBodyPositionTriangle[i].Status)
 		{
 			if(0 == u->UltrasonicPacket[i].status)
 			{
-				current_distance = u->UltrasonicPacket[i].Distance1;
-				distance = current_distance < distance ? current_distance : distance;
-				status = Normal;
+				if(0 == u->UltrasonicPacket[i].Distance1)
+				{
+					distance = MAX_DETECT_RANGE;
+					region   = CenterRegion;
+					status   = OverDetection;
+				}
+				else
+				{
+					current_distance = u->UltrasonicPacket[i].Distance1;
+					if(current_distance < distance)
+					{
+						switch(i)
+						{
+							case 4:
+								region   = LeftRegion;
+							break;
+
+							case 5:
+							case 6:
+								region   = CenterRegion;
+							break;
+
+							case 7:
+								region   = RightRegion;
+							break;
+
+							default:
+								break;
+						}
+					}
+					distance = current_distance < distance ? current_distance : distance;
+					status = Normal;
+				}
 			}
 			else if(16 == u->UltrasonicPacket[i].status)
 			{
-				distance = 0;
+				distance = MIN_DETECT_RANGE;
+				region   = CenterRegion;
 				status   = BlindZone;
 				break;
 			}
 			else if(2 == u->UltrasonicPacket[i].status)
 			{
-				distance = u->UltrasonicPacket[i].Distance1;
+				distance = MAX_DETECT_RANGE;
+				region   = CenterRegion;
 				status   = Noise;
 			}
 		}
 	}
 	if(4 == over_detection_cnt)
 	{
-		distance = 3;
+		distance = MAX_DETECT_RANGE;
+		region   = CenterRegion;
 		status   = OverDetection;
 	}
 	_rear_obstacle_distance.distance = distance;
-	_rear_obstacle_distance.status   = status ;
+	_rear_obstacle_distance.region   = region;
+	_rear_obstacle_distance.status   = status;
 }
 /***********************************************************************************************/
 uint16_t UltrasonicObstaclePercption::getPositionListLength()

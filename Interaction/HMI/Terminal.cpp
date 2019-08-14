@@ -806,13 +806,13 @@ void Terminal::Push(UltrasonicObstaclePercption p)
 	temp_uint16 = p.getFrontObstacleDistance().distance * 10000;
 	m_CAN_Packet.data[0] = (uint8_t)( temp_uint16       & 0xff);
 	m_CAN_Packet.data[1] = (uint8_t)((temp_uint16 >> 8) & 0xff);
-	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[2] = (uint8_t)p.getFrontObstacleDistance().region;
 	m_CAN_Packet.data[3] = (uint8_t)p.getFrontObstacleDistance().status;
 
 	temp_uint16 = p.getRearObstacleDistance().distance * 10000;
 	m_CAN_Packet.data[4] = (uint8_t)( temp_uint16       & 0xff);
 	m_CAN_Packet.data[5] = (uint8_t)((temp_uint16 >> 8) & 0xff);
-	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[6] = (uint8_t)p.getRearObstacleDistance().region;
 	m_CAN_Packet.data[7] = (uint8_t)p.getRearObstacleDistance().status;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }

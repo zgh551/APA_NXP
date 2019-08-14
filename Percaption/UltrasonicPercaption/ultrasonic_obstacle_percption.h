@@ -32,6 +32,9 @@
 #define MIN_FIT_NUM                   (20)
 #define MIN_FIT_DISTANCE              (1.0)
 
+
+#define MAX_DETECT_RANGE              (3.5f)
+#define MIN_DETECT_RANGE              (0.0f)
 // 库位边沿查找算法
 typedef enum _EdgeFindingState
 {
