@@ -256,7 +256,7 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 	_last_yaw = Yaw;
 }
 
-void GeometricTrack::df_PulseUpdate(MessageManager *msg,PID *velocity)
+void GeometricTrack::VelocityPulseUpdate(MessageManager *msg,PID *velocity)
 {
 	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
 	{
@@ -290,7 +290,6 @@ void GeometricTrack::df_PulseUpdate(MessageManager *msg,PID *velocity)
 		 _wait_time_cnt++;
 		 _velocity_line_rate = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
 		 velocity->Desired = _velocity_line_rate;
-		 velocity->pidUpdate(LinearRate);
 		 LinearRate = LinearRate + (msg->LonAcc + velocity->pidUpdate(LinearRate)) * 0.02f;
 
 		 _cumulation_rear_left_pulse  = 0;
@@ -299,8 +298,8 @@ void GeometricTrack::df_PulseUpdate(MessageManager *msg,PID *velocity)
 	 }
 	 else if(_wait_time_cnt >= 50)
 	 {
-		 _velocity_lock = 0xff;
-		 LinearRate = 0;
+		 _velocity_lock               = 0xff;
+		 LinearRate 				  = 0;
 		 _cumulation_rear_left_pulse  = 0;
 		 _cumulation_rear_right_pulse = 0;
 		 _wait_time_cnt               = 0;

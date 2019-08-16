@@ -43,7 +43,8 @@ public:
 	void PulseUpdate(MessageManager *msg) override;
 	void PulseTrackUpdate(MessageManager *msg) override;
 
-	void df_PulseUpdate(MessageManager *msg,PID *velocity);
+	void VelocityPulseUpdate(MessageManager *msg,PID *velocity);
+
 	int32_t getSumRearLeftPulse();
 	void    setSumRearLeftPulse(int32_t value);
 	Property<GeometricTrack,int32_t,READ_WRITE> SumRearLeftPulse;
