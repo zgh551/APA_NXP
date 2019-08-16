@@ -68,10 +68,17 @@ LonControl m_LonControl;
 PID m_VelocityControlPID = PID(0.02,3.5,0.2,0.1,8,2,0.15);
 #endif
 
+
+#ifdef BORUI
+//速度PID参数
+PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
+#endif
+
+
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
 PID m_VelocityControlPID = PID(0.02,3.5,0.0,0.4,0.5,0.5,0.2);
-PID m_VelocityUpdatePID = PID(0.02,0.001f,0.0f,0.0f,0.0f,1,0.2);
+PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 #endif
 /**********************************************************************/
 #ifdef CHANGAN
@@ -268,14 +275,14 @@ void PIT0_isr(void)
 		#if 1 == SIMULATION
 		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
 		#else
-		m_GeometricTrack.PulseUpdate(&m_BoRuiMessage);
+		m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
 #endif
 #endif
 #ifdef DONG_FENG_E70
 		#if 1 == SIMULATION
 		m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
 		#else
-		m_GeometricTrack.df_PulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
+		m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
 #endif
 #endif
 	}
@@ -283,15 +290,15 @@ void PIT0_isr(void)
 	{
 	// 超声波避障功能
 #ifdef CHANGAN
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_0(&m_Ultrasonic,&m_ChangAnMessage);
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
 #endif
 
 #ifdef BORUI
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_0(&m_Ultrasonic,&m_BoRuiMessage);
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
 #endif
 
 #ifdef DONG_FENG_E70
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_0(&m_Ultrasonic,&m_DongFengE70Message);
+		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
 #endif
 	}
 
