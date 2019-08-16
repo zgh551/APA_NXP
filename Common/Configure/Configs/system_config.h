@@ -14,8 +14,8 @@
 #define CAN2_TASK     (4)
 
 /****************System Configure******************/
-#define CHANGAN
-//#define BORUI
+//#define CHANGAN
+#define BORUI
 //#define DONG_FENG_E70
 
 #define SIMULATION 0
