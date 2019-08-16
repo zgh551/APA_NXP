@@ -131,11 +131,16 @@ public:
 	int8_t ParkingCalculateStateMachine(void);
 
 	/*********************************************超声避障相关函数***************************************/
+	// 计算避障距离的基本函数
+	void CollisionDiatanceCalculate(Ultrasonic *u,uint8_t start,uint8_t end,uint8_t p_id,ObstacleDistancePacket *odp);
+
 	int8_t UltrasonicCollisionStatus(Ultrasonic *u,MessageManager *msg);
 
 	void UltrasonicCollisionDiatance(Ultrasonic *u,MessageManager *msg);
 
 	void UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,MessageManager *msg);
+
+	void UltrasonicCollisionDiatanceV1_1(Ultrasonic *u);
 	/*********************************************基础函数***************************************/
 	uint16_t getPositionListLength();
 	uint16_t getLocationListLength();
