@@ -110,7 +110,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			{
 				ctl->SteeringAngle 		= ((int16_t)((dat[1] << 8) | dat[0])) * 0.1f;
 				ctl->SteeringAngleRate 	= dat[2] * 4.0f;
-				ctl->Velocity		    = dat[3] * 0.1f;
+				ctl->Velocity		    = dat[3] * 0.01f;
 				ctl->Distance           = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f;
 				ctl->Gear 				= (uint8_t)(dat[6] & 0x0f);
 				ctl->APAEnable          = (uint8_t)((dat[6]>>4) & 0x03);
@@ -327,16 +327,18 @@ void Terminal::Push(MessageManager *msg)
 
 	m_CAN_Packet.id = 0x410;
 	m_CAN_Packet.length = 8;
-	m_CAN_Packet.data[0] = 0;//( (msg->EMS_QEC_ACC & 0x01) << 2) | ( (msg->ESP_QDC_ACC & 0x01) << 1) | (msg->APA_EPAS_Failed & 0x01);
-	m_CAN_Packet.data[1] = 0;
+
+	temp_uint16 = msg->VehicleMiddleSpeed * 1000;
+	m_CAN_Packet.data[0] =  temp_uint16 & 0xff;
+	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff;
 	temp_int16 = (int16_t)(msg->SteeringAngle * 10);
 	m_CAN_Packet.data[2] = temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
 	temp_uint16 = (uint16_t)(msg->SteeringAngleRate * 100);
 	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	m_CAN_Packet.data[6] = msg->Gear;
+	m_CAN_Packet.data[7] = msg->WheelSpeedDirection;
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	// 车速状态反馈
@@ -388,7 +390,24 @@ void Terminal::Push(MessageManager *msg)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
+void Terminal::Push(DongFengE70Message msg)
+{
+	CAN_Packet m_CAN_Packet;
 
+	m_CAN_Packet.length = 8;
+	m_CAN_Packet.id = 0x418;
+
+	m_CAN_Packet.data[0] = msg.getEPS_AvailabStatus();
+	m_CAN_Packet.data[1] = msg.getESC_APA_EnableStatus();
+	m_CAN_Packet.data[2] = msg.getVCU_APA_ControlStatus();
+	m_CAN_Packet.data[3] = 0;
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
 /*
  * 控制信号
  * */
@@ -449,9 +468,25 @@ void Terminal::Push(VehicleState *msg)
 	temp_int.i16 = (int16_t)(msg->Yaw * 100);
 	m_CAN_Packet.data[4] = temp_int.b[1];
 	m_CAN_Packet.data[5] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(msg->LinearRate * 1000);
-	m_CAN_Packet.data[6] = temp_int.b[1];
-	m_CAN_Packet.data[7] = temp_int.b[0];
+
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x44E;
+	m_CAN_Packet.length = 8;
+
+	temp_int.u16 = (uint16_t)(msg->getPulseUpdateVelocity() * 10000);
+	m_CAN_Packet.data[0] = temp_int.b[1];
+	m_CAN_Packet.data[1] = temp_int.b[0];
+	temp_int.u16 = (uint16_t)(msg->getAccUpdateVelocity() * 10000);
+	m_CAN_Packet.data[2] = temp_int.b[1];
+	m_CAN_Packet.data[3] = temp_int.b[0];
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
