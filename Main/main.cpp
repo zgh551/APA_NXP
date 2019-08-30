@@ -77,7 +77,7 @@ PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
-PID m_VelocityControlPID = PID(0.02,3.5,0.0,0.4,0.5,0.5,0.2);
+PID m_VelocityControlPID = PID(0.02,3.0,0.0,0.1,0.6,0.6,0.2);
 PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 #endif
 /**********************************************************************/
@@ -165,6 +165,81 @@ int main()
 			if(0xA5 == m_Terminal_CA.PushActive)//数据推送内容,5ms进行一次推送
 			{
 				m_Terminal_CA.PushActive = 0;
+				//测试控制代码
+				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
+				{
+
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
+				{
+					// TODO 检车位测试时可以屏蔽
+					#ifdef CHANGAN
+					m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VelocityControlPID);//20ms
+					m_ChangAnController.EnableControl();
+					m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+					m_ChangAnController.GearControlStateMachine(m_ChangAnMessage.ACM_APA_RequestEnable);
+					m_ChangAnController.SteeringAngleControl(0.02, m_ChangAnMessage.SteeringAngle);//角速度控制
+					m_ChangAnController.Push();
+					#endif
+
+					#ifdef BORUI
+					m_BoRuiController.Push(0.02);
+					#endif
+
+					#ifdef DONG_FENG_E70
+					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
+					#endif
+				}
+				#ifdef DONG_FENG_E70
+				if(m_Ultrasonic.SystemTime % 2 == 1)
+				{
+					m_DongFengE70Controller.EnableControl();
+					m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(),
+							                                        m_DongFengE70Message.getEPS_AvailabStatus(),
+																	m_DongFengE70Message.getESC_APA_EnableStatus());
+					m_DongFengE70Controller.Push();
+				}
+				#endif
+				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
+				{
+			#ifdef CHANGAN
+					#if 1 == SIMULATION
+					m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+					#else
+					m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+					#endif
+			#endif
+			#ifdef BORUI
+					#if 1 == SIMULATION
+					m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
+					#else
+					m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
+			#endif
+			#endif
+			#ifdef DONG_FENG_E70
+					#if 1 == SIMULATION
+					m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
+					#else
+					m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
+			#endif
+			#endif
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
+				{
+				// 超声波避障功能
+			#ifdef CHANGAN
+					m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+			#endif
+
+			#ifdef BORUI
+					m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+			#endif
+
+			#ifdef DONG_FENG_E70
+					m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+			#endif
+				}
+				/***********************************控制台消息推送***********************************************/
 				m_Terminal_CA.Push(&m_Ultrasonic);//5ms
 
 				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
@@ -194,6 +269,7 @@ int main()
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Message);
+					m_Terminal_CA.Push( m_DongFengE70Message);
 #endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
@@ -230,77 +306,77 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
-	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
-	{
-
-	}
-	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
-	{
-		// TODO 检车位测试时可以屏蔽
-		#ifdef CHANGAN
-		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VelocityControlPID);//20ms
-		m_ChangAnController.EnableControl();
-		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
-		m_ChangAnController.GearControlStateMachine(m_ChangAnMessage.ACM_APA_RequestEnable);
-		m_ChangAnController.SteeringAngleControl(0.02, m_ChangAnMessage.SteeringAngle);//角速度控制
-		m_ChangAnController.Push();
-		#endif
-
-		#ifdef BORUI
-		m_BoRuiController.Push(0.02);
-		#endif
-
-		#ifdef DONG_FENG_E70
-		m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
-		#endif
-	}
-	#ifdef DONG_FENG_E70
-	if(m_Ultrasonic.SystemTime % 2 == 1)
-	{
-		m_DongFengE70Controller.EnableControl();
-		m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(), m_DongFengE70Message.getESP_AvailabStatus());
-		m_DongFengE70Controller.Push();
-	}
-	#endif
-	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
-	{
-#ifdef CHANGAN
-		#if 1 == SIMULATION
-		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
-		#else
-		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
-		#endif
-#endif
-#ifdef BORUI
-		#if 1 == SIMULATION
-		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
-		#else
-		m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
-#endif
-#endif
-#ifdef DONG_FENG_E70
-		#if 1 == SIMULATION
-		m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
-		#else
-		m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
-#endif
-#endif
-	}
-	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
-	{
-	// 超声波避障功能
-#ifdef CHANGAN
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
-#endif
-
-#ifdef BORUI
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
-#endif
-
-#ifdef DONG_FENG_E70
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
-#endif
-	}
+//	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
+//	{
+//
+//	}
+//	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
+//	{
+//		// TODO 检车位测试时可以屏蔽
+//		#ifdef CHANGAN
+//		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VelocityControlPID);//20ms
+//		m_ChangAnController.EnableControl();
+//		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+//		m_ChangAnController.GearControlStateMachine(m_ChangAnMessage.ACM_APA_RequestEnable);
+//		m_ChangAnController.SteeringAngleControl(0.02, m_ChangAnMessage.SteeringAngle);//角速度控制
+//		m_ChangAnController.Push();
+//		#endif
+//
+//		#ifdef BORUI
+//		m_BoRuiController.Push(0.02);
+//		#endif
+//
+//		#ifdef DONG_FENG_E70
+//		m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
+//		#endif
+//	}
+//	#ifdef DONG_FENG_E70
+//	if(m_Ultrasonic.SystemTime % 2 == 1)
+//	{
+//		m_DongFengE70Controller.EnableControl();
+//		m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(), m_DongFengE70Message.getESP_AvailabStatus());
+//		m_DongFengE70Controller.Push();
+//	}
+//	#endif
+//	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
+//	{
+//#ifdef CHANGAN
+//		#if 1 == SIMULATION
+//		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+//		#else
+//		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+//		#endif
+//#endif
+//#ifdef BORUI
+//		#if 1 == SIMULATION
+//		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
+//		#else
+//		m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
+//#endif
+//#endif
+//#ifdef DONG_FENG_E70
+//		#if 1 == SIMULATION
+//		m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
+//		#else
+//		m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
+//#endif
+//#endif
+//	}
+//	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
+//	{
+//	// 超声波避障功能
+//#ifdef CHANGAN
+//		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+//#endif
+//
+//#ifdef BORUI
+//		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+//#endif
+//
+//#ifdef DONG_FENG_E70
+//		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+//#endif
+//	}
 
 //	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 //	{
@@ -412,8 +488,8 @@ void FlexCAN2_Isr(void)
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
 #endif
 #ifdef DONG_FENG_E70
-//		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
-		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityUpdatePID);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
+//		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityUpdatePID);
 #endif
 
 #ifdef CHANGAN
