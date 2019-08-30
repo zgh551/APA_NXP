@@ -94,8 +94,8 @@ VehicleController::VehicleController() {
 	GearEnable.setter(&VehicleController::setGearEnable);
 
 	APAEnable.setContainer(this);
-	APAEnable.getter(&VehicleController::getGearEnable);
-	APAEnable.setter(&VehicleController::setGearEnable);
+	APAEnable.getter(&VehicleController::getAPAEnable);
+	APAEnable.setter(&VehicleController::setAPAEnable);
 
 	EPBEnable.setContainer(this);
 	EPBEnable.getter(&VehicleController::getEPBEnable);
