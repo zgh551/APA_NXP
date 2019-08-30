@@ -63,6 +63,7 @@ private:
 
 	int16_t _cumulation_rear_left_pulse;
 	int16_t _cumulation_rear_right_pulse;
+
 	float _cumulation_middle_displacement;
 	float _velocity_line_rate;
 	float _last_velocity_line_rate;

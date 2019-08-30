@@ -144,6 +144,8 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 
 	// 速度判定
 	_velocity_line_rate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
+
+
 	if(_velocity_line_rate < 0.2f)//低速情形
 	{
 		// 累积脉冲达到指定
@@ -277,9 +279,20 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg,PID *velocity)
 		_delta_rear_right_pulse = (msg->WheelPulseRearRight >= _last_rear_right_pulse ? 0 : WHEEL_PUSLE_MAX) +
 								   msg->WheelPulseRearRight  - _last_rear_right_pulse ;
 	}
-
 	// 速度判定
-	/*********************************************************************************************************/
+	if((msg->WheelSpeedRearRight > 0.2f) && (msg->WheelSpeedRearLeft > 0.2f))
+	{
+		msg->VehicleMiddleSpeed = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
+	}
+	else
+	{
+		msg->VehicleMiddleSpeed = 0;
+	}
+	/*************************************************脉冲计算速度********************************************************/
+	 if((_delta_rear_left_pulse > 0) || (_delta_rear_right_pulse > 0))//脉冲更新解锁
+	 {
+		 _velocity_lock = 0;
+	 }
 	// 累积脉冲达到指定
 	 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
 	 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
@@ -288,45 +301,40 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg,PID *velocity)
 	 {
 		 _velocity_lock = 0;
 		 _wait_time_cnt++;
-		 _velocity_line_rate = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
-		 velocity->Desired = _velocity_line_rate;
-		 LinearRate = LinearRate + (msg->LonAcc + velocity->pidUpdate(LinearRate)) * 0.02f;
-
+		 PulseUpdateVelocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
 		 _cumulation_rear_left_pulse  = 0;
 		 _cumulation_rear_right_pulse = 0;
 		 _wait_time_cnt               = 0;
 	 }
-	 else if(_wait_time_cnt >= 50)
+	 else if(_wait_time_cnt >= 25)
 	 {
-		 _velocity_lock               = 0xff;
-		 LinearRate 				  = 0;
-		 _cumulation_rear_left_pulse  = 0;
-		 _cumulation_rear_right_pulse = 0;
-		 _wait_time_cnt               = 0;
+		 if((msg->WheelSpeedRearRight < 1.0e-6) && (msg->WheelSpeedRearLeft < 1.0e-6))
+		 {
+			 _velocity_lock               = 0xff;
+			 PulseUpdateVelocity          = 0;
+			 _cumulation_rear_left_pulse  = 0;
+			 _cumulation_rear_right_pulse = 0;
+			 _wait_time_cnt               = 0;
+		 }
 	 }
 	 else
 	 {
-		 _wait_time_cnt++;
-		 if(0xff == _velocity_lock)
+		 if(0xff != _velocity_lock)
 		 {
-			 LinearRate = 0;
+			 _wait_time_cnt++;
 		 }
-		 else
+	 }
+	 /**************************************************脉冲计算结束****************************************/
+	 if(msg->VehicleMiddleSpeed < 1.0e-6)
+	 {
+		 if( PulseUpdateVelocity < 0.5f )
 		 {
-			 LinearRate = LinearRate + msg->LonAcc * 0.02f;
-			 if(LinearRate < 0)
-			 {
-				 _velocity_lock = 0xff;
-				 LinearRate = 0;
-			 }
+			 msg->VehicleMiddleSpeed = PulseUpdateVelocity;
 		 }
 	 }
 
-	_last_velocity_line_rate = _velocity_line_rate;
-
 	_sum_rear_left_pulse  += _delta_rear_left_pulse;
 	_sum_rear_right_pulse += _delta_rear_right_pulse;
-
 
 	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
 	_last_rear_right_pulse = msg->WheelPulseRearRight;
