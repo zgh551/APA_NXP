@@ -17,7 +17,7 @@
 // 选择车辆入库的方向，可选的是x轴还是y轴
 #define X_AXIS_ENTER				   (0)
 #define Y_AXIS_ENTER				   (1)
-#define ENTER_PARK_DIRECTION           (X_AXIS_ENTER)
+#define ENTER_PARK_DIRECTION           (Y_AXIS_ENTER)
 
 // 入库过程库位调整相关参数
 #define DISTANCE_ERR_THRESHOLD        (0.6f)
@@ -32,6 +32,9 @@
 #define MIN_FIT_NUM                   (20)
 #define MIN_FIT_DISTANCE              (1.0)
 
+
+#define MAX_DETECT_RANGE              (3.5f)
+#define MIN_DETECT_RANGE              (0.0f)
 // 库位边沿查找算法
 typedef enum _EdgeFindingState
 {
@@ -128,9 +131,16 @@ public:
 	int8_t ParkingCalculateStateMachine(void);
 
 	/*********************************************超声避障相关函数***************************************/
+	// 计算避障距离的基本函数
+	void CollisionDiatanceCalculate(Ultrasonic *u,uint8_t start,uint8_t end,uint8_t p_id,ObstacleDistancePacket *odp);
+
 	int8_t UltrasonicCollisionStatus(Ultrasonic *u,MessageManager *msg);
 
 	void UltrasonicCollisionDiatance(Ultrasonic *u,MessageManager *msg);
+
+	void UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,MessageManager *msg);
+
+	void UltrasonicCollisionDiatanceV1_1(Ultrasonic *u);
 	/*********************************************基础函数***************************************/
 	uint16_t getPositionListLength();
 	uint16_t getLocationListLength();

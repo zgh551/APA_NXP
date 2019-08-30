@@ -57,12 +57,23 @@ public:
 	float getTurnningRadius();
 	void  setTurnningRadius(float value);
 	Property<VehicleState,float,READ_WRITE> TurnningRadius;
+
+	float getPulseUpdateVelocity();
+	void  setPulseUpdateVelocity(float value);
+	Property<VehicleState,float,READ_WRITE> PulseUpdateVelocity;
+
+	float getAccUpdateVelocity();
+	void  setAccUpdateVelocity(float value);
+	Property<VehicleState,float,READ_WRITE> AccUpdateVelocity;
 protected:
 	Vector2d _position;
 	float    _yaw;
 	float _linear_velocity;
 	float _linear_rate;
 	float _turnning_radius;
+
+	float _pulse_update_velocity;
+	float _acc_update_velocity;
 };
 
 #endif /* VEHICLESTATE_VEHICLESTATE_H_ */

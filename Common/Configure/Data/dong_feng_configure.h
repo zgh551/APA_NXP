@@ -137,52 +137,52 @@
 //#define SENSOR4_ANGLE ( 0.00f )
 
 //实际车辆的超声安装位置
-#define SENSOR1_X     ( 3.56f )
-#define SENSOR1_Y     ( 0.68f )
+#define SENSOR1_X     ( 3.4f )
+#define SENSOR1_Y     ( 0.73f )
 #define SENSOR1_ANGLE ( 0.00f )
 
-#define SENSOR2_X     ( 3.76f )
+#define SENSOR2_X     ( 3.5f )
 #define SENSOR2_Y     ( 0.32f )
 #define SENSOR2_ANGLE ( 0.00f )
 
-#define SENSOR3_X     ( 3.76f )
+#define SENSOR3_X     ( 3.5f )
 #define SENSOR3_Y     (-0.32f )
 #define SENSOR3_ANGLE ( 0.00f )
 
-#define SENSOR4_X     ( 3.56f )
-#define SENSOR4_Y     (-0.68f )
+#define SENSOR4_X     ( 3.4f )
+#define SENSOR4_Y     (-0.73f )
 #define SENSOR4_ANGLE ( 0.00f )
 
-#define SENSOR5_X     (-1.02f )
-#define SENSOR5_Y     ( 0.69f )
+#define SENSOR5_X     (-0.9f )
+#define SENSOR5_Y     ( 0.66f )
 #define SENSOR5_ANGLE ( 3.1415926535897932384626433832795 )
 
-#define SENSOR6_X     (-1.08f )
-#define SENSOR6_Y     ( 0.32f )
+#define SENSOR6_X     (-1.0f )
+#define SENSOR6_Y     ( 0.25f )
 #define SENSOR6_ANGLE ( 3.1415926535897932384626433832795 )
 
-#define SENSOR7_X     (-1.08f )
-#define SENSOR7_Y     (-0.32f )
+#define SENSOR7_X     (-1.0f )
+#define SENSOR7_Y     (-0.25f )
 #define SENSOR7_ANGLE ( 3.1415926535897932384626433832795 )
 
-#define SENSOR8_X     (-1.02f )
-#define SENSOR8_Y     (-0.69f )
+#define SENSOR8_X     (-0.9f )
+#define SENSOR8_Y     (-0.66f )
 #define SENSOR8_ANGLE ( 3.1415926535897932384626433832795 )
 
-#define SENSOR9_X     ( 3.15f )
-#define SENSOR9_Y     ( 0.90f )
+#define SENSOR9_X     ( 3.02f )
+#define SENSOR9_Y     ( 0.80f )
 #define SENSOR9_ANGLE (1.5707963267948966192313216916398 )
 
-#define SENSOR10_X     ( 3.15f )
-#define SENSOR10_Y     (-0.90f )
+#define SENSOR10_X     ( 3.02f )
+#define SENSOR10_Y     (-0.80f )
 #define SENSOR10_ANGLE (-1.5707963267948966192313216916398 )
 
-#define SENSOR11_X     (-0.32f)
-#define SENSOR11_Y     ( 0.90f)
+#define SENSOR11_X     (-0.35f)
+#define SENSOR11_Y     ( 0.80f)
 #define SENSOR11_ANGLE (1.5707963267948966192313216916398)
 
-#define SENSOR12_X     (-0.32f)
-#define SENSOR12_Y     (-0.90f)
+#define SENSOR12_X     (-0.35f)
+#define SENSOR12_Y     (-0.80f)
 #define SENSOR12_ANGLE (-1.5707963267948966192313216916398)
 
 
@@ -731,6 +731,6 @@ const float torque_table[ACC_ARRAY_NUM][VELOCITY_ARRAY_NUM]=
 		{140,140,140,140,120,100,80},
 		{140,140,140,140,140,120,100},
 		{140,140,140,140,140,140,120},
-		{270,240,180,140,140,140,140}
+		{270,240,220,200,180,150,140}
 };
 #endif /* CONFIGURE_DATA_BO_RUI_CONFIGURE_H_ */

@@ -68,10 +68,17 @@ LonControl m_LonControl;
 PID m_VelocityControlPID = PID(0.02,3.5,0.2,0.1,8,2,0.15);
 #endif
 
+
+#ifdef BORUI
+//速度PID参数
+PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
+#endif
+
+
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
-PID m_VelocityControlPID = PID(0.02,3.5,0.1,0.1,0.005,0.5,0.2);
-PID m_AccelerateControlPID = PID(0.02,400,20.0,20.0,10,300,0.2);
+PID m_VelocityControlPID = PID(0.02,3.0,0.0,0.1,0.6,0.6,0.2);
+PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 #endif
 /**********************************************************************/
 #ifdef CHANGAN
@@ -114,60 +121,9 @@ int main()
 		/* Init LinFlexD Module */
 		LINFlexD_Configure();
 
-		/* Init eTimer Module */
-//		eTimer2_Init();
-//		eTimer2_OutputInit();
-//		eTimer1_OutputInit();
 		/* Init PIT Module */
 		PIT_Configure();
 		/* Loop forever */
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.AccelerateTable, 10, 0.12,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.AccelerateTable, 10, 0.22,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.AccelerateTable, 10, 0.07,&m_before,&m_after);
-//
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.12,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.32,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.52,&m_before,&m_after);
-//		m_Interpolation.ArrayIndexFind(m_VehilceConfig.VelocityTable, 7, 0.62,&m_before,&m_after);
-//
-//		int_value = m_Interpolation.InterpolateValue(4, 3, 6, 5, 7);
-//		int_value = m_Interpolation.InterpolateValue(7, 3, 6, 5, 7);
-//		int_value = m_Interpolation.InterpolateValue(2, 3, 6, 5, 7);
-//
-//		int_value = m_Interpolation.InterpolationYZ(0.12, m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum, m_VehilceConfig.TorqueTable);
-//		int_value = m_Interpolation.InterpolationYZ(0.62, m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum, m_VehilceConfig.TorqueTable);
-//		int_value = m_Interpolation.InterpolationYZ(0.12, m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum, m_VehilceConfig.TorqueTable + m_VehilceConfig.VlcNum);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.08, 0.34,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.18, 0.34,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.04, 0.05,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.08, 0.8,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.32, 0.05,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-//
-//		int_value = m_Interpolation.Interpolation2D(0.32, 0.9,
-//													m_VehilceConfig.AccelerateTable, m_VehilceConfig.AccNum,
-//													m_VehilceConfig.VelocityTable, m_VehilceConfig.VlcNum,
-//													m_VehilceConfig.TorqueTable);
-
 		for(;;)
 		{
 			//Task 一次性的计算任务 泊车规划任务
@@ -209,6 +165,81 @@ int main()
 			if(0xA5 == m_Terminal_CA.PushActive)//数据推送内容,5ms进行一次推送
 			{
 				m_Terminal_CA.PushActive = 0;
+				//测试控制代码
+				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
+				{
+
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
+				{
+					// TODO 检车位测试时可以屏蔽
+					#ifdef CHANGAN
+					m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VelocityControlPID);//20ms
+					m_ChangAnController.EnableControl();
+					m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+					m_ChangAnController.GearControlStateMachine(m_ChangAnMessage.ACM_APA_RequestEnable);
+					m_ChangAnController.SteeringAngleControl(0.02, m_ChangAnMessage.SteeringAngle);//角速度控制
+					m_ChangAnController.Push();
+					#endif
+
+					#ifdef BORUI
+					m_BoRuiController.Push(0.02);
+					#endif
+
+					#ifdef DONG_FENG_E70
+					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
+					#endif
+				}
+				#ifdef DONG_FENG_E70
+				if(m_Ultrasonic.SystemTime % 2 == 1)
+				{
+					m_DongFengE70Controller.EnableControl();
+					m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(),
+							                                        m_DongFengE70Message.getEPS_AvailabStatus(),
+																	m_DongFengE70Message.getESC_APA_EnableStatus());
+					m_DongFengE70Controller.Push();
+				}
+				#endif
+				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
+				{
+			#ifdef CHANGAN
+					#if 1 == SIMULATION
+					m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+					#else
+					m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+					#endif
+			#endif
+			#ifdef BORUI
+					#if 1 == SIMULATION
+					m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
+					#else
+					m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
+			#endif
+			#endif
+			#ifdef DONG_FENG_E70
+					#if 1 == SIMULATION
+					m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
+					#else
+					m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
+			#endif
+			#endif
+				}
+				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
+				{
+				// 超声波避障功能
+			#ifdef CHANGAN
+					m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+			#endif
+
+			#ifdef BORUI
+					m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+			#endif
+
+			#ifdef DONG_FENG_E70
+					m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+			#endif
+				}
+				/***********************************控制台消息推送***********************************************/
 				m_Terminal_CA.Push(&m_Ultrasonic);//5ms
 
 				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
@@ -238,6 +269,7 @@ int main()
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Message);
+					m_Terminal_CA.Push( m_DongFengE70Message);
 #endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
@@ -274,78 +306,77 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
-	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
-	{
-
-	}
-	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
-	{
-		// TODO 检车位测试时可以屏蔽
-		#ifdef CHANGAN
-		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VelocityControlPID);//20ms
-		m_ChangAnController.EnableControl();
-		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
-		m_ChangAnController.GearControlStateMachine(m_ChangAnMessage.ACM_APA_RequestEnable);
-		m_ChangAnController.SteeringAngleControl(0.02, m_ChangAnMessage.SteeringAngle);//角速度控制
-		m_ChangAnController.Push();
-		#endif
-
-		#ifdef BORUI
-		m_BoRuiController.Push(0.02);
-		#endif
-
-		#ifdef DONG_FENG_E70
-		m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
-		#endif
-	}
-	#ifdef DONG_FENG_E70
-	if(m_Ultrasonic.SystemTime % 2 == 1)
-	{
-		m_DongFengE70Controller.EnableControl();
-		m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(), m_DongFengE70Message.getESP_AvailabStatus());
-		m_DongFengE70Controller.Push();
-	}
-	#endif
-	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
-	{
-#ifdef CHANGAN
-		#if 1 == SIMULATION
-		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
-		#else
-		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
-		#endif
-#endif
-#ifdef BORUI
-		#if 1 == SIMULATION
-		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
-		#else
-		m_GeometricTrack.PulseUpdate(&m_BoRuiMessage);
-#endif
-#endif
-#ifdef DONG_FENG_E70
-		#if 1 == SIMULATION
-		m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
-		#else
-		m_GeometricTrack.df_PulseUpdate(&m_DongFengE70Message);
-#endif
-#endif
-	}
-	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
-	{
-	// 超声波避障功能
-#ifdef CHANGAN
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_ChangAnMessage);
-#endif
-
-#ifdef BORUI
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_BoRuiMessage);
-#endif
-
-#ifdef DONG_FENG_E70
-		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatance(&m_Ultrasonic,&m_DongFengE70Message);
-#endif
-
-	}
+//	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
+//	{
+//
+//	}
+//	if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
+//	{
+//		// TODO 检车位测试时可以屏蔽
+//		#ifdef CHANGAN
+//		m_LonControl.Proc(&m_ChangAnMessage, &m_ChangAnController, &m_VelocityControlPID);//20ms
+//		m_ChangAnController.EnableControl();
+//		m_ChangAnController.SteeringAngleControlStateMachine(m_ChangAnMessage.APA_ControlFeedback);
+//		m_ChangAnController.GearControlStateMachine(m_ChangAnMessage.ACM_APA_RequestEnable);
+//		m_ChangAnController.SteeringAngleControl(0.02, m_ChangAnMessage.SteeringAngle);//角速度控制
+//		m_ChangAnController.Push();
+//		#endif
+//
+//		#ifdef BORUI
+//		m_BoRuiController.Push(0.02);
+//		#endif
+//
+//		#ifdef DONG_FENG_E70
+//		m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
+//		#endif
+//	}
+//	#ifdef DONG_FENG_E70
+//	if(m_Ultrasonic.SystemTime % 2 == 1)
+//	{
+//		m_DongFengE70Controller.EnableControl();
+//		m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(), m_DongFengE70Message.getESP_AvailabStatus());
+//		m_DongFengE70Controller.Push();
+//	}
+//	#endif
+//	if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
+//	{
+//#ifdef CHANGAN
+//		#if 1 == SIMULATION
+//		m_GeometricTrack.VelocityUpdate(&m_ChangAnMessage,0.02);
+//		#else
+//		m_GeometricTrack.PulseUpdate(&m_ChangAnMessage);
+//		#endif
+//#endif
+//#ifdef BORUI
+//		#if 1 == SIMULATION
+//		m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
+//		#else
+//		m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
+//#endif
+//#endif
+//#ifdef DONG_FENG_E70
+//		#if 1 == SIMULATION
+//		m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
+//		#else
+//		m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
+//#endif
+//#endif
+//	}
+//	if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
+//	{
+//	// 超声波避障功能
+//#ifdef CHANGAN
+//		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+//#endif
+//
+//#ifdef BORUI
+//		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+//#endif
+//
+//#ifdef DONG_FENG_E70
+//		m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+//#endif
+//	}
 
 //	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 //	{
@@ -354,7 +385,6 @@ void PIT0_isr(void)
 ////		eTimer1Channel5OutputStart();
 ////		eTimer1_Channel5Send();
 //	}
-
 
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
@@ -459,7 +489,7 @@ void FlexCAN2_Isr(void)
 #endif
 #ifdef DONG_FENG_E70
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
-//		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_AccelerateControlPID);
+//		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityUpdatePID);
 #endif
 
 #ifdef CHANGAN

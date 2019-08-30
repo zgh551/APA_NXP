@@ -19,7 +19,7 @@
 
 #include "property.h"
 #include "derivative.h"
-//#include "ChangAn/chang_an_message.h"
+#include "DongFengE70/dong_feng_e70_message.h"
 #include "Interface/vehicle_controller.h"
 #include "Interface/message_manager.h"
 #include "Interface/vehicle_state.h"
@@ -71,7 +71,8 @@ public:
 	void Parse(vuint32_t id,vuint8_t dat[]);
 	// Terminal Control
 	void Push(MessageManager *msg);
-//	void Push(ChangAnMessage *msg);
+
+	void Push(DongFengE70Message msg);
 
 	void Push(VehicleController *msg);
 

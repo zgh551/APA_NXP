@@ -22,9 +22,13 @@ void DongFengE70Message::Init()
 	VCU_APA_ControlStatus.getter(&DongFengE70Message::getVCU_APA_ControlStatus);
 	VCU_APA_ControlStatus.setter(&DongFengE70Message::setVCU_APA_ControlStatus);
 
-	ESP_AvailabStatus.setContainer(this);
-	ESP_AvailabStatus.getter(&DongFengE70Message::getESP_AvailabStatus);
-	ESP_AvailabStatus.setter(&DongFengE70Message::setESP_AvailabStatus);
+	EPS_AvailabStatus.setContainer(this);
+	EPS_AvailabStatus.getter(&DongFengE70Message::getEPS_AvailabStatus);
+	EPS_AvailabStatus.setter(&DongFengE70Message::setEPS_AvailabStatus);
+
+	ESC_APA_EnableStatus.setContainer(this);
+	ESC_APA_EnableStatus.getter(&DongFengE70Message::getESC_APA_EnableStatus);
+	ESC_APA_EnableStatus.setter(&DongFengE70Message::setESC_APA_EnableStatus);
 }
 
 void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght)
@@ -36,12 +40,17 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			YawRate = (((data[2] & 0x07) << 8 ) | data[3]) * 0.03 - 15.36;
 			break;
 
-		case 0x165:
-			_esp_availab_status = (data[0] >> 6) & 0x03;
+		case 0xFA:
+			_esc_apa_enable_status = (uint8_t)((data[1] >> 6) & 0x03);
 			break;
 
-		case 0x355:
-			switch((uint8_t)((data[0] >> 5) & 0x07))
+		case 0x165:
+			_eps_availab_status = (uint8_t)((data[0] >> 6) & 0x03);
+			break;
+
+		case 0x176://VCU 10
+			_vcu_apa_control_st = (uint8_t)(( data[0] >> 5 ) & 0x03);
+			switch((uint8_t)( data[0] & 0x07))
 			{
 				case 1:
 					Gear = Parking;
@@ -65,13 +74,9 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			}
 			break;
 
-		case 0x176://VCU 10
-			_vcu_apa_control_st = (uint8_t)(( data[0] >> 5 ) & 0x03);
-			break;
-
 		case 0xA0:
-			VehicleMiddleSpeed      = (uint16_t)((data[6] << 8) | data[7]) * V_M_S;
-			VehicleMiddleSpeedValid = (uint8_t)((data[3] >> 1) & 0x01);
+//			VehicleMiddleSpeed      = (uint16_t)((data[6] << 8) | data[7]) * V_M_S;
+//			VehicleMiddleSpeedValid = (uint8_t)((data[3] >> 1) & 0x01);
 			break;
 
 		case 0xA3://ESC
@@ -131,5 +136,8 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 uint8_t DongFengE70Message::getVCU_APA_ControlStatus()			   {return _vcu_apa_control_st ;}
 void    DongFengE70Message::setVCU_APA_ControlStatus(uint8_t value){_vcu_apa_control_st = value;}
 
-uint8_t DongFengE70Message::getESP_AvailabStatus()			   {return _esp_availab_status ;}
-void    DongFengE70Message::setESP_AvailabStatus(uint8_t value){_esp_availab_status = value;}
+uint8_t DongFengE70Message::getEPS_AvailabStatus()			   {return _eps_availab_status ;}
+void    DongFengE70Message::setEPS_AvailabStatus(uint8_t value){_eps_availab_status = value;}
+
+uint8_t DongFengE70Message::getESC_APA_EnableStatus()			  {return _esc_apa_enable_status ;}
+void    DongFengE70Message::setESC_APA_EnableStatus(uint8_t value){_esc_apa_enable_status = value;}

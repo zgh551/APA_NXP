@@ -46,6 +46,14 @@ void VehicleState::Init()
 	TurnningRadius.setContainer(this);
 	TurnningRadius.getter(&VehicleState::getTurnningRadius);
 	TurnningRadius.setter(&VehicleState::setTurnningRadius);
+
+	PulseUpdateVelocity.setContainer(this);
+	PulseUpdateVelocity.getter(&VehicleState::getPulseUpdateVelocity);
+	PulseUpdateVelocity.setter(&VehicleState::setPulseUpdateVelocity);
+
+	AccUpdateVelocity.setContainer(this);
+	AccUpdateVelocity.getter(&VehicleState::getAccUpdateVelocity);
+	AccUpdateVelocity.setter(&VehicleState::setAccUpdateVelocity);
 }
 
 Vector2d VehicleState::getPosition()              { return  _position;}
@@ -62,3 +70,9 @@ void  VehicleState::setLinearRate(float value){_linear_rate = value;}
 
 float VehicleState::getTurnningRadius()           { return _turnning_radius;}
 void  VehicleState::setTurnningRadius(float value){_turnning_radius = value;}
+
+float VehicleState::getPulseUpdateVelocity()           { return _pulse_update_velocity;}
+void  VehicleState::setPulseUpdateVelocity(float value){_pulse_update_velocity = value;}
+
+float VehicleState::getAccUpdateVelocity()           { return _acc_update_velocity;}
+void  VehicleState::setAccUpdateVelocity(float value){_acc_update_velocity = value;}

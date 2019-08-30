@@ -48,6 +48,14 @@ Percaption::Percaption() {
 	ObstacleDistance.getter(&Percaption::getObstacleDistance);
 	ObstacleDistance.setter(&Percaption::setObstacleDistance);
 
+	FrontObstacleDistance.setContainer(this);
+	FrontObstacleDistance.getter(&Percaption::getFrontObstacleDistance);
+	FrontObstacleDistance.setter(&Percaption::setFrontObstacleDistance);
+
+	RearObstacleDistance.setContainer(this);
+	RearObstacleDistance.getter(&Percaption::getRearObstacleDistance);
+	RearObstacleDistance.setter(&Percaption::setRearObstacleDistance);
+
 	LeftFitLinePacket.setContainer(this);
 	LeftFitLinePacket.getter(&Percaption::getLeftFitLinePacket);
 	LeftFitLinePacket.setter(&Percaption::setLeftFitLinePacket);
@@ -105,6 +113,12 @@ void  Percaption::setValidParkingCenterPosition(EdgeInformationPacket value){ _v
 
 ObstacleDistancePacket Percaption::getObstacleDistance()           { return  _obstacle_distance;}
 void  Percaption::setObstacleDistance(ObstacleDistancePacket value){ _obstacle_distance = value;}
+
+ObstacleDistancePacket Percaption::getFrontObstacleDistance()           { return  _front_obstacle_distance;}
+void  Percaption::setFrontObstacleDistance(ObstacleDistancePacket value){ _front_obstacle_distance = value;}
+
+ObstacleDistancePacket Percaption::getRearObstacleDistance()           { return  _rear_obstacle_distance;}
+void  Percaption::setRearObstacleDistance(ObstacleDistancePacket value){ _rear_obstacle_distance = value;}
 
 LineFitInformationPacket Percaption::getLeftFitLinePacket()           { return  _left_fit_line_packet;}
 void  Percaption::setLeftFitLinePacket(LineFitInformationPacket value){ _left_fit_line_packet = value;}
