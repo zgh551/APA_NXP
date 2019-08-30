@@ -23,7 +23,9 @@
 typedef enum _ObstacleRegion
 {
 	LeftRegion = 0,
-    CenterRegion,
+    LeftCenterRegion,
+	CenterRegion,
+	RightCenterRegion,
 	RightRegion
 }ObstacleRegion;
 
