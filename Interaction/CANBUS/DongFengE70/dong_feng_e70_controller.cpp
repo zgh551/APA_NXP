@@ -18,8 +18,9 @@ DongFengE70Controller::~DongFengE70Controller() {
 
 void DongFengE70Controller::Init()
 {
-	_apa_torque_control_state = TorqueWaitEnable;
+	_apa_torque_control_state = TorqueInitStatus;
 	_apa_turn_control_state   = TurnWaitHand;
+	_apa_esc_control_state    = ESCWaitHand;
 
 	_apa_max_troque = 1000;
 }
@@ -172,16 +173,26 @@ void DongFengE70Controller::VehicleContorl_10ms(void)
 		crc_temp = crc_temp ^ m_CAN_Packet.data[i];
 	}
 	m_CAN_Packet.data[7] = crc_temp & 0xff;
-	m_CAN_Packet.data[7] = 0;
 	CAN0_TransmitMsg(m_CAN_Packet);
 	_apa_esc_rolling_count++;
 }
 
-void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts)
+void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts,uint8_t esc_apa_enable_status)
 {
-	// Torque Control
+	// VCU Torque Gear Control
 	switch(_apa_torque_control_state)
 	{
+		case TorqueInitStatus:
+			if(0 == apa_ctl_sts)
+			{
+				_apa_torque_control_state = TorqueWaitEnable;
+			}
+			else
+			{
+				_apa_work_status = 0;
+			}
+			break;
+
 		case TorqueWaitEnable:
 			if(TorqueEnable)
 			{
@@ -198,16 +209,26 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 		case TorqueWaitActive:
 			if(2 == apa_ctl_sts)
 			{
-				_apa_torque_control_state = TorqueWaitDisable;
+				_apa_torque_control_state = TorqueWaitInactive;
 			}
 			break;
 
-		case TorqueWaitDisable:
+		case TorqueWaitInactive:
 			if(0 == TorqueEnable)
 			{
-				_apa_work_status = 0;
 				_apa_vcu_control = 0;
-				_apa_torque_control_state = TorqueWaitEnable;
+			}
+			if(3 == apa_ctl_sts)
+			{
+				_apa_torque_control_state = TorqueWaitUnavailable;
+			}
+			break;
+
+		case TorqueWaitUnavailable:
+			_apa_work_status = 0;
+			if(0 == apa_ctl_sts)
+			{
+				_apa_torque_control_state = TorqueInitStatus;
 			}
 			break;
 
@@ -215,7 +236,7 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 
 			break;
 	}
-	// Steering Angle Control
+	// EPS Steering Angle Control
 	switch(_apa_turn_control_state)
 	{
 		case TurnWaitHand:
@@ -248,16 +269,53 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 			break;
 
 	}
-	// ACC
-	if(AccelerationEnable)
+	// ESC ACC
+	switch(_apa_esc_control_state)
 	{
-		_apa_esc_brake_req_valid_flag = 1;
-	}
-	else
-	{
-		_apa_esc_brake_req_valid_flag = 0;
-	}
+		case ESCWaitHand:
+			if(AccelerationEnable)
+			{
+				_apa_esc_control_req = 1;
+				_apa_esc_manuver_state = 1;
+				_apa_esc_brake_req_valid_flag = 1;
+				_apa_esc_control_state = ESCWiatActive;
+			}
+			else
+			{
+				_apa_esc_control_req = 0;
+				_apa_esc_manuver_state = 0;
+				_apa_esc_brake_req_valid_flag = 0;
+			}
+			break;
 
+		case ESCWiatActive:
+			if(2 == esc_apa_enable_status)
+			{
+				_apa_esc_control_state = ESCWaitDisable;
+			}
+			break;
+
+		case ESCWaitDisable:
+			if(0 == AccelerationEnable)
+			{
+				_apa_esc_control_req = 0;
+				_apa_esc_manuver_state = 0;
+				_apa_esc_brake_req_valid_flag = 0;
+				_apa_esc_control_state = ESCWaitStatusArrive;
+			}
+			break;
+
+		case ESCWaitStatusArrive:
+			if(1 == esc_apa_enable_status)
+			{
+				_apa_esc_control_state = ESCWaitHand;
+			}
+			break;
+
+		default:
+
+			break;
+	}
 }
 
 void DongFengE70Controller::Push(void)

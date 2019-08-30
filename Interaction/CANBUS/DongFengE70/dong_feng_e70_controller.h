@@ -14,17 +14,27 @@
 
 typedef enum _APA_TorqueControlState
 {
-	TorqueWaitEnable = 0,
+	TorqueInitStatus = 0,
+	TorqueWaitEnable,
 	TorqueWaitActive,
-	TorqueWaitDisable
+	TorqueWaitInactive,
+	TorqueWaitUnavailable
 }APA_TorqueControlState;
 
-typedef enum APA_TurnControlState
+typedef enum _APA_TurnControlState
 {
 	TurnWaitHand = 0,
 	TurnWiatActive,
 	TurnWaitDisable
 }APA_TurnControlState;
+
+typedef enum _APA_ESC_ControlState
+{
+	ESCWaitHand = 0,
+	ESCWiatActive,
+	ESCWaitDisable,
+	ESCWaitStatusArrive
+}APA_ESC_ControlState;
 
 class DongFengE70Controller  : public VehicleController
 {
@@ -56,7 +66,7 @@ public:
 
 	void VehicleContorl_20ms(void);
 	void VehicleContorl_10ms(void);
-	void APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts);
+	void APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts,uint8_t esc_apa_enable_status);
 
 	// push the command to the vehicle
 	void Push();
@@ -65,6 +75,7 @@ public:
 private:
 	APA_TorqueControlState _apa_torque_control_state;
 	APA_TurnControlState   _apa_turn_control_state;
+	APA_ESC_ControlState   _apa_esc_control_state;
 	/*
 	 * VCU
 	 * */
