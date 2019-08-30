@@ -27,7 +27,7 @@ void LonControl::Init()
 	_min_velocity = MIN_VELOCITY;// 曲线段的速度
 
 	_throttle_lowerbound = 50;//Nm
-	_brake_lowerbound = 0;// m/s2
+	_brake_lowerbound = -0.123;// m/s2
 
 }
 
@@ -116,10 +116,9 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 {
 	if(ctl->VelocityEnable)
 	{
-		_vehicle_velocity = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
-//		_vehicle_velocity = msg->VehicleMiddleSpeed;
-//		velocity_pid->Desired = ctl->Velocity;
-		velocity_pid->Desired   = VelocityControl(ctl->Distance,ctl->Velocity);
+		_vehicle_velocity = msg->VehicleMiddleSpeed;
+//		velocity_pid->Desired = ctl->Velocity;//纯速度控制
+		velocity_pid->Desired   = VelocityControl(ctl->Distance,ctl->Velocity);//距离速度控制
 		ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
 
 		if(ctl->TargetAcceleration > 0)
@@ -149,9 +148,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 					ctl->Torque = _throttle_lowerbound;
 					ctl->Acceleration = 0;
 				}
-
 			}
-//			ctl->Acceleration = 0;
 		}
 		else
 		{
@@ -162,7 +159,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 			{
 				if(velocity_pid->Desired < 1.0e-6)
 				{
-					ctl->Acceleration = -0.1;
+					ctl->Acceleration = -0.6;
 				}
 				else
 				{
