@@ -65,14 +65,11 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
@@ -112,14 +109,11 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/LookAround&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Interaction/Ultrasonic&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/FusionPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
@@ -198,9 +192,6 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Interface&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/ParallelParking&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/VerticalParking&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.793304228" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
