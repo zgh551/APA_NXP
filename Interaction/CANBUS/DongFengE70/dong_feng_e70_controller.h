@@ -66,7 +66,7 @@ public:
 
 	void VehicleContorl_20ms(void);
 	void VehicleContorl_10ms(void);
-	void APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts,uint8_t esc_apa_enable_status);
+	void APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts,uint8_t esc_apa_enable_status,uint8_t epb_status);
 
 	// push the command to the vehicle
 	void Push();
@@ -105,6 +105,8 @@ private:
 
 	uint16_t _apa_esc_brake_req;
 	uint8_t _apa_esc_rolling_count;
+
+	uint8_t _apa_enable_flag;
 };
 
 #endif /* CANBUS_DONGFENGE70_DONG_FENG_E70_CONTROLLER_H_ */

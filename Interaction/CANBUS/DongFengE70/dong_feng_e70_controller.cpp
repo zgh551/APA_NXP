@@ -23,6 +23,8 @@ void DongFengE70Controller::Init()
 	_apa_esc_control_state    = ESCWaitHand;
 
 	_apa_max_troque = 1000;
+
+	_apa_enable_flag = 0xff;
 }
 
 void DongFengE70Controller::Start()
@@ -75,6 +77,7 @@ void DongFengE70Controller::EnableControl()
 	if(APAEnable)
 	{
 		Start();
+		_apa_enable_flag = 0xff;
 	}
 	else
 	{
@@ -177,7 +180,7 @@ void DongFengE70Controller::VehicleContorl_10ms(void)
 	_apa_esc_rolling_count++;
 }
 
-void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts,uint8_t esc_apa_enable_status)
+void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t esp_availab_sts,uint8_t esc_apa_enable_status,uint8_t epb_status)
 {
 	// VCU Torque Gear Control
 	switch(_apa_torque_control_state)
@@ -190,6 +193,7 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 			else
 			{
 				_apa_work_status = 0;
+				_apa_vcu_control = 0;
 			}
 			break;
 
@@ -197,6 +201,12 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 			if(TorqueEnable)
 			{
 				_apa_work_status = 1;
+			}
+			else
+			{
+				_apa_work_status = 0;
+				_apa_vcu_control = 0;
+				_apa_torque_control_state = TorqueInitStatus;
 			}
 			if(3 == apa_ctl_sts)
 			{
@@ -211,6 +221,10 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 			{
 				_apa_torque_control_state = TorqueWaitInactive;
 			}
+			else if(0 == apa_ctl_sts)
+			{
+				_apa_torque_control_state = TorqueInitStatus;
+			}
 			break;
 
 		case TorqueWaitInactive:
@@ -221,6 +235,15 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 			if(3 == apa_ctl_sts)
 			{
 				_apa_torque_control_state = TorqueWaitUnavailable;
+			}
+			else if(0 == apa_ctl_sts)
+			{
+				_apa_work_status = 0;
+				_apa_torque_control_state = TorqueInitStatus;
+			}
+			else if(1 == apa_ctl_sts)//通信故障
+			{
+				_apa_torque_control_state = TorqueInitStatus;
 			}
 			break;
 
@@ -247,6 +270,10 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 					_apa_auto_drive_enable = 6;
 					_apa_turn_control_state = TurnWiatActive;
 				}
+			}
+			else
+			{
+				_apa_auto_drive_enable = 0;
 			}
 			break;
 
@@ -310,11 +337,38 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 			{
 				_apa_esc_control_state = ESCWaitHand;
 			}
+			else if(0 == esc_apa_enable_status)//通信中断
+			{
+				_apa_esc_control_state = ESCWaitHand;
+			}
 			break;
 
 		default:
 
 			break;
+	}
+	if(0xff == _apa_enable_flag)
+	{
+		if( (2 == esp_availab_sts) && (2 == apa_ctl_sts))
+		{
+			_apa_epb_request = 1;
+		}
+		if(0 == epb_status)
+		{
+			_apa_enable_flag = 0xAA;
+		}
+	}
+	else if(0xAA == _apa_enable_flag)
+	{
+		if((1 == esp_availab_sts) && (0 == apa_ctl_sts))
+		{
+			_apa_epb_request = 2;
+		}
+		if(1 == epb_status)
+		{
+			_apa_epb_request = 0;
+			_apa_enable_flag = 0x00;
+		}
 	}
 }
 

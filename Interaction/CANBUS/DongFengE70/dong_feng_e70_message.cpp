@@ -29,6 +29,10 @@ void DongFengE70Message::Init()
 	ESC_APA_EnableStatus.setContainer(this);
 	ESC_APA_EnableStatus.getter(&DongFengE70Message::getESC_APA_EnableStatus);
 	ESC_APA_EnableStatus.setter(&DongFengE70Message::setESC_APA_EnableStatus);
+
+	EPB_Status.setContainer(this);
+	EPB_Status.getter(&DongFengE70Message::getEPB_Status);
+	EPB_Status.setter(&DongFengE70Message::setEPB_Status);
 }
 
 void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght)
@@ -38,6 +42,10 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 		case 0x122:
 			LatAcc = (uint16_t)(((data[0] & 0x0f) << 8) | data[1] ) * 0.1 - 204.8;
 			YawRate = (((data[2] & 0x07) << 8 ) | data[3]) * 0.03 - 15.36;
+			break;
+
+		case 0x31A:
+			_epb_status = (uint8_t)(data[1] & 0x07);
 			break;
 
 		case 0xFA:
@@ -141,3 +149,6 @@ void    DongFengE70Message::setEPS_AvailabStatus(uint8_t value){_eps_availab_sta
 
 uint8_t DongFengE70Message::getESC_APA_EnableStatus()			  {return _esc_apa_enable_status ;}
 void    DongFengE70Message::setESC_APA_EnableStatus(uint8_t value){_esc_apa_enable_status = value;}
+
+uint8_t DongFengE70Message::getEPB_Status()			    {return _epb_status ;}
+void    DongFengE70Message::setEPB_Status(uint8_t value){_epb_status = value;}
