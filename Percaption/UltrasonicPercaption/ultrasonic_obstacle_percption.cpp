@@ -49,6 +49,12 @@ void UltrasonicObstaclePercption::Init()
 
 	_left_fit_edge_list   = new LinkList;
 	_right_fit_edge_list  = new LinkList;
+
+	_front_obstacle_process_state = WaitObstacleState;
+	_rear_obstacle_process_state = WaitObstacleState;
+
+	front_obstacle_cnt = 0;
+	rear_obstacle_cnt = 0;
 }
 
 void UltrasonicObstaclePercption::Push(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat)
@@ -1210,6 +1216,47 @@ void UltrasonicObstaclePercption::CollisionDiatanceCalculate(Ultrasonic *u,uint8
 	odp->status   = status ;
 }
 
+void UltrasonicObstaclePercption::ObstacleDistanceProcess(ObstacleDistancePacket *before,ObstacleDistancePacket *after,ObstacleDistanceProcessState *state,uint8_t *cnt)
+{
+	switch(*state)
+	{
+		case WaitObstacleState:
+			if(Normal == before->status)
+			{
+				if(before->distance > 1.0f)
+				{
+					*after = *before;
+					*cnt = 0;
+					*state = ObstacleUpdateState;
+				}
+			}
+			else if(OverDetection == before->status)
+			{
+				*after = *before;
+			}
+			break;
+
+		case ObstacleUpdateState:
+			if(OverDetection == before->status)
+			{
+				*cnt = *cnt + 1;
+				if((*cnt > 10) && (after->distance > 1.0f))
+				{
+					*state = WaitObstacleState;
+				}
+			}
+			else
+			{
+				*cnt = 0;
+				*after = *before;
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
 void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,MessageManager *msg)
 {
 	uint8_t i;
@@ -1536,6 +1583,17 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_1(Ultrasonic *u)
 {
 	CollisionDiatanceCalculate(u,0,4,1,&_front_obstacle_distance);
 	CollisionDiatanceCalculate(u,4,8,5,&_rear_obstacle_distance);
+
+}
+
+void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_2(Ultrasonic *u)
+{
+	CollisionDiatanceCalculate(u,0,4,1,&_front_obstacle_distance_temp);
+	CollisionDiatanceCalculate(u,4,8,5,&_rear_obstacle_distance_temp);
+
+	ObstacleDistanceProcess(&_front_obstacle_distance_temp,&_front_obstacle_distance,&_front_obstacle_process_state,&front_obstacle_cnt);
+	ObstacleDistanceProcess(&_rear_obstacle_distance_temp,&_rear_obstacle_distance,&_rear_obstacle_process_state,&rear_obstacle_cnt);
+
 }
 /***********************************************************************************************/
 uint16_t UltrasonicObstaclePercption::getPositionListLength()

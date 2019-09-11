@@ -74,6 +74,11 @@ typedef enum _UltrasonicLocationCalculateState
 	ParkingCenterCalculate
 }UltrasonicLocationCalculateState;
 
+typedef enum _ObstacleDistanceProcessState
+{
+	WaitObstacleState = 0,
+	ObstacleUpdateState,
+}ObstacleDistanceProcessState;
 
 class UltrasonicObstaclePercption : public Percaption
 {
@@ -134,6 +139,8 @@ public:
 	// 计算避障距离的基本函数
 	void CollisionDiatanceCalculate(Ultrasonic *u,uint8_t start,uint8_t end,uint8_t p_id,ObstacleDistancePacket *odp);
 
+	void ObstacleDistanceProcess(ObstacleDistancePacket *before,ObstacleDistancePacket *after,ObstacleDistanceProcessState *state,uint8_t *cnt);
+
 	int8_t UltrasonicCollisionStatus(Ultrasonic *u,MessageManager *msg);
 
 	void UltrasonicCollisionDiatance(Ultrasonic *u,MessageManager *msg);
@@ -141,6 +148,8 @@ public:
 	void UltrasonicCollisionDiatanceV1_0(Ultrasonic *u,MessageManager *msg);
 
 	void UltrasonicCollisionDiatanceV1_1(Ultrasonic *u);
+
+	void UltrasonicCollisionDiatanceV1_2(Ultrasonic *u);
 	/*********************************************基础函数***************************************/
 	uint16_t getPositionListLength();
 	uint16_t getLocationListLength();
@@ -178,6 +187,15 @@ private:
 	/**************超声避障相关参数************/
 	/******************************************/
 	VehilceConfig _ultrasonic_obstacle_config;
+
+	ObstacleDistanceProcessState _front_obstacle_process_state;
+	ObstacleDistanceProcessState _rear_obstacle_process_state;
+
+	uint8_t front_obstacle_cnt;
+	uint8_t rear_obstacle_cnt;
+
+	ObstacleDistancePacket _front_obstacle_distance_temp;
+	ObstacleDistancePacket _rear_obstacle_distance_temp;
 };
 
 #endif /* ULTRASONICPERCAPTION_ULTRASONIC_ABSTACLE_PERCPTION_H_ */
