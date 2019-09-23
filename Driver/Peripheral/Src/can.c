@@ -79,7 +79,7 @@ void FlexCAN0_Init(void) {              /* General init. No MB IDs iniialized */
   CAN_0.MCR.B.HALT = 0;
   while (CAN_0.MCR.B.FRZACK & CAN_0.MCR.B.NOTRDY) {} /* Wait to clear */
                  /* Good practice: wait for FRZACK on freeze mode entry/exit */
-  INTC_0.PSR[524].R = 0x8009;
+  INTC_0.PSR[524].R = 0x800F;
 }
 
 void FlexCAN1_Init(void) {              /* General init. No MB IDs iniialized */
