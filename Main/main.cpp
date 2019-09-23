@@ -77,8 +77,8 @@ PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
-PID m_VelocityControlPID = PID(0.02,3.0,0.0,0.1,0.6,0.6,0.2);
-PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
+PID m_VelocityControlPID = PID(0.02f,1.8f,0.1f,0.3f,6,0.8f,0.2f);
+PID m_VelocityStratControlPID  = PID(0.02f,1.5f,0.0f,0.12f,0.6f,0.6f,0.2f);
 #endif
 /**********************************************************************/
 #ifdef CHANGAN
@@ -167,6 +167,7 @@ int main()
 			if(0xA5 == m_Terminal_CA.PushActive)//数据推送内容,5ms进行一次推送
 			{
 				m_Terminal_CA.PushActive = 0;
+
 				//测试控制代码
 				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 				{
@@ -189,20 +190,9 @@ int main()
 					#endif
 
 					#ifdef DONG_FENG_E70
-					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityControlPID);
+					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityStratControlPID,&m_VelocityControlPID);
 					#endif
 				}
-				#ifdef DONG_FENG_E70
-				if(m_Ultrasonic.SystemTime % 2 == 1)
-				{
-					m_DongFengE70Controller.EnableControl();
-					m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(),
-							                                        m_DongFengE70Message.getEPS_AvailabStatus(),
-																	m_DongFengE70Message.getESC_APA_EnableStatus(),
-																	m_DongFengE70Message.getEPB_Status());
-					m_DongFengE70Controller.Push();
-				}
-				#endif
 				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 				{
 			#ifdef CHANGAN
@@ -223,7 +213,7 @@ int main()
 					#if 1 == SIMULATION
 					m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
 					#else
-					m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message,&m_VelocityUpdatePID);
+					m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message);
 			#endif
 			#endif
 				}
@@ -231,15 +221,15 @@ int main()
 				{
 				// 超声波避障功能
 				#ifdef CHANGAN
-						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_2(&m_Ultrasonic);
 				#endif
 
 				#ifdef BORUI
-						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_2(&m_Ultrasonic);
 				#endif
 
 				#ifdef DONG_FENG_E70
-						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_1(&m_Ultrasonic);
+						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_2(&m_Ultrasonic);
 				#endif
 				}
 /***********************************控制台消息推送***********************************************/
@@ -255,6 +245,7 @@ int main()
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Controller);
+					m_Terminal_CA.Push(m_LonControl);
 #endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
@@ -309,6 +300,18 @@ Issues        : NONE
 *******************************************************************************/
 void PIT0_isr(void)
 {
+	#ifdef DONG_FENG_E70
+	if(m_Ultrasonic.SystemTime % 2 == 1)
+	{
+		m_DongFengE70Controller.EnableControl();
+		m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(),
+														m_DongFengE70Message.getEPS_AvailabStatus(),
+														m_DongFengE70Message.getESC_APA_EnableStatus(),
+														m_DongFengE70Message.getEPB_Status());
+		m_DongFengE70Controller.Push();
+	}
+	#endif
+
 //	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 //	{
 ////		eTimer1_Channel5SendWakeUp();
