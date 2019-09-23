@@ -124,6 +124,10 @@ public:
 	float getLatAcc();
 	void  setLatAcc(float value);
 	Property<MessageManager,float,READ_WRITE> LatAcc;
+
+	uint8_t getBrakePressure();
+	void  setBrakePressure(uint8_t value);
+	Property<MessageManager,uint8_t,READ_WRITE> BrakePressure;
 private:
 	// wheel speed
 	float _wheel_speed_front_left ;
@@ -155,6 +159,8 @@ private:
 	float _yaw_rate;
 	float _lon_acc;
 	float _lat_acc;
+
+	uint8_t _brake_pressure;
 };
 
 #endif /* CANBUS_INTERFACE_MESSAGE_MANAGER_H_ */

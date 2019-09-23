@@ -93,6 +93,11 @@ MessageManager::MessageManager() {
 	LatAcc.setContainer(this);
 	LatAcc.getter(&MessageManager::getLatAcc);
 	LatAcc.setter(&MessageManager::setLatAcc);
+
+	BrakePressure.setContainer(this);
+	BrakePressure.getter(&MessageManager::getBrakePressure);
+	BrakePressure.setter(&MessageManager::setBrakePressure);
+
 }
 
 MessageManager::~MessageManager() {
@@ -158,3 +163,6 @@ void  MessageManager::setLonAcc(float value){_lon_acc = value;}
 
 float MessageManager::getLatAcc()           { return _lat_acc;}
 void  MessageManager::setLatAcc(float value){_lat_acc = value;}
+
+uint8_t MessageManager::getBrakePressure()           { return _brake_pressure;}
+void  MessageManager::setBrakePressure(uint8_t value){_brake_pressure = value;}
