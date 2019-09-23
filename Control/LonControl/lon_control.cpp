@@ -12,6 +12,10 @@
 #include <lon_control.h>
 
 LonControl::LonControl() {
+	ControlStateFlag.setContainer(this);
+	ControlStateFlag.getter(&LonControl::getControlStateFlag);
+	ControlStateFlag.setter(&LonControl::setControlStateFlag);
+
 	Init();
 }
 
@@ -29,6 +33,8 @@ void LonControl::Init()
 	_throttle_lowerbound = 50;//Nm
 	_brake_lowerbound = -0.123;// m/s2
 
+	_control_state_flag = 0;
+	_lon_velocity_control_state = VelocityStartStatus;
 }
 
 //根据距离规划速度
@@ -112,14 +118,63 @@ void LonControl::AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid
 	}
 }
 
-void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid)
+void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *start_velocity_pid,PID *velocity_pid)
 {
+	_current_gear = msg->getGear();
+
+//	_target_velocity = ctl->Velocity;//纯速度控制
+	_target_velocity = VelocityControl(ctl->Distance,ctl->Velocity);//距离速度控制
+
+	_vehicle_velocity = msg->VehicleMiddleSpeed;
+	_current_velocity = _vehicle_velocity;
+
+	switch(_lon_velocity_control_state)
+	{
+		case VelocityStartStatus:
+			if(_current_gear != _last_gear)//换挡
+			{
+				_control_state_flag = 0xAA;
+				_lon_velocity_control_state = WaitVelocityStableStatus;
+			}
+			else if(_target_velocity < 1.0e-6f)//目标速度接近0
+			{
+				_control_state_flag = 0xAA;
+				_lon_velocity_control_state = WaitVelocityStableStatus;
+			}
+			break;
+
+		case WaitVelocityStableStatus:
+			if( (fabs(_vehicle_velocity - _target_velocity) < 0.1f) && (_target_velocity > 0.1F))//接近目标速度
+			{
+				_control_state_flag = 0x55;
+				_lon_velocity_control_state = VelocityStartStatus;
+			}
+			else if(_current_velocity < _last_velocity)//速度变慢
+			{
+				_control_state_flag = 0x55;
+				_lon_velocity_control_state = VelocityStartStatus;
+			}
+			break;
+
+		default:
+
+			break;
+	}
+	_last_gear = _current_gear;
+	_last_velocity = _current_velocity;
+
 	if(ctl->VelocityEnable)
 	{
-		_vehicle_velocity = msg->VehicleMiddleSpeed;
-//		velocity_pid->Desired = ctl->Velocity;//纯速度控制
-		velocity_pid->Desired   = VelocityControl(ctl->Distance,ctl->Velocity);//距离速度控制
-		ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
+		if(0x55 == _control_state_flag)//启动后速度控制
+		{
+			velocity_pid->Desired = _target_velocity;
+			ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
+		}
+		else if(0xAA == _control_state_flag)//启动前
+		{
+			start_velocity_pid->Desired = _target_velocity;
+			ctl->TargetAcceleration = start_velocity_pid->pidUpdate(_vehicle_velocity);
+		}
 
 		if(ctl->TargetAcceleration > 0)
 		{
@@ -173,4 +228,15 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 			ctl->Torque = 0;
 		}
 	}
+	else
+	{
+		ctl->AccelerationEnable = 0;
+		ctl->TorqueEnable       = 0;
+		ctl->Acceleration = 0;
+		ctl->Torque       = 0;
+	}
 }
+
+
+float LonControl::getControlStateFlag()           { return _control_state_flag;}
+void  LonControl::setControlStateFlag(float value){_control_state_flag = value;}

@@ -26,6 +26,12 @@
 #define MAX_VELOCITY	  		( 1.0 ) // 直线段的速度
 #define MIN_VELOCITY	      	( 0.3 ) // 曲线段的速度
 
+typedef enum _Lon_VelocityControlState
+{
+	VelocityStartStatus = 0,
+	WaitVelocityStableStatus
+}Lon_VelocityControlState;
+
 class LonControl:public Controller
 {
 public:
@@ -40,10 +46,14 @@ public:
 
 	void AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid);
 
-	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid);
+	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *start_velocity_pid,PID *velocity_pid);
 
 	float VelocityPlanningControl(float distance);
 	float VelocityControl(float distance,float velocity);
+
+	float getControlStateFlag();
+	void  setControlStateFlag(float value);
+	Property<LonControl,float,READ_WRITE> ControlStateFlag;
 private:
 	float _max_position,_min_position;
 	float _max_velocity,_min_velocity;
@@ -55,6 +65,13 @@ private:
 
 	VehilceConfig _lon_VehilceConfig;
 	Interpolation _lon_Interpolation;
+
+	Lon_VelocityControlState _lon_velocity_control_state;
+	GearStatus _current_gear,_last_gear;
+	float _current_velocity,_last_velocity;
+	uint8_t _control_state_flag;
+	float _target_velocity;
+
 };
 
 #endif /* LONCONTROL_LON_CONTROL_H_ */
