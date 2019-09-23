@@ -851,6 +851,23 @@ void Terminal::Push(UltrasonicObstaclePercption p)
 	m_CAN_Packet.data[7] = (uint8_t)p.getRearObstacleDistance().status;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
+
+void Terminal::Push(LonControl lon_control)
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.id = 0x4A0;
+	m_CAN_Packet.length = 8;
+
+	m_CAN_Packet.data[0] = lon_control.getControlStateFlag();
+	m_CAN_Packet.data[1] = 0;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = 0;
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
 /**************************************************************************************/
 /*
  * 直接测量超声波原始信号
@@ -862,7 +879,6 @@ void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 	m_CAN_Packet.length = 8;
 	if(id < 8)
 	{
-
 		m_CAN_Packet.data[0] =  msg[id].STP318.TOF       & 0xff;
 		m_CAN_Packet.data[1] = (msg[id].STP318.TOF >> 8) & 0xff;
 		m_CAN_Packet.data[2] = 0;
