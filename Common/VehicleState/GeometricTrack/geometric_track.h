@@ -43,7 +43,7 @@ public:
 	void PulseUpdate(MessageManager *msg) override;
 	void PulseTrackUpdate(MessageManager *msg) override;
 
-	void VelocityPulseUpdate(MessageManager *msg,PID *velocity);
+	void VelocityPulseUpdate(MessageManager *msg);
 
 	int32_t getSumRearLeftPulse();
 	void    setSumRearLeftPulse(int32_t value);

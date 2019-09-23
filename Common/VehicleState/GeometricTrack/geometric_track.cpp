@@ -258,7 +258,7 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 	_last_yaw = Yaw;
 }
 
-void GeometricTrack::VelocityPulseUpdate(MessageManager *msg,PID *velocity)
+void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 {
 	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
 	{
