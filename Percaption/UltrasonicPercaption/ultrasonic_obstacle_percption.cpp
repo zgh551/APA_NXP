@@ -1045,55 +1045,51 @@ void UltrasonicObstaclePercption::CollisionDiatanceCalculate(Ultrasonic *u,uint8
 		}
 		else if(InvalidPoint == u->AbstacleBodyPositionTriangle[i].Status)
 		{
-			if(0 == u->UltrasonicPacket[i].status)
+			for(i=start;i<end;i++)
 			{
-				if(u->UltrasonicPacket[i].Distance1 < 0.35f)
+				if(0 == u->UltrasonicPacket[i].status)
 				{
-					distance = MAX_DETECT_RANGE;
-					region   = CenterRegion;
-					status   = OverDetection;
-				}
-				else
-				{
-					current_distance = u->UltrasonicPacket[i].Distance1;
-					if(current_distance < distance)
+					if(u->UltrasonicPacket[i].Distance1 > 0.35f)
 					{
-						switch(i)
+						current_distance = u->UltrasonicPacket[i].Distance1;
+						if(current_distance < distance)
 						{
-							case 0:
-							case 4:
-								region   = LeftRegion;
-							break;
-
-							case 1:
-							case 5:
-								region   = LeftCenterRegion;
+							switch(i)
+							{
+								case 0:
+								case 4:
+									region   = LeftRegion;
 								break;
 
-							case 2:
-							case 6:
-								region   = RightCenterRegion;
-							break;
+								case 1:
+								case 5:
+									region   = LeftCenterRegion;
+									break;
 
-							case 3:
-							case 7:
-								region   = RightRegion;
-							break;
-
-							default:
+								case 2:
+								case 6:
+									region   = RightCenterRegion;
 								break;
+
+								case 3:
+								case 7:
+									region   = RightRegion;
+								break;
+
+								default:
+									break;
+							}
 						}
+						distance = current_distance < distance ? current_distance : distance;
+						status = Normal;
 					}
-					distance = current_distance < distance ? current_distance : distance;
-					status = Normal;
-				}
 			}
 			else if(16 == u->UltrasonicPacket[i].status)
 			{
 				distance = MIN_DETECT_RANGE;
 				status   = BlindZone;
 				switch(i)
-				{
+					{
 					case 0:
 					case 4:
 						region   = LeftRegion;
@@ -1116,17 +1112,19 @@ void UltrasonicObstaclePercption::CollisionDiatanceCalculate(Ultrasonic *u,uint8
 
 					default:
 						break;
+					}
+					break;
 				}
-				break;
-			}
-			else if(2 == u->UltrasonicPacket[i].status)
-			{
-				distance = MAX_DETECT_RANGE;
-				region   = CenterRegion;
-				status   = Noise;
+				else if(2 == u->UltrasonicPacket[i].status)
+				{
+					distance = MAX_DETECT_RANGE;
+					region   = CenterRegion;
+					status   = Noise;
+					break;
+				}
 			}
 		}
-	}
+	}//for loop
 	if(4 == over_detection_cnt)
 	{
 		distance = MAX_DETECT_RANGE;
@@ -1593,7 +1591,6 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_2(Ultrasonic *u)
 
 	ObstacleDistanceProcess(&_front_obstacle_distance_temp,&_front_obstacle_distance,&_front_obstacle_process_state,&front_obstacle_cnt);
 	ObstacleDistanceProcess(&_rear_obstacle_distance_temp,&_rear_obstacle_distance,&_rear_obstacle_process_state,&rear_obstacle_cnt);
-
 }
 /***********************************************************************************************/
 uint16_t UltrasonicObstaclePercption::getPositionListLength()
