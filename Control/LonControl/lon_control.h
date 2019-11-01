@@ -47,7 +47,7 @@ public:
 	void AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid);
 
 	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *start_velocity_pid,PID *velocity_pid);
-
+	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid);
 	float VelocityPlanningControl(float distance);
 	float VelocityControl(float distance,float velocity);
 
@@ -71,7 +71,7 @@ private:
 	float _current_velocity,_last_velocity;
 	uint8_t _control_state_flag;
 	float _target_velocity;
-
+	float _delta_velocity;
 };
 
 #endif /* LONCONTROL_LON_CONTROL_H_ */
