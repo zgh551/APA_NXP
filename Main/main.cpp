@@ -77,8 +77,8 @@ PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
-PID m_VelocityControlPID = PID(0.02f,1.8f,0.1f,0.3f,6,0.8f,0.2f);
-PID m_VelocityStratControlPID  = PID(0.02f,1.5f,0.0f,0.12f,0.6f,0.6f,0.2f);
+PID m_VelocityControlPID = PID(0.02f,3.0f,0.0f,0.0f,0.6,0.6f,0.1f);
+PID m_VelocityStratControlPID  = PID(0.02f,1.8f,0.1f,0.3f,0.2f,0.6f,0.2f);
 #endif
 /**********************************************************************/
 #ifdef CHANGAN
@@ -190,7 +190,7 @@ int main()
 					#endif
 
 					#ifdef DONG_FENG_E70
-					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_VelocityStratControlPID,&m_VelocityControlPID);
+					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller,&m_VelocityControlPID);
 					#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
@@ -206,7 +206,8 @@ int main()
 					#if 1 == SIMULATION
 					m_GeometricTrack.VelocityUpdate(&m_BoRuiMessage,0.02);
 					#else
-					m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage,&m_VelocityUpdatePID);
+					m_GeometricTrack.VelocityPulseUpdate(&m_BoRuiMessage);
+//					m_GeometricTrack.PulseUpdate(&m_BoRuiMessage);
 			#endif
 			#endif
 			#ifdef DONG_FENG_E70
@@ -214,6 +215,7 @@ int main()
 					m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
 					#else
 					m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message);
+					m_GeometricTrack.PulseUpdate(&m_DongFengE70Message);
 			#endif
 			#endif
 				}
