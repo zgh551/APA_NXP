@@ -142,49 +142,6 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	}
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 
-	// 速度判定
-	_velocity_line_rate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
-
-
-	if(_velocity_line_rate < 0.2f)//低速情形
-	{
-		// 累积脉冲达到指定
-		if(msg->WheelSpeedDirection == Forward)
-		{
-
-		}
-		else if(msg->WheelSpeedDirection == Backward)
-		{
-
-		}
-		else if(msg->WheelSpeedDirection == StandStill)
-		{
-
-		}
-		else
-		{
-
-		}
-		 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
-		 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
-		 _cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
-		 if(_cumulation_middle_displacement >= 4.0f)
-		 {
-			 LinearVelocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
-		 }
-		 else
-		 {
-			 _wait_time_cnt++;
-		 }
-	}
-	else// 高速情形
-	{
-		LinearRate = _velocity_line_rate;
-	}
-
-
-
-
 	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
 					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
