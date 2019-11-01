@@ -83,6 +83,7 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			break;
 
 		case 0xA0:
+			BrakePressure = (uint8_t)(((data[0] << 3) & 0xf8) | ((data[1] >> 5) & 0x07));
 //			VehicleMiddleSpeed      = (uint16_t)((data[6] << 8) | data[7]) * V_M_S;
 //			VehicleMiddleSpeedValid = (uint8_t)((data[3] >> 1) & 0x01);
 			break;
