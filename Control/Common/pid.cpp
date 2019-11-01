@@ -280,14 +280,19 @@ float PID::pidUpdateIntegralSeparation(float measured)
     output += _outD;
 
     //Integral separation
-    if(fabs(_error) < _threshold)
+    if(_error < _threshold)
     {
-    	index = 0;
-    	_integ = 0;
+    	index = 0.2;
+    	_integ += _error * _dt;
+    }
+    else if(_error > _threshold)
+    {
+    	index = 1;
+    	_integ += _error * _dt;
     }
     else
     {
-    	index = 1;
+    	index = 0;
     	_integ += _error * _dt;
     }
 
