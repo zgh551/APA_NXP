@@ -670,7 +670,7 @@ void UltrasonicObstaclePercption::EdgeLineFitParkingCenterCalculate()
 #elif ENTER_PARK_DIRECTION == Y_AXIS_ENTER
 	_valid_parking_center_position.angle        = _center_fit_line_packet.angle + PI_2;
 	_valid_parking_center_position.position.setY((left > right) ? left : right);
-	_valid_parking_center_position.position.setX(-tanf(_center_fit_line_packet.angle) * _valid_parking_center_position.position.getX() - _center_fit_line_packet.offset);
+	_valid_parking_center_position.position.setX(-tanf(_center_fit_line_packet.angle) * _valid_parking_center_position.position.getY() - _center_fit_line_packet.offset);
 #endif
 	_left_fit_edge_list->Delete();
 	_right_fit_edge_list->Delete();
@@ -1586,11 +1586,14 @@ void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_1(Ultrasonic *u)
 
 void UltrasonicObstaclePercption::UltrasonicCollisionDiatanceV1_2(Ultrasonic *u)
 {
-	CollisionDiatanceCalculate(u,0,4,1,&_front_obstacle_distance_temp);
-	CollisionDiatanceCalculate(u,4,8,5,&_rear_obstacle_distance_temp);
+	CollisionDiatanceCalculate(u,0,4,1,&_front_obstacle_distance);
+	CollisionDiatanceCalculate(u,4,8,5,&_rear_obstacle_distance);
 
-	ObstacleDistanceProcess(&_front_obstacle_distance_temp,&_front_obstacle_distance,&_front_obstacle_process_state,&front_obstacle_cnt);
-	ObstacleDistanceProcess(&_rear_obstacle_distance_temp,&_rear_obstacle_distance,&_rear_obstacle_process_state,&rear_obstacle_cnt);
+//	CollisionDiatanceCalculate(u,0,4,1,&_front_obstacle_distance_temp);
+//	CollisionDiatanceCalculate(u,4,8,5,&_rear_obstacle_distance_temp);
+
+//	ObstacleDistanceProcess(&_front_obstacle_distance_temp,&_front_obstacle_distance,&_front_obstacle_process_state,&front_obstacle_cnt);
+//	ObstacleDistanceProcess(&_rear_obstacle_distance_temp,&_rear_obstacle_distance,&_rear_obstacle_process_state,&rear_obstacle_cnt);
 }
 /***********************************************************************************************/
 uint16_t UltrasonicObstaclePercption::getPositionListLength()
