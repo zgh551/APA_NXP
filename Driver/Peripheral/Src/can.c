@@ -267,7 +267,7 @@ void CAN0_TransmitMsg(CAN_Packet m_CAN_Packet)
 	vuint8_t i;
 	if(8 != can0_tx_cnt)
 	{
-		while(CAN_0.MB[0].CS.B.CODE != 0x8 ){}
+		while(CAN_0.MB[can0_tx_cnt].CS.B.CODE != 0x8 ){}
 		CAN_0.MB[can0_tx_cnt].CS.B.IDE = 0;       /* Use standard ID length */
 		CAN_0.MB[can0_tx_cnt].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
 		CAN_0.MB[can0_tx_cnt].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
@@ -287,7 +287,7 @@ void CAN1_TransmitMsg(CAN_Packet m_CAN_Packet)
 	vuint8_t i;
 	if(8 != can1_tx_cnt)
 	{
-		while(CAN_1.MB[0].CS.B.CODE != 0x8 ){}
+		while(CAN_1.MB[can1_tx_cnt].CS.B.CODE != 0x8 ){}
 		CAN_1.MB[can1_tx_cnt].CS.B.IDE = 0;       /* Use standard ID length */
 		CAN_1.MB[can1_tx_cnt].ID.B.ID_STD = m_CAN_Packet.id;/* Transmit ID is 0x555 */
 		CAN_1.MB[can1_tx_cnt].CS.B.RTR = 0;       /* Data frame, not remote Tx request frame */
