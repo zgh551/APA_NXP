@@ -77,7 +77,7 @@ PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 
 #ifdef DONG_FENG_E70
 //正向PID取消积分项
-PID m_VelocityControlPID = PID(0.02f,3.0f,0.0f,0.0f,0.6,0.6f,0.1f);
+PID m_VelocityControlPID = PID(0.02f,2.0f,0.0f,0.0f,0.6,0.6f,0.1f);
 PID m_VelocityStratControlPID  = PID(0.02f,1.8f,0.1f,0.3f,0.2f,0.6f,0.2f);
 #endif
 /**********************************************************************/
