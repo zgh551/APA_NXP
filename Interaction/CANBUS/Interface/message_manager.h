@@ -93,6 +93,10 @@ public:
 	void     setWheelPulseRearLeft(uint16_t value);
 	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearLeft;
 
+	int32_t getWheelSumPulse();
+	void    setWheelSumPulse(int32_t value);
+	Property<MessageManager,int32_t,READ_WRITE> WheelSumPulse;
+
 	// wheel pulse dirction
 	DirectStatus getWheelPulseDirection();
 	void         setWheelPulseDirection(DirectStatus value);
@@ -145,6 +149,8 @@ private:
 	uint16_t _wheel_pulse_front_right;
 	uint16_t _wheel_pulse_rear_right ;
 	uint16_t _wheel_pulse_rear_left  ;
+
+	int32_t _wheel_sum_pulse;
 	// wheel pulse dirction
 	DirectStatus _wheel_pulse_direction;
 

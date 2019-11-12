@@ -62,6 +62,10 @@ MessageManager::MessageManager() {
 	WheelPulseRearLeft.setContainer(this);
 	WheelPulseRearLeft.getter(&MessageManager::getWheelPulseRearLeft);
 	WheelPulseRearLeft.setter(&MessageManager::setWheelPulseRearLeft);
+
+	WheelSumPulse.setContainer(this);
+	WheelSumPulse.getter(&MessageManager::getWheelSumPulse);
+	WheelSumPulse.setter(&MessageManager::setWheelSumPulse);
 	// wheel pulse dirction
 	WheelPulseDirection.setContainer(this);
 	WheelPulseDirection.getter(&MessageManager::getWheelPulseDirection);
@@ -139,6 +143,9 @@ void     MessageManager::setWheelPulseRearRight(uint16_t value){_wheel_pulse_rea
 
 uint16_t MessageManager::getWheelPulseRearLeft()              { return _wheel_pulse_rear_left;}
 void     MessageManager::setWheelPulseRearLeft(uint16_t value){_wheel_pulse_rear_left = value;}
+
+int32_t MessageManager::getWheelSumPulse()              { return _wheel_sum_pulse;}
+void    MessageManager::setWheelSumPulse(int32_t value){_wheel_sum_pulse = value;}
 // wheel pulse dirction
 DirectStatus MessageManager::getWheelPulseDirection()                  { return _wheel_pulse_direction;}
 void         MessageManager::setWheelPulseDirection(DirectStatus value){_wheel_pulse_direction = value;}
