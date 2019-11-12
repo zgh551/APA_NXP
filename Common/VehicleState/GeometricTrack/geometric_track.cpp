@@ -293,6 +293,8 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 	_sum_rear_left_pulse  += _delta_rear_left_pulse;
 	_sum_rear_right_pulse += _delta_rear_right_pulse;
 
+	msg->setWheelSumPulse((int32_t)((_sum_rear_left_pulse + _sum_rear_right_pulse) * 0.5f));
+
 	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
 	_last_rear_right_pulse = msg->WheelPulseRearRight;
 }
