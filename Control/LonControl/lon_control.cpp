@@ -36,7 +36,7 @@ void LonControl::Init()
 	_control_state_flag = 0;
 	_lon_velocity_control_state = VelocityStartStatus;
 
-	_delta_velocity = 0.3 * 0.02f;
+	_delta_velocity = START_ACC * DT;
 }
 
 //根据距离规划速度
@@ -241,6 +241,32 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 	}
 }
 
+float LonControl::AcceleratePlanningControl(float cur_velocity,float stop_distance)
+{
+	float target_acc;
+	if((cur_velocity < 1.0e-6f) || (stop_distance < 1.0e-6f))
+	{
+		return MAX_DECELERATION;
+	}
+	else
+	{
+		target_acc = -0.5f * cur_velocity * cur_velocity / stop_distance;
+		return target_acc < MAX_DECELERATION ? MAX_DECELERATION : target_acc;
+	}
+}
+
+float LonControl::AccAcceleratePlanningControl(float cur_velocity,float stop_distance)
+{
+	if((cur_velocity < 1.0e-6f) || (stop_distance < 1.0e-6f))
+	{
+		return MAX_DECELERATION/DT;
+	}
+	else
+	{
+		return (-8.0f * cur_velocity * cur_velocity * cur_velocity)/(9.0f * stop_distance * stop_distance);
+	}
+}
+
 void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid)
 {
 //	_target_velocity = ctl->Velocity;//纯速度控制
@@ -249,25 +275,59 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 
 	if(ctl->VelocityEnable)
 	{
+		ctl->TorqueEnable = 1;
+		if(_target_velocity < 1.0e-6f)
+		{
+			if(_distance_update_distance_value < 1.0e-6f)
+			{
+				_distance_update_distance_value = ctl->Distance;
+				_distance_update_pulse_value = msg->getWheelSumPulse();
+				_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
+			}
+			else
+			{
+				// 距离值更新
+				if((ctl->Distance < (_distance_update_distance_value - 1.0e-6f)) || (ctl->Distance > (_distance_update_distance_value + 1.0e-6f)))
+				{
+					_distance_update_distance_value = ctl->Distance;
+					_distance_update_pulse_value = msg->getWheelSumPulse();
+					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
+				}
+				else
+				{
+					_distance_update_distance_value -= (msg->getWheelSumPulse() - _distance_update_pulse_value) * WHEEL_PUSLE_RATIO;
+					if(_distance_update_distance_value < 1.0e-6f)
+					{
+						_distance_update_distance_value = 0;
+					}
+					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
+				}
+			}
+			_vehicle_stop_acc += _vehicle_stop_acc_acc * DT;
+			_vehicle_stop_acc  = _vehicle_stop_acc < MAX_DECELERATION ? MAX_DECELERATION : _vehicle_stop_acc;
+		}
+		else
+		{
+			_vehicle_stop_acc = 0;
+			_distance_update_distance_value = 0;
+		}
+
 		if(msg->BrakePressure > 0)
 		{
-			velocity_pid->Desired = -0.1f;
+			velocity_pid->Desired = 0.0f;
 		}
 		else
 		{
 			if(velocity_pid->Desired <= (_target_velocity - _delta_velocity))
 			{
-				velocity_pid->Desired =  velocity_pid->Desired + _delta_velocity;//_target_velocity;
+				velocity_pid->Desired =  velocity_pid->Desired + _delta_velocity;
 			}
 			else
 			{
 				velocity_pid->Desired = _target_velocity;
 			}
 		}
-
 		ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
-		ctl->TorqueEnable       = 1;
-
 		if(ctl->TargetAcceleration > 0)
 		{
 			_calibration_value = _lon_Interpolation.Interpolation2D(ctl->TargetAcceleration, _vehicle_velocity,
@@ -277,9 +337,9 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 
 			if(velocity_pid->Desired < 1.0e-6)//速度为0时，直接刹住
 			{
-				ctl->Torque = 0;
-				ctl->Acceleration = -0.5;
 				ctl->AccelerationEnable = 1;
+				ctl->Acceleration = _vehicle_stop_acc;
+				ctl->Torque = 0;
 			}
 			else
 			{
@@ -300,11 +360,10 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 		else
 		{
 			_calibration_value = ctl->TargetAcceleration;
-
-			if((velocity_pid->Desired < 1.0e-6) && (velocity_pid->Desired > -1.0e-6))
+			if(velocity_pid->Desired < 1.0e-6)//刹车
 			{
 				ctl->AccelerationEnable = 1;
-				ctl->Acceleration = -0.5;
+				ctl->Acceleration = _vehicle_stop_acc;
 				ctl->Torque = 0;
 			}
 			else
@@ -320,6 +379,11 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 		ctl->TorqueEnable       = 0;
 		ctl->Acceleration = 0;
 		ctl->Torque       = 0;
+	}
+	if(0 == msg->BrakePressure)
+	{
+		//异常处理
+
 	}
 }
 

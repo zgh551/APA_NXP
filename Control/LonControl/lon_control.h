@@ -25,6 +25,9 @@
 #define MIN_POSITION            ( 0.4 ) // 速度控制下限点
 #define MAX_VELOCITY	  		( 1.0 ) // 直线段的速度
 #define MIN_VELOCITY	      	( 0.3 ) // 曲线段的速度
+/**************************加速度控制******************************/
+#define START_ACC               ( 0.2f  ) // 车辆起步时的正向加速度
+#define DT                      ( 0.02f ) // 控制时间间隔
 
 typedef enum _Lon_VelocityControlState
 {
@@ -50,6 +53,8 @@ public:
 	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid);
 	float VelocityPlanningControl(float distance);
 	float VelocityControl(float distance,float velocity);
+	float AcceleratePlanningControl(float cur_velocity,float stop_distance);
+	float AccAcceleratePlanningControl(float cur_velocity,float stop_distance);
 
 	float getControlStateFlag();
 	void  setControlStateFlag(float value);
@@ -72,6 +77,10 @@ private:
 	uint8_t _control_state_flag;
 	float _target_velocity;
 	float _delta_velocity;
+	float _distance_update_distance_value;
+	float _distance_update_pulse_value;
+	float _vehicle_stop_acc;
+	float _vehicle_stop_acc_acc;
 };
 
 #endif /* LONCONTROL_LON_CONTROL_H_ */
