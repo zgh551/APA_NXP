@@ -50,6 +50,14 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 
 		case 0xFA:
 			_esc_apa_enable_status = (uint8_t)((data[1] >> 6) & 0x03);
+			if( (1 == _esc_apa_enable_status) || (2 == _esc_apa_enable_status))
+			{
+				setESC_Status(ActuatorNormal);
+			}
+			else
+			{
+				setESC_Status(ActuatorErr);
+			}
 			break;
 
 		case 0x165:

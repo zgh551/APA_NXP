@@ -145,6 +145,9 @@ public:
 	void  setDistance(float value);
 	Property<VehicleController,float,READ_WRITE> Distance;
 
+	float getDistanceSet();
+	void  setDistanceSet(float value);
+
 	uint8_t getVelocityEnable();
 	void    setVelocityEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> VelocityEnable;
@@ -157,6 +160,10 @@ public:
 	float getSteeringAngleRate();
 	void  setSteeringAngleRate(float value);
 	Property<VehicleController,float,READ_WRITE> SteeringAngleRate;
+
+	float getSteeringAngleSet();
+	void  setSteeringAngleSet(float value);
+	Property<VehicleController,float,READ_WRITE> SteeringAngleSet;
 
 	uint8_t getSteeringEnable();
 	void    setSteeringEnable(uint8_t value);
@@ -201,11 +208,13 @@ private:
 	/* Velocity */
 	float _velocity;
 	float _distance;
+	float _distance_set;
 	uint8_t _velocity_enable;
 
 	/* Steering System */
 	float _steering_angle;
 	float _steering_angle_rate;
+	float _steering_angle_set;
 	uint8_t _steering_enable;
 
 	/* Gear */

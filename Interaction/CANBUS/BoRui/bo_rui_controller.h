@@ -10,6 +10,7 @@
 
 #include "derivative.h"
 #include "property.h"
+#include "math.h"
 #include "Interface/vehicle_controller.h"
 
 class BoRuiController  : public VehicleController
@@ -45,14 +46,16 @@ public:
 	void VehicleContorlPri();
 	// Steeing angle control base on the angle speed
 	void SteeringAngleControl(float dt);
+	void SteeringAngleControl(float dt,float actual_steering);
 
 	// push the command to the vehicle
 	void Push(float dt);
+	void Push(float dt,float actual_steering);
 
 private:
 	/* SteeringAngle */
 	// actual value
-	float _steering_angle_set;
+
 	// current value
 	int16_t _current_steering_angle_target;
 

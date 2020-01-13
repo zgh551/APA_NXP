@@ -1009,7 +1009,7 @@ void Ultrasonic::BodyTriangleCalculate( Location position_a,Location position_b,
 			)
 			{
 				alpha = ( position_b.Point - position_a.Point ).Angle();
-				if(position_a.Angle > PI)
+				if(position_a.Angle > (PI + 1.0e-6f))
 				{
 					beta =  acosf( (bottom_edge * bottom_edge + data_ul.Distance1 * data_ul.Distance1 - data_ur.Distance1 * data_ur.Distance1) / (2 * data_ul.Distance1 * bottom_edge));
 				}

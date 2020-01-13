@@ -312,17 +312,17 @@ void ChangAnController::VehicleContorl()
 void ChangAnController::SteeringAngleControl(float dt,float steer_angle)
 {
     float da = SteeringAngleRate * dt;
-    float left_target_angle = SteeringAngle - da;
-    float right_target_angle = SteeringAngle + da;
+    float left_target_angle = steer_angle - da;
+    float right_target_angle = steer_angle + da;
 
-    if(_steering_angle_set < left_target_angle)
+    if(SteeringAngle < left_target_angle)
     {
-    	_steering_angle_set += da;
+    	_steering_angle_set = left_target_angle;
 //    	_steering_angle_set = steer_angle + da;
     }
-    else if(_steering_angle_set > right_target_angle)
+    else if(SteeringAngle > right_target_angle)
     {
-    	_steering_angle_set -= da;
+    	_steering_angle_set = right_target_angle;
 //    	_steering_angle_set = steer_angle - da;
     }
     else

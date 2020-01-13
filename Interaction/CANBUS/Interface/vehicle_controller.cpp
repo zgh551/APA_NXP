@@ -80,6 +80,10 @@ VehicleController::VehicleController() {
 	SteeringAngleRate.getter(&VehicleController::getSteeringAngleRate);
 	SteeringAngleRate.setter(&VehicleController::setSteeringAngleRate);
 
+	SteeringAngleSet.setContainer(this);
+	SteeringAngleSet.getter(&VehicleController::getSteeringAngleSet);
+	SteeringAngleSet.setter(&VehicleController::setSteeringAngleSet);
+
 	SteeringEnable.setContainer(this);
 	SteeringEnable.getter(&VehicleController::getSteeringEnable);
 	SteeringEnable.setter(&VehicleController::setSteeringEnable);
@@ -146,6 +150,9 @@ void  VehicleController::setVelocity(float value){_velocity = value;}
 float VehicleController::getDistance()           { return _distance;}
 void  VehicleController::setDistance(float value){_distance = value;}
 
+float VehicleController::getDistanceSet()           { return _distance_set;}
+void  VehicleController::setDistanceSet(float value){_distance_set = value;}
+
 uint8_t VehicleController::getVelocityEnable()             { return _velocity_enable;}
 void    VehicleController::setVelocityEnable(uint8_t value){_velocity_enable = value;}
 
@@ -155,6 +162,9 @@ void  VehicleController::setSteeringAngle(float value){_steering_angle = value;}
 
 float VehicleController::getSteeringAngleRate()           { return _steering_angle_rate;}
 void  VehicleController::setSteeringAngleRate(float value){_steering_angle_rate = value;}
+
+float VehicleController::getSteeringAngleSet()           { return _steering_angle_set;}
+void  VehicleController::setSteeringAngleSet(float value){_steering_angle_set = value;}
 
 uint8_t VehicleController::getSteeringEnable()             { return _steering_enable;}
 void    VehicleController::setSteeringEnable(uint8_t value){_steering_enable = value;}

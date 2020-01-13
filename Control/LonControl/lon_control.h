@@ -51,6 +51,9 @@ public:
 
 	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *start_velocity_pid,PID *velocity_pid);
 	void VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid);
+
+	void DistanceProc(MessageManager *msg,VehicleController *ctl);
+
 	float VelocityPlanningControl(float distance);
 	float VelocityControl(float distance,float velocity);
 	float AcceleratePlanningControl(float cur_velocity,float stop_distance);
@@ -78,9 +81,13 @@ private:
 	float _target_velocity;
 	float _delta_velocity;
 	float _distance_update_distance_value;
+	float _variable_distance_value;
+	float _delta_distance;
 	float _distance_update_pulse_value;
 	float _vehicle_stop_acc;
 	float _vehicle_stop_acc_acc;
+	float _vehicle_slow_down_acc;
+	uint16_t _err_velocity_cnt;
 };
 
 #endif /* LONCONTROL_LON_CONTROL_H_ */

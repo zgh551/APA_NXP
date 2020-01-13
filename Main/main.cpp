@@ -186,7 +186,8 @@ int main()
 					#endif
 
 					#ifdef BORUI
-					m_BoRuiController.Push(0.02);
+					m_LonControl.DistanceProc(&m_BoRuiMessage, &m_BoRuiController);
+					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
 					#endif
 
 					#ifdef DONG_FENG_E70

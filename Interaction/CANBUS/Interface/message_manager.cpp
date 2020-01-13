@@ -101,7 +101,6 @@ MessageManager::MessageManager() {
 	BrakePressure.setContainer(this);
 	BrakePressure.getter(&MessageManager::getBrakePressure);
 	BrakePressure.setter(&MessageManager::setBrakePressure);
-
 }
 
 MessageManager::~MessageManager() {
@@ -127,6 +126,9 @@ void  MessageManager::setVehicleMiddleSpeed(float value){_vehicle_middle_speed =
 
 uint8_t MessageManager::getVehicleMiddleSpeedValid()             { return _vehicle_middle_speed_valid;}
 void    MessageManager::setVehicleMiddleSpeedValid(uint8_t value){_vehicle_middle_speed_valid = value;}
+
+SpeedStatus MessageManager::getVehicleMiddleSpeedAbnormal()             { return _vehicle_middle_speed_abnormal;}
+void    MessageManager::setVehicleMiddleSpeedAbnormal(SpeedStatus value){_vehicle_middle_speed_abnormal = value;}
 // wheel speed direction
 DirectStatus MessageManager::getWheelSpeedDirection()                  { return _wheel_speed_direction;}
 void         MessageManager::setWheelSpeedDirection(DirectStatus value){_wheel_speed_direction = value;}
@@ -171,5 +173,11 @@ void  MessageManager::setLonAcc(float value){_lon_acc = value;}
 float MessageManager::getLatAcc()           { return _lat_acc;}
 void  MessageManager::setLatAcc(float value){_lat_acc = value;}
 
-uint8_t MessageManager::getBrakePressure()           { return _brake_pressure;}
-void  MessageManager::setBrakePressure(uint8_t value){_brake_pressure = value;}
+uint8_t MessageManager::getBrakePressure()             { return _brake_pressure;}
+void    MessageManager::setBrakePressure(uint8_t value){_brake_pressure = value;}
+
+ActuatorStatus MessageManager::getESC_Status()                    { return _esc_status;}
+void           MessageManager::setESC_Status(ActuatorStatus value){_esc_status = value;}
+
+ActuatorStatus MessageManager::getEPS_Status()                    { return _eps_status;}
+void           MessageManager::setEPS_Status(ActuatorStatus value){_eps_status = value;}

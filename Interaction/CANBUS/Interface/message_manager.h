@@ -37,6 +37,18 @@ typedef enum _DirectStatus
 	Invalid
 }DirectStatus;
 
+typedef enum _ActuatorStatus
+{
+	ActuatorNormal = 0,
+	ActuatorErr
+}ActuatorStatus;
+
+typedef enum _SpeedStatus
+{
+	SpeedNormal = 0,
+	SpeedAbnormal
+}SpeedStatus;
+
 class MessageManager {
 public:
 	MessageManager();
@@ -71,6 +83,11 @@ public:
 	uint8_t getVehicleMiddleSpeedValid();
 	void    setVehicleMiddleSpeedValid(uint8_t value);
 	Property<MessageManager,uint8_t,READ_WRITE> VehicleMiddleSpeedValid;
+
+	// the middle speed abnormal single
+	SpeedStatus getVehicleMiddleSpeedAbnormal();
+	void        setVehicleMiddleSpeedAbnormal(SpeedStatus value);
+
 	// wheel speed direction
 	DirectStatus getWheelSpeedDirection();
 	void         setWheelSpeedDirection(DirectStatus value);
@@ -132,6 +149,12 @@ public:
 	uint8_t getBrakePressure();
 	void  setBrakePressure(uint8_t value);
 	Property<MessageManager,uint8_t,READ_WRITE> BrakePressure;
+
+	ActuatorStatus getESC_Status();
+	void           setESC_Status(ActuatorStatus value);
+
+	ActuatorStatus getEPS_Status();
+	void           setEPS_Status(ActuatorStatus value);
 private:
 	// wheel speed
 	float _wheel_speed_front_left ;
@@ -141,6 +164,7 @@ private:
 	// vehicle speed base pulse,calculate by self
 	float   _vehicle_middle_speed;
 	uint8_t _vehicle_middle_speed_valid;
+	SpeedStatus _vehicle_middle_speed_abnormal;
 	// wheel speed direction
 	DirectStatus _wheel_speed_direction;
 
@@ -167,6 +191,9 @@ private:
 	float _lat_acc;
 
 	uint8_t _brake_pressure;
+
+	ActuatorStatus _esc_status;
+	ActuatorStatus _eps_status;
 };
 
 #endif /* CANBUS_INTERFACE_MESSAGE_MANAGER_H_ */
