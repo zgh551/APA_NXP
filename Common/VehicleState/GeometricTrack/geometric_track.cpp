@@ -223,8 +223,8 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 	}
 	else
 	{
-		_delta_rear_left_pulse =(msg->WheelPulseRearLeft >= _last_rear_left_pulse ? 0 : WHEEL_PUSLE_MAX) +
-								 msg->WheelPulseRearLeft  - _last_rear_left_pulse ;
+		_delta_rear_left_pulse =(msg->getWheelPulseRearLeft() >= _last_rear_left_pulse ? 0 : WHEEL_PUSLE_MAX) +
+								 msg->getWheelPulseRearLeft()  - _last_rear_left_pulse ;
 	}
 
 	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
@@ -233,17 +233,18 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 	}
 	else
 	{
-		_delta_rear_right_pulse = (msg->WheelPulseRearRight >= _last_rear_right_pulse ? 0 : WHEEL_PUSLE_MAX) +
-								   msg->WheelPulseRearRight  - _last_rear_right_pulse ;
+		_delta_rear_right_pulse = (msg->getWheelPulseRearRight() >= _last_rear_right_pulse ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->getWheelPulseRearRight()  - _last_rear_right_pulse ;
 	}
+
 	// 速度判定
-	if((msg->WheelSpeedRearRight > 0.2f) && (msg->WheelSpeedRearLeft > 0.2f))
+	if((msg->getWheelSpeedRearRight() > 0.2f) && (msg->getWheelSpeedRearLeft() > 0.2f))
 	{
-		msg->VehicleMiddleSpeed = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft) * 0.5f;
+		msg->setVehicleMiddleSpeed((msg->getWheelSpeedRearRight() + msg->getWheelSpeedRearLeft()) * 0.5f);
 	}
 	else
 	{
-		msg->VehicleMiddleSpeed = 0;
+		msg->setVehicleMiddleSpeed(0);
 	}
 	/*************************************************脉冲计算速度********************************************************/
 	 if((_delta_rear_left_pulse > 0) || (_delta_rear_right_pulse > 0))//脉冲更新解锁
@@ -258,20 +259,20 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 	 {
 		 _velocity_lock = 0;
 		 _wait_time_cnt++;
-		 PulseUpdateVelocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
+		 setPulseUpdateVelocity(_cumulation_middle_displacement  * 50 /_wait_time_cnt);
 		 _cumulation_rear_left_pulse  = 0;
 		 _cumulation_rear_right_pulse = 0;
 		 _wait_time_cnt               = 0;
 	 }
 	 else if(_wait_time_cnt >= 25)
 	 {
-		 if((msg->WheelSpeedRearRight < 1.0e-6) && (msg->WheelSpeedRearLeft < 1.0e-6))
+		 if((msg->getWheelSpeedRearRight() < 1.0e-6) && (msg->getWheelSpeedRearLeft() < 1.0e-6))
 		 {
 			 _velocity_lock               = 0xff;
-			 PulseUpdateVelocity          = 0;
 			 _cumulation_rear_left_pulse  = 0;
 			 _cumulation_rear_right_pulse = 0;
 			 _wait_time_cnt               = 0;
+			 setPulseUpdateVelocity(0);
 		 }
 	 }
 	 else
@@ -282,11 +283,27 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 		 }
 	 }
 	 /**************************************************脉冲计算结束****************************************/
-	 if(msg->VehicleMiddleSpeed < 1.0e-6)
+	 if(msg->getVehicleMiddleSpeed() < 1.0e-6)
 	 {
-		 if( PulseUpdateVelocity < 0.5f )
+		 if( getPulseUpdateVelocity() < 0.3f )
 		 {
-			 msg->VehicleMiddleSpeed = PulseUpdateVelocity;
+			 msg->setVehicleMiddleSpeedAbnormal(SpeedNormal);
+		 }
+		 else
+		 {
+			 msg->setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
+		 }
+		 msg->setVehicleMiddleSpeed(getPulseUpdateVelocity());
+	 }
+	 else
+	 {
+		 if(fabs(msg->getVehicleMiddleSpeed() - getPulseUpdateVelocity()) < 0.2f)
+		 {
+			 msg->setVehicleMiddleSpeedAbnormal(SpeedNormal);
+		 }
+		 else
+		 {
+			 msg->setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
 		 }
 	 }
 
