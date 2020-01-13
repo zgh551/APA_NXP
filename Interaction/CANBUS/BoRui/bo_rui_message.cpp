@@ -24,8 +24,8 @@ void BoRuiMessage::Init()
 
 void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
 {
-	uint8_t crc_temp,i;
-	uint8_t dat_temp[7];
+//	uint8_t crc_temp,i;
+//	uint8_t dat_temp[7];
 	switch(id)
 	{
 		case 0x2A0://eps status
@@ -138,8 +138,8 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 //			crc_temp = crc8.crcCompute(dat_temp, 7);
 //			if(crc_temp == dat[7])
 //			{
-				SteeringAngle     = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
-				SteeringAngleRate = dat[2]*4.0f;
+				this->setSteeringAngle(((int16_t)((dat[0] << 8) | dat[1])) * 0.1f);
+				this->setSteeringAngleRate(dat[2]*4.0f);
 //			}
 			break;
 

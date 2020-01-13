@@ -108,13 +108,13 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl->SteeringAngle 		= ((int16_t)((dat[1] << 8) | dat[0])) * 0.1f;
-				ctl->SteeringAngleRate 	= dat[2] * 4.0f;
-				ctl->Velocity		    = dat[3] * 0.01f;
-				ctl->Distance           = ((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f;
-				ctl->Gear 				= (uint8_t)(dat[6] & 0x0f);
-				ctl->APAEnable          = (uint8_t)((dat[6]>>4) & 0x03);
-				AckValid = 0xa5;
+				ctl->setSteeringAngle(((int16_t)((dat[1] << 8) | dat[0])) * 0.1f);
+				ctl->setSteeringAngleRate(dat[2] * 4.0f);
+				ctl->setVelocity(dat[3] * 0.01f);
+				ctl->setDistance(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f);
+				ctl->setGear((uint8_t)(dat[6] & 0x0f));
+				ctl->setAPAEnable((uint8_t)((dat[6]>>4) & 0x03));
+				setAckValid(0xa5);
 			}
 			break;
 
@@ -222,7 +222,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
         case 0x510:
         	temp_int.b[1] = dat[2];
         	temp_int.b[0] = dat[3];
-        	msg->SteeringAngle = temp_int.i16 * 0.1;
+//        	msg->setSteeringAngle(temp_int.i16 * 0.1);
         	break;
 
         case 0x520:
@@ -438,15 +438,15 @@ void Terminal::Push(VehicleController *msg)
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x415;
-	temp_uint16 = (uint16_t)(msg->Distance * 1000);
+	temp_uint16 = (uint16_t)(msg->getDistanceSet() * 1000);
 	m_CAN_Packet.data[0] =  temp_uint16 & 0xff ;
 	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff ;
-	temp_int16 = (int16_t)(msg->TargetAcceleration * 1000);
-	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+	temp_int16 = (int16_t)(msg->getTargetAcceleration() * 1000);
+	m_CAN_Packet.data[2] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-
-	m_CAN_Packet.data[4] = 0;
-	m_CAN_Packet.data[5] = 0;
+	temp_int16 = (int16_t)(msg->getSteeringAngleSet() * 10);
+	m_CAN_Packet.data[4] =   temp_int16 & 0xff;
+	m_CAN_Packet.data[5] =  (temp_int16 >> 8) & 0xff;
 	m_CAN_Packet.data[6] = 0;
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);

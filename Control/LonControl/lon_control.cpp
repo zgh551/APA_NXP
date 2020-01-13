@@ -37,6 +37,8 @@ void LonControl::Init()
 	_lon_velocity_control_state = VelocityStartStatus;
 
 	_delta_velocity = START_ACC * DT;
+
+	_err_velocity_cnt = 0;
 }
 
 //根据距离规划速度
@@ -270,37 +272,36 @@ float LonControl::AccAcceleratePlanningControl(float cur_velocity,float stop_dis
 void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *velocity_pid)
 {
 //	_target_velocity = ctl->Velocity;//纯速度控制
-	_target_velocity = VelocityControl(ctl->Distance,ctl->Velocity);//距离速度控制
-	_vehicle_velocity = msg->VehicleMiddleSpeed;
+	_target_velocity = VelocityControl(ctl->getDistance(),ctl->getVelocity());//距离速度控制
+	_vehicle_velocity = msg->getVehicleMiddleSpeed();
 
-	if(ctl->VelocityEnable)
+	if(ctl->getVelocityEnable())
 	{
-		ctl->TorqueEnable = 1;
 		if(_target_velocity < 1.0e-6f)
 		{
 			if(_distance_update_distance_value < 1.0e-6f)
 			{
-				_distance_update_distance_value = ctl->Distance;
+				_distance_update_distance_value = ctl->getDistance();
 				_distance_update_pulse_value = msg->getWheelSumPulse();
 				_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
 			}
 			else
 			{
 				// 距离值更新
-				if((ctl->Distance < (_distance_update_distance_value - 1.0e-6f)) || (ctl->Distance > (_distance_update_distance_value + 1.0e-6f)))
+				if((ctl->getDistance() < (_distance_update_distance_value - 1.0e-6f)) || (ctl->getDistance() > (_distance_update_distance_value + 1.0e-6f)))
 				{
-					_distance_update_distance_value = ctl->Distance;
+					_distance_update_distance_value = ctl->getDistance();
 					_distance_update_pulse_value = msg->getWheelSumPulse();
 					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
 				}
 				else
 				{
-					_distance_update_distance_value -= (msg->getWheelSumPulse() - _distance_update_pulse_value) * WHEEL_PUSLE_RATIO;
-					if(_distance_update_distance_value < 1.0e-6f)
-					{
-						_distance_update_distance_value = 0;
-					}
-					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
+					_delta_distance          = (msg->getWheelSumPulse() - _distance_update_pulse_value) * WHEEL_PUSLE_RATIO;
+					_variable_distance_value = (_delta_distance > 0) ? _distance_update_distance_value - _delta_distance
+							                                         : _distance_update_distance_value;
+					_variable_distance_value = _variable_distance_value < 1.0e-6f ? 0 : _variable_distance_value;
+
+					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_variable_distance_value);
 				}
 			}
 			_vehicle_stop_acc += _vehicle_stop_acc_acc * DT;
@@ -312,78 +313,156 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 			_distance_update_distance_value = 0;
 		}
 
-		if(msg->BrakePressure > 0)
+		if(msg->getBrakePressure() > 0)
 		{
-			velocity_pid->Desired = 0.0f;
+			velocity_pid->setDesired(0.0f);
 		}
 		else
 		{
-			if(velocity_pid->Desired <= (_target_velocity - _delta_velocity))
+			if(velocity_pid->getDesired() <= (_target_velocity - _delta_velocity))
 			{
-				velocity_pid->Desired =  velocity_pid->Desired + _delta_velocity;
+				velocity_pid->setDesired(velocity_pid->getDesired() + _delta_velocity);
 			}
 			else
 			{
-				velocity_pid->Desired = _target_velocity;
+				velocity_pid->setDesired(_target_velocity);
 			}
 		}
-		ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
-		if(ctl->TargetAcceleration > 0)
-		{
-			_calibration_value = _lon_Interpolation.Interpolation2D(ctl->TargetAcceleration, _vehicle_velocity,
-																	_lon_VehilceConfig.AccelerateTable, _lon_VehilceConfig.AccNum,
-																	_lon_VehilceConfig.VelocityTable, _lon_VehilceConfig.VlcNum,
-																	_lon_VehilceConfig.TorqueTable);
 
-			if(velocity_pid->Desired < 1.0e-6)//速度为0时，直接刹住
+		ctl->setTorqueEnable(1);
+
+		if(SpeedNormal == msg->getVehicleMiddleSpeedAbnormal())/*速度正常，更新控制信息*/
+		{
+			ctl->setTargetAcceleration(velocity_pid->pidUpdate(_vehicle_velocity));
+			if(ctl->getTargetAcceleration() > 0)
 			{
-				ctl->AccelerationEnable = 1;
-				ctl->Acceleration = _vehicle_stop_acc;
-				ctl->Torque = 0;
-			}
-			else
-			{
-				if(ctl->TargetAcceleration >= 1.0e-2)
+				_calibration_value = _lon_Interpolation.Interpolation2D(ctl->getTargetAcceleration(), _vehicle_velocity,
+																		_lon_VehilceConfig.AccelerateTable, _lon_VehilceConfig.AccNum,
+																		_lon_VehilceConfig.VelocityTable, _lon_VehilceConfig.VlcNum,
+																		_lon_VehilceConfig.TorqueTable);
+				if(velocity_pid->getDesired() < 1.0e-6)//速度为0时，直接刹住
 				{
-					ctl->AccelerationEnable = 0;
-					ctl->Torque = fmax(_calibration_value,_throttle_lowerbound);//添加最小死区的判断
-					ctl->Acceleration = 0;
+					ctl->setAccelerationEnable(1);
+					ctl->setAcceleration(_vehicle_stop_acc);
+					ctl->setTorque(0);
 				}
 				else
 				{
-					ctl->Torque = _throttle_lowerbound;
-					ctl->Acceleration = 0;
-					ctl->AccelerationEnable = 0;
+					ctl->setTorque(fmax(_calibration_value,_throttle_lowerbound));//添加最小死区的判断
+					ctl->setAcceleration(0);
+					ctl->setAccelerationEnable(0);
 				}
-			}
-		}
-		else
-		{
-			_calibration_value = ctl->TargetAcceleration;
-			if(velocity_pid->Desired < 1.0e-6)//刹车
-			{
-				ctl->AccelerationEnable = 1;
-				ctl->Acceleration = _vehicle_stop_acc;
-				ctl->Torque = 0;
+				_vehicle_slow_down_acc = 0.0f;
 			}
 			else
 			{
-				ctl->AccelerationEnable = 0;
-				ctl->Torque = _throttle_lowerbound;
+				_calibration_value = ctl->getTargetAcceleration();
+				if(velocity_pid->getDesired() < 1.0e-6)//刹车
+				{
+					ctl->setTorque(0);
+					ctl->setAccelerationEnable(1);
+					ctl->setAcceleration(_vehicle_stop_acc);
+					_vehicle_slow_down_acc = 0.0f;
+				}
+				else//减速控制
+				{
+					ctl->setAccelerationEnable(0);
+					ctl->setTorque(0);
+					if( (velocity_pid->getDesired() - _vehicle_velocity) < -0.1f)
+					{
+						_vehicle_slow_down_acc -= START_ACC * DT;
+						_vehicle_slow_down_acc = _vehicle_slow_down_acc < -5.0f? -5.0f : _vehicle_slow_down_acc;
+					}
+					else
+					{
+						_vehicle_slow_down_acc = 0.0f;
+					}
+					ctl->setAcceleration(_vehicle_slow_down_acc);
+				}
 			}
+		}
+		// 异常处理
+		// (1)速度反馈异常
+		if(0 == msg->getBrakePressure())
+		{
+			if(SpeedAbnormal == msg->getVehicleMiddleSpeedAbnormal())/*速度值异常*/
+			{
+				_err_velocity_cnt++;
+			}
+			else
+			{
+				_err_velocity_cnt = 0;
+			}
+		}
+		if(_err_velocity_cnt > 100)
+		{
+			// 策略：制动减速度设置为最大减速度，强制车辆停止
+			ctl->setAccelerationEnable(1);
+			ctl->setTorqueEnable(1);
+			ctl->setAcceleration(MAX_DECELERATION);
+			ctl->setTorque(0);
+		}
+
+		// (2)ESC异常
+		if(ActuatorErr == msg->getESC_Status())
+		{
+			// 策略：失效扭矩控制
+			ctl->setAccelerationEnable(0);
+			ctl->setTorqueEnable(0);
+			ctl->setAcceleration(0);
+			ctl->setTorque(0);
 		}
 	}
 	else
 	{
-		ctl->AccelerationEnable = 0;
-		ctl->TorqueEnable       = 0;
-		ctl->Acceleration = 0;
-		ctl->Torque       = 0;
+		ctl->setAccelerationEnable(0);
+		ctl->setTorqueEnable(0);
+		ctl->setAcceleration(0);
+		ctl->setTorque(0);
 	}
-	if(0 == msg->BrakePressure)
-	{
-		//异常处理
+}
 
+void LonControl::DistanceProc(MessageManager *msg,VehicleController *ctl)
+{
+	_target_velocity = VelocityControl(ctl->getDistance(),ctl->getVelocity());//距离速度控制
+	_vehicle_velocity = msg->getVehicleMiddleSpeed();
+
+	if(_target_velocity < 1.0e-6f)
+	{
+		if(_distance_update_distance_value < 1.0e-6f)/*变量初始化*/
+		{
+			_distance_update_distance_value = ctl->getDistance();
+			_distance_update_pulse_value    = msg->getWheelSumPulse();
+			_variable_distance_value        = _distance_update_distance_value;
+		}
+		else
+		{
+			// 距离值更新
+			if((ctl->getDistance() < (_distance_update_distance_value - 1.0e-6f)) || (ctl->getDistance() > (_distance_update_distance_value + 1.0e-6f)))
+			{
+				_distance_update_distance_value = ctl->getDistance();
+				_distance_update_pulse_value    = msg->getWheelSumPulse();
+				_variable_distance_value        = _distance_update_distance_value;
+			}
+			else
+			{
+				_delta_distance          = (msg->getWheelSumPulse() - _distance_update_pulse_value) * WHEEL_PUSLE_RATIO;
+				_variable_distance_value = (_delta_distance > 0) ? _distance_update_distance_value - _delta_distance
+						                                         : _distance_update_distance_value;
+				_variable_distance_value = _variable_distance_value < 1.0e-6f ? 0 : _variable_distance_value;
+			}
+		}
+		if(_vehicle_velocity < 1.0e-6f)
+		{
+			_variable_distance_value = 0;
+		}
+		ctl->setDistanceSet(_variable_distance_value);
+	}
+	else
+	{
+		_distance_update_distance_value = 0;
+		_distance_update_pulse_value    = 0;
+		ctl->setDistanceSet(ctl->getDistance());
 	}
 }
 
