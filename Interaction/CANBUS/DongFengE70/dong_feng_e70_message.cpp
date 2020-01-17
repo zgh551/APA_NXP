@@ -70,22 +70,27 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				case 1:
 					Gear = Parking;
+					WheelSpeedDirection = StandStill;
 					break;
 
 				case 2:
 					Gear = Reverse;
+					WheelSpeedDirection = Backward;
 					break;
 
 				case 3:
 					Gear = Neutral;
+					WheelSpeedDirection = StandStill;
 					break;
 
 				case 4:
 					Gear = Drive;
+					WheelSpeedDirection = Forward;
 					break;
 
 				default:
 					Gear = None;
+					WheelSpeedDirection = Invalid;
 					break;
 			}
 			break;
