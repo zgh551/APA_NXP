@@ -119,12 +119,12 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	}
 	else
 	{
-		_delta_rear_left_pulse =  msg->WheelSpeedDirection == Forward ?
-								((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) :
-								  msg->WheelSpeedDirection == Backward ?
-							   -((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) : 0;
+		_delta_rear_left_pulse =  msg->getWheelSpeedDirection() == Forward ?
+								((msg->getWheelPulseRearLeft() >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->getWheelPulseRearLeft()  - _last_rear_left_pulse) :
+								  msg->getWheelSpeedDirection() == Backward ?
+							   -((msg->getWheelPulseRearLeft() >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->getWheelPulseRearLeft()  - _last_rear_left_pulse) : 0;
 	}
 
 	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
@@ -133,21 +133,21 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	}
 	else
 	{
-		_delta_rear_right_pulse =  msg->WheelSpeedDirection == Forward ?
-								 ((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								   msg->WheelPulseRearRight  - _last_rear_right_pulse) :
-								   msg->WheelSpeedDirection == Backward ?
-								-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
+		_delta_rear_right_pulse =  msg->getWheelSpeedDirection() == Forward ?
+								 ((msg->getWheelPulseRearRight() >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->getWheelPulseRearRight()  - _last_rear_right_pulse) :
+								   msg->getWheelSpeedDirection() == Backward ?
+								-((msg->getWheelPulseRearRight() >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->getWheelPulseRearRight()  - _last_rear_right_pulse) : 0;
 	}
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 
-	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
-					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
+	LinearVelocity = msg->getWheelSpeedDirection() == Forward ?  LinearRate :
+					 msg->getWheelSpeedDirection() == Backward ? -LinearRate : 0;
 
-	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((uint16_t)fabs(msg->SteeringAngle) < 520))
+	if( ((int16_t)fabs(msg->getSteeringAngle()) != 0) && ((uint16_t)fabs(msg->getSteeringAngle()) < 520))
 	{
-		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
+		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->getSteeringAngle());
 		Yaw  = _last_yaw + displacement / radius;
 		_position.X = _position.X + radius * (sinf(Yaw) - sinf(_last_yaw));
 		_position.Y = _position.Y + radius * (cosf(_last_yaw) - cosf(Yaw));
@@ -162,8 +162,8 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	_sum_rear_right_pulse += _delta_rear_right_pulse;
 
 
-	_last_rear_left_pulse  = msg->WheelPulseRearLeft;
-	_last_rear_right_pulse = msg->WheelPulseRearRight;
+	_last_rear_left_pulse  = msg->getWheelPulseRearLeft();
+	_last_rear_right_pulse = msg->getWheelPulseRearRight();
 	_last_yaw = Yaw;
 }
 
@@ -177,12 +177,12 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 	}
 	else
 	{
-		_delta_rear_left_pulse =  msg->WheelSpeedDirection == Forward ?
-								((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) :
-								  msg->WheelSpeedDirection == Backward ?
-							   -((msg->WheelPulseRearLeft >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								  msg->WheelPulseRearLeft  - _last_rear_left_pulse) : 0;
+		_delta_rear_left_pulse =  msg->getWheelSpeedDirection() == Forward ?
+								((msg->getWheelPulseRearLeft() >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->getWheelPulseRearLeft()  - _last_rear_left_pulse) :
+								  msg->getWheelSpeedDirection() == Backward ?
+							   -((msg->getWheelPulseRearLeft() >= _last_rear_left_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								  msg->getWheelPulseRearLeft()  - _last_rear_left_pulse) : 0;
 	}
 
 	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
@@ -191,12 +191,12 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 	}
 	else
 	{
-		_delta_rear_right_pulse =  msg->WheelSpeedDirection == Forward ?
-								 ((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								   msg->WheelPulseRearRight  - _last_rear_right_pulse) :
-								   msg->WheelSpeedDirection == Backward ?
-								-((msg->WheelPulseRearRight >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
-								   msg->WheelPulseRearRight  - _last_rear_right_pulse) : 0;
+		_delta_rear_right_pulse =  msg->getWheelSpeedDirection() == Forward ?
+								 ((msg->getWheelPulseRearRight() >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->getWheelPulseRearRight()  - _last_rear_right_pulse) :
+								   msg->getWheelSpeedDirection() == Backward ?
+								-((msg->getWheelPulseRearRight() >= _last_rear_right_pulse  ? 0 : WHEEL_PUSLE_MAX) +
+								   msg->getWheelPulseRearRight()  - _last_rear_right_pulse) : 0;
 	}
 
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
@@ -217,6 +217,8 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 
 void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 {
+	float displacement,radius;
+
 	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
 	{
 		_delta_rear_left_pulse = 0;
@@ -306,6 +308,38 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 			 msg->setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
 		 }
 	 }
+
+	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+
+	if( ((int16_t)fabs(msg->getSteeringAngle()) != 0) && ((uint16_t)fabs(msg->getSteeringAngle()) < 520))
+	{
+		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->getSteeringAngle());
+		Yaw  = _last_yaw + displacement / radius;
+		_position.X = _position.X + radius * (sinf(Yaw) - sinf(_last_yaw));
+		_position.Y = _position.Y + radius * (cosf(_last_yaw) - cosf(Yaw));
+	}
+	else
+	{
+		_position.X = _position.X + displacement * cosf(Yaw);
+		_position.Y = _position.Y + displacement * sinf(Yaw);
+	}
+	_last_yaw = Yaw;
+	//////////////////////////////////////////////////////////////
+//	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+//	if(_delta_rear_right_pulse == _delta_rear_left_pulse)
+//	{
+//		_position.X = _position.X + displacement * cosf(Yaw);
+//		_position.Y = _position.Y + displacement * sinf(Yaw);
+//	}
+//	else
+//	{
+//		_delta_yaw = (_delta_rear_right_pulse - _delta_rear_left_pulse)/WIDTH;
+//		Yaw  = _last_yaw + _delta_yaw;
+//		_position.X = _position.X + displacement * cosf(_last_yaw + _delta_yaw*0.5);
+//		_position.Y = _position.Y + displacement * sinf(_last_yaw + _delta_yaw*0.5);
+//	}
+//	_last_yaw = Yaw;
+	/////////////////////////////////////////////////////////////
 
 	_sum_rear_left_pulse  += _delta_rear_left_pulse;
 	_sum_rear_right_pulse += _delta_rear_right_pulse;
