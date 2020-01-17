@@ -73,6 +73,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
+								<option id="gnu.c.compiler.option.dialect.std.981665742" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1194180490" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.1048352341" name="Standard S32DS C++ Compiler" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler">
@@ -99,7 +100,9 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Math&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Configs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/Configure/Data&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Common&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LatControl&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/LonControl&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Driver/System/Inc&quot;"/>
@@ -114,8 +117,6 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/LookAroundPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Percaption/UltrasonicPercaption&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Planning/Common&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Control/Interface&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Common/VehicleState&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.1228741557" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1261271260" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
