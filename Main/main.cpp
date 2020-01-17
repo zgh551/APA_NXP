@@ -40,6 +40,7 @@
 // 车辆控制
 #include "pid.h"
 #include "lon_control.h"
+#include "lat_control.h"
 // 感知
 #include "percaption.h"
 #include "ultrasonic_obstacle_percption.h"
@@ -61,6 +62,7 @@ Terminal m_Terminal_CA;
 Ultrasonic m_Ultrasonic;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
+LatControl m_LatControl;
 /**********************************************************************/
 #ifdef CHANGAN
 //原始版本的PID参数
@@ -191,6 +193,9 @@ int main()
 					#endif
 
 					#ifdef DONG_FENG_E70
+					// 横向控制
+					m_LatControl.Proc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_GeometricTrack);
+					// 纵向速度控制
 					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller,&m_VelocityControlPID);
 					#endif
 				}
@@ -216,7 +221,8 @@ int main()
 					m_GeometricTrack.VelocityUpdate(&m_DongFengE70Message,0.02);
 					#else
 					m_GeometricTrack.VelocityPulseUpdate(&m_DongFengE70Message);
-					m_GeometricTrack.PulseUpdate(&m_DongFengE70Message);
+//					m_GeometricTrack.PulseTrackUpdate(&m_DongFengE70Message);
+//					m_GeometricTrack.PulseUpdate(&m_DongFengE70Message);
 			#endif
 			#endif
 				}
@@ -249,6 +255,7 @@ int main()
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Controller);
 					m_Terminal_CA.Push(m_LonControl);
+					m_Terminal_CA.Push(m_LatControl);
 #endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
