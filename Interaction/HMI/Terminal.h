@@ -29,6 +29,7 @@
 #include "percaption.h"
 #include "ultrasonic_obstacle_percption.h"
 #include "lon_control.h"
+#include "lat_control.h"
 
 typedef union _byte2float
 {
@@ -87,6 +88,8 @@ public:
 	void Push(UltrasonicObstaclePercption p);
 
 	void Push(LonControl lon_control);
+
+	void Push(LatControl lat_control);
 ///////////////////////////////////////////////////////////////////////////
 	/*
 	 * 直接测量超声波原始信号

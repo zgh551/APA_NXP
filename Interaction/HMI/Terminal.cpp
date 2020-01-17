@@ -868,6 +868,53 @@ void Terminal::Push(LonControl lon_control)
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
+
+void Terminal::Push(LatControl lat_control)
+{
+	CAN_Packet m_CAN_Packet;
+	Byte2Float temp_float;
+
+	m_CAN_Packet.length = 8;
+
+	m_CAN_Packet.id = 0x4B0;
+	temp_float.f = lat_control.getTargetTrack().getX();
+	m_CAN_Packet.data[0] = temp_float.b[3];
+	m_CAN_Packet.data[1] = temp_float.b[2];
+	m_CAN_Packet.data[2] = temp_float.b[1];
+	m_CAN_Packet.data[3] = temp_float.b[0];
+	temp_float.f = lat_control.getTargetTrack().getY();
+	m_CAN_Packet.data[4] = temp_float.b[3];
+	m_CAN_Packet.data[5] = temp_float.b[2];
+	m_CAN_Packet.data[6] = temp_float.b[1];
+	m_CAN_Packet.data[7] = temp_float.b[0];
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x4B1;
+	temp_float.f = lat_control.getX1();
+	m_CAN_Packet.data[0] = temp_float.b[3];
+	m_CAN_Packet.data[1] = temp_float.b[2];
+	m_CAN_Packet.data[2] = temp_float.b[1];
+	m_CAN_Packet.data[3] = temp_float.b[0];
+	temp_float.f = lat_control.getX2();
+	m_CAN_Packet.data[4] = temp_float.b[3];
+	m_CAN_Packet.data[5] = temp_float.b[2];
+	m_CAN_Packet.data[6] = temp_float.b[1];
+	m_CAN_Packet.data[7] = temp_float.b[0];
+	CAN2_TransmitMsg(m_CAN_Packet);
+
+	m_CAN_Packet.id = 0x4B2;
+	temp_float.f = lat_control.getSlidingVariable();
+	m_CAN_Packet.data[0] = temp_float.b[3];
+	m_CAN_Packet.data[1] = temp_float.b[2];
+	m_CAN_Packet.data[2] = temp_float.b[1];
+	m_CAN_Packet.data[3] = temp_float.b[0];
+
+	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[5] = 0;
+	m_CAN_Packet.data[6] = 0;
+	m_CAN_Packet.data[7] = 0;
+	CAN2_TransmitMsg(m_CAN_Packet);
+}
 /**************************************************************************************/
 /*
  * 直接测量超声波原始信号
@@ -1059,8 +1106,6 @@ void Terminal::ParkingMsgSend(Percaption *p,float fm,float rm)
 	m_CAN_Packet.data[7] = temp_int.b[0];
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-
-
 
 void Terminal::ParkingCenterPointSend(Vector2d v)
 {
