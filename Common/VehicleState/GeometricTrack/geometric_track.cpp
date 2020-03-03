@@ -87,6 +87,22 @@ void GeometricTrack::Init(Percaption *p)
 	_wait_time_cnt = 0;
 }
 
+float GeometricTrack::pi2pi(float angle)
+{
+	if(angle > M_PI)
+	{
+		return angle - 2 * M_PI;
+	}
+	else if(angle <= -M_PI)
+	{
+		return angle + 2 * M_PI;
+	}
+	else
+	{
+		return angle;
+	}
+}
+
 void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 {
 	float radius;
@@ -310,22 +326,20 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 	 }
 
 	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
-
+	//////////////////////////////////////////////////////////////
 	if( ((int16_t)fabs(msg->getSteeringAngle()) != 0) && ((uint16_t)fabs(msg->getSteeringAngle()) < 520))
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->getSteeringAngle());
-		Yaw  = _last_yaw + displacement / radius;
-		_position.X = _position.X + radius * (sinf(Yaw) - sinf(_last_yaw));
-		_position.Y = _position.Y + radius * (cosf(_last_yaw) - cosf(Yaw));
+		_yaw  = pi2pi(_last_yaw + displacement / radius);
+		_position.X = _position.X + radius * (sinf(_yaw) - sinf(_last_yaw));
+		_position.Y = _position.Y + radius * (cosf(_last_yaw) - cosf(_yaw));
 	}
 	else
 	{
-		_position.X = _position.X + displacement * cosf(Yaw);
-		_position.Y = _position.Y + displacement * sinf(Yaw);
+		_position.X = _position.X + displacement * cosf(_yaw);
+		_position.Y = _position.Y + displacement * sinf(_yaw);
 	}
-	_last_yaw = Yaw;
 	//////////////////////////////////////////////////////////////
-//	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 //	if(_delta_rear_right_pulse == _delta_rear_left_pulse)
 //	{
 //		_position.X = _position.X + displacement * cosf(Yaw);
@@ -338,9 +352,8 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 //		_position.X = _position.X + displacement * cosf(_last_yaw + _delta_yaw*0.5);
 //		_position.Y = _position.Y + displacement * sinf(_last_yaw + _delta_yaw*0.5);
 //	}
-//	_last_yaw = Yaw;
 	/////////////////////////////////////////////////////////////
-
+	_last_yaw = _yaw;
 	_sum_rear_left_pulse  += _delta_rear_left_pulse;
 	_sum_rear_right_pulse += _delta_rear_right_pulse;
 

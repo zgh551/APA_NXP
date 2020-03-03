@@ -45,6 +45,8 @@ public:
 
 	void VelocityPulseUpdate(MessageManager *msg);
 
+	float pi2pi(float angle);
+
 	int32_t getSumRearLeftPulse();
 	void    setSumRearLeftPulse(int32_t value);
 	Property<GeometricTrack,int32_t,READ_WRITE> SumRearLeftPulse;
