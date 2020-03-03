@@ -25,6 +25,8 @@ public:
 	void Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght) override;
 
 private:
+	float fifo_steering_angle_array[64];
+	int16_t _index;
 
 };
 

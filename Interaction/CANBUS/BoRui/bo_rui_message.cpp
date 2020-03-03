@@ -19,7 +19,7 @@ BoRuiMessage::~BoRuiMessage() {
 
 void BoRuiMessage::Init()
 {
-
+	_index = 29;
 }
 
 void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
@@ -130,17 +130,15 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 			break;
 
 		case 0x0E0://SAS
-//			for(i=0;i<7;i++)
-//			{
-//				dat_temp[i] = dat[i];
-//			}
-//			dat_temp[4] = 0x4A;
-//			crc_temp = crc8.crcCompute(dat_temp, 7);
-//			if(crc_temp == dat[7])
-//			{
-				this->setSteeringAngle(((int16_t)((dat[0] << 8) | dat[1])) * 0.1f);
+				for(int16_t i = _index;i>0;i--)
+				{
+					fifo_steering_angle_array[i] = fifo_steering_angle_array[i-1];
+				}
+				fifo_steering_angle_array[0] = ((int16_t)((dat[0] << 8) | dat[1])) * 0.1f;
+
+				this->setSteeringAngle(fifo_steering_angle_array[_index]);
 				this->setSteeringAngleRate(dat[2]*4.0f);
-//			}
+
 			break;
 
 		default:
