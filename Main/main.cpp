@@ -188,13 +188,14 @@ int main()
 					#endif
 
 					#ifdef BORUI
+					m_LatControl.Work(&m_BoRuiMessage, &m_BoRuiController, &m_GeometricTrack);
 					m_LonControl.DistanceProc(&m_BoRuiMessage, &m_BoRuiController);
 					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
 					#endif
 
 					#ifdef DONG_FENG_E70
 					// 横向控制
-					m_LatControl.Proc(&m_DongFengE70Message, &m_DongFengE70Controller, &m_GeometricTrack);
+					m_LatControl.Work(&m_DongFengE70Message, &m_DongFengE70Controller, &m_GeometricTrack);
 					// 纵向速度控制
 					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller,&m_VelocityControlPID);
 					#endif
@@ -254,9 +255,9 @@ int main()
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Controller);
+#endif
 					m_Terminal_CA.Push(m_LonControl);
 					m_Terminal_CA.Push(m_LatControl);
-#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 				{
