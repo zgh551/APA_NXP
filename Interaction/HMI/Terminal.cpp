@@ -877,12 +877,12 @@ void Terminal::Push(LatControl lat_control)
 	m_CAN_Packet.length = 8;
 
 	m_CAN_Packet.id = 0x4B0;
-	temp_float.f = lat_control.getTargetTrack().getX();
+	temp_float.f = lat_control.getTargetTrack().point.getX();
 	m_CAN_Packet.data[0] = temp_float.b[3];
 	m_CAN_Packet.data[1] = temp_float.b[2];
 	m_CAN_Packet.data[2] = temp_float.b[1];
 	m_CAN_Packet.data[3] = temp_float.b[0];
-	temp_float.f = lat_control.getTargetTrack().getY();
+	temp_float.f = lat_control.getTargetTrack().point.getY();
 	m_CAN_Packet.data[4] = temp_float.b[3];
 	m_CAN_Packet.data[5] = temp_float.b[2];
 	m_CAN_Packet.data[6] = temp_float.b[1];
