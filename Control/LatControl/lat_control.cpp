@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include "lat_control.h"
+#include "lat_control.h"‬
 
 LatControl::LatControl() {
 	// TODO Auto-generated constructor stub
@@ -18,7 +18,7 @@ LatControl::~LatControl() {
 
 void LatControl::Init()
 {
-
+	_lat_control_status = init_status;
 }
 
 void LatControl::Proc(MessageManager *msg,VehicleController *ctl,PID *pid)
@@ -44,6 +44,7 @@ float LatControl::TargetLineSecondDerivative(float x)
 	return -COEFFICIENT_TLS*COEFFICIENT_TLS*cosf(COEFFICIENT_TLS*x);
 }
 
+//
 float LatControl::SatFunction(float x)
 {
 	if(x > COEFFICIENT_DELTA)
@@ -60,60 +61,201 @@ float LatControl::SatFunction(float x)
 	}
 }
 
-void LatControl::Proc(MessageManager *msg,VehicleController *ctl,GeometricTrack *track)
+TargetTrack LatControl::TrackingCurve(float x)
 {
-	float psi_r,delta_r;
-	float cos_psi,cos_psi_r;
-	float tan_psi,tan_psi_r;
+	TargetTrack _temp_track;
+	float _temp_cos_psi_r;
 
-	float delta_ctl;
+	_temp_track.point.setX(x);
+	_temp_track.point.setY(TargetLine(x));
+	_temp_track.yaw = atanf(TargetLineFirstDerivative(x)); // (-90,90)°
+	_temp_cos_psi_r = cosf(_temp_track.yaw);
+	_temp_track.curvature = _temp_cos_psi_r*_temp_cos_psi_r*_temp_cos_psi_r*TargetLineSecondDerivative(x);
+	return _temp_track;
+}
+
+//psi in (-pi/2,pi/2)
+void LatControl::Proc(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
+{
+	float delta_t;
+	float cos_psi_a,cos_psi_t;
+	float tan_psi_a,tan_psi_t;
 	float temp_a,temp_b;
+	float delta_ctl;
 
-	if(ctl->SteeringEnable)
+	cos_psi_t = cosf(t_track.yaw);
+	tan_psi_t = tanf(t_track.yaw);
+
+	cos_psi_a = cosf(a_track->getYaw());
+	tan_psi_a = tanf(a_track->getYaw());
+
+	delta_t = atanf(WHEEL_BASE*t_track.curvature);
+
+	_x1 = t_track.point.getY() - a_track->getPosition().getY();
+
+	if(Drive == msg->getGear())
 	{
-		_target_track.setX(track->getPosition().getX());
-		_target_track.setY(TargetLine(_target_track.getX()));
+		_x2 = tan_psi_t - tan_psi_a;
+	}
+	else if(Reverse == msg->getGear())
+	{
+		_x2 = tan_psi_a - tan_psi_t;
+	}
+	else
+	{
 
-		_x1 = _target_track.getY() - track->getPosition().getY();
-		psi_r = atanf(TargetLineFirstDerivative(track->getPosition().getX()));
+	}
+	_sliding_variable = COEFFICIENT_SMV * _x1 + _x2;
 
-		cos_psi_r = cosf(psi_r);
-		tan_psi_r = tanf(psi_r);
+	temp_a = WHEEL_BASE * cos_psi_a * cos_psi_a * cos_psi_a;
+	temp_b = tanf(delta_t)/(WHEEL_BASE * cos_psi_t * cos_psi_t * cos_psi_t) +
+			COEFFICIENT_SMV * _x2 +
+			COEFFICIENT_RHO * SatFunction(_sliding_variable) +
+			COEFFICIENT_K   * _sliding_variable;
 
-		cos_psi   = cosf(track->getYaw());
-		tan_psi   = tanf(track->getYaw());
+	delta_ctl = atanf(temp_a * temp_b);
 
-		delta_r = atanf(WHEEL_BASE*cos_psi_r*cos_psi_r*cos_psi_r*TargetLineSecondDerivative(track->getPosition().getX()));
+	delta_ctl = delta_ctl > 0.54 ? 0.54 : delta_ctl < -0.54 ? -0.54:delta_ctl;
+	ctl->SteeringAngle 		= delta_ctl * 16 * 57.3f;
+	ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+}
 
-		if(Drive == msg->getGear())
-		{
-			_x2 = tan_psi_r - tan_psi;
-		}
-		else if(Reverse == msg->getGear())
-		{
-			_x2 = tan_psi - tan_psi_r;
-		}
-		else
-		{
+// psi in (-pi,pi)
+void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
+{
+	float cos_psi_a,cos_psi_t;
+	float tan_psi_a,tan_psi_t;
+	float delta_t,rote_angle;
+	float temp_a,temp_b;
+	float delta_ctl;
 
-		}
-		_sliding_variable = COEFFICIENT_SMV * _x1 + _x2;
+	float yaw_a,yaw_t;
+	Vector2d point_a,point_t;
 
-		temp_a = WHEEL_BASE * cos_psi * cos_psi * cos_psi;
-		temp_b = tanf(delta_r)/(WHEEL_BASE * cos_psi_r * cos_psi_r * cos_psi_r) +
-				COEFFICIENT_SMV * _x2 +
-				COEFFICIENT_RHO * SatFunction(_sliding_variable) +
-				COEFFICIENT_K * _sliding_variable;
+	if((a_track->getYaw() >= -M_PI) && (a_track->getYaw() < -M_3PI4))
+	{
+		rote_angle = M_3PI4;
+	}
+	else if((a_track->getYaw() >= -M_3PI4) && (a_track->getYaw() < -M_PI2))
+	{
+		rote_angle = M_PI2;
+	}
+	else if((a_track->getYaw() >= -M_PI2) && (a_track->getYaw() < -M_PI4))
+	{
+		rote_angle = M_PI4;
+	}
+	else if((a_track->getYaw() >= -M_PI4) && (a_track->getYaw() < 0))
+	{
+		rote_angle = 0;
+	}
+	else if((a_track->getYaw() >= 0) && (a_track->getYaw() < M_PI4))
+	{
+		rote_angle = 0;
+	}
+	else if((a_track->getYaw() >= M_PI4) && (a_track->getYaw() < M_PI2))
+	{
+		rote_angle = -M_PI4;
+	}
+	else if((a_track->getYaw() >= M_PI2) && (a_track->getYaw() < M_3PI4))
+	{
+		rote_angle = -M_PI2;
+	}
+	else if((a_track->getYaw() >= M_3PI4) && (a_track->getYaw() < M_PI))
+	{
+		rote_angle = -M_3PI4;
+	}
+	else
+	{
 
-		delta_ctl = atanf(temp_a * temp_b);
+	}
 
-		ctl->SteeringAngle 		= delta_ctl*16*57.3f;
-		ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+	point_a = a_track->getPosition().rotate(rote_angle);
+	point_t = t_track.point.rotate(rote_angle);
+
+	yaw_a = a_track->getYaw() + rote_angle;
+	yaw_t = t_track.yaw       + rote_angle;
+
+	cos_psi_t = cosf(yaw_t);
+	tan_psi_t = tanf(yaw_t);
+
+	cos_psi_a = cosf(yaw_a);
+	tan_psi_a = tanf(yaw_a);
+
+	delta_t = atanf(WHEEL_BASE*t_track.curvature);
+
+	_x1 = point_t.getY() - point_a.getY();
+
+	if(Drive == msg->getGear())
+	{
+		_x2 = tan_psi_t - tan_psi_a;
+	}
+	else if(Reverse == msg->getGear())
+	{
+		_x2 = tan_psi_a - tan_psi_t;
+	}
+	else
+	{
+
+	}
+	_sliding_variable = COEFFICIENT_SMV * _x1 + _x2;
+
+	temp_a = WHEEL_BASE * cos_psi_a * cos_psi_a * cos_psi_a;
+	temp_b = tanf(delta_t)/(WHEEL_BASE * cos_psi_t * cos_psi_t * cos_psi_t) +
+			COEFFICIENT_SMV * _x2 +
+			COEFFICIENT_RHO * SatFunction(_sliding_variable) +
+			COEFFICIENT_K   * _sliding_variable;
+
+	delta_ctl = atanf(temp_a * temp_b);
+
+	delta_ctl = delta_ctl > 0.54 ? 0.54 : delta_ctl < -0.54 ? -0.54:delta_ctl;
+	ctl->SteeringAngle 		= delta_ctl * 16 * 57.3f;
+	ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+}
+
+void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
+{
+	float err_theta;
+	err_theta = a_track->getYaw() - t_track.yaw;
+
+
+}
+
+void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *track)
+{
+	switch(_lat_control_status)
+	{
+		case init_status:
+			if(ctl->getAPAEnable() && (msg->getSteeringAngle() < 5.0f) && (msg->getSteeringAngle() > -5.0f))
+			{
+				track->Init(); // 跟踪位置初始化，从坐标零点开始控制
+				_lat_control_status = process_status;
+			}
+			else
+			{
+				ctl->SteeringAngle 		= 0;
+				ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+			}
+			break;
+
+		case process_status:
+			if(ctl->getAPAEnable())
+			{
+				_target_track = TrackingCurve(track->getPosition().getX());
+				ProcV1_0(msg,ctl,track,_target_track);
+			}
+			else
+			{
+				_lat_control_status = init_status;
+			}
+			break;
+
+		default:
+			break;
 	}
 }
 
-Vector2d LatControl::getTargetTrack()               { return  _target_track;}
-void     LatControl::setTargetTrack(Vector2d value) { _target_track = value;}
+TargetTrack LatControl::getTargetTrack()                  { return  _target_track;}
+void        LatControl::setTargetTrack(TargetTrack value) { _target_track = value;}
 
 float LatControl::getX1()            { return  _x1;}
 void  LatControl::setX1(float value) { _x1 = value;}

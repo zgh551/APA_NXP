@@ -21,7 +21,23 @@
 #define COEFFICIENT_SMV 	( 12.0f )	// 滑模变量系数
 #define COEFFICIENT_RHO 	( 0.02f )	// 补偿噪声系数
 #define COEFFICIENT_K   	( 1.1f  )	// 指数趋近率系数
-#define COEFFICIENT_DELTA	( 0.1f  ) // Sat函数系数
+#define COEFFICIENT_DELTA	( 0.1f  )   // Sat函数系数
+
+
+
+typedef enum _LatControlStatus
+{
+	init_status = 0,
+	process_status
+}LatControlStatus;
+
+
+typedef struct _TargetTrack
+{
+	Vector2d point;
+	float    yaw;
+	float    curvature;
+}TargetTrack;
 
 class LatControl :public Controller
 {
@@ -35,13 +51,19 @@ public:
 	float TargetLineFirstDerivative(float x);
 	float TargetLineSecondDerivative(float x);
 
+	TargetTrack TrackingCurve(float x);
+
 	float SatFunction(float x);
 
 	void Proc(MessageManager *msg,VehicleController *ctl,PID *pid) override;
-	void Proc(MessageManager *msg,VehicleController *ctl,GeometricTrack *track);
+	void Proc(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
+	void ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
 
-	Vector2d getTargetTrack();
-	void setTargetTrack(Vector2d value);
+	void RearWheelFeedback(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
+	void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *track);
+
+	TargetTrack getTargetTrack();
+	void setTargetTrack(TargetTrack value);
 
 	float getX1();
 	void  setX1(float value);
@@ -53,11 +75,12 @@ public:
 	void  setSlidingVariable(float value);
 
 private:
-	Vector2d _target_track;
-
+	TargetTrack _target_track;
 	float _x1;
 	float _x2;
 	float _sliding_variable;
+
+	LatControlStatus _lat_control_status;
 };
 
 #endif /* LATCONTROL_LAT_CONTROL_H_ */
