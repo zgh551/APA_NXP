@@ -63,14 +63,14 @@ public:
 
 	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
 
-
 	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pct);
-
-
 
 	void Parse(vuint32_t id,vuint8_t dat[],PID *msg);
 
 	void Parse(vuint32_t id,vuint8_t dat[]);
+
+	void Parse(vuint32_t id,vuint8_t dat[],LatControl *lat_ctl);
+
 	// Terminal Control
 	void Push(MessageManager *msg);
 

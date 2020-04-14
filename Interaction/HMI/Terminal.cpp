@@ -180,29 +180,29 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u)
 			break;
 
         case 0x50C:
-        	obstacle_location_packet.Position.X = (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01);
-        	obstacle_location_packet.Position.Y = (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01);
+        	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
+        	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
         	u->setAbstacleGroundPositionTriangle(5, obstacle_location_packet);
         	break;
 
         case 0x50D:
-        	obstacle_location_packet.Position.X = (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01);
-        	obstacle_location_packet.Position.Y = (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01);
+        	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
+        	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
         	u->setAbstacleGroundPositionTriangle(6, obstacle_location_packet);
         	break;
 
         case 0x50E:
-        	obstacle_location_packet.Position.X = (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01);
-        	obstacle_location_packet.Position.Y = (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01);
+        	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
+        	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
         	u->setAbstacleGroundPositionTriangle(10, obstacle_location_packet);
         	break;
 
         case 0x50F:
-        	obstacle_location_packet.Position.X = (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01);
-        	obstacle_location_packet.Position.Y = (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01);
+        	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
+        	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
         	u->setAbstacleGroundPositionTriangle(11, obstacle_location_packet);
         	AckValid = 0xa5;
@@ -312,6 +312,19 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[])
 
         case 0x512:
         	AckEcho = (uint8_t)dat[0];
+        	break;
+
+        default:
+        	break;
+	}
+}
+
+void Parse(vuint32_t id,vuint8_t dat[],LatControl *lat_ctl)
+{
+	switch(id)
+	{
+        case 0x5B0:
+        	lat_ctl->setCommand((uint8_t)dat[0]);
         	break;
 
         default:
@@ -459,10 +472,10 @@ void Terminal::Push(VehicleState *msg)
 	m_CAN_Packet.id = 0x442;
 	m_CAN_Packet.length = 8;
 
-	temp_int.i16 = (int16_t)(msg->getPosition().X * 100);
+	temp_int.i16 = (int16_t)(msg->getPosition().getX() * 100);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(msg->getPosition().Y * 100);
+	temp_int.i16 = (int16_t)(msg->getPosition().getY() * 100);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
 	temp_int.i16 = (int16_t)(msg->Yaw * 100);

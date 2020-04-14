@@ -80,6 +80,7 @@ typedef enum _ObstacleDistanceProcessState
 	ObstacleUpdateState,
 }ObstacleDistanceProcessState;
 
+class ObstacleLinkList : public LinkList<ObstacleLocationPacket>{};
 class UltrasonicObstaclePercption : public Percaption
 {
 public:
@@ -88,36 +89,36 @@ public:
 
 	void Init();
 
-	void Push(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
+	void Push(ObstacleLinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
 	/*
 	 * 有序数据的推送
 	 * */
-	void OrderedPush(LinkList *list,ObstacleLocationPacket p_dat);
+	void OrderedPush(ObstacleLinkList *list,ObstacleLocationPacket p_dat);
 	/*
 	 * 无序数据的推送
 	 * */
-	void DisorderPush(LinkList *list,ObstacleLocationPacket p_dat);
+	void DisorderPush(ObstacleLinkList *list,ObstacleLocationPacket p_dat);
 
-	void ParkingCenterPush(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
+	void ParkingCenterPush(ObstacleLinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
 	/*******************************************************************************************/
 	float WeightCalculation(float d);
 
-	void DataCredibilityCalculate(LinkList *list);
+	void DataCredibilityCalculate(ObstacleLinkList *list);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	void EdgeFinding(LinkList *list);
-	void EdgeFinding_V1_0(LinkList *list);
+	void EdgeFinding(ObstacleLinkList *list);
+	void EdgeFinding_V1_0(ObstacleLinkList *list);
 	// 求取最高分布值的最优解
 	float HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value);
 	// 求取最高分布的索引值
 	uint8_t HighestDistributionBase(uint8_t group_number,uint16_t* group_value_array);
-	void ValueDistributed(LinkList *valid_list);
+	void ValueDistributed(ObstacleLinkList *valid_list);
 	/*
 	 * 数值分布求取
 	 * valid_list：原始的分布数据集，
 	 * fit_list：分布最高的数据集
 	 * */
-	void ValueDistributedFilter(LinkList *valid_list,LinkList *fit_list);
+	void ValueDistributedFilter(ObstacleLinkList *valid_list,ObstacleLinkList *fit_list);
 	// 根据有效数据拟合车库边沿
 	void EdgeLineFitParkingCenterCalculate();
 	/******************************库位重新定位的状态机***************************************/
@@ -167,14 +168,14 @@ private:
 	UltrasonicLocationPushState      _data_push_state;
 	UltrasonicLocationCalculateState _parking_calculate_state;
 
-	LinkList *_ultrasonic_position_list;
-	LinkList *_ultrasonic_triangle_location_list;
+	ObstacleLinkList *_ultrasonic_position_list;
+	ObstacleLinkList *_ultrasonic_triangle_location_list;
 
-	LinkList *_left_edge_position_list;
-	LinkList *_right_edge_position_list;
+	ObstacleLinkList *_left_edge_position_list;
+	ObstacleLinkList *_right_edge_position_list;
 
-	LinkList *_left_fit_edge_list;
-	LinkList *_right_fit_edge_list;
+	ObstacleLinkList *_left_fit_edge_list;
+	ObstacleLinkList *_right_fit_edge_list;
 
 	ObstacleInformationPacket _parking_position;
 	ObstacleInformationPacket _vehicle_position;

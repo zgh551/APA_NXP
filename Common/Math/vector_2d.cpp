@@ -16,13 +16,7 @@
 #include <vector_2d.h>
 
 Vector2d::Vector2d() {
-	X.setContainer(this);
-	X.getter(&Vector2d::getX);
-	X.setter(&Vector2d::setX);
 
-	Y.setContainer(this);
-	Y.getter(&Vector2d::getY);
-	Y.setter(&Vector2d::setY);
 }
 
 Vector2d::~Vector2d() {
@@ -44,9 +38,21 @@ float Vector2d::Angle(void)const
 	return atan2f(this->_y , this->_x);
 }
 
-float Vector2d::DistanceTo(const Vector2d &other)const
+float Vector2d::DistanceTo(const Vector2d &other) const
 {
 	return hypotf(this->_x - other._x , this->_y - other._y);
+}
+
+// 向量叉积 axb
+float Vector2d::CrossProduct(const Vector2d&other) const
+{
+	return this->_x * other._y - this->_y * other._x;
+}
+
+// 向量内积 a.b
+float Vector2d::InnerProduct(const Vector2d&other) const
+{
+	return this->_x * other._x + this->_y * other._y;
 }
 
 
@@ -66,6 +72,11 @@ Vector2d Vector2d::Orthogonal(const float angle) const
 	c_value = cosf(angle);
 	return Vector2d(this->_x * c_value * c_value + this->_y * s_value * c_value,
 			        this->_x * s_value * c_value + this->_y * s_value * s_value);
+}
+
+// 航向角为angle的归一化向量
+Vector2d Vector2d::Normalize(const float angle) const{
+//	return Vector2d(cosf(angle),sinf(angle));
 }
 
 Vector2d Vector2d::operator+(const Vector2d& other) const

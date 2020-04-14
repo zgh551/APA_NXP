@@ -12,8 +12,6 @@
 #include "property.h"
 #include "Interface/message_manager.h"
 
-#define V_M_S 0.00277777777777777777777777777778
-
 class DongFengE70Message  : public MessageManager
 {
 public:

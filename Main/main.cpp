@@ -63,6 +63,9 @@ Ultrasonic m_Ultrasonic;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 LatControl m_LatControl;
+TrackLinkList *_target_curvature_data_sets;
+TargetTrack temp_node;
+TargetTrack end_node;
 /**********************************************************************/
 #ifdef CHANGAN
 //原始版本的PID参数
@@ -125,6 +128,8 @@ int main()
 
 		/* Init PIT Module */
 		PIT_Configure();
+
+		_target_curvature_data_sets = new TrackLinkList();
 		/* Loop forever */
 		for(;;)
 		{
@@ -160,6 +165,14 @@ int main()
 					m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
 				}
 			}
+			else if(0xD0 == m_Terminal_CA.Command)//曲线生成
+			{
+				_target_curvature_data_sets->Delete();
+				m_LatControl.GenerateCurvatureSets(_target_curvature_data_sets);
+				end_node = _target_curvature_data_sets->getEndNode()->data;
+				m_LatControl.setCurvatureValid(0xA5);
+				m_Terminal_CA.setCommand(0);
+			}
 			else//车辆
 			{
 
@@ -188,9 +201,13 @@ int main()
 					#endif
 
 					#ifdef BORUI
-					m_LatControl.Work(&m_BoRuiMessage, &m_BoRuiController, &m_GeometricTrack);
+				    if(0xA5 == m_LatControl.getCurvatureValid())
+				    {
+				        temp_node = m_LatControl.CalculateNearestPoint(_target_curvature_data_sets,&m_GeometricTrack);
+				        m_LatControl.Work(&m_BoRuiMessage,&m_BoRuiController,&m_GeometricTrack,temp_node,end_node);
+				    }
 					m_LonControl.DistanceProc(&m_BoRuiMessage, &m_BoRuiController);
-					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
+//					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
 					#endif
 
 					#ifdef DONG_FENG_E70

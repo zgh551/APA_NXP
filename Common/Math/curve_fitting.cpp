@@ -7,7 +7,7 @@
 /* ---   -----------    ----------------    ---------------------            */
 /* 1.0	 Guohua Zhu     May 20 2019         Initial Version                  */
 /*****************************************************************************/
-#include <curve_fitting.h>
+#include "curve_fitting.h"
 
 CurveFitting::CurveFitting() {
 	// TODO Auto-generated constructor stub
@@ -18,12 +18,12 @@ CurveFitting::~CurveFitting() {
 	// TODO Auto-generated destructor stub
 }
 
-void CurveFitting::LineFitting(LinkList *l,float *a,float *b)
+void CurveFitting::LineFitting(LinkList<ObstacleLocationPacket> *l,float *a,float *b)
 {
 	float sum_x,sum_y,sum_xy,sum_x2,sum_n;
 	float denominator,molecule_a,molecule_b;
-	Node *current_node;
-	current_node = l->HeadNode;
+	Node<ObstacleLocationPacket> *current_node;
+	current_node = l->getHeadNode();
 
 	sum_x = 0;
 	sum_y = 0;

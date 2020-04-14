@@ -41,14 +41,14 @@ void UltrasonicObstaclePercption::Init()
 	_valid_parking_center_position.angle    = 0;
 	_push_cnt = 0;
 	/******************************************/
-	_ultrasonic_position_list          = new LinkList;
-	_ultrasonic_triangle_location_list = new LinkList;
+	_ultrasonic_position_list          = new ObstacleLinkList;
+	_ultrasonic_triangle_location_list = new ObstacleLinkList;
 
-	_left_edge_position_list  = new LinkList;
-	_right_edge_position_list = new LinkList;
+	_left_edge_position_list  = new ObstacleLinkList;
+	_right_edge_position_list = new ObstacleLinkList;
 
-	_left_fit_edge_list   = new LinkList;
-	_right_fit_edge_list  = new LinkList;
+	_left_fit_edge_list   = new ObstacleLinkList;
+	_right_fit_edge_list  = new ObstacleLinkList;
 
 	_front_obstacle_process_state = WaitObstacleState;
 	_rear_obstacle_process_state = WaitObstacleState;
@@ -57,10 +57,10 @@ void UltrasonicObstaclePercption::Init()
 	rear_obstacle_cnt = 0;
 }
 
-void UltrasonicObstaclePercption::Push(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat)
+void UltrasonicObstaclePercption::Push(ObstacleLinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat)
 {
 	// 时间序列的数据
-	if(list->HeadNode == NULL)
+	if(list->getHeadNode() == NULL)
 	{
 		if (u_dat.Distance2 > u_dat.Distance1)
 		{
@@ -99,10 +99,10 @@ void UltrasonicObstaclePercption::Push(LinkList *list,Ultrasonic_Packet u_dat,Ob
 	}
 }
 
-void UltrasonicObstaclePercption::OrderedPush(LinkList *list,ObstacleLocationPacket p_dat)
+void UltrasonicObstaclePercption::OrderedPush(ObstacleLinkList *list,ObstacleLocationPacket p_dat)
 {
 	// 时间序列的数据
-	if(list->HeadNode == NULL)
+	if(list->getHeadNode() == NULL)
 	{
 		if(p_dat.Status == 0)
 		{
@@ -119,7 +119,7 @@ void UltrasonicObstaclePercption::OrderedPush(LinkList *list,ObstacleLocationPac
 }
 
 // 无序列的数据
-void UltrasonicObstaclePercption::DisorderPush(LinkList *list,ObstacleLocationPacket p_dat)
+void UltrasonicObstaclePercption::DisorderPush(ObstacleLinkList *list,ObstacleLocationPacket p_dat)
 {
 	// 无序数据
 	if(list->getHeadNode() == NULL)
@@ -138,7 +138,7 @@ void UltrasonicObstaclePercption::DisorderPush(LinkList *list,ObstacleLocationPa
 	}
 }
 
-void UltrasonicObstaclePercption::ParkingCenterPush(LinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat)
+void UltrasonicObstaclePercption::ParkingCenterPush(ObstacleLinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat)
 {
 	ObstacleLocationPacket temp_packet;
 	// 有序数据集
@@ -185,7 +185,7 @@ float UltrasonicObstaclePercption::WeightCalculation(float d)
 	}
 }
 
-void UltrasonicObstaclePercption::DataCredibilityCalculate(LinkList *list)
+void UltrasonicObstaclePercption::DataCredibilityCalculate(ObstacleLinkList *list)
 {
 //	float weigth_array_buffer[4];
 //	uint8_t i;
@@ -208,21 +208,21 @@ void UltrasonicObstaclePercption::DataCredibilityCalculate(LinkList *list)
 
 }
 /******************************************************************************************************************************/
-void UltrasonicObstaclePercption::EdgeFinding(LinkList *list)
+void UltrasonicObstaclePercption::EdgeFinding(ObstacleLinkList *list)
 {
-	Node* _current_node;//当前节点
-	Node* _last_node;//上一节点
+	Node<ObstacleLocationPacket>* _current_node;//当前节点
+	Node<ObstacleLocationPacket>* _last_node;//上一节点
 	ObstacleInformationPacket parking_position_temp;
 	ObstacleInformationPacket vehicle_position_temp;
 	float max_y_axis_value;
 	float _err_distance;
 
-	if(list->HeadNode == NULL)
+	if(list->getHeadNode() == NULL)
 	{
 		return;
 	}
-	_current_node = list->HeadNode;//当前节点
-	_last_node    = list->HeadNode;//上一节点
+	_current_node = list->getHeadNode();//当前节点
+	_last_node    = list->getHeadNode();//上一节点
 
 	while(_current_node->next != NULL)
 	{
@@ -300,20 +300,20 @@ void UltrasonicObstaclePercption::EdgeFinding(LinkList *list)
 	list->Delete();
 }
 
-void UltrasonicObstaclePercption::EdgeFinding_V1_0(LinkList *list)
+void UltrasonicObstaclePercption::EdgeFinding_V1_0(ObstacleLinkList *list)
 {
-	Node* _current_node;//当前节点
-	Node* _last_node;//上一节点
+	Node<ObstacleLocationPacket>* _current_node;//当前节点
+	Node<ObstacleLocationPacket>* _last_node;//上一节点
 	ObstacleInformationPacket vehicle_position_temp;
 	float max_y_axis_value;
 	float _err_distance;
 
-	if(list->HeadNode == NULL)
+	if(list->getHeadNode() == NULL)
 	{
 		return;
 	}
 
-	_last_node    = list->HeadNode;//上一节点
+	_last_node    = list->getHeadNode();//上一节点
 	_current_node = _last_node->next;//当前节点
 
 	while(_current_node->next != NULL)
@@ -477,19 +477,19 @@ uint8_t UltrasonicObstaclePercption::HighestDistributionBase(uint8_t group_numbe
 	return max_distribute_number_id;
 }
 
-void  UltrasonicObstaclePercption::ValueDistributed(LinkList *valid_list)
+void  UltrasonicObstaclePercption::ValueDistributed(ObstacleLinkList *valid_list)
 {
 	uint8_t i;
 	float min_x,max_x;
 	float min_y,max_y;
 	uint8_t  x_group_number,y_group_number;
-	Node* _current_node_triangle;//当前节点零时变量
+	Node<ObstacleLocationPacket>* _current_node_triangle;//当前节点零时变量
 
-	if(valid_list->HeadNode == NULL)
+	if(valid_list->getHeadNode() == NULL)
 	{
 		return;
 	}
-	_current_node_triangle = valid_list->HeadNode;
+	_current_node_triangle = valid_list->getHeadNode();
 	min_x = _current_node_triangle->data.Position.getX();
 	max_x = _current_node_triangle->data.Position.getX();
 	min_y = _current_node_triangle->data.Position.getY();
@@ -508,7 +508,7 @@ void  UltrasonicObstaclePercption::ValueDistributed(LinkList *valid_list)
 	x_group_number = (uint8_t)((max_x - min_x)/STEP_DISTANCE) + 1;
 	y_group_number = (uint8_t)((max_y - min_y)/STEP_DISTANCE) + 1;
 
-	_current_node_triangle = valid_list->HeadNode;
+	_current_node_triangle = valid_list->getHeadNode();
 
 	uint16_t *distribute_number_x = new uint16_t[x_group_number];
 	uint16_t *distribute_number_y = new uint16_t[y_group_number];
@@ -551,7 +551,7 @@ void  UltrasonicObstaclePercption::ValueDistributed(LinkList *valid_list)
 	valid_list->Delete();
 }
 
-void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,LinkList *fit_list)
+void UltrasonicObstaclePercption::ValueDistributedFilter(ObstacleLinkList *valid_list,ObstacleLinkList *fit_list)
 {
 	uint8_t i,max_distribute_number_id;
 //	uint8_t x_group_number;
@@ -559,10 +559,10 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 //	float min_x,max_x;
 	float min_y,max_y;
 	float treshold_down,treshold_up;
-	Node* current_node;
+	Node<ObstacleLocationPacket>* current_node;
 
-	if(valid_list->HeadNode == NULL){return;}
-	current_node = valid_list->HeadNode;
+	if(valid_list->getHeadNode() == NULL){return;}
+	current_node = valid_list->getHeadNode();
 //	min_x = current_node->data.Position.getX();
 //	max_x = current_node->data.Position.getX();
 	min_y = current_node->data.Position.getY();
@@ -579,7 +579,7 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 //	x_group_number = (uint8_t)((max_x - min_x)/FIT_LINE_STEP_DISTANCE) + 1;
 	y_group_number = (uint8_t)((max_y - min_y)/FIT_LINE_STEP_DISTANCE) + 1;
 
-	current_node = valid_list->HeadNode;
+	current_node = valid_list->getHeadNode();
 	// create the array
 //	uint16_t *distribute_number_x = new uint16_t[x_group_number];
 	uint16_t *distribute_number_y = new uint16_t[y_group_number];
@@ -623,7 +623,7 @@ void UltrasonicObstaclePercption::ValueDistributedFilter(LinkList *valid_list,Li
 //	treshold_up   = min_x + FIT_LINE_STEP_DISTANCE *(max_distribute_number_id + 1);
 //#endif
 
-	current_node = valid_list->HeadNode;
+	current_node = valid_list->getHeadNode();
 	if(fit_list->Length() != 0)
 	{
 		fit_list->Delete();
@@ -741,7 +741,7 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic* u_dat)
 			ParkingCenterPush(_left_edge_position_list,u_dat->UltrasonicPacket[10],u_dat->AbstacleGroundPositionTriangle[10]);
 			ParkingCenterPush(_right_edge_position_list,u_dat->UltrasonicPacket[11],u_dat->AbstacleGroundPositionTriangle[11]);
 #endif
-			if((_left_edge_position_list->EndNode != NULL) && (_right_edge_position_list->EndNode != NULL))
+			if((_left_edge_position_list->getEndNode() != NULL) && (_right_edge_position_list->getEndNode() != NULL))
 			{
 				if(((_left_edge_position_list->getHeadNode()->data.Position - _left_edge_position_list->getEndNode()->data.Position).Length() > MIN_FIT_DISTANCE)  &&
 				   ((_right_edge_position_list->getHeadNode()->data.Position - _right_edge_position_list->getEndNode()->data.Position).Length() > MIN_FIT_DISTANCE) &&

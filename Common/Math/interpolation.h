@@ -13,7 +13,7 @@
 #include "derivative.h"
 #include "property.h"
 #include "math.h"
-#include "vehilce_config.h"
+#include "vehicle_config.h"
 
 #define kDoubleEpsilon (1.0e-6)
 

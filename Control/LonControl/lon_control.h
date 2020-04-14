@@ -17,7 +17,7 @@
 #include "controller.h"
 #include "pid.h"
 #include "math.h"
-#include "vehilce_config.h"
+#include "vehicle_config.h"
 #include "interpolation.h"
 
 /**************************速度控制******************************/

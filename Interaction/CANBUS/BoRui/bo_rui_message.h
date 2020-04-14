@@ -13,8 +13,6 @@
 #include "Interface/message_manager.h"
 #include "crc_compute.h"
 
-#define V_M_S 0.015625
-
 class BoRuiMessage  : public MessageManager
 {
 public:

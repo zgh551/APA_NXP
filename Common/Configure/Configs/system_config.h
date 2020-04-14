@@ -7,6 +7,7 @@
 
 #ifndef CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_
 #define CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_
+
 /****************Task Shedule Priority Level******************/
 #define TIME_5MS_TASK (1)
 #define CAN0_TASK     (2)

@@ -5,7 +5,8 @@
  *      Author: zhuguohua
  */
 
-#include <BoRui/bo_rui_message.h>
+#include "BoRui/bo_rui_message.h"
+
 CRC8 crc8 (CRC8::eAUTOSAR);
 
 BoRuiMessage::BoRuiMessage() {
@@ -139,6 +140,10 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 				this->setSteeringAngle(fifo_steering_angle_array[_index]);
 				this->setSteeringAngleRate(dat[2]*4.0f);
 
+			break;
+
+		case 0x131:
+			LonAcc = (uint16_t)((dat[2] << 8) | dat[3]) * 0.001f - 2.0f;
 			break;
 
 		default:

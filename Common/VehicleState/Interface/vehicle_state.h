@@ -21,7 +21,7 @@
 #include "property.h"
 #include "math.h"
 #include "vector_2d.h"
-#include "vehilce_config.h"
+#include "vehicle_config.h"
 #include "Interface/message_manager.h"
 
 

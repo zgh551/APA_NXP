@@ -10,7 +10,7 @@
 
 #include "derivative.h"
 #include "property.h"
-#include "vehilce_config.h"
+#include "vehicle_config.h"
 
 #include "Ultrasonic.h"
 #include "Interface/vehicle_state.h"

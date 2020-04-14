@@ -11,14 +11,14 @@
 #define MATH_CURVE_FITTING_H_
 
 #include "link_list.h"
-
+#include "Ultrasonic.h"
 
 class CurveFitting {
 public:
 	CurveFitting();
 	virtual ~CurveFitting();
 
-	void LineFitting(LinkList *l,float *a,float *b);
+	void LineFitting(LinkList<ObstacleLocationPacket> *l,float *a,float *b);
 };
 
 #endif /* MATH_CURVE_FITTING_H_ */

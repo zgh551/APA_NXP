@@ -35,10 +35,19 @@ public:
 	float Angle(void)const;
 	//求连个矢量之间的距离
 	float DistanceTo(const Vector2d &other)const;
+
+	// 向量叉积 axb
+	float CrossProduct(const Vector2d&other) const;
+	// 向量内积 a.b
+	float InnerProduct(const Vector2d&other) const;
+
 	//矢量旋转，旋转角度逆时针为正，顺时针为负
 	Vector2d rotate(const float angle) const;
 	//矢量正交点计算
 	Vector2d Orthogonal(const float angle) const;
+
+	// 航向角为angle的归一化向量
+	Vector2d Normalize(const float angle) const;
 
 	//运算符重载
 	Vector2d operator+(const Vector2d &other) const;
@@ -47,11 +56,9 @@ public:
 
 	float getX();
 	void  setX(float value);
-	Property<Vector2d,float,READ_WRITE> X;
 
 	float getY();
 	void  setY(float value);
-	Property<Vector2d,float,READ_WRITE> Y;
 
 protected:
 	float _x;

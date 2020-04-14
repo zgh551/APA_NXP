@@ -23,7 +23,7 @@
 // math
 #include "math.h"
 #include "vector_2d.h"
-#include "vehilce_config.h"
+#include "vehicle_config.h"
 // Track
 #include "../../VehicleState/Interface/vehicle_state.h"
 

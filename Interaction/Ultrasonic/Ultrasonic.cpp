@@ -66,8 +66,8 @@ void Ultrasonic::Init(void)
 
 	for(i=0;i<4;i++)
 	{
-		_ultrasonic_data_buffer[i].Position.X = 0.0f;
-		_ultrasonic_data_buffer[i].Position.Y = 0.0f;
+		_ultrasonic_data_buffer[i].Position.setX(0.0f);
+		_ultrasonic_data_buffer[i].Position.setY(0.0f);
 		_ultrasonic_data_buffer[i].UltrasonicData.Distance1 = 0.0f;
 		_ultrasonic_data_buffer[i].UltrasonicData.Distance2 = 0.0f;
 		_ultrasonic_data_buffer[i].UltrasonicData.Level = 0.0f;

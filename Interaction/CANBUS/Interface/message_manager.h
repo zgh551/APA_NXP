@@ -19,6 +19,7 @@
 
 #include "derivative.h"
 #include "property.h"
+#include "vehicle_config.h"
 
 typedef enum _GearStatus
 {

@@ -44,6 +44,8 @@
 #define SPEED_REVISE_RATIO               (1.01)
 // 轮脉冲比例系数
 #define WHEEL_PUSLE_RATIO                (0.021654)
+
+#define V_M_S 0.015625
 /****/
 // 1530 -> 33.2    :0.02169935
 // 2060 -> 44.55   :0.02162621
