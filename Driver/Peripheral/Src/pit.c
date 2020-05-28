@@ -59,7 +59,8 @@ void PIT_Configure()
 	                        /* PIT is enabled here before starting other cores.  */
 		PIT_0.MCR.B.FRZ = 1;  /* Freeze PIT timers in debug mode */
 //		PIT0_init(1000000);//20ms
-		PIT0_init(250000);//5ms
+//		PIT0_init(250000);//5ms
+		PIT0_init(300000);//6ms
 		/* timeout= 0.8M  PITclks x 4 sysclks/1 PITclk x 1 sec/160Msysck */
 		/*        = 0.8M x 4 / 160M = 3.2/160 = 0.02 sec.  */
 		PIT_0.MCR.B.FRZ = 0; //Unfreeze timers
