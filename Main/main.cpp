@@ -268,18 +268,18 @@ int main()
 					m_Terminal_CA.Push(&m_ChangAnController);
 #endif
 #ifdef BORUI
-					m_Terminal_CA.Push(&m_BoRuiController);
+//					m_Terminal_CA.Push(&m_BoRuiController);
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Controller);
 #endif
-					m_Terminal_CA.Push(m_LonControl);
-					m_Terminal_CA.Push(m_LatControl);
+//					m_Terminal_CA.Push(m_LonControl);
+//					m_Terminal_CA.Push(m_LatControl);
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 				{
-					m_Terminal_CA.Push(&m_GeometricTrack);
-					m_Terminal_CA.Push( m_GeometricTrack);
+//					m_Terminal_CA.Push(&m_GeometricTrack);
+//					m_Terminal_CA.Push( m_GeometricTrack);
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 				{
@@ -287,7 +287,7 @@ int main()
 					m_Terminal_CA.Push(&m_ChangAnMessage);
 #endif
 #ifdef BORUI
-					m_Terminal_CA.Push(&m_BoRuiMessage);
+//					m_Terminal_CA.Push(&m_BoRuiMessage);
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Message);
@@ -297,7 +297,7 @@ int main()
 				if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 				{
 					//推送障碍物检测信息
-					m_Terminal_CA.Push(m_UltrasonicObstaclePercption);
+//					m_Terminal_CA.Push(m_UltrasonicObstaclePercption);
 				}
 			}
 			// 终端应答信号
@@ -340,14 +340,6 @@ void PIT0_isr(void)
 	}
 	#endif
 
-//	if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
-//	{
-////		eTimer1_Channel5SendWakeUp();
-//		eTimer1_Channel5Send_ID();
-////		eTimer1Channel5OutputStart();
-////		eTimer1_Channel5Send();
-//	}
-
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
 	m_Ultrasonic.Update(25);
@@ -365,8 +357,26 @@ void PIT0_isr(void)
 //	m_UltrasonicObstaclePercption.DataPushStateMachine(&m_Ultrasonic);
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
-	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 
+	if(4 == m_Terminal_CA.getWorkMode())
+	{
+		if(0 == m_Terminal_CA.getFunctionState())
+		{
+			m_Ultrasonic.UltrasonicScheduleStatusMachineType2_V3();//6ms
+			m_Ultrasonic.DateUpdateType2_V3(25);
+			m_Ultrasonic.setScheduleTimeCnt((m_Ultrasonic.getScheduleTimeCnt() + 1) % 32);
+		}
+		else if(1 == m_Terminal_CA.getFunctionState())
+		{
+			m_Ultrasonic.UltrasonicScheduleStatusMachineType1_V3();//6ms
+			m_Ultrasonic.DateUpdateType1_V3(25);
+			m_Ultrasonic.BodyDirectLocationType1();
+			m_Ultrasonic.BodyTriangleLocationType1();
+			m_Ultrasonic.setScheduleTimeCnt((m_Ultrasonic.getScheduleTimeCnt() + 1) % 22);
+		}
+	}
+
+	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	m_Terminal_CA.PushActive = 0xA5;
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
 	{

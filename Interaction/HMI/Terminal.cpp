@@ -310,6 +310,11 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[])
         	Command = (uint8_t)dat[0];
         	break;
 
+        case 0x531:
+        	_work_mode      = (uint8_t)dat[0];
+        	_function_state = (uint8_t)dat[1];
+        	break;
+
         case 0x512:
         	AckEcho = (uint8_t)dat[0];
         	break;
@@ -655,7 +660,49 @@ void Terminal::Push(Ultrasonic *u)
 			break;
 	}
 #endif
+#if ULTRASONIC_SCHEDULE_MODO == 4
+	switch(u->ScheduleTimeCnt)
+	{
+		case 6:
+			UltrasonicSend(1,u->UltrasonicPacket);
+			UltrasonicSend(6,u->UltrasonicPacket);
+		break;
 
+		case 14:
+			UltrasonicSend(3,u->UltrasonicPacket);
+			UltrasonicSend(4,u->UltrasonicPacket);
+		break;
+
+		case 22:
+			UltrasonicSend(0,u->UltrasonicPacket);
+			UltrasonicSend(7,u->UltrasonicPacket);
+		break;
+
+		case 30:
+			UltrasonicSend(2,u->UltrasonicPacket);
+			UltrasonicSend(5,u->UltrasonicPacket);
+		break;
+
+		case 7:
+		case 15:
+		case 23:
+		case 31:
+			UltrasonicSend(8 ,u->UltrasonicPacket);
+			UltrasonicSend(10,u->UltrasonicPacket);
+		break;
+
+		case 8:
+		case 16:
+		case 24:
+		case 0:
+			UltrasonicSend(9,u->UltrasonicPacket);
+			UltrasonicSend(11,u->UltrasonicPacket);
+		break;
+
+		default:
+			break;
+	}
+#endif
 #else
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	switch(u->ReadStage)

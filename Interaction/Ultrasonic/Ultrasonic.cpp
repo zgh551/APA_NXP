@@ -661,6 +661,263 @@ void Ultrasonic::UltrasonicScheduleStatusMachine_V3(void)
 	}
 }
 
+
+/*
+ * 调度状态类型1: 多发多收调度,针对定时器为6ms时的优化
+ * */
+void Ultrasonic::UltrasonicScheduleStatusMachineType1_V3(void)
+{
+	switch(_schedule_time_cnt)
+	{
+		case 0:
+			InitUltrasonicSensorRx(1);
+			InitUltrasonicSensorRx(6);
+			_ultrasonic_packet[1].Time_Tx  = _system_time;
+			_ultrasonic_packet[6].Time_Tx = _system_time;
+			break;
+
+		case 1:
+			InitUltrasonicSensorRx(8);
+			InitUltrasonicSensorRx(10);
+			_ultrasonic_packet[8].Time_Tx = _system_time;
+			_ultrasonic_packet[9].Time_Tx = _system_time;
+			_ultrasonic_packet[10].Time_Tx = _system_time;
+			_ultrasonic_packet[11].Time_Tx = _system_time;
+			break;
+
+		case 4:
+			ReadUltrasonicSensorRxs(0,1);
+			ReadUltrasonicSensorRxs(3,6);
+			break;
+
+		case 5:
+			InitUltrasonicSensor(3);
+			InitUltrasonicSensor(4);
+			_ultrasonic_packet[3].Time_Tx = _system_time;
+			_ultrasonic_packet[4].Time_Tx = _system_time;
+			_ultrasonic_datas[1] = _ultrasonic_location_datas[1];
+			_ultrasonic_datas[6] = _ultrasonic_location_datas[10];
+			break;
+
+		case 6:
+			ReadUltrasonicSensorRxs(0,0);
+			ReadUltrasonicSensorRxs(3,5);
+			break;
+
+		case 7:
+			ReadUltrasonicSensorRxs(0,2);
+			ReadUltrasonicSensorRxs(3,7);
+			break;
+
+		case 8:
+			ReadUltrasonicSensor(8);
+			ReadUltrasonicSensor(10);
+			break;
+
+		case 9:
+			ReadUltrasonicSensor(9);
+			ReadUltrasonicSensor(11);
+			break;
+
+		case 10:
+			ReadUltrasonicSensor(3);
+			ReadUltrasonicSensor(4);
+			break;
+
+		case 11:
+			InitUltrasonicSensorRx(2);
+			InitUltrasonicSensorRx(5);
+			_ultrasonic_packet[2].Time_Tx = _system_time;
+			_ultrasonic_packet[5].Time_Tx = _system_time;
+			break;
+
+		case 12:
+			InitUltrasonicSensorRx(8);
+			InitUltrasonicSensorRx(10);
+			_ultrasonic_packet[8].Time_Tx = _system_time;
+			_ultrasonic_packet[9].Time_Tx = _system_time;
+			_ultrasonic_packet[10].Time_Tx = _system_time;
+			_ultrasonic_packet[11].Time_Tx = _system_time;
+			break;
+
+		case 15:
+			ReadUltrasonicSensorRxs(1,2);
+			ReadUltrasonicSensorRxs(2,5);
+			break;
+
+		case 16:
+			InitUltrasonicSensor(0);
+			InitUltrasonicSensor(7);
+			_ultrasonic_packet[0].Time_Tx = _system_time;
+			_ultrasonic_packet[7].Time_Tx = _system_time;
+			_ultrasonic_datas[2] = _ultrasonic_location_datas[4];
+			_ultrasonic_datas[5] = _ultrasonic_location_datas[7];
+			break;
+
+		case 17:
+			ReadUltrasonicSensorRxs(1,1);
+			ReadUltrasonicSensorRxs(2,4);
+			break;
+
+		case 18:
+			ReadUltrasonicSensorRxs(1,3);
+			ReadUltrasonicSensorRxs(2,6);
+			break;
+
+		case 19:
+			ReadUltrasonicSensor(8);
+			ReadUltrasonicSensor(10);
+			break;
+
+		case 20:
+			ReadUltrasonicSensor(9);
+			ReadUltrasonicSensor(11);
+			break;
+
+		case 21:
+			ReadUltrasonicSensor(0);
+			ReadUltrasonicSensor(7);
+			break;
+
+		default:
+			break;
+	}
+}
+
+/*
+ * 调度状态类型2: 优先长距调度，定时6ms，最小化调度周期
+ */
+void Ultrasonic::UltrasonicScheduleStatusMachineType2_V3(void)
+{
+	switch(_schedule_time_cnt)
+	{
+		case 0:
+			InitUltrasonicSensorRx(8);
+			InitUltrasonicSensorRx(10);
+			_ultrasonic_packet[8].Time_Tx  = _system_time;
+			_ultrasonic_packet[9].Time_Tx  = _system_time;
+			_ultrasonic_packet[10].Time_Tx = _system_time;
+			_ultrasonic_packet[11].Time_Tx = _system_time;
+			break;
+
+		case 1:
+			InitUltrasonicSensorRx(1);
+			InitUltrasonicSensorRx(6);
+			_ultrasonic_packet[1].Time_Tx = _system_time;
+			_ultrasonic_packet[6].Time_Tx = _system_time;
+			break;
+
+		case 5:
+			ReadUltrasonicSensor(1);
+			ReadUltrasonicSensor(6);
+			break;
+
+		case 6:
+			ReadUltrasonicSensor(8);
+			ReadUltrasonicSensor(10);
+			break;
+
+		case 7:
+			ReadUltrasonicSensor(9);
+			ReadUltrasonicSensor(11);
+			break;
+
+		case 8:
+			InitUltrasonicSensorRx(8);
+			InitUltrasonicSensorRx(10);
+			_ultrasonic_packet[8].Time_Tx  = _system_time;
+			_ultrasonic_packet[9].Time_Tx  = _system_time;
+			_ultrasonic_packet[10].Time_Tx = _system_time;
+			_ultrasonic_packet[11].Time_Tx = _system_time;
+			break;
+
+		case 9:
+			InitUltrasonicSensorRx(3);
+			InitUltrasonicSensorRx(4);
+			_ultrasonic_packet[3].Time_Tx = _system_time;
+			_ultrasonic_packet[4].Time_Tx = _system_time;
+			break;
+
+		case 13:
+			ReadUltrasonicSensor(3);
+			ReadUltrasonicSensor(4);
+			break;
+
+		case 14:
+			ReadUltrasonicSensor(8);
+			ReadUltrasonicSensor(10);
+			break;
+
+		case 15:
+			ReadUltrasonicSensor(9);
+			ReadUltrasonicSensor(11);
+			break;
+
+		case 16:
+			InitUltrasonicSensorRx(8);
+			InitUltrasonicSensorRx(10);
+			_ultrasonic_packet[8].Time_Tx  = _system_time;
+			_ultrasonic_packet[9].Time_Tx  = _system_time;
+			_ultrasonic_packet[10].Time_Tx = _system_time;
+			_ultrasonic_packet[11].Time_Tx = _system_time;
+			break;
+
+		case 17:
+			InitUltrasonicSensorRx(0);
+			InitUltrasonicSensorRx(7);
+			_ultrasonic_packet[0].Time_Tx = _system_time;
+			_ultrasonic_packet[7].Time_Tx = _system_time;
+			break;
+
+		case 21:
+			ReadUltrasonicSensor(0);
+			ReadUltrasonicSensor(7);
+			break;
+
+		case 22:
+			ReadUltrasonicSensor(8);
+			ReadUltrasonicSensor(10);
+			break;
+
+		case 23:
+			ReadUltrasonicSensor(9);
+			ReadUltrasonicSensor(11);
+			break;
+
+		case 24:
+			InitUltrasonicSensorRx(8);
+			InitUltrasonicSensorRx(10);
+			_ultrasonic_packet[8].Time_Tx  = _system_time;
+			_ultrasonic_packet[9].Time_Tx  = _system_time;
+			_ultrasonic_packet[10].Time_Tx = _system_time;
+			_ultrasonic_packet[11].Time_Tx = _system_time;
+			break;
+
+		case 25:
+			InitUltrasonicSensorRx(2);
+			InitUltrasonicSensorRx(5);
+			_ultrasonic_packet[2].Time_Tx = _system_time;
+			_ultrasonic_packet[5].Time_Tx = _system_time;
+			break;
+
+		case 29:
+			ReadUltrasonicSensor(2);
+			ReadUltrasonicSensor(5);
+			break;
+
+		case 30:
+			ReadUltrasonicSensor(8);
+			ReadUltrasonicSensor(10);
+			break;
+
+		case 31:
+			ReadUltrasonicSensor(9);
+			ReadUltrasonicSensor(11);
+			break;
+		default:
+			break;
+	}
+}
 /*
  * type: 0 -> 短距解码
  * 		 1 -> 长距解码
@@ -942,6 +1199,128 @@ void Ultrasonic::Update(float t)
 }
 
 /*
+ * 数据更新类型1 ：三角定位全部更新，使整个周期时间最短
+ */
+void Ultrasonic::DateUpdateType1_V3(float t)
+{
+	switch(_schedule_time_cnt)
+	{
+		case 0:
+			UltrasonicConvert(0, _ultrasonic_datas[0], &_ultrasonic_packet[0],t);
+			UltrasonicConvert(0, _ultrasonic_datas[7], &_ultrasonic_packet[7],t);
+		break;
+
+		case 8:
+			UltrasonicConvert(0, _ultrasonic_datas[1], &_ultrasonic_packet[1],t);
+			UltrasonicConvert(0, _ultrasonic_datas[6], &_ultrasonic_packet[6],t);
+
+			UltrasonicConvert(0, _ultrasonic_location_datas[0], &_ultrasonic_location_packet[0],t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[1], &_ultrasonic_location_packet[1],t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[2], &_ultrasonic_location_packet[2],t);
+			_ultrasonic_location_packet[0].Distance1 = 2 * _ultrasonic_location_packet[0].Distance1 - _ultrasonic_location_packet[1].Distance1;
+			_ultrasonic_location_packet[2].Distance1 = 2 * _ultrasonic_location_packet[2].Distance1 - _ultrasonic_location_packet[1].Distance1;
+
+			UltrasonicConvert(0, _ultrasonic_location_datas[9] , &_ultrasonic_location_packet[9] , t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[10], &_ultrasonic_location_packet[10], t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[11], &_ultrasonic_location_packet[11], t);
+			_ultrasonic_location_packet[9].Distance1  = 2 * _ultrasonic_location_packet[9].Distance1  - _ultrasonic_location_packet[10].Distance1;
+			_ultrasonic_location_packet[11].Distance1 = 2 * _ultrasonic_location_packet[11].Distance1 - _ultrasonic_location_packet[10].Distance1;
+		break;
+
+		case 9:
+			UltrasonicConvert(1, _ultrasonic_datas[8] , &_ultrasonic_packet[8] , t);
+			UltrasonicConvert(1, _ultrasonic_datas[10], &_ultrasonic_packet[10], t);
+		break;
+
+		case 10:
+			UltrasonicConvert(1, _ultrasonic_datas[9] , &_ultrasonic_packet[9],t);
+			UltrasonicConvert(1, _ultrasonic_datas[11], &_ultrasonic_packet[11],t);
+		break;
+
+		case 11:
+			UltrasonicConvert(0, _ultrasonic_datas[3],& _ultrasonic_packet[3],t);
+			UltrasonicConvert(0, _ultrasonic_datas[4],& _ultrasonic_packet[4],t);
+		break;
+
+		case 19:
+			UltrasonicConvert(0, _ultrasonic_datas[2], &_ultrasonic_packet[2],t);
+			UltrasonicConvert(0, _ultrasonic_datas[5], &_ultrasonic_packet[5],t);
+
+			UltrasonicConvert(0, _ultrasonic_location_datas[3], &_ultrasonic_location_packet[3], t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[4], &_ultrasonic_location_packet[4], t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[5], &_ultrasonic_location_packet[5], t);
+			_ultrasonic_location_packet[3].Distance1 = 2 * _ultrasonic_location_packet[3].Distance1 - _ultrasonic_location_packet[4].Distance1;
+			_ultrasonic_location_packet[5].Distance1 = 2 * _ultrasonic_location_packet[5].Distance1 - _ultrasonic_location_packet[4].Distance1;
+
+			UltrasonicConvert(0, _ultrasonic_location_datas[6], &_ultrasonic_location_packet[6], t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[7], &_ultrasonic_location_packet[7], t);
+			UltrasonicConvert(0, _ultrasonic_location_datas[8], &_ultrasonic_location_packet[8], t);
+			_ultrasonic_location_packet[6].Distance1 = 2 * _ultrasonic_location_packet[6].Distance1 - _ultrasonic_location_packet[7].Distance1;
+			_ultrasonic_location_packet[8].Distance1 = 2 * _ultrasonic_location_packet[8].Distance1 - _ultrasonic_location_packet[7].Distance1;
+		break;
+
+		case 20:
+			UltrasonicConvert(1, _ultrasonic_datas[8] , &_ultrasonic_packet[8] , t);
+			UltrasonicConvert(1, _ultrasonic_datas[10], &_ultrasonic_packet[10], t);
+		break;
+
+		case 21:
+			UltrasonicConvert(1, _ultrasonic_datas[9] , &_ultrasonic_packet[9] , t);
+			UltrasonicConvert(1, _ultrasonic_datas[11], &_ultrasonic_packet[11], t);
+		break;
+
+		default:
+		break;
+	}
+}
+/*
+ * 数据更新类型2 ：对于长距传感器采集优先策略，保证长距传感器单个周期最小
+ */
+void Ultrasonic::DateUpdateType2_V3(float t)
+{
+	switch(_schedule_time_cnt)
+	{
+		case 6:
+			UltrasonicConvert(0,_ultrasonic_datas[1],&_ultrasonic_packet[1],t);
+			UltrasonicConvert(0,_ultrasonic_datas[6],&_ultrasonic_packet[6],t);
+		break;
+
+		case 14:
+			UltrasonicConvert(0,_ultrasonic_datas[3],&_ultrasonic_packet[3],t);
+			UltrasonicConvert(0,_ultrasonic_datas[4],&_ultrasonic_packet[4],t);
+		break;
+
+		case 22:
+			UltrasonicConvert(0,_ultrasonic_datas[0],&_ultrasonic_packet[0],t);
+			UltrasonicConvert(0,_ultrasonic_datas[7],&_ultrasonic_packet[7],t);
+		break;
+
+		case 30:
+			UltrasonicConvert(0,_ultrasonic_datas[2],&_ultrasonic_packet[2],t);
+			UltrasonicConvert(0,_ultrasonic_datas[5],&_ultrasonic_packet[5],t);
+		break;
+
+		case 7:
+		case 15:
+		case 23:
+		case 31:
+			UltrasonicConvert(1,_ultrasonic_datas[8],&_ultrasonic_packet[8],t);
+			UltrasonicConvert(1,_ultrasonic_datas[10],&_ultrasonic_packet[10],t);
+		break;
+
+		case 8:
+		case 16:
+		case 24:
+		case 0:
+			UltrasonicConvert(1,_ultrasonic_datas[9],&_ultrasonic_packet[9],t);
+			UltrasonicConvert(1,_ultrasonic_datas[11],&_ultrasonic_packet[11],t);
+		break;
+
+		default:
+		break;
+	}
+}
+/*
  * 直接测量数据的传感器坐标系与载体坐标系的转换
  * position: 传感器的安装坐标
  * data    : 超声波数据
@@ -1163,6 +1542,108 @@ void Ultrasonic::BodyTriangleLocation()
 			break;
 
 		case 22:
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[4],_abstacle_config.UltrasonicLocationArray[5],
+								  UltrasonicLocationPacket[6],UltrasonicLocationPacket[7],
+								  &AbstacleBodyPositionTriangle[4]);
+
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[5],_abstacle_config.UltrasonicLocationArray[6],
+								  UltrasonicLocationPacket[7],UltrasonicLocationPacket[8],
+								  &AbstacleBodyPositionTriangle[5]);
+
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[5],_abstacle_config.UltrasonicLocationArray[6],
+								  UltrasonicLocationPacket[9],UltrasonicLocationPacket[10],
+								  &AbstacleBodyPositionTriangle[6]);
+
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[6],_abstacle_config.UltrasonicLocationArray[7],
+								  UltrasonicLocationPacket[10],UltrasonicLocationPacket[11],
+								  &AbstacleBodyPositionTriangle[7]);
+			break;
+
+		default:
+			break;
+	}
+}
+
+/*
+ * 类型1： 基于直接测量值的载体坐标系转换
+ * */
+void Ultrasonic::BodyDirectLocationType1()
+{
+	switch(ScheduleTimeCnt)
+	{
+		case 0:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[0],UltrasonicPacket[0],&AbstacleBodyPositionDirect[0]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[7],UltrasonicPacket[7],&AbstacleBodyPositionDirect[7]);
+			break;
+
+
+		case 5:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[1],UltrasonicPacket[1],&AbstacleBodyPositionDirect[1]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[6],UltrasonicPacket[6],&AbstacleBodyPositionDirect[6]);
+			break;
+
+		case 9:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[8],UltrasonicPacket[8],&AbstacleBodyPositionDirect[8]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[10],UltrasonicPacket[10],&AbstacleBodyPositionDirect[10]);
+			break;
+
+		case 10:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[9],UltrasonicPacket[9],&AbstacleBodyPositionDirect[9]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[11],UltrasonicPacket[11],&AbstacleBodyPositionDirect[11]);
+			break;
+
+		case 11:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[3],UltrasonicPacket[3],&AbstacleBodyPositionDirect[3]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[4],UltrasonicPacket[4],&AbstacleBodyPositionDirect[4]);
+			break;
+
+		case 16:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[2],UltrasonicPacket[2],&AbstacleBodyPositionDirect[2]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[5],UltrasonicPacket[5],&AbstacleBodyPositionDirect[5]);
+			break;
+
+
+		case 20:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[8],UltrasonicPacket[8],&AbstacleBodyPositionDirect[8]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[10],UltrasonicPacket[10],&AbstacleBodyPositionDirect[10]);
+
+			break;
+
+		case 21:
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[9],UltrasonicPacket[9],&AbstacleBodyPositionDirect[9]);
+			BodyDirectCalculate( _abstacle_config.UltrasonicLocationArray[11],UltrasonicPacket[11],&AbstacleBodyPositionDirect[11]);
+			break;
+
+		default:
+			break;
+	}
+}
+/*
+ * 类型1： 基于三角定位载体坐标系转换
+ * */
+void Ultrasonic::BodyTriangleLocationType1()
+{
+	switch(ScheduleTimeCnt)
+	{
+		case 8:
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[0],_abstacle_config.UltrasonicLocationArray[1],
+								  UltrasonicLocationPacket[0],UltrasonicLocationPacket[1],
+								  &AbstacleBodyPositionTriangle[0]);
+
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[1],_abstacle_config.UltrasonicLocationArray[2],
+								  UltrasonicLocationPacket[1],UltrasonicLocationPacket[2],
+								  &AbstacleBodyPositionTriangle[1]);
+
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[1],_abstacle_config.UltrasonicLocationArray[2],
+								  UltrasonicLocationPacket[3],UltrasonicLocationPacket[4],
+								  &AbstacleBodyPositionTriangle[2]);
+
+			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[2],_abstacle_config.UltrasonicLocationArray[3],
+								  UltrasonicLocationPacket[4],UltrasonicLocationPacket[5],
+								  &AbstacleBodyPositionTriangle[3]);
+			break;
+
+		case 19:
 			BodyTriangleCalculate(_abstacle_config.UltrasonicLocationArray[4],_abstacle_config.UltrasonicLocationArray[5],
 								  UltrasonicLocationPacket[6],UltrasonicLocationPacket[7],
 								  &AbstacleBodyPositionTriangle[4]);

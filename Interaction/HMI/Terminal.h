@@ -131,6 +131,13 @@ public:
 	Property<Terminal,uint8_t,READ_WRITE> Command;
 
 	// Commond
+	uint8_t getWorkMode(void) { return _work_mode; }
+	void    setWorkMode(uint8_t value){ _work_mode = value; }
+
+	uint8_t getFunctionState(void) { return _function_state; }
+	void    setFunctionState(uint8_t value){ _function_state = value; }
+
+	// Commond
 	uint8_t getPushActive();
 	void    setPushActive(uint8_t value);
 	Property<Terminal,uint8_t,READ_WRITE> PushActive;
@@ -138,6 +145,9 @@ public:
 private:
 	/// terminal command
 	uint8_t _command;
+
+	uint8_t _work_mode;
+	uint8_t _function_state;
 
 	/// push state
 	uint8_t _push_active;

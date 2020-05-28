@@ -35,7 +35,7 @@
 
 /************************超声发送格式按钮*************************/
 #define ULTRASONIC_PACKET         ( 1 ) // 超声包格式
-#define ULTRASONIC_SCHEDULE_MODO  ( 3 ) // 超声调度模式
+#define ULTRASONIC_SCHEDULE_MODO  ( 4 ) // 超声调度模式
 
 /*** LIN Device Data Struct ***/
 typedef enum _UltrasonicStatus
@@ -107,6 +107,16 @@ public:
 	void UltrasonicScheduleStatusMachine_V2(void);
 	void UltrasonicScheduleStatusMachine_V3(void);
 
+	/*
+	 * 调度状态类型1: 多发多收调度,针对定时器为6ms时的优化
+	 * */
+	void UltrasonicScheduleStatusMachineType1_V3(void);
+
+	/*
+	 * 调度状态类型2: 优先长距调度，定时6ms，最小化调度周期
+	 */
+	void UltrasonicScheduleStatusMachineType2_V3(void);
+
 	void UltrasonicConvert(uint8_t type,LIN_RAM d,Ultrasonic_Packet *p,float t);
 	float Compensation(float temp);
 
@@ -116,6 +126,16 @@ public:
 	 * 数据更新 定时器触发
 	 * */
 	void Update(float t);
+
+	/*
+	 * 数据更新类型1 ：三角定位全部更新，使整个周期时间最短
+	 */
+	void DateUpdateType1_V3(float t);
+
+	/*
+	 * 数据更新类型2 ：对于长距传感器采集优先策略，保证长距传感器单个周期最小
+	 */
+	void DateUpdateType2_V3(float t);
 
 	/*
 	 * 直接测量数据的传感器坐标系与载体坐标系的转换
@@ -154,10 +174,19 @@ public:
 	void BodyTriangleLocation();
 
 	/*
+	 * 类型1： 基于直接测量值的载体坐标系转换
+	 * */
+	void BodyDirectLocationType1();
+
+	/*
+	 * 类型1： 基于三角定位载体坐标系转换
+	 * */
+	void BodyTriangleLocationType1();
+
+	/*
 	 * 地面坐标超声波数据定位
 	 * */
 	void GroundTriangleLocation(VehicleState *vehicle_state);
-
 
 	/*
 	 * base on triangle parking location
