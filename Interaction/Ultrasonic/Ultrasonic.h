@@ -35,7 +35,7 @@
 
 /************************超声发送格式按钮*************************/
 #define ULTRASONIC_PACKET         ( 1 ) // 超声包格式
-#define ULTRASONIC_SCHEDULE_MODO  ( 4 ) // 超声调度模式
+#define ULTRASONIC_SCHEDULE_MODO  ( 3 ) // 超声调度模式
 
 /*** LIN Device Data Struct ***/
 typedef enum _UltrasonicStatus

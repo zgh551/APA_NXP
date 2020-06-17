@@ -84,6 +84,8 @@ public:
 
 	void Push(Ultrasonic *u);
 
+	void Push(Ultrasonic *u, uint8_t f);
+
 	void Push(Percaption *p);
 	void Push(UltrasonicObstaclePercption p);
 

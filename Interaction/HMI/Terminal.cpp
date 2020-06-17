@@ -20,6 +20,10 @@ Terminal::Terminal() {
 	_terminal_frame = FirstHead1;
 	_frame_err_cnt = 0;
 	_push_active = 0;
+
+	_work_mode      = 4;
+	_function_state = 1;
+
 	// ACK Valid
 	AckValid.setContainer(this);
 	AckValid.getter(&Terminal::getAckValid);
@@ -661,46 +665,140 @@ void Terminal::Push(Ultrasonic *u)
 	}
 #endif
 #if ULTRASONIC_SCHEDULE_MODO == 4
-	switch(u->ScheduleTimeCnt)
+	if(0 == _function_state)
 	{
-		case 6:
-			UltrasonicSend(1,u->UltrasonicPacket);
-			UltrasonicSend(6,u->UltrasonicPacket);
-		break;
-
-		case 14:
-			UltrasonicSend(3,u->UltrasonicPacket);
-			UltrasonicSend(4,u->UltrasonicPacket);
-		break;
-
-		case 22:
-			UltrasonicSend(0,u->UltrasonicPacket);
-			UltrasonicSend(7,u->UltrasonicPacket);
-		break;
-
-		case 30:
-			UltrasonicSend(2,u->UltrasonicPacket);
-			UltrasonicSend(5,u->UltrasonicPacket);
-		break;
-
-		case 7:
-		case 15:
-		case 23:
-		case 31:
-			UltrasonicSend(8 ,u->UltrasonicPacket);
-			UltrasonicSend(10,u->UltrasonicPacket);
-		break;
-
-		case 8:
-		case 16:
-		case 24:
-		case 0:
-			UltrasonicSend(9,u->UltrasonicPacket);
-			UltrasonicSend(11,u->UltrasonicPacket);
-		break;
-
-		default:
+		switch(u->ScheduleTimeCnt)
+		{
+			case 6:
+				UltrasonicSend(1,u->UltrasonicPacket);
+				UltrasonicSend(6,u->UltrasonicPacket);
 			break;
+
+			case 14:
+				UltrasonicSend(3,u->UltrasonicPacket);
+				UltrasonicSend(4,u->UltrasonicPacket);
+			break;
+
+			case 22:
+				UltrasonicSend(0,u->UltrasonicPacket);
+				UltrasonicSend(7,u->UltrasonicPacket);
+			break;
+
+			case 30:
+				UltrasonicSend(2,u->UltrasonicPacket);
+				UltrasonicSend(5,u->UltrasonicPacket);
+			break;
+
+			case 7:
+			case 15:
+			case 23:
+			case 31:
+				UltrasonicSend(8 ,u->UltrasonicPacket);
+				UltrasonicSend(10,u->UltrasonicPacket);
+			break;
+
+			case 8:
+			case 16:
+			case 24:
+			case 0:
+				UltrasonicSend(9,u->UltrasonicPacket);
+				UltrasonicSend(11,u->UltrasonicPacket);
+			break;
+
+			default:
+				break;
+		}
+	}
+	else if(1 == _function_state)
+	{
+		switch(u->ScheduleTimeCnt)
+		{
+			case 0:
+				UltrasonicSend(0,u->UltrasonicPacket);
+				UltrasonicSend(7,u->UltrasonicPacket);
+				break;
+
+			case 8:
+				// 直接测量的传感器值
+				UltrasonicSend(1,u->UltrasonicPacket);
+				UltrasonicSend(6,u->UltrasonicPacket);
+
+				// 三角定位测量的传感器值
+				UltrasonicLocationSend(0 ,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(1 ,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(2 ,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(9 ,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(10,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(11,u->UltrasonicLocationPacket);
+
+				// 三角定位车体坐标系
+				UltrasonicBodyLocationSend(0,u->AbstacleBodyPositionTriangle[0]);
+				UltrasonicBodyLocationSend(1,u->AbstacleBodyPositionTriangle[1]);
+				UltrasonicBodyLocationSend(2,u->AbstacleBodyPositionTriangle[2]);
+				UltrasonicBodyLocationSend(3,u->AbstacleBodyPositionTriangle[3]);
+				// 三角定位地面坐标系
+//				UltrasonicGroundLocationSend(0,u->AbstacleGroundPositionTriangle[0]);
+//				UltrasonicGroundLocationSend(1,u->AbstacleGroundPositionTriangle[1]);
+//				UltrasonicGroundLocationSend(2,u->AbstacleGroundPositionTriangle[2]);
+//				UltrasonicGroundLocationSend(3,u->AbstacleGroundPositionTriangle[3]);
+				break;
+
+			case 19:
+				UltrasonicSend(2,u->UltrasonicPacket);
+				UltrasonicSend(5,u->UltrasonicPacket);
+				// 三角定位测量的传感器值
+				UltrasonicLocationSend(3,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(4,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(5,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(6,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(7,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(8,u->UltrasonicLocationPacket);
+				// 三角定位车体坐标系
+				UltrasonicBodyLocationSend(4,u->AbstacleBodyPositionTriangle[4]);
+				UltrasonicBodyLocationSend(5,u->AbstacleBodyPositionTriangle[5]);
+				UltrasonicBodyLocationSend(6,u->AbstacleBodyPositionTriangle[6]);
+				UltrasonicBodyLocationSend(7,u->AbstacleBodyPositionTriangle[7]);
+//				// 三角定位地面坐标系
+//				UltrasonicGroundLocationSend(4,u->AbstacleGroundPositionTriangle[4]);
+//				UltrasonicGroundLocationSend(5,u->AbstacleGroundPositionTriangle[5]);
+//				UltrasonicGroundLocationSend(6,u->AbstacleGroundPositionTriangle[6]);
+//				UltrasonicGroundLocationSend(7,u->AbstacleGroundPositionTriangle[7]);
+				break;
+
+			case 9:
+			case 20:
+				UltrasonicSend(8 ,u->UltrasonicPacket);
+				UltrasonicSend(10,u->UltrasonicPacket);
+
+				UltrasonicBodyLocationSend(8,u->AbstacleBodyPositionDirect[8]);
+				UltrasonicBodyLocationSend(10,u->AbstacleBodyPositionDirect[10]);
+
+//				UltrasonicGroundLocationSend(8,u->AbstacleGroundPositionTriangle[8]);
+//				UltrasonicGroundLocationSend(10,u->AbstacleGroundPositionTriangle[10]);
+			break;
+
+			case 10:
+			case 21:
+				UltrasonicSend(9,u->UltrasonicPacket);
+				UltrasonicSend(11,u->UltrasonicPacket);
+
+				UltrasonicBodyLocationSend(9,u->AbstacleBodyPositionDirect[9]);
+				UltrasonicBodyLocationSend(11,u->AbstacleBodyPositionDirect[11]);
+
+//				UltrasonicGroundLocationSend(9,u->AbstacleGroundPositionTriangle[9]);
+//				UltrasonicGroundLocationSend(11,u->AbstacleGroundPositionTriangle[11]);
+				break;
+
+			case 11:
+				UltrasonicSend(3,u->UltrasonicPacket);
+				UltrasonicSend(4,u->UltrasonicPacket);
+				break;
+
+
+
+			default:
+				break;
+		}
 	}
 #endif
 #else

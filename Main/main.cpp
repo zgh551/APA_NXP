@@ -188,7 +188,7 @@ int main()
 				{
 
 				}
-				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
+				if(m_Ultrasonic.SystemTime % 2 == 1)//20ms
 				{
 					// TODO 检车位测试时可以屏蔽
 					#ifdef CHANGAN
@@ -207,14 +207,21 @@ int main()
 				        m_LatControl.Work(&m_BoRuiMessage,&m_BoRuiController,&m_GeometricTrack,temp_node,end_node);
 				    }
 					m_LonControl.DistanceProc(&m_BoRuiMessage, &m_BoRuiController);
-//					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
+					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
 					#endif
 
 					#ifdef DONG_FENG_E70
 					// 横向控制
-					m_LatControl.Work(&m_DongFengE70Message, &m_DongFengE70Controller, &m_GeometricTrack);
+//					m_LatControl.Work(&m_DongFengE70Message, &m_DongFengE70Controller, &m_GeometricTrack);
 					// 纵向速度控制
 					m_LonControl.VelocityLookupProc(&m_DongFengE70Message, &m_DongFengE70Controller,&m_VelocityControlPID);
+
+					m_DongFengE70Controller.EnableControl();
+					m_DongFengE70Controller.APA_ControlStateMachine(m_DongFengE70Message.getVCU_APA_ControlStatus(),
+																	m_DongFengE70Message.getEPS_AvailabStatus(),
+																	m_DongFengE70Message.getESC_APA_EnableStatus(),
+																	m_DongFengE70Message.getEPB_Status());
+					m_DongFengE70Controller.Push();
 					#endif
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
@@ -256,7 +263,7 @@ int main()
 				#endif
 
 				#ifdef DONG_FENG_E70
-						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_2(&m_Ultrasonic);
+//						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_2(&m_Ultrasonic);
 				#endif
 				}
 /***********************************控制台消息推送***********************************************/
@@ -268,18 +275,18 @@ int main()
 					m_Terminal_CA.Push(&m_ChangAnController);
 #endif
 #ifdef BORUI
-//					m_Terminal_CA.Push(&m_BoRuiController);
+					m_Terminal_CA.Push(&m_BoRuiController);
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Controller);
 #endif
-//					m_Terminal_CA.Push(m_LonControl);
-//					m_Terminal_CA.Push(m_LatControl);
+					m_Terminal_CA.Push(m_LonControl);
+					m_Terminal_CA.Push(m_LatControl);
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 				{
-//					m_Terminal_CA.Push(&m_GeometricTrack);
-//					m_Terminal_CA.Push( m_GeometricTrack);
+					m_Terminal_CA.Push(&m_GeometricTrack);
+					m_Terminal_CA.Push( m_GeometricTrack);
 				}
 				if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 				{
@@ -287,7 +294,7 @@ int main()
 					m_Terminal_CA.Push(&m_ChangAnMessage);
 #endif
 #ifdef BORUI
-//					m_Terminal_CA.Push(&m_BoRuiMessage);
+					m_Terminal_CA.Push(&m_BoRuiMessage);
 #endif
 #ifdef DONG_FENG_E70
 					m_Terminal_CA.Push(&m_DongFengE70Message);
@@ -358,6 +365,7 @@ void PIT0_isr(void)
 	m_Ultrasonic.ScheduleTimeCnt = (m_Ultrasonic.ScheduleTimeCnt + 1) % 28;
 #endif
 
+#if ULTRASONIC_SCHEDULE_MODO == 4
 	if(4 == m_Terminal_CA.getWorkMode())
 	{
 		if(0 == m_Terminal_CA.getFunctionState())
@@ -375,6 +383,7 @@ void PIT0_isr(void)
 			m_Ultrasonic.setScheduleTimeCnt((m_Ultrasonic.getScheduleTimeCnt() + 1) % 22);
 		}
 	}
+#endif
 
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
 	m_Terminal_CA.PushActive = 0xA5;

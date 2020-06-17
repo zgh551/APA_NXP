@@ -87,7 +87,6 @@ private:
 	float _vehicle_stop_acc;
 	float _vehicle_stop_acc_acc;
 	float _vehicle_slow_down_acc;
-	uint16_t _err_velocity_cnt;
 };
 
 #endif /* LONCONTROL_LON_CONTROL_H_ */

@@ -316,6 +316,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 		 }
 	 }
 	 /**************************************************脉冲计算结束****************************************/
+	 // 轮脉冲与轮速比较，判断速度是否异常
 	 if(msg->getVehicleMiddleSpeed() < 1.0e-6)
 	 {
 		 if( getPulseUpdateVelocity() < 0.3f )
