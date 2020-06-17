@@ -1,4 +1,5 @@
-/Debug
-/Debug_RAM
-/Release
-/.settings
+Debug/
+Debug_RAM/
+Release/
+.settings/
+.cproject
