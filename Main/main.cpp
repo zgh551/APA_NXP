@@ -105,8 +105,7 @@ UltrasonicObstaclePercption m_UltrasonicObstaclePercption;
 Interpolation m_Interpolation;
 VehilceConfig m_VehilceConfig;
 
-uint16_t m_before,m_after;
-float int_value;
+uint8_t ultrasonic_gain_adjust_flag = 0;
 
 __attribute__ ((section(".text")))
 int main()
@@ -201,11 +200,11 @@ int main()
 					#endif
 
 					#ifdef BORUI
-				    if(0xA5 == m_LatControl.getCurvatureValid())
-				    {
-				        temp_node = m_LatControl.CalculateNearestPoint(_target_curvature_data_sets,&m_GeometricTrack);
-				        m_LatControl.Work(&m_BoRuiMessage,&m_BoRuiController,&m_GeometricTrack,temp_node,end_node);
-				    }
+//				    if(0xA5 == m_LatControl.getCurvatureValid())
+//				    {
+//				        temp_node = m_LatControl.CalculateNearestPoint(_target_curvature_data_sets,&m_GeometricTrack);
+//				        m_LatControl.Work(&m_BoRuiMessage,&m_BoRuiController,&m_GeometricTrack,temp_node,end_node);
+//				    }
 					m_LonControl.DistanceProc(&m_BoRuiMessage, &m_BoRuiController);
 					m_BoRuiController.Push(0.02,m_BoRuiMessage.getSteeringAngle());
 					#endif
@@ -266,9 +265,20 @@ int main()
 //						m_UltrasonicObstaclePercption.UltrasonicCollisionDiatanceV1_2(&m_Ultrasonic);
 				#endif
 				}
+
+				#ifdef BORUI
+				if(0xAA != ultrasonic_gain_adjust_flag)
+				{
+					if(0xA5 == m_BoRuiMessage.getAmbientTemperatureValid())
+					{
+						m_Ultrasonic.GainConfigure(m_BoRuiMessage.getAmbientTemperature());
+						ultrasonic_gain_adjust_flag = 0xAA;
+					}
+				}
+				#endif
+
 /***********************************控制台消息推送***********************************************/
 				m_Terminal_CA.Push(&m_Ultrasonic);//5ms
-
 				if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 				{
 #ifdef CHANGAN
@@ -347,6 +357,41 @@ void PIT0_isr(void)
 	}
 	#endif
 
+	#ifdef BORUI
+		if(m_BoRuiController.getAPAEnable())
+		{
+			if(m_BoRuiController.getShakeHandsCnt() < 200)
+			{
+				m_BoRuiController.setShakeHandsCnt(m_BoRuiController.getShakeHandsCnt() + 1);
+			}
+			else
+			{
+				m_BoRuiController.setDistance(0);
+				m_BoRuiController.setVelocity(0);
+				if(m_BoRuiMessage.getVehicleMiddleSpeed() < 1.0e-6)
+				{
+					if(m_BoRuiController.getShakeHandsCnt() < 300)
+					{
+						m_BoRuiController.setShakeHandsCnt(m_BoRuiController.getShakeHandsCnt() + 1);
+					}
+					else
+					{
+						m_BoRuiController.setGear(Parking);
+					}
+					if(Parking == m_BoRuiMessage.getGear())
+					{
+						m_BoRuiController.setAPAEnable(0);
+					}
+				}
+			}
+		}
+		else
+		{
+			m_BoRuiController.setShakeHandsCnt(0);
+		}
+	#endif
+
+
 #if ULTRASONIC_SCHEDULE_MODO == 2
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V2();//5ms
 	m_Ultrasonic.Update(25);
@@ -354,7 +399,7 @@ void PIT0_isr(void)
 #endif
 #if ULTRASONIC_SCHEDULE_MODO == 3
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V3();//5ms
-	m_Ultrasonic.Update(25);
+	m_Ultrasonic.Update(m_BoRuiMessage.getAmbientTemperature());
 	m_Ultrasonic.BodyDirectLocation();
 	m_Ultrasonic.BodyTriangleLocation();
 	m_Ultrasonic.GroundTriangleLocation(&m_GeometricTrack);
