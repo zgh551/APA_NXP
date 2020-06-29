@@ -186,6 +186,9 @@ public:
 	void    setEPBEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> EPBEnable;
 
+	uint16_t getShakeHandsCnt() 			  { return _shake_hands_cnt ; }
+	void     setShakeHandsCnt(uint16_t value) { _shake_hands_cnt = value; }
+
 private:
 	/* ACC */
 	float _target_acceleration;
@@ -227,6 +230,8 @@ private:
 	/* EPB */
 	uint8_t _epb_enable;
 
+	// shake hands
+	uint16_t _shake_hands_cnt;
 	/*
 	* @brief NEUTRAL, REVERSE, DRIVE
 	*/

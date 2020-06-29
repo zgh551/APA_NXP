@@ -119,6 +119,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 				ctl->setGear((uint8_t)(dat[6] & 0x0f));
 				ctl->setAPAEnable((uint8_t)((dat[6]>>4) & 0x03));
 				setAckValid(0xa5);
+				ctl->setShakeHandsCnt(0);
 			}
 			break;
 
@@ -407,8 +408,9 @@ void Terminal::Push(MessageManager *msg)
 	temp_int16 = (int16_t)(msg->YawRate * 100);
 	m_CAN_Packet.data[4] = temp_int16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff;
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
+	temp_int16 = (int16_t)(msg->getAmbientTemperature() * 10);
+	m_CAN_Packet.data[6] =  temp_int16 & 0xff;
+	m_CAN_Packet.data[7] = (temp_int16 >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 

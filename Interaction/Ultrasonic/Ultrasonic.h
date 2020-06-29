@@ -92,6 +92,14 @@ public:
 
 	void Init(void);
 
+	void GainConfigure(float t);
+
+	int8_t GainAdjustmentTemperatureCompensation_STP318(float t);
+	int8_t GainAdjustmentTemperatureCompensation_STP313(float t);
+
+	void GainAdj_STP318(int8_t s, int8_t m, int8_t e, void (*TransmitFrame)(LIN_RAM));
+	void GainAdj_STP313(int8_t s, int8_t m, int8_t e, void (*TransmitFrame)(LIN_RAM));
+
 	void InitSensing_STP318(uint8_t tx,uint8_t rx,void (*TransmitFrame)(LIN_RAM));
 	void InitSensing_STP313(uint8_t tx_rx,void (*TransmitFrame)(LIN_RAM));
 

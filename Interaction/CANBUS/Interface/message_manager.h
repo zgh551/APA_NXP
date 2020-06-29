@@ -151,6 +151,12 @@ public:
 	void  setBrakePressure(uint8_t value);
 	Property<MessageManager,uint8_t,READ_WRITE> BrakePressure;
 
+	float getAmbientTemperature(void) 	     { return _ambient_temperature;  }
+	void  setAmbientTemperature(float value) { _ambient_temperature = value; }
+
+	uint8_t getAmbientTemperatureValid(void)          { return _ambient_temperature_valid; }
+	void    setAmbientTemperatureValid(uint8_t value) { _ambient_temperature_valid = value;}
+
 	ActuatorStatus getESC_Status();
 	void           setESC_Status(ActuatorStatus value);
 
@@ -191,8 +197,14 @@ private:
 	float _lon_acc;
 	float _lat_acc;
 
+	// the VCU
 	uint8_t _brake_pressure;
 
+	// AC
+	float _ambient_temperature;
+	uint8_t _ambient_temperature_valid;
+
+	// VCU ABS
 	ActuatorStatus _esc_status;
 	ActuatorStatus _eps_status;
 };

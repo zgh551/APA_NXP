@@ -78,6 +78,19 @@ void Ultrasonic::Init(void)
 	}
 }
 
+void Ultrasonic::GainConfigure(float t)
+{
+	int8_t temp_gain_adj;
+
+	temp_gain_adj = GainAdjustmentTemperatureCompensation_STP318(t);
+	GainAdj_STP318(temp_gain_adj, temp_gain_adj, temp_gain_adj,LIN0_TransmitFrame_DMA);
+	GainAdj_STP318(temp_gain_adj, temp_gain_adj, temp_gain_adj,LIN1_TransmitFrame_DMA);
+
+	temp_gain_adj = GainAdjustmentTemperatureCompensation_STP313(t);
+	GainAdj_STP313(temp_gain_adj, temp_gain_adj, temp_gain_adj,LIN0_TransmitFrame_DMA);
+	GainAdj_STP313(temp_gain_adj, temp_gain_adj, temp_gain_adj,LIN1_TransmitFrame_DMA);
+}
+
 uint8_t Ultrasonic::getScheduleTimeCnt()             {return _schedule_time_cnt ;}
 void    Ultrasonic::setScheduleTimeCnt(uint8_t value){_schedule_time_cnt = value;}
 
@@ -114,6 +127,86 @@ void Ultrasonic::setUltrasonicLocationPacket(uint8_t n,Ultrasonic_Packet p)
 void Ultrasonic::setAbstacleGroundPositionTriangle(uint8_t n,ObstacleLocationPacket p)
 {
 	_abstacle_ground_position_triangle[n] = p;
+}
+
+int8_t Ultrasonic::GainAdjustmentTemperatureCompensation_STP318(float t)
+{
+	int8_t gain_adj;
+	if(t >= -40 && t < -20)
+	{
+		gain_adj = -(t + 20) / 20 - 14;
+	}
+	else if(t >= -20 && t < 0)
+	{
+		gain_adj = (t * 3 / 20) - 11;
+	}
+	else if(t >= 0 && t <= 50)
+	{
+		gain_adj = (t - 25) * 22 / 50;
+	}
+	else
+	{
+		gain_adj = 0;
+	}
+	return gain_adj;
+}
+
+int8_t Ultrasonic::GainAdjustmentTemperatureCompensation_STP313(float t)
+{
+	int8_t gain_adj;
+	if(t >= -40 && t < -10)
+	{
+		gain_adj = -4 * (t + 10) / 30 - 8.7;
+	}
+	else if(t >= -10 && t < 10)
+	{
+		gain_adj = (t - 10) * 3 / 20 - 5.7;
+	}
+	else if(t >= 10 && t < 20)
+	{
+		gain_adj = (t - 20) * 4 / 10 - 1.7;
+	}
+	else if(t >= 20 && t < 80)
+	{
+		gain_adj = (t - 25) * 20 / 60;
+	}
+	else
+	{
+		gain_adj = 0;
+	}
+	return gain_adj;
+}
+
+void Ultrasonic::GainAdj_STP318(int8_t s, int8_t m, int8_t e, void (*TransmitFrame)(LIN_RAM))
+{
+	LIN_RAM m_LIN_RAM;
+	m_LIN_RAM.BIDR.B.ID  = 0x3C;
+	m_LIN_RAM.BIDR.B.DFL = 7;
+	m_LIN_RAM.BDRL.B.DATA0 = 19; //NAD
+	m_LIN_RAM.BDRL.B.DATA1 = 0x06; //PCI
+	m_LIN_RAM.BDRL.B.DATA2 = 0x2E; //SID
+	m_LIN_RAM.BDRL.B.DATA3 = 200;
+	m_LIN_RAM.BDRM.B.DATA4 = s + 128;
+	m_LIN_RAM.BDRM.B.DATA5 = 128;
+	m_LIN_RAM.BDRM.B.DATA6 = e + 128;
+	m_LIN_RAM.BDRM.B.DATA7 = 128;
+	TransmitFrame(m_LIN_RAM);
+}
+
+void Ultrasonic::GainAdj_STP313(int8_t s, int8_t m, int8_t e, void (*TransmitFrame)(LIN_RAM))
+{
+	LIN_RAM m_LIN_RAM;
+	m_LIN_RAM.BIDR.B.ID  = 0x3C;
+	m_LIN_RAM.BIDR.B.DFL = 7;
+	m_LIN_RAM.BDRL.B.DATA0 = 0x09; //NAD
+	m_LIN_RAM.BDRL.B.DATA1 = 0x06; //PCI
+	m_LIN_RAM.BDRL.B.DATA2 = 0x2E; //SID
+	m_LIN_RAM.BDRL.B.DATA3 = 200;
+	m_LIN_RAM.BDRM.B.DATA4 = s + 128;
+	m_LIN_RAM.BDRM.B.DATA5 = m + 128;
+	m_LIN_RAM.BDRM.B.DATA6 = e + 128;
+	m_LIN_RAM.BDRM.B.DATA7 = 128;
+	TransmitFrame(m_LIN_RAM);
 }
 
 void Ultrasonic::InitSensing_STP318(uint8_t tx,uint8_t rx,void (*TransmitFrame)(LIN_RAM))
