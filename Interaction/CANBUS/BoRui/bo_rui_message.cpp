@@ -35,7 +35,7 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 		case 0x2F1:
 			if(0 == (dat[1] >> 1 & 0x01))
 			{
-				this->setAmbientTemperature(0.5f * (dat[1] - 40));
+				this->setAmbientTemperature(0.5f * dat[1] - 40);
 				this->setAmbientTemperatureValid(0xA5);
 			}
 			break;

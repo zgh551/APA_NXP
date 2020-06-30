@@ -360,17 +360,17 @@ void PIT0_isr(void)
 	#ifdef BORUI
 		if(m_BoRuiController.getAPAEnable())
 		{
-			if(m_BoRuiController.getShakeHandsCnt() < 200)
+			if(m_BoRuiController.getShakeHandsCnt() < 50)
 			{
 				m_BoRuiController.setShakeHandsCnt(m_BoRuiController.getShakeHandsCnt() + 1);
 			}
 			else
 			{
-				m_BoRuiController.setDistance(0);
 				m_BoRuiController.setVelocity(0);
 				if(m_BoRuiMessage.getVehicleMiddleSpeed() < 1.0e-6)
 				{
-					if(m_BoRuiController.getShakeHandsCnt() < 300)
+					m_BoRuiController.setDistance(0);
+					if(m_BoRuiController.getShakeHandsCnt() < 150)
 					{
 						m_BoRuiController.setShakeHandsCnt(m_BoRuiController.getShakeHandsCnt() + 1);
 					}

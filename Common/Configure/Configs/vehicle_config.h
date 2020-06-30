@@ -23,6 +23,9 @@
 #ifdef DONG_FENG_E70
 #include "dong_feng_configure.h"
 #endif
+#ifdef CHERY_S51EV
+#include "chery_s51ev.h"
+#endif
 
 typedef struct _Location
 {
