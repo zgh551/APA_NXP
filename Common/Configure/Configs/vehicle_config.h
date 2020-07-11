@@ -1,30 +1,26 @@
 /*
  * vehilce_config.h
  *
- *  Created on: 2019年1月10日
+ *  Created on: 2019骞�1鏈�10鏃�
  *      Author: zhuguohua
  */
 
 #ifndef CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_
 #define CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_
 
-#include "derivative.h"
-#include "property.h"
 #include "math.h"
-#include "vector_2d.h"
 #include "system_config.h"
+#include "../../Utils/Inc/property.h"
+#include "../../Math/vector_2d.h"
 
-#ifdef CHANGAN
-#include "chang_an_configure.h"
-#endif
 #ifdef BORUI
-#include "bo_rui_configure.h"
+#include "../Data/bo_rui_configure.h"
 #endif
 #ifdef DONG_FENG_E70
-#include "dong_feng_configure.h"
+#include "../Data/dong_feng_configure.h"
 #endif
 #ifdef CHERY_S51EV
-#include "chery_s51ev.h"
+#include "../Data/chery_s51ev.h"
 #endif
 
 typedef struct _Location

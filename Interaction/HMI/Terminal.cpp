@@ -17,7 +17,6 @@
 #include "Terminal.h"
 
 Terminal::Terminal() {
-	_terminal_frame = FirstHead1;
 	_frame_err_cnt = 0;
 	_push_active = 0;
 
@@ -59,7 +58,7 @@ void    Terminal::setCommand(uint8_t value){_command = value;}
 uint8_t Terminal::getPushActive()             {return _push_active ;}
 void    Terminal::setPushActive(uint8_t value){_push_active = value;}
 /**************************************************************************************/
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 {
 	uint8_t i,check_sum;
 	switch(id)
@@ -72,18 +71,18 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl->GearEnable 		=  dat[0]       & 0x01;
-				ctl->AccelerationEnable = (dat[0] >> 2) & 0x01;
-				ctl->DecelerationEnable = (dat[0] >> 4) & 0x01;
-				ctl->TorqueEnable       = (dat[0] >> 5) & 0x01;
-				ctl->VelocityEnable     = (dat[0] >> 3) & 0x01;
-				if((0 == ctl->SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
+				ctl.GearEnable 		=  dat[0]       & 0x01;
+				ctl.AccelerationEnable = (dat[0] >> 2) & 0x01;
+				ctl.setDecelerationReq((dat[0] >> 4) & 0x01);
+				ctl.TorqueEnable       = (dat[0] >> 5) & 0x01;
+				ctl.VelocityEnable     = (dat[0] >> 3) & 0x01;
+				if((0 == ctl.SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
 				{
-					ctl->SteeringEnable 	= (dat[0] >> 1) & 0x01;
+					ctl.SteeringEnable 	= (dat[0] >> 1) & 0x01;
 				}
-				ctl->Gear 				= (uint8_t)dat[1];
-				ctl->SteeringAngle 		= (float)(((int16_t)((dat[3] << 8) | dat[2])) * 0.1);
-				ctl->SteeringAngleRate 	= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.01);
+				ctl.Gear 				= (GearStatus)dat[1];
+				ctl.SteeringAngle 		= (float)(((int16_t)((dat[3] << 8) | dat[2])) * 0.1);
+				ctl.SteeringAngleRate 	= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.01);
 				AckValid = 0xa5;
 			}
 			break;
@@ -96,11 +95,11 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl->Acceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
-//				ctl->TargetAcceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
-				ctl->Deceleration	= (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.001);
-				ctl->Velocity		= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001);
-				ctl->Torque			= (float)(dat[6] * 2);
+				ctl.Acceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+//				ctl.TargetAcceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+				ctl.Deceleration	= (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.001);
+				ctl.Velocity		= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001);
+				ctl.Torque			= (float)(dat[6] * 2);
 			}
 			break;
 
@@ -112,14 +111,14 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl->setSteeringAngle(((int16_t)((dat[1] << 8) | dat[0])) * 0.1f);
-				ctl->setSteeringAngleRate(dat[2] * 4.0f);
-				ctl->setVelocity(dat[3] * 0.01f);
-				ctl->setDistance(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f);
-				ctl->setGear((uint8_t)(dat[6] & 0x0f));
-				ctl->setAPAEnable((uint8_t)((dat[6]>>4) & 0x03));
+				ctl.setSteeringAngle(((int16_t)((dat[1] << 8) | dat[0])) * 0.1f);
+				ctl.setSteeringAngleRate(dat[2] * 4.0f);
+				ctl.setVelocity(dat[3] * 0.01f);
+				ctl.setDistance(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001f);
+				ctl.setGear((GearStatus)(dat[6] & 0x0f));
+				ctl.setAPAEnable((uint8_t)((dat[6]>>4) & 0x03));
 				setAckValid(0xa5);
-				ctl->setShakeHandsCnt(0);
+				ctl.setShakeHandsCnt(0);
 			}
 			break;
 
@@ -131,16 +130,16 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl->SteeringAngle 		= (float)(((int16_t)((dat[1] << 8) | dat[0])) * 0.1);
-				ctl->SteeringAngleRate 	= (float)(((uint16_t)((dat[3] << 8) | dat[2])) * 0.01);
-				ctl->Torque			    = (float)(((uint16_t)((dat[5] << 8) | dat[4])));
+				ctl.SteeringAngle 		= (float)(((int16_t)((dat[1] << 8) | dat[0])) * 0.1);
+				ctl.SteeringAngleRate 	= (float)(((uint16_t)((dat[3] << 8) | dat[2])) * 0.01);
+				ctl.Torque			    = (float)(((uint16_t)((dat[5] << 8) | dat[4])));
 
-				ctl->GearEnable 		=  dat[6]       & 0x01;
-				ctl->SteeringEnable 	= (dat[6] >> 1) & 0x01;
-				ctl->AccelerationEnable = (dat[6] >> 2) & 0x01;
-				ctl->VelocityEnable     = (dat[6] >> 3) & 0x01;
-				ctl->DecelerationEnable = (dat[6] >> 4) & 0x01;
-				ctl->TorqueEnable       = (dat[6] >> 5) & 0x01;
+				ctl.GearEnable 		=  dat[6]       & 0x01;
+				ctl.SteeringEnable 	= (dat[6] >> 1) & 0x01;
+				ctl.AccelerationEnable = (dat[6] >> 2) & 0x01;
+				ctl.VelocityEnable     = (dat[6] >> 3) & 0x01;
+				ctl.setDecelerationReq((dat[6] >> 4) & 0x01);
+				ctl.TorqueEnable       = (dat[6] >> 5) & 0x01;
 				AckValid = 0xa5;
 			}
 			break;
@@ -153,11 +152,24 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl->Acceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
-//				ctl->TargetAcceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
-				ctl->Deceleration	= (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.001);
-				ctl->Velocity		= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001);
-				ctl->Gear 			= (uint8_t)dat[6];
+				ctl.Acceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+//				ctl.TargetAcceleration	= (float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.001);
+				ctl.Deceleration	= (float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.001);
+				ctl.Velocity		= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.001);
+				ctl.Gear 			= (GearStatus)dat[6];
+			}
+			break;
+
+		case 0x51B://emerger status
+			check_sum =0 ;
+			for(i=0;i<7;i++){
+				check_sum += dat[i];
+			}
+			check_sum = check_sum ^ 0xFF;
+			if(check_sum == dat[7])
+			{
+				ctl.setBrakeDegree(dat[0] * 0.4f);
+				ctl.setDecelerationReq(dat[1] & 0x01);
 			}
 			break;
 		default:
@@ -166,7 +178,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl)
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic &u)
 {
 	Ultrasonic_Packet ultrasonic_packet;
 	ObstacleLocationPacket obstacle_location_packet;
@@ -181,35 +193,35 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u)
         	ultrasonic_packet.Level = dat[4] * 0.1;
         	ultrasonic_packet.Width = dat[5];
         	ultrasonic_packet.status = dat[6];
-        	u->setUltrasonicPacket(id & 0x00f,ultrasonic_packet);
+        	u.setUltrasonicPacket(id & 0x00f,ultrasonic_packet);
 			break;
 
         case 0x50C:
         	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
         	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
-        	u->setAbstacleGroundPositionTriangle(5, obstacle_location_packet);
+        	u.setAbstacleGroundPositionTriangle(5, obstacle_location_packet);
         	break;
 
         case 0x50D:
         	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
         	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
-        	u->setAbstacleGroundPositionTriangle(6, obstacle_location_packet);
+        	u.setAbstacleGroundPositionTriangle(6, obstacle_location_packet);
         	break;
 
         case 0x50E:
         	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
         	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
-        	u->setAbstacleGroundPositionTriangle(10, obstacle_location_packet);
+        	u.setAbstacleGroundPositionTriangle(10, obstacle_location_packet);
         	break;
 
         case 0x50F:
         	obstacle_location_packet.Position.setX((float)(((int16_t )((dat[1] << 8) | dat[0])) * 0.01));
         	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
-        	u->setAbstacleGroundPositionTriangle(11, obstacle_location_packet);
+        	u.setAbstacleGroundPositionTriangle(11, obstacle_location_packet);
         	AckValid = 0xa5;
         	break;
 
@@ -219,24 +231,24 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u)
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager &msg)
 {
 	Byte2Int temp_int;
 	switch(id)
 	{
         case 0x510:
-        	temp_int.b[1] = dat[2];
-        	temp_int.b[0] = dat[3];
+//        	temp_int.b[1] = dat[2];
+//        	temp_int.b[0] = dat[3];
 //        	msg->setSteeringAngle(temp_int.i16 * 0.1);
         	break;
 
         case 0x520:
-        	temp_int.b[1] = dat[4];
-        	temp_int.b[0] = dat[5];
-        	msg->WheelSpeedRearLeft = temp_int.u16 * 0.001;
-        	temp_int.b[1] = dat[6];
-        	temp_int.b[0] = dat[7];
-        	msg->WheelSpeedRearRight = temp_int.u16 * 0.001;
+//        	temp_int.b[1] = dat[4];
+//        	temp_int.b[0] = dat[5];
+//        	msg->WheelSpeedRearLeft = temp_int.u16 * 0.001;
+//        	temp_int.b[1] = dat[6];
+//        	temp_int.b[0] = dat[7];
+//        	msg->WheelSpeedRearRight = temp_int.u16 * 0.001;
         	break;
 		default:
 
@@ -244,21 +256,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg)
 	}
 }
 
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],Percaption *pct)
-{
-	switch(id)
-	{
-        case 0x533:
-			pct->Command = (uint8_t)dat[0];
-        	break;
-		default:
-
-
-			break;
-	}
-}
-
-void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID *msg)
+void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID &msg)
 {
 	Byte2Float temp_float;
 	switch(id)
@@ -268,12 +266,12 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID *msg)
 			temp_float.b[1] = dat[1];
 			temp_float.b[2] = dat[2];
 			temp_float.b[3] = dat[3];
-			msg->KP = temp_float.f;
+			msg.KP = temp_float.f;
 			temp_float.b[0] = dat[4];
 			temp_float.b[1] = dat[5];
 			temp_float.b[2] = dat[6];
 			temp_float.b[3] = dat[7];
-			msg->KI = temp_float.f;
+			msg.KI = temp_float.f;
 			break;
 
 		case 0x551:
@@ -281,12 +279,12 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID *msg)
 			temp_float.b[1] = dat[1];
 			temp_float.b[2] = dat[2];
 			temp_float.b[3] = dat[3];
-			msg->KD = temp_float.f;
+			msg.KD = temp_float.f;
 			temp_float.b[0] = dat[4];
 			temp_float.b[1] = dat[5];
 			temp_float.b[2] = dat[6];
 			temp_float.b[3] = dat[7];
-			msg->OutputLimit = temp_float.f;
+			msg.OutputLimit = temp_float.f;
 			break;
 
 		case 0x552:
@@ -294,12 +292,12 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],PID *msg)
 			temp_float.b[1] = dat[1];
 			temp_float.b[2] = dat[2];
 			temp_float.b[3] = dat[3];
-			msg->Threshold = temp_float.f;
+			msg.Threshold = temp_float.f;
 			temp_float.b[0] = dat[4];
 			temp_float.b[1] = dat[5];
 			temp_float.b[2] = dat[6];
 			temp_float.b[3] = dat[7];
-			msg->ILimit = temp_float.f;
+			msg.ILimit = temp_float.f;
 			break;
 
 		default:
@@ -342,100 +340,122 @@ void Parse(vuint32_t id,vuint8_t dat[],LatControl *lat_ctl)
 	}
 }
 /**************************************************************************************/
-void Terminal::Push(MessageManager *msg)
+/**
+ * 推送车辆信息
+ */
+void Terminal::Push(MessageManager &msg)
 {
 	CAN_Packet m_CAN_Packet;
-	int16_t temp_int16;
+	int16_t  temp_int16;
 	uint16_t temp_uint16;
+	Byte2Int32 temp_int32;
 
-	m_CAN_Packet.id = 0x410;
 	m_CAN_Packet.length = 8;
-
-	temp_uint16 = msg->VehicleMiddleSpeed * 1000;
+	m_CAN_Packet.id = 0x410;
+	temp_uint16 = msg.getVehicleMiddleSpeed() * 1000;
 	m_CAN_Packet.data[0] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff;
-	temp_int16 = (int16_t)(msg->SteeringAngle * 10);
-	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+	temp_int16 = (int16_t)(msg.getSteeringAngle() * 10);
+	m_CAN_Packet.data[2] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-	temp_uint16 = (uint16_t)(msg->SteeringAngleRate * 100);
+	temp_uint16 = (uint16_t)(msg.getSteeringAngleRate() * 100);
 	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
-	m_CAN_Packet.data[6] = msg->Gear;
-	m_CAN_Packet.data[7] = msg->WheelSpeedDirection;
+	m_CAN_Packet.data[6] = msg.getActualGear();
+	m_CAN_Packet.data[7] =  msg.getWheelSpeedDirection()  & 0x03
+						 | (msg.getSystemReadyStatus()    & 0x01) << 2
+						 | (msg.getAutoDriverModeStatus() & 0x01) << 3;
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	// 车速状态反馈
 	m_CAN_Packet.id = 0x411;
-	m_CAN_Packet.length = 8;
-	temp_uint16 = (uint16_t)(msg->WheelSpeedFrontLeft * 1000);
+	temp_uint16 = (uint16_t)(msg.getWheelSpeedFrontLeft() * 1000);
 	m_CAN_Packet.data[0] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff;
-	temp_uint16 = (uint16_t)(msg->WheelSpeedFrontRight * 1000);
-	m_CAN_Packet.data[2] = temp_uint16 & 0xff;
+	temp_uint16 = (uint16_t)(msg.getWheelSpeedFrontRight() * 1000);
+	m_CAN_Packet.data[2] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_uint16 >> 8) & 0xff;
-	temp_uint16 = (uint16_t)(msg->WheelSpeedRearLeft * 1000);
+	temp_uint16 = (uint16_t)(msg.getWheelSpeedRearLeft() * 1000);
 	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
-	temp_uint16 = (uint16_t)(msg->WheelSpeedRearRight * 1000);
-	m_CAN_Packet.data[6] = temp_uint16 & 0xff;
+	temp_uint16 = (uint16_t)(msg.getWheelSpeedRearRight() * 1000);
+	m_CAN_Packet.data[6] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	// 车速状态反馈
 	m_CAN_Packet.id = 0x412;
-	m_CAN_Packet.length = 8;
-	temp_uint16 = msg->WheelPulseFrontLeft;
+	temp_uint16 = msg.getWheelPulseFrontLeft();
 	m_CAN_Packet.data[0] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff;
-	temp_uint16 = msg->WheelPulseFrontRight;
-	m_CAN_Packet.data[2] = temp_uint16 & 0xff;
+	temp_uint16 = msg.getWheelPulseFrontRight();
+	m_CAN_Packet.data[2] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_uint16 >> 8) & 0xff;
-	temp_uint16 = msg->WheelPulseRearLeft;
+	temp_uint16 = msg.getWheelPulseRearLeft();
 	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
-	temp_uint16 = msg->WheelPulseRearRight;
-	m_CAN_Packet.data[6] = temp_uint16 & 0xff;
+	temp_uint16 = msg.getWheelPulseRearRight();
+	m_CAN_Packet.data[6] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
 
+	// the pulse sum
+	m_CAN_Packet.id = 0x413;
+	temp_int32.i32 = msg.getRearLeftSumPulse();
+	m_CAN_Packet.data[0] = temp_int32.b[3];
+	m_CAN_Packet.data[1] = temp_int32.b[2];
+	m_CAN_Packet.data[2] = temp_int32.b[1];
+	m_CAN_Packet.data[3] = temp_int32.b[0];
+	temp_int32.i32 = msg.getRearRightSumPulse();
+	m_CAN_Packet.data[4] = temp_int32.b[3];
+	m_CAN_Packet.data[5] = temp_int32.b[2];
+	m_CAN_Packet.data[6] = temp_int32.b[1];
+	m_CAN_Packet.data[7] = temp_int32.b[0];
+	CAN2_TransmitMsg(m_CAN_Packet);
+
 	m_CAN_Packet.id = 0x417;
-	temp_int16 = (int16_t)(msg->LonAcc * 1000);
+	temp_int16 = (int16_t)(msg.getLonAcc() * 1000);
 	m_CAN_Packet.data[0] =  temp_int16 & 0xff ;
 	m_CAN_Packet.data[1] = (temp_int16 >> 8) & 0xff ;
-	temp_int16 = (int16_t)(msg->LatAcc * 1000);
-	m_CAN_Packet.data[2] = temp_int16 & 0xff;
+	temp_int16 = (int16_t)(msg.getLatAcc() * 1000);
+	m_CAN_Packet.data[2] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-	temp_int16 = (int16_t)(msg->YawRate * 100);
-	m_CAN_Packet.data[4] = temp_int16 & 0xff;
+	temp_int16 = (int16_t)(msg.getYawRate() * 100);
+	m_CAN_Packet.data[4] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff;
-	temp_int16 = (int16_t)(msg->getAmbientTemperature() * 10);
+	temp_int16 = (int16_t)(msg.getAmbientTemperature() * 10);
 	m_CAN_Packet.data[6] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[7] = (temp_int16 >> 8) & 0xff;
 	CAN2_TransmitMsg(m_CAN_Packet);
-}
 
-void Terminal::Push(DongFengE70Message msg)
-{
-	CAN_Packet m_CAN_Packet;
-
-	m_CAN_Packet.length = 8;
 	m_CAN_Packet.id = 0x418;
+	m_CAN_Packet.data[0] = ( msg.getEPS_Status() & 0x01 )
+						 | ( msg.getESC_Status() & 0x01 ) << 1
+						 | ( msg.getEPB_Status() & 0x01 ) << 2
+						 | ( msg.getVCU_Status() & 0x01 ) << 3
+						 | ( msg.getSAS_Status() & 0x01 ) << 4
+						 | ( msg.getTCU_Status() & 0x01 ) << 5
+						 | ( msg.getEMS_Status() & 0x01 ) << 6;
+						 
+	m_CAN_Packet.data[1] = ( msg.getDriverDoorSts() & 0x01 ) 
+						 | ( msg.getPassangerDoorSts() & 0x01) << 1
+						 | ( msg.getTrunkSts() & 0x01 ) << 2;
 
-	m_CAN_Packet.data[0] = msg.getEPS_AvailabStatus();
-	m_CAN_Packet.data[1] = msg.getESC_APA_EnableStatus();
-	m_CAN_Packet.data[2] = msg.getVCU_APA_ControlStatus();
-	m_CAN_Packet.data[3] = 0;
+	m_CAN_Packet.data[2] = ( msg.getTurnLightLeftSts() & 0x01 )
+						 | ( msg.getTurnLightRightSts() & 0x01 ) << 1;
 
-	m_CAN_Packet.data[4] = 0;
+	m_CAN_Packet.data[3] = msg.getDriverSeatBeltSwitchSts() & 0x01; 
+	m_CAN_Packet.data[4] = msg.getEPB_SwitchPosition();
 	m_CAN_Packet.data[5] = 0;
 	m_CAN_Packet.data[6] = 0;
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
+
 /*
  * 控制信号
  * */
-void Terminal::Push(VehicleController *msg)
+void Terminal::Push(VehicleController &msg)
 {
 	CAN_Packet m_CAN_Packet;
 	int16_t temp_int16;
@@ -443,53 +463,53 @@ void Terminal::Push(VehicleController *msg)
 
 	m_CAN_Packet.id = 0x414;
 	m_CAN_Packet.length = 8;
-	m_CAN_Packet.data[0] = 	 msg->AccelerationEnable 	   |
-							(msg->DecelerationEnable << 1) |
-							(msg->TorqueEnable       << 2) |
-							(msg->VelocityEnable     << 3) |
-							(msg->SteeringEnable     << 4) |
-							(msg->GearEnable         << 6) ;
-	m_CAN_Packet.data[1] = msg->Gear ;
-	temp_int16 = (int16_t)(msg->Acceleration * 100);
+	m_CAN_Packet.data[0] = 	 msg.getAccelerationEnable() 	   |
+							(msg.getDecelerationReq() << 1) |
+							(msg.getTorqueEnable()       << 2) |
+							(msg.getVelocityEnable()     << 3) |
+							(msg.getSteeringEnable()     << 4) |
+							(msg.getGearEnable()         << 6) ;
+	m_CAN_Packet.data[1] = msg.getGear();
+	temp_int16 = (int16_t)(msg.getAcceleration() * 100);
 	m_CAN_Packet.data[2] =  temp_int16       & 0xff ;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff ;
-	temp_uint16 = (uint16_t)msg->Torque;
+	temp_uint16 = (uint16_t)msg.getTorque();
 	m_CAN_Packet.data[4] =  temp_uint16       & 0xff ;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff ;
-	temp_uint16 = (uint16_t)(msg->Velocity * 100);
+	temp_uint16 = (uint16_t)(msg.getVelocity() * 100);
 	m_CAN_Packet.data[6] =  temp_uint16       & 0xff ;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff ;
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x415;
-	temp_uint16 = (uint16_t)(msg->getDistanceSet() * 1000);
+	temp_uint16 = (uint16_t)(msg.getDistanceSet() * 1000);
 	m_CAN_Packet.data[0] =  temp_uint16 & 0xff ;
 	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff ;
-	temp_int16 = (int16_t)(msg->getTargetAcceleration() * 1000);
+	temp_int16 = (int16_t)(msg.getTargetAcceleration() * 1000);
 	m_CAN_Packet.data[2] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-	temp_int16 = (int16_t)(msg->getSteeringAngleSet() * 10);
-	m_CAN_Packet.data[4] =   temp_int16 & 0xff;
-	m_CAN_Packet.data[5] =  (temp_int16 >> 8) & 0xff;
+	temp_int16 = (int16_t)(msg.getSteeringAngleSet() * 10);
+	m_CAN_Packet.data[4] =  temp_int16 & 0xff;
+	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff;
 	m_CAN_Packet.data[6] = 0;
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::Push(VehicleState *msg)
+void Terminal::Push(VehicleState &msg)
 {
 	CAN_Packet m_CAN_Packet;
 	Byte2Int temp_int;
 	m_CAN_Packet.id = 0x442;
 	m_CAN_Packet.length = 8;
 
-	temp_int.i16 = (int16_t)(msg->getPosition().getX() * 100);
+	temp_int.i16 = (int16_t)(msg.getPosition().getX() * 100);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(msg->getPosition().getY() * 100);
+	temp_int.i16 = (int16_t)(msg.getPosition().getY() * 100);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(msg->Yaw * 100);
+	temp_int.i16 = (int16_t)(msg.Yaw * 100);
 	m_CAN_Packet.data[4] = temp_int.b[1];
 	m_CAN_Packet.data[5] = temp_int.b[0];
 
@@ -500,10 +520,10 @@ void Terminal::Push(VehicleState *msg)
 	m_CAN_Packet.id = 0x44E;
 	m_CAN_Packet.length = 8;
 
-	temp_int.u16 = (uint16_t)(msg->getPulseUpdateVelocity() * 10000);
+	temp_int.u16 = (uint16_t)(msg.getPulseUpdateVelocity() * 10000);
 	m_CAN_Packet.data[0] = temp_int.b[1];
 	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(msg->getAccUpdateVelocity() * 10000);
+	temp_int.u16 = (uint16_t)(msg.getAccUpdateVelocity() * 10000);
 	m_CAN_Packet.data[2] = temp_int.b[1];
 	m_CAN_Packet.data[3] = temp_int.b[0];
 
@@ -514,63 +534,43 @@ void Terminal::Push(VehicleState *msg)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::Push(GeometricTrack track)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int32 temp_int32;
-	m_CAN_Packet.id = 0x413;
-	m_CAN_Packet.length = 8;
-
-	temp_int32.i32 = track.SumRearLeftPulse;
-	m_CAN_Packet.data[0] = temp_int32.b[3];
-	m_CAN_Packet.data[1] = temp_int32.b[2];
-	m_CAN_Packet.data[2] = temp_int32.b[1];
-	m_CAN_Packet.data[3] = temp_int32.b[0];
-	temp_int32.i32 = track.SumRearRightPulse;
-	m_CAN_Packet.data[4] = temp_int32.b[3];
-	m_CAN_Packet.data[5] = temp_int32.b[2];
-	m_CAN_Packet.data[6] = temp_int32.b[1];
-	m_CAN_Packet.data[7] = temp_int32.b[0];
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::Push(Ultrasonic *u)
+void Terminal::Push(Ultrasonic &u)
 {
 #if ULTRASONIC_PACKET == 1
 
 #if ULTRASONIC_SCHEDULE_MODO == 2
-	switch(u->ScheduleTimeCnt)
+	switch(u.ScheduleTimeCnt)
 	{
 		case 7:
-			UltrasonicSend(1,u->UltrasonicPacket);
-			UltrasonicSend(7,u->UltrasonicPacket);
+			UltrasonicSend(1,u.UltrasonicPacket);
+			UltrasonicSend(7,u.UltrasonicPacket);
 			break;
 
 		case 10:
 		case 23:
-			UltrasonicSend(8,u->UltrasonicPacket);
-			UltrasonicSend(11,u->UltrasonicPacket);
+			UltrasonicSend(8,u.UltrasonicPacket);
+			UltrasonicSend(11,u.UltrasonicPacket);
 			break;
 
 		case 12:
 		case 25:
-			UltrasonicSend(9,u->UltrasonicPacket);
-			UltrasonicSend(10,u->UltrasonicPacket);
+			UltrasonicSend(9,u.UltrasonicPacket);
+			UltrasonicSend(10,u.UltrasonicPacket);
 			break;
 
 		case 13:
-			UltrasonicSend(3,u->UltrasonicPacket);
-			UltrasonicSend(5,u->UltrasonicPacket);
+			UltrasonicSend(3,u.UltrasonicPacket);
+			UltrasonicSend(5,u.UltrasonicPacket);
 			break;
 
 		case 20:
-			UltrasonicSend(0,u->UltrasonicPacket);
-			UltrasonicSend(6,u->UltrasonicPacket);
+			UltrasonicSend(0,u.UltrasonicPacket);
+			UltrasonicSend(6,u.UltrasonicPacket);
 			break;
 
 		case 0:
-			UltrasonicSend(2,u->UltrasonicPacket);
-			UltrasonicSend(4,u->UltrasonicPacket);
+			UltrasonicSend(2,u.UltrasonicPacket);
+			UltrasonicSend(4,u.UltrasonicPacket);
 			break;
 
 		default:
@@ -579,87 +579,87 @@ void Terminal::Push(Ultrasonic *u)
 #endif
 
 #if ULTRASONIC_SCHEDULE_MODO == 3
-	switch(u->ScheduleTimeCnt)
+	switch(u.ScheduleTimeCnt)
 	{
 		case 9:
 			// 直接测量的传感器值
-			UltrasonicSend(1,u->UltrasonicPacket);
-			UltrasonicSend(6,u->UltrasonicPacket);
+			UltrasonicSend(1,u.UltrasonicPacket);
+			UltrasonicSend(6,u.UltrasonicPacket);
 
 			// 三角定位测量的传感器值
-			UltrasonicLocationSend(0 ,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(1 ,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(2 ,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(9 ,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(10,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(11,u->UltrasonicLocationPacket);
+			UltrasonicLocationSend(0 ,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(1 ,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(2 ,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(9 ,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(10,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(11,u.UltrasonicLocationPacket);
 
 			// 三角定位车体坐标系
-			UltrasonicBodyLocationSend(0,u->AbstacleBodyPositionTriangle[0]);
-			UltrasonicBodyLocationSend(1,u->AbstacleBodyPositionTriangle[1]);
-			UltrasonicBodyLocationSend(2,u->AbstacleBodyPositionTriangle[2]);
-			UltrasonicBodyLocationSend(3,u->AbstacleBodyPositionTriangle[3]);
+			UltrasonicBodyLocationSend(0,u.AbstacleBodyPositionTriangle[0]);
+			UltrasonicBodyLocationSend(1,u.AbstacleBodyPositionTriangle[1]);
+			UltrasonicBodyLocationSend(2,u.AbstacleBodyPositionTriangle[2]);
+			UltrasonicBodyLocationSend(3,u.AbstacleBodyPositionTriangle[3]);
 			// 三角定位地面坐标系
-			UltrasonicGroundLocationSend(0,u->AbstacleGroundPositionTriangle[0]);
-			UltrasonicGroundLocationSend(1,u->AbstacleGroundPositionTriangle[1]);
-			UltrasonicGroundLocationSend(2,u->AbstacleGroundPositionTriangle[2]);
-			UltrasonicGroundLocationSend(3,u->AbstacleGroundPositionTriangle[3]);
+			UltrasonicGroundLocationSend(0,u.AbstacleGroundPositionTriangle[0]);
+			UltrasonicGroundLocationSend(1,u.AbstacleGroundPositionTriangle[1]);
+			UltrasonicGroundLocationSend(2,u.AbstacleGroundPositionTriangle[2]);
+			UltrasonicGroundLocationSend(3,u.AbstacleGroundPositionTriangle[3]);
 			break;
 
 		case 23:
-			UltrasonicSend(2,u->UltrasonicPacket);
-			UltrasonicSend(5,u->UltrasonicPacket);
+			UltrasonicSend(2,u.UltrasonicPacket);
+			UltrasonicSend(5,u.UltrasonicPacket);
 			// 三角定位测量的传感器值
-			UltrasonicLocationSend(3,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(4,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(5,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(6,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(7,u->UltrasonicLocationPacket);
-			UltrasonicLocationSend(8,u->UltrasonicLocationPacket);
+			UltrasonicLocationSend(3,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(4,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(5,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(6,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(7,u.UltrasonicLocationPacket);
+			UltrasonicLocationSend(8,u.UltrasonicLocationPacket);
 			// 三角定位车体坐标系
-			UltrasonicBodyLocationSend(4,u->AbstacleBodyPositionTriangle[4]);
-			UltrasonicBodyLocationSend(5,u->AbstacleBodyPositionTriangle[5]);
-			UltrasonicBodyLocationSend(6,u->AbstacleBodyPositionTriangle[6]);
-			UltrasonicBodyLocationSend(7,u->AbstacleBodyPositionTriangle[7]);
+			UltrasonicBodyLocationSend(4,u.AbstacleBodyPositionTriangle[4]);
+			UltrasonicBodyLocationSend(5,u.AbstacleBodyPositionTriangle[5]);
+			UltrasonicBodyLocationSend(6,u.AbstacleBodyPositionTriangle[6]);
+			UltrasonicBodyLocationSend(7,u.AbstacleBodyPositionTriangle[7]);
 			// 三角定位地面坐标系
-			UltrasonicGroundLocationSend(4,u->AbstacleGroundPositionTriangle[4]);
-			UltrasonicGroundLocationSend(5,u->AbstacleGroundPositionTriangle[5]);
-			UltrasonicGroundLocationSend(6,u->AbstacleGroundPositionTriangle[6]);
-			UltrasonicGroundLocationSend(7,u->AbstacleGroundPositionTriangle[7]);
+			UltrasonicGroundLocationSend(4,u.AbstacleGroundPositionTriangle[4]);
+			UltrasonicGroundLocationSend(5,u.AbstacleGroundPositionTriangle[5]);
+			UltrasonicGroundLocationSend(6,u.AbstacleGroundPositionTriangle[6]);
+			UltrasonicGroundLocationSend(7,u.AbstacleGroundPositionTriangle[7]);
 			break;
 
 		case 11:
 		case 25:
-			UltrasonicSend(8 ,u->UltrasonicPacket);
-			UltrasonicSend(10,u->UltrasonicPacket);
+			UltrasonicSend(8 ,u.UltrasonicPacket);
+			UltrasonicSend(10,u.UltrasonicPacket);
 
-			UltrasonicBodyLocationSend(8,u->AbstacleBodyPositionDirect[8]);
-			UltrasonicBodyLocationSend(10,u->AbstacleBodyPositionDirect[10]);
+			UltrasonicBodyLocationSend(8,u.AbstacleBodyPositionDirect[8]);
+			UltrasonicBodyLocationSend(10,u.AbstacleBodyPositionDirect[10]);
 
-			UltrasonicGroundLocationSend(8,u->AbstacleGroundPositionTriangle[8]);
-			UltrasonicGroundLocationSend(10,u->AbstacleGroundPositionTriangle[10]);
+			UltrasonicGroundLocationSend(8,u.AbstacleGroundPositionTriangle[8]);
+			UltrasonicGroundLocationSend(10,u.AbstacleGroundPositionTriangle[10]);
 		break;
 
 		case 13:
 		case 27:
-			UltrasonicSend(9,u->UltrasonicPacket);
-			UltrasonicSend(11,u->UltrasonicPacket);
+			UltrasonicSend( 9,u.UltrasonicPacket);
+			UltrasonicSend(11,u.UltrasonicPacket);
 
-			UltrasonicBodyLocationSend(9,u->AbstacleBodyPositionDirect[9]);
-			UltrasonicBodyLocationSend(11,u->AbstacleBodyPositionDirect[11]);
+			UltrasonicBodyLocationSend(9,u.AbstacleBodyPositionDirect[9]);
+			UltrasonicBodyLocationSend(11,u.AbstacleBodyPositionDirect[11]);
 
-			UltrasonicGroundLocationSend(9,u->AbstacleGroundPositionTriangle[9]);
-			UltrasonicGroundLocationSend(11,u->AbstacleGroundPositionTriangle[11]);
+			UltrasonicGroundLocationSend(9,u.AbstacleGroundPositionTriangle[9]);
+			UltrasonicGroundLocationSend(11,u.AbstacleGroundPositionTriangle[11]);
 			break;
 
 		case 14:
-			UltrasonicSend(3,u->UltrasonicPacket);
-			UltrasonicSend(4,u->UltrasonicPacket);
+			UltrasonicSend(3,u.UltrasonicPacket);
+			UltrasonicSend(4,u.UltrasonicPacket);
 			break;
 
 		case 0:
-			UltrasonicSend(0,u->UltrasonicPacket);
-			UltrasonicSend(7,u->UltrasonicPacket);
+			UltrasonicSend(0,u.UltrasonicPacket);
+			UltrasonicSend(7,u.UltrasonicPacket);
 			break;
 
 		default:
@@ -669,42 +669,42 @@ void Terminal::Push(Ultrasonic *u)
 #if ULTRASONIC_SCHEDULE_MODO == 4
 	if(0 == _function_state)
 	{
-		switch(u->ScheduleTimeCnt)
+		switch(u.ScheduleTimeCnt)
 		{
 			case 6:
-				UltrasonicSend(1,u->UltrasonicPacket);
-				UltrasonicSend(6,u->UltrasonicPacket);
+				UltrasonicSend(1,u.UltrasonicPacket);
+				UltrasonicSend(6,u.UltrasonicPacket);
 			break;
 
 			case 14:
-				UltrasonicSend(3,u->UltrasonicPacket);
-				UltrasonicSend(4,u->UltrasonicPacket);
+				UltrasonicSend(3,u.UltrasonicPacket);
+				UltrasonicSend(4,u.UltrasonicPacket);
 			break;
 
 			case 22:
-				UltrasonicSend(0,u->UltrasonicPacket);
-				UltrasonicSend(7,u->UltrasonicPacket);
+				UltrasonicSend(0,u.UltrasonicPacket);
+				UltrasonicSend(7,u.UltrasonicPacket);
 			break;
 
 			case 30:
-				UltrasonicSend(2,u->UltrasonicPacket);
-				UltrasonicSend(5,u->UltrasonicPacket);
+				UltrasonicSend(2,u.UltrasonicPacket);
+				UltrasonicSend(5,u.UltrasonicPacket);
 			break;
 
 			case 7:
 			case 15:
 			case 23:
 			case 31:
-				UltrasonicSend(8 ,u->UltrasonicPacket);
-				UltrasonicSend(10,u->UltrasonicPacket);
+				UltrasonicSend(8 ,u.UltrasonicPacket);
+				UltrasonicSend(10,u.UltrasonicPacket);
 			break;
 
 			case 8:
 			case 16:
 			case 24:
 			case 0:
-				UltrasonicSend(9,u->UltrasonicPacket);
-				UltrasonicSend(11,u->UltrasonicPacket);
+				UltrasonicSend(9,u.UltrasonicPacket);
+				UltrasonicSend(11,u.UltrasonicPacket);
 			break;
 
 			default:
@@ -713,87 +713,87 @@ void Terminal::Push(Ultrasonic *u)
 	}
 	else if(1 == _function_state)
 	{
-		switch(u->ScheduleTimeCnt)
+		switch(u.ScheduleTimeCnt)
 		{
 			case 0:
-				UltrasonicSend(0,u->UltrasonicPacket);
-				UltrasonicSend(7,u->UltrasonicPacket);
+				UltrasonicSend(0,u.UltrasonicPacket);
+				UltrasonicSend(7,u.UltrasonicPacket);
 				break;
 
 			case 8:
 				// 直接测量的传感器值
-				UltrasonicSend(1,u->UltrasonicPacket);
-				UltrasonicSend(6,u->UltrasonicPacket);
+				UltrasonicSend(1,u.UltrasonicPacket);
+				UltrasonicSend(6,u.UltrasonicPacket);
 
 				// 三角定位测量的传感器值
-				UltrasonicLocationSend(0 ,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(1 ,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(2 ,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(9 ,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(10,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(11,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(0 ,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(1 ,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(2 ,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(9 ,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(10,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(11,u.UltrasonicLocationPacket);
 
 				// 三角定位车体坐标系
-				UltrasonicBodyLocationSend(0,u->AbstacleBodyPositionTriangle[0]);
-				UltrasonicBodyLocationSend(1,u->AbstacleBodyPositionTriangle[1]);
-				UltrasonicBodyLocationSend(2,u->AbstacleBodyPositionTriangle[2]);
-				UltrasonicBodyLocationSend(3,u->AbstacleBodyPositionTriangle[3]);
+				UltrasonicBodyLocationSend(0,u.AbstacleBodyPositionTriangle[0]);
+				UltrasonicBodyLocationSend(1,u.AbstacleBodyPositionTriangle[1]);
+				UltrasonicBodyLocationSend(2,u.AbstacleBodyPositionTriangle[2]);
+				UltrasonicBodyLocationSend(3,u.AbstacleBodyPositionTriangle[3]);
 				// 三角定位地面坐标系
-//				UltrasonicGroundLocationSend(0,u->AbstacleGroundPositionTriangle[0]);
-//				UltrasonicGroundLocationSend(1,u->AbstacleGroundPositionTriangle[1]);
-//				UltrasonicGroundLocationSend(2,u->AbstacleGroundPositionTriangle[2]);
-//				UltrasonicGroundLocationSend(3,u->AbstacleGroundPositionTriangle[3]);
+//				UltrasonicGroundLocationSend(0,u.AbstacleGroundPositionTriangle[0]);
+//				UltrasonicGroundLocationSend(1,u.AbstacleGroundPositionTriangle[1]);
+//				UltrasonicGroundLocationSend(2,u.AbstacleGroundPositionTriangle[2]);
+//				UltrasonicGroundLocationSend(3,u.AbstacleGroundPositionTriangle[3]);
 				break;
 
 			case 19:
-				UltrasonicSend(2,u->UltrasonicPacket);
-				UltrasonicSend(5,u->UltrasonicPacket);
+				UltrasonicSend(2,u.UltrasonicPacket);
+				UltrasonicSend(5,u.UltrasonicPacket);
 				// 三角定位测量的传感器值
-				UltrasonicLocationSend(3,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(4,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(5,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(6,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(7,u->UltrasonicLocationPacket);
-				UltrasonicLocationSend(8,u->UltrasonicLocationPacket);
+				UltrasonicLocationSend(3,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(4,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(5,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(6,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(7,u.UltrasonicLocationPacket);
+				UltrasonicLocationSend(8,u.UltrasonicLocationPacket);
 				// 三角定位车体坐标系
-				UltrasonicBodyLocationSend(4,u->AbstacleBodyPositionTriangle[4]);
-				UltrasonicBodyLocationSend(5,u->AbstacleBodyPositionTriangle[5]);
-				UltrasonicBodyLocationSend(6,u->AbstacleBodyPositionTriangle[6]);
-				UltrasonicBodyLocationSend(7,u->AbstacleBodyPositionTriangle[7]);
+				UltrasonicBodyLocationSend(4,u.AbstacleBodyPositionTriangle[4]);
+				UltrasonicBodyLocationSend(5,u.AbstacleBodyPositionTriangle[5]);
+				UltrasonicBodyLocationSend(6,u.AbstacleBodyPositionTriangle[6]);
+				UltrasonicBodyLocationSend(7,u.AbstacleBodyPositionTriangle[7]);
 //				// 三角定位地面坐标系
-//				UltrasonicGroundLocationSend(4,u->AbstacleGroundPositionTriangle[4]);
-//				UltrasonicGroundLocationSend(5,u->AbstacleGroundPositionTriangle[5]);
-//				UltrasonicGroundLocationSend(6,u->AbstacleGroundPositionTriangle[6]);
-//				UltrasonicGroundLocationSend(7,u->AbstacleGroundPositionTriangle[7]);
+//				UltrasonicGroundLocationSend(4,u.AbstacleGroundPositionTriangle[4]);
+//				UltrasonicGroundLocationSend(5,u.AbstacleGroundPositionTriangle[5]);
+//				UltrasonicGroundLocationSend(6,u.AbstacleGroundPositionTriangle[6]);
+//				UltrasonicGroundLocationSend(7,u.AbstacleGroundPositionTriangle[7]);
 				break;
 
 			case 9:
 			case 20:
-				UltrasonicSend(8 ,u->UltrasonicPacket);
-				UltrasonicSend(10,u->UltrasonicPacket);
+				UltrasonicSend(8 ,u.UltrasonicPacket);
+				UltrasonicSend(10,u.UltrasonicPacket);
 
-				UltrasonicBodyLocationSend(8,u->AbstacleBodyPositionDirect[8]);
-				UltrasonicBodyLocationSend(10,u->AbstacleBodyPositionDirect[10]);
+				UltrasonicBodyLocationSend(8,u.AbstacleBodyPositionDirect[8]);
+				UltrasonicBodyLocationSend(10,u.AbstacleBodyPositionDirect[10]);
 
-//				UltrasonicGroundLocationSend(8,u->AbstacleGroundPositionTriangle[8]);
-//				UltrasonicGroundLocationSend(10,u->AbstacleGroundPositionTriangle[10]);
+//				UltrasonicGroundLocationSend(8,u.AbstacleGroundPositionTriangle[8]);
+//				UltrasonicGroundLocationSend(10,u.AbstacleGroundPositionTriangle[10]);
 			break;
 
 			case 10:
 			case 21:
-				UltrasonicSend(9,u->UltrasonicPacket);
-				UltrasonicSend(11,u->UltrasonicPacket);
+				UltrasonicSend(9,u.UltrasonicPacket);
+				UltrasonicSend(11,u.UltrasonicPacket);
 
-				UltrasonicBodyLocationSend(9,u->AbstacleBodyPositionDirect[9]);
-				UltrasonicBodyLocationSend(11,u->AbstacleBodyPositionDirect[11]);
+				UltrasonicBodyLocationSend(9,u.AbstacleBodyPositionDirect[9]);
+				UltrasonicBodyLocationSend(11,u.AbstacleBodyPositionDirect[11]);
 
-//				UltrasonicGroundLocationSend(9,u->AbstacleGroundPositionTriangle[9]);
-//				UltrasonicGroundLocationSend(11,u->AbstacleGroundPositionTriangle[11]);
+//				UltrasonicGroundLocationSend(9,u.AbstacleGroundPositionTriangle[9]);
+//				UltrasonicGroundLocationSend(11,u.AbstacleGroundPositionTriangle[11]);
 				break;
 
 			case 11:
-				UltrasonicSend(3,u->UltrasonicPacket);
-				UltrasonicSend(4,u->UltrasonicPacket);
+				UltrasonicSend(3,u.UltrasonicPacket);
+				UltrasonicSend(4,u.UltrasonicPacket);
 				break;
 
 
@@ -805,38 +805,38 @@ void Terminal::Push(Ultrasonic *u)
 #endif
 #else
 #if ULTRASONIC_SCHEDULE_MODO == 2
-	switch(u->ReadStage)
+	switch(u.ReadStage)
 	{
 		case 0:
-			UltrasonicSend(1,u->UltrasonicDatas);
-			UltrasonicSend(7,u->UltrasonicDatas);
+			UltrasonicSend(1,u.UltrasonicDatas);
+			UltrasonicSend(7,u.UltrasonicDatas);
 			break;
 
 		case 1:
 		case 5:
-			UltrasonicSend(8,u->UltrasonicDatas);
-			UltrasonicSend(11,u->UltrasonicDatas);
+			UltrasonicSend(8,u.UltrasonicDatas);
+			UltrasonicSend(11,u.UltrasonicDatas);
 			break;
 
 		case 2:
 		case 6:
-			UltrasonicSend(9,u->UltrasonicDatas);
-			UltrasonicSend(10,u->UltrasonicDatas);
+			UltrasonicSend(9,u.UltrasonicDatas);
+			UltrasonicSend(10,u.UltrasonicDatas);
 			break;
 
 		case 3:
-			UltrasonicSend(3,u->UltrasonicDatas);
-			UltrasonicSend(5,u->UltrasonicDatas);
+			UltrasonicSend(3,u.UltrasonicDatas);
+			UltrasonicSend(5,u.UltrasonicDatas);
 			break;
 
 		case 4:
-			UltrasonicSend(0,u->UltrasonicDatas);
-			UltrasonicSend(6,u->UltrasonicDatas);
+			UltrasonicSend(0,u.UltrasonicDatas);
+			UltrasonicSend(6,u.UltrasonicDatas);
 			break;
 
 		case 7:
-			UltrasonicSend(2,u->UltrasonicDatas);
-			UltrasonicSend(4,u->UltrasonicDatas);
+			UltrasonicSend(2,u.UltrasonicDatas);
+			UltrasonicSend(4,u.UltrasonicDatas);
 			break;
 
 		default:
@@ -845,50 +845,50 @@ void Terminal::Push(Ultrasonic *u)
 #endif
 
 #if ULTRASONIC_SCHEDULE_MODO == 3
-	switch(u->ReadStage)
+	switch(u.ReadStage)
 	{
 		case 0:
-			UltrasonicSend(1,u->UltrasonicDatas);
-			UltrasonicSend(6,u->UltrasonicDatas);
-			UltrasonicLocationSend(0,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(1,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(2,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(9,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(10,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(11,u->UltrasonicLocationDatas);
+			UltrasonicSend(1,u.UltrasonicDatas);
+			UltrasonicSend(6,u.UltrasonicDatas);
+			UltrasonicLocationSend(0,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(1,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(2,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(9,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(10,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(11,u.UltrasonicLocationDatas);
 			break;
 
 		case 1:
 		case 5:
-			UltrasonicSend(8,u->UltrasonicDatas);
-			UltrasonicSend(10,u->UltrasonicDatas);
+			UltrasonicSend(8,u.UltrasonicDatas);
+			UltrasonicSend(10,u.UltrasonicDatas);
 			break;
 
 		case 2:
 		case 6:
-			UltrasonicSend(9,u->UltrasonicDatas);
-			UltrasonicSend(11,u->UltrasonicDatas);
+			UltrasonicSend(9,u.UltrasonicDatas);
+			UltrasonicSend(11,u.UltrasonicDatas);
 			break;
 
 		case 3:
-			UltrasonicSend(3,u->UltrasonicDatas);
-			UltrasonicSend(4,u->UltrasonicDatas);
+			UltrasonicSend(3,u.UltrasonicDatas);
+			UltrasonicSend(4,u.UltrasonicDatas);
 			break;
 
 		case 4:
-			UltrasonicSend(2,u->UltrasonicDatas);
-			UltrasonicSend(5,u->UltrasonicDatas);
-			UltrasonicLocationSend(3,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(4,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(5,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(6,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(7,u->UltrasonicLocationDatas);
-			UltrasonicLocationSend(8,u->UltrasonicLocationDatas);
+			UltrasonicSend(2,u.UltrasonicDatas);
+			UltrasonicSend(5,u.UltrasonicDatas);
+			UltrasonicLocationSend(3,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(4,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(5,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(6,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(7,u.UltrasonicLocationDatas);
+			UltrasonicLocationSend(8,u.UltrasonicLocationDatas);
 			break;
 
 		case 7:
-			UltrasonicSend(0,u->UltrasonicDatas);
-			UltrasonicSend(7,u->UltrasonicDatas);
+			UltrasonicSend(0,u.UltrasonicDatas);
+			UltrasonicSend(7,u.UltrasonicDatas);
 			break;
 
 		default:
@@ -898,121 +898,7 @@ void Terminal::Push(Ultrasonic *u)
 #endif
 }
 
-void Terminal::Push(Percaption *p)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-
-	m_CAN_Packet.length = 8;
-
-	m_CAN_Packet.id = 0x440;
-	temp_int.i16 = (int16_t)(p->PositionX * 100);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->PositionY * 100);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->AttitudeYaw * 100);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-	m_CAN_Packet.data[6] = p->DetectParkingStatus;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-
-	m_CAN_Packet.id = 0x441;
-	temp_int.u16 = (uint16_t)(p->ParkingLength * 1000);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(p->ParkingWidth * 1000);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	m_CAN_Packet.data[4] = 0;
-	m_CAN_Packet.data[5] = 0;
-	m_CAN_Packet.data[6] = 0;
-	m_CAN_Packet.data[7] = 0;
-	CAN2_TransmitMsg(m_CAN_Packet);
-
-	m_CAN_Packet.id = 0x449;
-	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().First_Position.getX() * 1000);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().First_Position.getY() * 1000);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().Second_Position.getX() * 1000);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingEdgePosition().Second_Position.getY() * 1000);
-	m_CAN_Packet.data[6] = temp_int.b[1];
-	m_CAN_Packet.data[7] = temp_int.b[0];
-	CAN2_TransmitMsg(m_CAN_Packet);
-
-	m_CAN_Packet.id = 0x44B;
-	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().position.getX() * 1000);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().position.getY() * 1000);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getValidParkingCenterPosition().angle * 10000);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getCenterFitLinePacket().offset * 1000);
-	m_CAN_Packet.data[6] = temp_int.b[1];
-	m_CAN_Packet.data[7] = temp_int.b[0];
-	CAN2_TransmitMsg(m_CAN_Packet);
-
-	m_CAN_Packet.id = 0x44C;
-	temp_int.i16 = (int16_t)(p->getLeftFitLinePacket().angle * 10000);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getLeftFitLinePacket().offset * 1000);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getRightFitLinePacket().angle * 10000);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-	temp_int.i16 = (int16_t)(p->getRightFitLinePacket().offset * 1000);
-	m_CAN_Packet.data[6] = temp_int.b[1];
-	m_CAN_Packet.data[7] = temp_int.b[0];
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::Push(UltrasonicObstaclePercption p)
-{
-	CAN_Packet m_CAN_Packet;
-	uint16_t temp_uint16;
-
-	m_CAN_Packet.id = 0x44A;
-	m_CAN_Packet.length = 8;
-
-	m_CAN_Packet.data[0] = (uint8_t)p.UltrasonicLocationStatus;
-	m_CAN_Packet.data[1] = 0;
-	m_CAN_Packet.data[2] = 0;
-	m_CAN_Packet.data[3] = 0;
-
-	m_CAN_Packet.data[4] = (uint8_t)(p.getPositionListLength()  & 0xff);
-	m_CAN_Packet.data[5] = (uint8_t)(p.getLocationListLength()  & 0xff);
-	m_CAN_Packet.data[6] = (uint8_t)(p.getLeftEdgeListLength()  & 0xff);
-	m_CAN_Packet.data[7] = (uint8_t)(p.getRightEdgeListLength() & 0xff);
-	CAN2_TransmitMsg(m_CAN_Packet);
-
-	m_CAN_Packet.id = 0x44D;
-	temp_uint16 = p.getFrontObstacleDistance().distance * 10000;
-	m_CAN_Packet.data[0] = (uint8_t)( temp_uint16       & 0xff);
-	m_CAN_Packet.data[1] = (uint8_t)((temp_uint16 >> 8) & 0xff);
-	m_CAN_Packet.data[2] = (uint8_t)p.getFrontObstacleDistance().region;
-	m_CAN_Packet.data[3] = (uint8_t)p.getFrontObstacleDistance().status;
-
-	temp_uint16 = p.getRearObstacleDistance().distance * 10000;
-	m_CAN_Packet.data[4] = (uint8_t)( temp_uint16       & 0xff);
-	m_CAN_Packet.data[5] = (uint8_t)((temp_uint16 >> 8) & 0xff);
-	m_CAN_Packet.data[6] = (uint8_t)p.getRearObstacleDistance().region;
-	m_CAN_Packet.data[7] = (uint8_t)p.getRearObstacleDistance().status;
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
-void Terminal::Push(LonControl lon_control)
+void Terminal::Push(LonControl &lon_control)
 {
 	CAN_Packet m_CAN_Packet;
 	m_CAN_Packet.id = 0x4A0;
@@ -1029,7 +915,7 @@ void Terminal::Push(LonControl lon_control)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::Push(LatControl lat_control)
+void Terminal::Push(LatControl &lat_control)
 {
 	CAN_Packet m_CAN_Packet;
 	Byte2Float temp_float;
@@ -1079,7 +965,7 @@ void Terminal::Push(LatControl lat_control)
 /*
  * 直接测量超声波原始信号
  * */
-void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
+void Terminal::UltrasonicSend(const uint8_t id,const LIN_RAM *msg)
 {
 	CAN_Packet m_CAN_Packet;
 	m_CAN_Packet.id = 0x400 | id;
@@ -1108,7 +994,7 @@ void Terminal::UltrasonicSend(uint8_t id,LIN_RAM *msg)
 	}
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
+void Terminal::UltrasonicSend(const uint8_t id,const Ultrasonic_Packet *msg_pk)
 {
 	CAN_Packet m_CAN_Packet;
 	uint16_t temp;
@@ -1145,7 +1031,7 @@ void Terminal::UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 /*
  * 三角定位的短距离超声波信号
  * */
-void Terminal::UltrasonicLocationSend(uint8_t id,LIN_RAM *msg)
+void Terminal::UltrasonicLocationSend(const uint8_t id,const LIN_RAM *msg)
 {
 	CAN_Packet m_CAN_Packet;
 	m_CAN_Packet.id = 0x470 | id;
@@ -1160,7 +1046,7 @@ void Terminal::UltrasonicLocationSend(uint8_t id,LIN_RAM *msg)
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
-void Terminal::UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk)
+void Terminal::UltrasonicLocationSend(const uint8_t id,const Ultrasonic_Packet *msg_pk)
 {
 	CAN_Packet m_CAN_Packet;
 	uint16_t temp;
@@ -1183,7 +1069,7 @@ void Terminal::UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk)
 /*
  * 载体坐标系的数据发送
  * */
-void Terminal::UltrasonicBodyLocationSend(uint8_t id,ObstacleLocationPacket packet)
+void Terminal::UltrasonicBodyLocationSend(const uint8_t id,ObstacleLocationPacket &packet)
 {
 	CAN_Packet m_CAN_Packet;
 	int16_t temp;
@@ -1207,7 +1093,7 @@ void Terminal::UltrasonicBodyLocationSend(uint8_t id,ObstacleLocationPacket pack
 /*
  * 地面坐标系的数据发送
  * */
-void Terminal::UltrasonicGroundLocationSend(uint8_t id,ObstacleLocationPacket packet)
+void Terminal::UltrasonicGroundLocationSend(const uint8_t id,ObstacleLocationPacket &packet)
 {
 	CAN_Packet m_CAN_Packet;
 	int16_t temp;
@@ -1244,29 +1130,6 @@ void Terminal::Ack(void)
 	CAN2_TransmitMsg(m_CAN_Packet);
 }
 
-void Terminal::ParkingMsgSend(Percaption *p,float fm,float rm)
-{
-	CAN_Packet m_CAN_Packet;
-	Byte2Int temp_int;
-	Vector2d temp_v;
-	m_CAN_Packet.id = 0x441;
-	m_CAN_Packet.length = 8;
-
-	temp_int.u16 = (uint16_t)(p->ParkingLength * 1000);
-	m_CAN_Packet.data[0] = temp_int.b[1];
-	m_CAN_Packet.data[1] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(p->ParkingWidth * 1000);
-	m_CAN_Packet.data[2] = temp_int.b[1];
-	m_CAN_Packet.data[3] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(fm * 1000);
-	m_CAN_Packet.data[4] = temp_int.b[1];
-	m_CAN_Packet.data[5] = temp_int.b[0];
-	temp_int.u16 = (uint16_t)(rm * 1000);
-	m_CAN_Packet.data[6] = temp_int.b[1];
-	m_CAN_Packet.data[7] = temp_int.b[0];
-	CAN2_TransmitMsg(m_CAN_Packet);
-}
-
 void Terminal::ParkingCenterPointSend(Vector2d v)
 {
 	CAN_Packet m_CAN_Packet;
@@ -1285,7 +1148,6 @@ void Terminal::ParkingCenterPointSend(Vector2d v)
 
 	m_CAN_Packet.data[4] = 0;
 	m_CAN_Packet.data[5] = 0;
-
 	m_CAN_Packet.data[6] = 0;
 	m_CAN_Packet.data[7] = 0;
 	CAN2_TransmitMsg(m_CAN_Packet);

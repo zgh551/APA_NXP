@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include <BoRui/bo_rui_controller.h>
+#include "bo_rui_controller.h"
 
 BoRuiController::BoRuiController() {
 	// TODO Auto-generated constructor stub
@@ -174,5 +174,15 @@ void BoRuiController::Push(float dt)
 void BoRuiController::Push(float dt,float actual_steering)
 {
 	SteeringAngleControl(dt,actual_steering);
+	VehicleContorl();
+}
+
+void BoRuiController::WorkStateMachine(MessageManager& msg)
+{
+
+}
+
+void BoRuiController::DataPush(void)
+{
 	VehicleContorl();
 }

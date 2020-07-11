@@ -17,8 +17,8 @@
 #ifndef CANBUS_INTERFACE_VEHICLECONTROLLER_H_
 #define CANBUS_INTERFACE_VEHICLECONTROLLER_H_
 
-#include "derivative.h"
-#include "property.h"
+#include "../../../Driver/System/derivative.h"
+#include "../../../Common/Utils/Inc/property.h"
 #include "message_manager.h"
 
 typedef struct _ControlCommand
@@ -62,6 +62,17 @@ typedef struct _APAControlCommand
 	float Distance;
 }APAControlCommand;
 
+typedef enum _ActiveStatus
+{
+	Inactive = 0,
+	Active
+}ActiveStatus;
+
+typedef enum _HandeBrakeRequestStatus
+{
+	ReleaseRequest = 0,
+	AppliedRequest
+}HandeBrakeRequestStatus;
 
 class VehicleController {
 public:
@@ -92,6 +103,12 @@ public:
 
 	virtual void Update(APAControlCommand cmd) = 0;
 
+	// control state machine
+	virtual void WorkStateMachine(MessageManager& msg) = 0;
+
+	// push the command to the vehicle
+	virtual void DataPush(void) = 0;
+
 	/* ACC */
 	float getTargetAcceleration();
 	void  setTargetAcceleration(float value);
@@ -110,9 +127,11 @@ public:
 	void  setDeceleration(float value);
 	Property<VehicleController,float,READ_WRITE> Deceleration;
 
-	uint8_t getDecelerationEnable();
-	void    setDecelerationEnable(uint8_t value);
-	Property<VehicleController,uint8_t,READ_WRITE> DecelerationEnable;
+	uint8_t getDecelerationReq(void)			{ return _deceleration_req; }
+	void    setDecelerationReq(uint8_t value) 	{ _deceleration_req = value;}
+
+	float getBrakeDegree(void) 			{ return _brake_degree; }
+	void  setBrakeDegree(float value)	{ _brake_degree = value;}
 
 	/* Torque */
 	float getTorque();
@@ -170,9 +189,9 @@ public:
 	Property<VehicleController,uint8_t,READ_WRITE> SteeringEnable;
 
 	/* Gear */
-	uint8_t getGear();
-	void    setGear(uint8_t value);
-	Property<VehicleController,uint8_t,READ_WRITE> Gear;
+	GearStatus getGear();
+	void       setGear(GearStatus value);
+	Property<VehicleController,GearStatus,READ_WRITE> Gear;
 
 	uint8_t getGearEnable();
 	void    setGearEnable(uint8_t value);
@@ -189,7 +208,18 @@ public:
 	uint16_t getShakeHandsCnt() 			  { return _shake_hands_cnt ; }
 	void     setShakeHandsCnt(uint16_t value) { _shake_hands_cnt = value; }
 
+	HandeBrakeRequestStatus getEpbReq() 								{ return _epb_req; }
+	void                    setEpbReq(HandeBrakeRequestStatus value) 	{ _epb_req = value;}
+
+	ActiveStatus getTurnLightLeftReq() 						{ return _turn_light_left_req; }
+	void         setTurnLightLeftReq(ActiveStatus value) 	{ _turn_light_left_req = value;}
+
+	ActiveStatus getTurnLightRightReq() 					{ return _turn_light_right_req; }
+	void         setTurnLightRightReq(ActiveStatus value) 	{ _turn_light_right_req = value;}
 private:
+	/* APA */
+	uint8_t _apa_enable;
+
 	/* ACC */
 	float _target_acceleration;
 	float _acceleration;
@@ -197,7 +227,10 @@ private:
 
 	/* AEB */
 	float _deceleration;
-	uint8_t _deceleration_enable;
+	uint8_t _deceleration_req;
+
+	/* Brake */
+	float _brake_degree;
 
 	/* Torque */
 	float _torque;
@@ -221,14 +254,15 @@ private:
 	uint8_t _steering_enable;
 
 	/* Gear */
-	uint8_t _gear;
+	GearStatus _gear;
 	uint8_t _gear_enable;
-
-	/* APA */
-	uint8_t _apa_enable;
 
 	/* EPB */
 	uint8_t _epb_enable;
+	HandeBrakeRequestStatus _epb_req;
+	// ICM
+	ActiveStatus _turn_light_left_req;
+	ActiveStatus _turn_light_right_req;
 
 	// shake hands
 	uint16_t _shake_hands_cnt;

@@ -8,9 +8,7 @@
 #ifndef CANBUS_DONGFENGE70_DONG_FENG_E70_MESSAGE_H_
 #define CANBUS_DONGFENGE70_DONG_FENG_E70_MESSAGE_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "Interface/message_manager.h"
+#include "../Interface/message_manager.h"
 
 class DongFengE70Message  : public MessageManager
 {

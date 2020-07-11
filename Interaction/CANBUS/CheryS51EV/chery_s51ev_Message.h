@@ -8,8 +8,7 @@
 #ifndef CANBUS_CHERYS51EV_CHERY_S51EV_MESSAGE_H_
 #define CANBUS_CHERYS51EV_CHERY_S51EV_MESSAGE_H_
 
-#include "Interface/message_manager.h"
-#include "crc_compute.h"
+#include "../Interface/message_manager.h"
 
 class CheryS51EV_Message   : public MessageManager
 {

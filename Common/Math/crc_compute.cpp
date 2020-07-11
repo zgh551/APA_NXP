@@ -1,11 +1,11 @@
 /*
  * crc_compute.cpp
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019骞�4鏈�1鏃�
  *      Author: zhuguohua
  */
 
-#include <crc_compute.h>
+#include "crc_compute.h"
 
 template <typename TYPE>
 void CRC<TYPE>::crcInit(void)

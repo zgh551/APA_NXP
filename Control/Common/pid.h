@@ -1,15 +1,15 @@
 /*
  * PID.h
  *
- *  Created on: 2018年11月28日
+ *  Created on: 2018骞�11鏈�28鏃�
  *      Author: zhuguohua
  */
 
 #ifndef PID_H_
 #define PID_H_
 
-#include "derivative.h"
-#include "property.h"
+#include "../../Driver/System/derivative.h"
+#include "../../Common/Utils/Inc/property.h"
 #include <math.h>
 
 class PID {

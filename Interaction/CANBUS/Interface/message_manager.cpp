@@ -14,7 +14,7 @@
 /* 1.0	 Guohua Zhu     December 28 2018    Initial Version                  */
 /*****************************************************************************/
 
-#include "Interface/message_manager.h"
+#include "message_manager.h"
 
 MessageManager::MessageManager() {
 	// wheel speed
@@ -63,9 +63,6 @@ MessageManager::MessageManager() {
 	WheelPulseRearLeft.getter(&MessageManager::getWheelPulseRearLeft);
 	WheelPulseRearLeft.setter(&MessageManager::setWheelPulseRearLeft);
 
-	WheelSumPulse.setContainer(this);
-	WheelSumPulse.getter(&MessageManager::getWheelSumPulse);
-	WheelSumPulse.setter(&MessageManager::setWheelSumPulse);
 	// wheel pulse dirction
 	WheelPulseDirection.setContainer(this);
 	WheelPulseDirection.getter(&MessageManager::getWheelPulseDirection);
@@ -81,10 +78,6 @@ MessageManager::MessageManager() {
 	SteeringAngleRate.setter(&MessageManager::setSteeringAngleRate);
 
 	// TCU
-	Gear.setContainer(this);
-	Gear.getter(&MessageManager::getGear);
-	Gear.setter(&MessageManager::setGear);
-
 	// ESP Sensor
 	YawRate.setContainer(this);
 	YawRate.getter(&MessageManager::getYawRate);
@@ -106,7 +99,6 @@ MessageManager::MessageManager() {
 MessageManager::~MessageManager() {
 
 }
-
 
 // wheel speed
 float MessageManager::getWheelSpeedFrontLeft()           { return _wheel_speed_front_left;}
@@ -145,9 +137,6 @@ void     MessageManager::setWheelPulseRearRight(uint16_t value){_wheel_pulse_rea
 
 uint16_t MessageManager::getWheelPulseRearLeft()              { return _wheel_pulse_rear_left;}
 void     MessageManager::setWheelPulseRearLeft(uint16_t value){_wheel_pulse_rear_left = value;}
-
-int32_t MessageManager::getWheelSumPulse()              { return _wheel_sum_pulse;}
-void    MessageManager::setWheelSumPulse(int32_t value){_wheel_sum_pulse = value;}
 // wheel pulse dirction
 DirectStatus MessageManager::getWheelPulseDirection()                  { return _wheel_pulse_direction;}
 void         MessageManager::setWheelPulseDirection(DirectStatus value){_wheel_pulse_direction = value;}
@@ -158,10 +147,6 @@ void  MessageManager::setSteeringAngle(float value){_steering_angle = value;}
 
 float MessageManager::getSteeringAngleRate()           { return _steering_angle_rate;}
 void  MessageManager::setSteeringAngleRate(float value){_steering_angle_rate = value;}
-
-// TCU gear
-GearStatus MessageManager::getGear()                { return _gear;}
-void       MessageManager::setGear(GearStatus value){_gear = value;}
 
 // ESP Sensor
 float MessageManager::getYawRate()           { return _yaw_rate;}

@@ -1,6 +1,3 @@
-#define ICACHE_ENABLE 0
-#define DCACHE_ENABLE 0
-
 #ifdef __ghs__    /* GreenHills */
         .section    .startup, axv
 		.vle
@@ -30,12 +27,13 @@
 #endif
 #ifdef __DCC__ /* Diab */
        .section ".startup",4,rx
-#endif       
+#endif
         .globl	_start
 		
 _start:
 
 ;#****************************** Turn off SWT ********************************
+#if defined(DISABLE_SWT0)
 ;#SWT0
 		e_lis	r4, 0xFC05
 		e_or2i	r4, 0x0000
@@ -49,7 +47,7 @@ _start:
 		e_lis	r3, 0xFF00
 		e_or2i	r3, 0x010A
 		e_stw	r3, 0(r4)
-
+#endif
 ;#********************************* Enable BTB ********************************
 ;# Flush & Enable BTB - Set BBFI bit in BUCSR
 		e_li	r3, 0x201
@@ -205,39 +203,52 @@ ROMCPYEND:
 		e_or2i	r6,0x1000
 		mtmsr	r6
 
-#if (ICACHE_ENABLE == 1)
+#ifdef ICACHE_ENABLE
 ;#****************** Invalidate and Enable the Instruction cache **************
 __icache_cfg:
-        e_li r5, 0x2
-        mtspr 1011,r5
+		e_lis	r7, 0x0000
+		e_or2i	r7, 0x03FF		#create mask for lower 11 bits
+		mfspr	r5, 516			#in lower 11 bits we have icache size
+		and.	r7, r7, r5		#check if we have icache
+		e_beq	_skip_i_cache	#branch if not
 
-        e_li r7, 0x4
-        e_li r8, 0x2
+		e_li	r5, 0x2
+		mtspr	1011,r5
+
+		e_li	r7, 0x4
+		e_li	r8, 0x2
 		;#e_lwi r11, 0xFFFFFFFB
 		e_lis	r11,0xFFFF
 		e_or2i	r11,0xFFFB
 
 __icache_inv:
-        mfspr r9, 1011
-        and.  r10, r7, r9
-        e_beq   __icache_no_abort
-        and.  r10, r11, r9
-        mtspr 1011, r10
-        e_b     __icache_cfg
+		mfspr	r9, 1011
+		and.	r10, r7, r9
+		e_beq	__icache_no_abort
+		and.	r10, r11, r9
+		mtspr	1011, r10
+		e_b		__icache_cfg
 
 __icache_no_abort:
-        and.  r10, r8, r9
-        e_bne __icache_inv
+		and.	r10, r8, r9
+		e_bne	__icache_inv
 
-        mfspr r5, 1011
-        e_ori   r5, r5, 0x0001
-        se_isync
-        msync
-        mtspr 1011, r5
+		mfspr	r5, 1011
+		e_ori	r5, r5, 0x0001
+		se_isync
+		;#msync
+		mtspr	1011, r5
+_skip_i_cache:
 #endif
-#if (DCACHE_ENABLE == 1)
+#ifdef DCACHE_ENABLE
 ;#****************** Invalidate and Enable the Data cache **************
 __dcache_cfg:
+		e_lis	r7, 0x0000
+		e_or2i	r7, 0x03FF		#create mask for lower 11 bits
+		mfspr	r5, 515			#in lower 11 bits we have dcache size
+		and.	r7, r7, r5		#check if we have dcache
+		e_beq	_skip_d_cache	#branch if not
+
         e_li r5, 0x2
         mtspr 1010,r5
 
@@ -263,6 +274,7 @@ __dcache_no_abort:
         se_isync
         msync
         mtspr 1010, r5
+_skip_d_cache:
 #endif
 ;#****************************** Initialize BSS section ******************************/
 bss_Init:

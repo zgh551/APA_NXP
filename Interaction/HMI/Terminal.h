@@ -17,19 +17,22 @@
 #ifndef TERMINAL_H_
 #define TERMINAL_H_
 
-#include "property.h"
-#include "derivative.h"
-#include "DongFengE70/dong_feng_e70_message.h"
-#include "Interface/vehicle_controller.h"
-#include "Interface/message_manager.h"
-#include "Interface/vehicle_state.h"
-#include "GeometricTrack/geometric_track.h"
-#include "pid.h"
-#include "Ultrasonic.h"
-#include "percaption.h"
-#include "ultrasonic_obstacle_percption.h"
-#include "lon_control.h"
-#include "lat_control.h"
+#include "../../Common/Utils/Inc/property.h"
+#include "../../Driver/System/derivative.h"
+#include "../CANBUS/DongFengE70/dong_feng_e70_message.h"
+
+#include "../CANBUS/Interface/vehicle_controller.h"
+#include "../CANBUS/Interface/message_manager.h"
+
+#include "../../Common/VehicleState/Interface/vehicle_state.h"
+#include "../../Common/VehicleState/GeometricTrack/geometric_track.h"
+
+#include "../../Control/Common/pid.h"
+
+#include "../Ultrasonic/Ultrasonic.h"
+
+#include "../../Control/LonControl/lon_control.h"
+#include "../../Control/LatControl/lat_control.h"
 
 typedef union _byte2float
 {
@@ -58,63 +61,44 @@ public:
 	virtual ~Terminal();
 
 	// CAN Module:Vehicle information receive
-	void Parse(vuint32_t id,vuint8_t dat[],VehicleController *ctl);
-	void Parse(vuint32_t id,vuint8_t dat[],MessageManager *msg);
-
-	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic *u);
-
-	void Parse(vuint32_t id,vuint8_t dat[],Percaption *pct);
-
-	void Parse(vuint32_t id,vuint8_t dat[],PID *msg);
-
+	void Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl);
+	void Parse(vuint32_t id,vuint8_t dat[],MessageManager &msg);
+	void Parse(vuint32_t id,vuint8_t dat[],Ultrasonic &u);
+	void Parse(vuint32_t id,vuint8_t dat[],PID &msg);
+	void Parse(vuint32_t id,vuint8_t dat[],LatControl &lat_ctl);
 	void Parse(vuint32_t id,vuint8_t dat[]);
 
-	void Parse(vuint32_t id,vuint8_t dat[],LatControl *lat_ctl);
-
 	// Terminal Control
-	void Push(MessageManager *msg);
+	void Push(MessageManager &msg);
+	void Push(VehicleController &msg);
+	void Push(VehicleState &msg);
 
-	void Push(DongFengE70Message msg);
+	void Push(Ultrasonic &u);
+	void Push(Ultrasonic &u, uint8_t f);
 
-	void Push(VehicleController *msg);
-
-	void Push(VehicleState *msg);
-	void Push(GeometricTrack track);
-
-
-	void Push(Ultrasonic *u);
-
-	void Push(Ultrasonic *u, uint8_t f);
-
-	void Push(Percaption *p);
-	void Push(UltrasonicObstaclePercption p);
-
-	void Push(LonControl lon_control);
-
-	void Push(LatControl lat_control);
+	void Push(LonControl &lon_control);
+	void Push(LatControl &lat_control);
 ///////////////////////////////////////////////////////////////////////////
 	/*
-	 * 直接测量超声波原始信号
+	 * 鐩存帴娴嬮噺瓒呭０娉㈠師濮嬩俊鍙�
 	 * */
-	void UltrasonicSend(uint8_t id,LIN_RAM *msg);
-	void UltrasonicSend(uint8_t id,Ultrasonic_Packet *msg_pk);
+	void UltrasonicSend(const uint8_t id,const LIN_RAM *msg);
+	void UltrasonicSend(const uint8_t id,const Ultrasonic_Packet *msg_pk);
 	/*
-	 * 三角定位的短距离超声波信号
+	 * 涓夎瀹氫綅鐨勭煭璺濈瓒呭０娉俊鍙�
 	 * */
-	void UltrasonicLocationSend(uint8_t id,LIN_RAM *msg);
-	void UltrasonicLocationSend(uint8_t id,Ultrasonic_Packet *msg_pk);
+	void UltrasonicLocationSend(const uint8_t id,const LIN_RAM *msg);
+	void UltrasonicLocationSend(const uint8_t id,const Ultrasonic_Packet *msg_pk);
 	/*
-	 * 载体坐标系的数据发送
+	 * 杞戒綋鍧愭爣绯荤殑鏁版嵁鍙戦��
 	 * */
-	void UltrasonicBodyLocationSend(uint8_t id,ObstacleLocationPacket packet);
+	void UltrasonicBodyLocationSend(const uint8_t id,ObstacleLocationPacket &packet);
 	/*
-	 * 地面坐标系的数据发送
+	 * 鍦伴潰鍧愭爣绯荤殑鏁版嵁鍙戦��
 	 * */
-	void UltrasonicGroundLocationSend(uint8_t id,ObstacleLocationPacket packet);
+	void UltrasonicGroundLocationSend(const uint8_t id,ObstacleLocationPacket &packet);
 
 	void Ack(void);
-
-	void ParkingMsgSend(Percaption *pi,float fm,float rm);
 	void ParkingCenterPointSend(Vector2d v);
 
 	/*** Property ***/
@@ -154,7 +138,6 @@ private:
 	/// push state
 	uint8_t _push_active;
 	/// terminal receive frame state machine
-	ReceiveFrame _terminal_frame;
 	uint8_t _data_buffer[32];
 	uint8_t _send_data_buffer[32];
 	uint8_t _frame_id,_frame_length,_frame_cnt,_check_sum;

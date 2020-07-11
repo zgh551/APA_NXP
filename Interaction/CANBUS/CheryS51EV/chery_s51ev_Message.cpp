@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include <CheryS51EV/chery_s51ev_Message.h>
+#include "chery_s51ev_Message.h"
 
 CheryS51EV_Message::CheryS51EV_Message() {
 	// TODO Auto-generated constructor stub
@@ -33,10 +33,13 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				temp_check_sum += data[i];
 			}
-			if(temp_check_sum == data[7])
+//			if((temp_check_sum ^ 0xff) == data[7])
 			{
+				this->setEpsAutoDriverModeStatus((data[0] & 0x01) == 0 ? ManualMode : AutoMode);
+				this->setEPS_ManualControlDetectionStatus(((data[0] >> 1) & 0x01) == 0 ? NoManualControlDetected : ManualControlDetected);
 				this->setEPS_Status( ((data[0] >> 7) & 0x01) == 0 ? ActuatorNormal : ActuatorErr );
-				this->setSteeringAngle( ((data[2] << 8) | data[3]) * 0.1f - 1080);
+				this->setSteeringAngle( ((data[1] << 8) | data[2]) * 0.1f - 1080);
+				this->setSteeringAngleRate(data[3] * 4.0f);
 			}
 			break;
 
@@ -47,14 +50,16 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				temp_check_sum += data[i];
 			}
-			if(temp_check_sum == data[7])
+//			if((temp_check_sum ^ 0xff) == data[7])
 			{
+				this->setAccPedalStroke(data[1] * 0.4f);
 				this->setBrakePedalSts  (data[2] & 0x01);
 				this->setAccPedalValid  (((data[2] >> 1) & 0x01) == 0 ? DataValid :DataInvalid);
 				this->setBrakePedalValid(((data[2] >> 2) & 0x01) == 0 ? DataValid :DataInvalid);
 				this->setTargetGearValid(((data[2] >> 3) & 0x01) == 0 ? DataValid :DataInvalid);
 				this->setActualGearValid(((data[2] >> 4) & 0x01) == 0 ? DataValid :DataInvalid);
-
+				this->setSystemReadyStatus(((data[2] >> 5) & 0x01) == 0 ? NoReady :Ready);
+				this->setAutoDriverModeStatus(((data[2] >> 6) & 0x01) == 0 ? ManualMode : AutoMode);
 				// target gear
 				if(DataValid == this->getTargetGearValid())
 				{
@@ -67,6 +72,11 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 						case 1:
 						case 2:
 						case 3:
+						case 4:
+						case 5:
+						case 6:
+						case 7:
+						case 8:
 							this->setTargetGear(Drive);
 							break;
 
@@ -94,36 +104,39 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 					switch((data[0] >> 4) & 0x0f)
 					{
 						case 0:
-							this->setGear(None);
+							this->setActualGear(None);
 							break;
 
 						case 1:
 						case 2:
 						case 3:
-							this->setGear(Drive);
+						case 4:
+						case 5:
+						case 6:
+						case 7:
+						case 8:
+							this->setActualGear(Drive);
 							break;
 
 						case 9:
-							this->setGear(Reverse);
+							this->setActualGear(Reverse);
 							break;
 
 						case 10:
-							this->setGear(Neutral);
+							this->setActualGear(Neutral);
 							break;
 
 						case 11:
-							this->setGear(Parking);
+							this->setActualGear(Parking);
 							break;
 
 						default:
-							this->setGear(None);
+							this->setActualGear(None);
 							break;
 					}
 				}
-
-				this->setVehicleGradient( data[5] * 0.1f - 10 );
 			}
-			break;
+		break;
 
 		// wheel speed
 		case 0x300:
@@ -148,12 +161,12 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				this->setWheelSpeedRearRight ((((data[6] << 8) | data[7]) & 0x3fff) * V_M_S);//m/s
 			}
-			break;
+		break;
 
 		// ESC
 		case 0x318:
 			this->setESC_Status(((data[1] >> 6) & 0x01) == 0 ? ActuatorNormal : ActuatorErr);
-			break;
+		break;
 
 		// wheel pulse
 		case 0x319:
@@ -178,9 +191,8 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				this->setWheelPulseRearRight(data[6]);
 			}
-			break;
+		break;
 
-		//
 		case 0x221:
 			this->setYawRateValid(( data[4]       & 0x01) == 0 ? DataValid :DataInvalid);
 			this->setLonAccValid (((data[4] >> 1) & 0x01) == 0 ? DataValid :DataInvalid);
@@ -197,7 +209,8 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				this->setLatAcc(((data[3] << 4) | (data[4] >> 4)) * 0.01f - 20.48f);
 			}
-			break;
+		break;
+
 		// belt
 		case 0x452:
 			this->setDriverSeatBeltSwitchSts(((data[5] >> 1) & 0x01) == 0 ? Fasten : Unfasten);
@@ -213,18 +226,43 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 
 		// EPB
 		case 0x393:
-			this->setEPB_Status( ((data[0] >> 2) & 0x03) == 0 ? ActuatorNormal : ActuatorErr);
+			this->setEPB_Status(((data[0] >> 2) & 0x03) < 2 ? ActuatorNormal : ActuatorErr);
+			switch((data[0] >> 4) & 0x07)
+			{
+				case 0:
+					this->setEPB_SystemStatus(EPB_SystemReleased);
+				break;
+
+				case 1:
+					this->setEPB_SystemStatus(EPB_SystemApplied);
+				break;
+
+				case 2:
+					this->setEPB_SystemStatus(EPB_SystemReleasing);
+				break;
+
+				case 3:
+					this->setEPB_SystemStatus(EPB_SystemFault);
+				break;
+
+				case 4:
+					this->setEPB_SystemStatus(EPB_SystemApplying);
+				break;
+
+				case 5:
+					this->setEPB_SystemStatus(EPB_SystemDisenaged);
+				break;
+
+				default:
+
+				break;
+			}
 			this->setEPB_SwitchPositionValid(((data[1] >> 7) & 0x01) == 0 ? DataValid :DataInvalid);
 			if(DataValid == this->getEPB_SwitchPositionValid())
 			{
 				this->setEPB_SwitchPosition(EPB_Status((data[1] >> 5) & 0x03));
 			}
 		break;
-
-		case 0x0E0://SAS
-
-
-			break;
 
 		default:
 

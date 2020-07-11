@@ -5,13 +5,11 @@
  *      Author: zhuguohua
  */
 
-#include "BoRui/bo_rui_message.h"
+#include "bo_rui_message.h"
 
-CRC8 crc8 (CRC8::eAUTOSAR);
 
 BoRuiMessage::BoRuiMessage() {
 	// TODO Auto-generated constructor stub
-//	CRC8 crc8 = CRC8(CRC8::eAUTOSAR);
 }
 
 BoRuiMessage::~BoRuiMessage() {
@@ -80,56 +78,31 @@ void BoRuiMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t l
 //			}
 			break;
 
-//		case 0x113:// TCU GEAR
-//			switch((uint8_t)(dat[5] >> 3))
-//			{
-//				case 0:
-//					Gear = None;
-//					break;
-//
-//				case 1:
-//					Gear = Parking;
-//					break;
-//
-//				case 2:
-//					Gear = Reverse;
-//					break;
-//
-//				case 3:
-//					Gear = Neutral;
-//					break;
-//
-//				default:
-//					Gear = Drive;
-//					break;
-//			}
-//			break;
-
 		case 0x165:
 			switch((uint8_t)(dat[1] & 0x1f))
 			{
 				case 0:
-					Gear = None;
+					this->setActualGear(None);
 					break;
 
 				case 1:
-					Gear = Parking;
+					this->setActualGear(Parking);
 					break;
 
 				case 2:
-					Gear = Reverse;
+					this->setActualGear(Reverse);
 					break;
 
 				case 3:
-					Gear = Neutral;
+					this->setActualGear(Neutral);
 					break;
 
 				case 4:
-					Gear = Drive;
+					this->setActualGear(Drive);
 					break;
 
 				default:
-					Gear = None;
+					this->setActualGear(None);
 					break;
 			}
 			break;

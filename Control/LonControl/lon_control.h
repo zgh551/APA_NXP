@@ -12,13 +12,9 @@
 #ifndef LONCONTROL_LON_CONTROL_H_
 #define LONCONTROL_LON_CONTROL_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "controller.h"
-#include "pid.h"
+#include "../Interface/controller.h"
 #include "math.h"
-#include "vehicle_config.h"
-#include "interpolation.h"
+#include "../../Common/Math/interpolation.h"
 
 /**************************速度控制******************************/
 #define MAX_POSITION            ( 0.9 ) // 速度控制上限点

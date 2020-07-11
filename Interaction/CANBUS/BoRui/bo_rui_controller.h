@@ -8,10 +8,7 @@
 #ifndef CANBUS_BORUI_BO_RUI_CONTROLLER_H_
 #define CANBUS_BORUI_BO_RUI_CONTROLLER_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "math.h"
-#include "Interface/vehicle_controller.h"
+#include "../Interface/vehicle_controller.h"
 
 class BoRuiController  : public VehicleController
 {
@@ -51,6 +48,11 @@ public:
 	// push the command to the vehicle
 	void Push(float dt);
 	void Push(float dt,float actual_steering);
+
+	void WorkStateMachine(MessageManager& msg) override;
+
+	// push the command to the vehicle
+	void DataPush(void) override;
 
 private:
 	/* SteeringAngle */

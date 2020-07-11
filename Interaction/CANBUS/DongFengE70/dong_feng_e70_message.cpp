@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include <DongFengE70/dong_feng_e70_message.h>
+#include "dong_feng_e70_message.h"
 
 DongFengE70Message::DongFengE70Message() {
 	// TODO Auto-generated constructor stub
@@ -69,27 +69,27 @@ void DongFengE70Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			switch((uint8_t)( data[0] & 0x07))
 			{
 				case 1:
-					Gear = Parking;
+					this->setActualGear(Parking);
 					WheelSpeedDirection = StandStill;
 					break;
 
 				case 2:
-					Gear = Reverse;
+					this->setActualGear(Reverse);
 					WheelSpeedDirection = Backward;
 					break;
 
 				case 3:
-					Gear = Neutral;
+					this->setActualGear(Neutral);
 					WheelSpeedDirection = StandStill;
 					break;
 
 				case 4:
-					Gear = Drive;
+					this->setActualGear(Drive);
 					WheelSpeedDirection = Forward;
 					break;
 
 				default:
-					Gear = None;
+					this->setActualGear(None);
 					WheelSpeedDirection = Invalid;
 					break;
 			}

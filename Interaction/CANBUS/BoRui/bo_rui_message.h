@@ -8,10 +8,7 @@
 #ifndef CANBUS_BORUI_BO_RUI_MESSAGE_H_
 #define CANBUS_BORUI_BO_RUI_MESSAGE_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "Interface/message_manager.h"
-#include "crc_compute.h"
+#include "../Interface/message_manager.h"
 
 class BoRuiMessage  : public MessageManager
 {

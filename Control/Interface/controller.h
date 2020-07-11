@@ -1,16 +1,21 @@
 /*
  * controller.h
  *
- *  Created on: 2019年1月3日
+ *  Created on: 2019骞�1鏈�3鏃�
  *      Author: zhuguohua
  */
 
 #ifndef INTERFACE_CONTROLLER_H_
 #define INTERFACE_CONTROLLER_H_
 
-#include "Interface/vehicle_controller.h"
-#include "Interface/message_manager.h"
-#include "pid.h"
+#include "../../Driver/System/derivative.h"
+#include "../../Common/Utils/Inc/property.h"
+#include "../../Common/Configure/Configs/vehicle_config.h"
+
+#include "../../Interaction/CANBUS/Interface/vehicle_controller.h"
+#include "../../Interaction/CANBUS/Interface/message_manager.h"
+
+#include "../Common/pid.h"
 
 class Controller {
 public:

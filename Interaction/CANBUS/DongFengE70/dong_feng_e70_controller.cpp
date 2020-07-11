@@ -5,7 +5,8 @@
  *      Author: zhuguohua
  */
 
-#include <DongFengE70/dong_feng_e70_controller.h>
+#include "dong_feng_e70_controller.h"
+
 uint8_t time_cnt;
 DongFengE70Controller::DongFengE70Controller() {
 	// TODO Auto-generated constructor stub
@@ -48,7 +49,7 @@ void DongFengE70Controller::Update(ControlCommand cmd)
 	SteeringEnable  	= cmd.ControlEnable.B.SteeringEnable;
 
 	AccelerationEnable  = cmd.ControlEnable.B.AccelerationEnable;
-	DecelerationEnable  = cmd.ControlEnable.B.DecelerationEnable;
+	this->setDecelerationReq(cmd.ControlEnable.B.DecelerationEnable);
 	TorqueEnable 	    = cmd.ControlEnable.B.TorqueEnable;
 	VelocityEnable      = cmd.ControlEnable.B.VelocityEnable;
 
@@ -373,6 +374,21 @@ void DongFengE70Controller::APA_ControlStateMachine(uint8_t apa_ctl_sts,uint8_t 
 }
 
 void DongFengE70Controller::Push(void)
+{
+	time_cnt = (time_cnt + 1)%2;
+	if(1 == time_cnt)
+	{
+		VehicleContorl_20ms();
+	}
+	VehicleContorl_10ms();
+}
+
+void DongFengE70Controller::WorkStateMachine(MessageManager& msg)
+{
+
+}
+
+void DongFengE70Controller::DataPush(void)
 {
 	time_cnt = (time_cnt + 1)%2;
 	if(1 == time_cnt)

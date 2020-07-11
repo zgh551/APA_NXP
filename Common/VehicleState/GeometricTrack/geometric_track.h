@@ -19,10 +19,8 @@
 
 
 #include "../Interface/vehicle_state.h"
-#include <percaption.h>
-#include "pid.h"
+#include "../../../Control/Common/pid.h"
 
-//#include <vehicle_body.h>
 typedef struct _fit_ratio
 {
 	float a;
@@ -37,23 +35,14 @@ public:
 
 	void Init(void);
 	void Init(float x,float y,float yaw);
-	void Init(Percaption *p);
 
-	void VelocityUpdate(MessageManager *msg,float dt) override;
-	void PulseUpdate(MessageManager *msg) override;
-	void PulseTrackUpdate(MessageManager *msg) override;
+	void VelocityUpdate(MessageManager &msg,float dt) override;
+	void PulseUpdate(MessageManager &msg) override;
+	void PulseTrackUpdate(MessageManager &msg) override;
 
-	void VelocityPulseUpdate(MessageManager *msg);
+	void VelocityPulseUpdate(MessageManager &msg);
 
 	float pi2pi(float angle);
-
-	int32_t getSumRearLeftPulse();
-	void    setSumRearLeftPulse(int32_t value);
-	Property<GeometricTrack,int32_t,READ_WRITE> SumRearLeftPulse;
-
-	int32_t getSumRearRightPulse();
-	void    setSumRearRightPulse(int32_t value);
-	Property<GeometricTrack,int32_t,READ_WRITE> SumRearRightPulse;
 private:
 	float _last_yaw,_delta_yaw;
 
@@ -72,9 +61,6 @@ private:
 	float _err_velocity;
 	uint8_t _wait_time_cnt;
 	uint8_t _velocity_lock;
-
-	int32_t _sum_rear_left_pulse;
-	int32_t _sum_rear_right_pulse;
 };
 
 #endif /* VEHICLESTATE_GEOMETRICTRACK_GEOMETRIC_TRACK_H_ */

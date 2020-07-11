@@ -13,7 +13,7 @@
 /* ---   -----------    ----------------    ---------------------            */
 /* 1.0	 Guohua Zhu     December 28 2018    Initial Version                  */
 /*****************************************************************************/
-#include "Interface/vehicle_controller.h"
+#include "vehicle_controller.h"
 
 VehicleController::VehicleController() {
 	////// ACC //////
@@ -33,10 +33,6 @@ VehicleController::VehicleController() {
 	Deceleration.setContainer(this);
 	Deceleration.getter(&VehicleController::getDeceleration);
 	Deceleration.setter(&VehicleController::setDeceleration);
-
-	DecelerationEnable.setContainer(this);
-	DecelerationEnable.getter(&VehicleController::getDecelerationEnable);
-	DecelerationEnable.setter(&VehicleController::setDecelerationEnable);
 
 	////// Torque //////
 	Torque.setContainer(this);
@@ -124,9 +120,6 @@ void    VehicleController::setAccelerationEnable(uint8_t value){_acceleration_en
 float VehicleController::getDeceleration()           { return _deceleration;}
 void  VehicleController::setDeceleration(float value){_deceleration = value;}
 
-uint8_t VehicleController::getDecelerationEnable()             { return _deceleration_enable;}
-void    VehicleController::setDecelerationEnable(uint8_t value){_deceleration_enable = value;}
-
 /// Torque
 float VehicleController::getTorque()           { return _torque;}
 void  VehicleController::setTorque(float value){_torque = value;}
@@ -170,8 +163,8 @@ uint8_t VehicleController::getSteeringEnable()             { return _steering_en
 void    VehicleController::setSteeringEnable(uint8_t value){_steering_enable = value;}
 
 /// Gear
-uint8_t VehicleController::getGear()             { return _gear;}
-void    VehicleController::setGear(uint8_t value){_gear = value;}
+GearStatus VehicleController::getGear()                { return _gear;}
+void       VehicleController::setGear(GearStatus value){_gear = value;}
 
 uint8_t VehicleController::getGearEnable()             { return _gear_enable;}
 void    VehicleController::setGearEnable(uint8_t value){_gear_enable = value;}

@@ -9,7 +9,6 @@
 #define MATH_CRC_COMPUTE_H_
 
 #include <stdint.h>
-#include "derivative.h"
 
 template <typename TYPE> class CRC
 {

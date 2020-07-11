@@ -14,7 +14,7 @@
 /* 1.0	 Guohua Zhu     December 29 2018    Initial Version                  */
 /*****************************************************************************/
 
-#include "../Interface/vehicle_state.h"
+#include "vehicle_state.h"
 
 VehicleState::VehicleState() {
 

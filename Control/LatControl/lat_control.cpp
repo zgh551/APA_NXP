@@ -276,11 +276,11 @@ void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTr
 
 	_x1 = point_t.getY() - point_a.getY();
 
-	if(Drive == msg->getGear())
+	if(Drive == msg->getActualGear())
 	{
 		_x2 = tan_psi_t - tan_psi_a;
 	}
-	else if(Reverse == msg->getGear())
+	else if(Reverse == msg->getActualGear())
 	{
 		_x2 = tan_psi_a - tan_psi_t;
 	}
@@ -325,14 +325,14 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
 
     vec_d = a_track->getPosition() - t_track.point;
 
-    if(Drive == msg->getGear())
+    if(Drive == msg->getActualGear())
     {
         vec_t = Vector2d(cosf(t_track.yaw),sinf(t_track.yaw));
         err_yaw = pi2pi(a_track->getYaw() - t_track.yaw);
         v_x = msg->getVehicleMiddleSpeed();
         k =  t_track.curvature;
     }
-    else if(Reverse == msg->getGear())
+    else if(Reverse == msg->getActualGear())
     {
         vec_t = Vector2d(cosf(t_track.yaw + M_PI),sinf(t_track.yaw + M_PI));
         err_yaw = pi2pi(a_track->getYaw() - t_track.yaw - M_PI);

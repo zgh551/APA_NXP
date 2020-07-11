@@ -8,9 +8,7 @@
 #ifndef CANBUS_DONGFENGE70_DONG_FENG_E70_CONTROLLER_H_
 #define CANBUS_DONGFENGE70_DONG_FENG_E70_CONTROLLER_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "Interface/vehicle_controller.h"
+#include "../Interface/vehicle_controller.h"
 
 typedef enum _APA_TorqueControlState
 {
@@ -72,6 +70,11 @@ public:
 	void Push();
 
 	void EnableControl();
+
+	void WorkStateMachine(MessageManager& msg) override;
+
+	// push the command to the vehicle
+	void DataPush(void) override;
 private:
 	APA_TorqueControlState _apa_torque_control_state;
 	APA_TurnControlState   _apa_turn_control_state;

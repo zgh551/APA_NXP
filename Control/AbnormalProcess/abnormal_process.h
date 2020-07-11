@@ -1,20 +1,20 @@
 /*
  * abnormal_process.h
  *
- *  Created on: 2020年6月2日
+ *  Created on: 2020骞�6鏈�2鏃�
  *      Author: zhuguohua
  */
 
 #ifndef ABNORMAL_PROCESS_H_
 #define ABNORMAL_PROCESS_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "controller.h"
-#include "pid.h"
 #include "math.h"
-#include "vehicle_config.h"
-#include "interpolation.h"
+#include "../../Driver/System/derivative.h"
+#include "../../Common/Utils/Inc/property.h"
+#include "../Common/pid.h"
+#include "../../Common/Configure/Configs/vehicle_config.h"
+#include "../../Interaction/CANBUS/Interface/vehicle_controller.h"
+#include "../../Interaction/CANBUS/Interface/message_manager.h"
 
 class AbnormalProcess {
 public:

@@ -17,13 +17,12 @@
 #ifndef VEHICLESTATE_VEHICLESTATE_H_
 #define VEHICLESTATE_VEHICLESTATE_H_
 
-#include "derivative.h"
-#include "property.h"
 #include "math.h"
-#include "vector_2d.h"
-#include "vehicle_config.h"
-#include "Interface/message_manager.h"
-
+#include "../../../Driver/System/derivative.h"
+#include "../../Utils/Inc/property.h"
+#include "../../Math/vector_2d.h"
+#include "../../Configure/Configs/vehicle_config.h"
+#include "../../../Interaction/CANBUS/Interface/message_manager.h"
 
 class VehicleState
 {
@@ -33,9 +32,9 @@ public:
 
 	void Init(void);
 
-	virtual void VelocityUpdate(MessageManager *msg,float dt) = 0;
-	virtual void PulseUpdate(MessageManager *msg) = 0;
-	virtual void PulseTrackUpdate(MessageManager *msg) = 0;
+	virtual void VelocityUpdate(MessageManager &msg,float dt) = 0;
+	virtual void PulseUpdate(MessageManager &msg) = 0;
+	virtual void PulseTrackUpdate(MessageManager &msg) = 0;
 
 
 	Vector2d getPosition();

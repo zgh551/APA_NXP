@@ -10,8 +10,8 @@
 #ifndef MATH_CURVE_FITTING_H_
 #define MATH_CURVE_FITTING_H_
 
-#include "link_list.h"
-#include "Ultrasonic.h"
+#include "../Utils/Inc/link_list.h"
+#include "../../Interaction/Ultrasonic/Ultrasonic.h"
 
 class CurveFitting {
 public:

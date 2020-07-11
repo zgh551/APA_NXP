@@ -10,10 +10,10 @@
 #ifndef MATH_INTERPOLATION_H_
 #define MATH_INTERPOLATION_H_
 
-#include "derivative.h"
-#include "property.h"
 #include "math.h"
-#include "vehicle_config.h"
+#include "../../Driver/System/derivative.h"
+#include "../Utils/Inc/property.h"
+#include "../Configure/Configs/vehicle_config.h"
 
 #define kDoubleEpsilon (1.0e-6)
 

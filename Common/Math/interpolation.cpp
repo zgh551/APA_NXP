@@ -7,7 +7,7 @@
 /* ---   -----------    ----------------    ---------------------            */
 /* 1.0	 Guohua Zhu     July 26 2019        Initial Version                  */
 /*****************************************************************************/
-#include <interpolation.h>
+#include "interpolation.h"
 
 Interpolation::Interpolation() {
 	// TODO Auto-generated constructor stub

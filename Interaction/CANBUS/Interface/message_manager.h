@@ -17,9 +17,9 @@
 #ifndef CANBUS_INTERFACE_MESSAGE_MANAGER_H_
 #define CANBUS_INTERFACE_MESSAGE_MANAGER_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "vehicle_config.h"
+#include "../../../Driver/System/derivative.h"
+#include "../../../Common/Utils/Inc/property.h"
+#include "../../../Common/Configure/Configs/vehicle_config.h"
 
 typedef enum _GearStatus
 {
@@ -49,6 +49,12 @@ typedef enum _ValidStatus
 	DataValid = 0,
 	DataInvalid
 }ValidStatus;
+
+typedef enum _ReadyStatus
+{
+	NoReady = 0,
+	Ready
+}ReadyStatus;
 
 typedef enum _SpeedStatus
 {
@@ -82,6 +88,29 @@ typedef enum _EPB_Status
 	EPB_InvalidValue
 }EPB_Status;
 
+typedef enum _EPB_SystemStatus
+{
+	EPB_SystemReleased = 0,
+	EPB_SystemApplied,
+	EPB_SystemReleasing,
+	EPB_SystemFault,
+	EPB_SystemApplying,
+	EPB_SystemDisenaged
+}EPB_SystemStatus;
+
+
+typedef enum _DriverMode
+{
+	ManualMode = 0,
+	AutoMode
+}DriverMode;
+
+typedef enum _ManualDetecte
+{
+	NoManualControlDetected = 0,
+	ManualControlDetected
+}ManualDetected;
+
 class MessageManager {
 public:
 	MessageManager();
@@ -90,6 +119,14 @@ public:
 	virtual void Init() = 0;
 	virtual void Parse(const uint32_t id,const vuint8_t *data,const vuint32_t lenght) = 0;
 	
+	ReadyStatus getSystemReadyStatus(void) 				{ return _system_ready_sts; }
+	void        setSystemReadyStatus(ReadyStatus value) { _system_ready_sts = value;}
+
+	DriverMode getAutoDriverModeStatus(void) 			{ return _auto_driver_mode_sts; }
+	void       setAutoDriverModeStatus(DriverMode value){ _auto_driver_mode_sts = value;}
+
+	DriverMode getEpsAutoDriverModeStatus(void) 			{ return _eps_auto_driver_mode_sts; }
+	void       setEpsAutoDriverModeStatus(DriverMode value) { _eps_auto_driver_mode_sts = value;}
 	/*** ESC ESP ***/
 	ActuatorStatus getESC_Status();
 	void           setESC_Status(ActuatorStatus value);
@@ -169,9 +206,14 @@ public:
 	ValidStatus getWheelPulseRearRightValid(void)				{ return _wheel_pulse_rear_right_valid; }
 	void        setWheelPulseRearRightValid(ValidStatus value)  { _wheel_pulse_rear_right_valid = value;}
 
-	int32_t getWheelSumPulse();
-	void    setWheelSumPulse(int32_t value);
-	Property<MessageManager,int32_t,READ_WRITE> WheelSumPulse;
+	int32_t getRearLeftSumPulse(void)			{ return  _sum_rear_left_pulse;}
+	void    setRearLeftSumPulse(int32_t value) 	{ _sum_rear_left_pulse = value;}
+
+	int32_t getRearRightSumPulse(void)			{ return  _sum_rear_right_pulse; }
+	void    setRearRightSumPulse(int32_t value)	{ _sum_rear_right_pulse = value; }
+
+	int32_t getWheelSumPulse(void)          { return _wheel_sum_pulse;}
+	void    setWheelSumPulse(int32_t value)	{_wheel_sum_pulse = value;}
 
 	// wheel pulse dirction
 	DirectStatus getWheelPulseDirection();
@@ -204,7 +246,11 @@ public:
 	ActuatorStatus getEPS_Status();
 	void           setEPS_Status(ActuatorStatus value);
 
+	ManualDetected getEPS_ManualControlDetectionStatus(void) 				{ return _eps_manual_control_detection_sts; }
+	void           setEPS_ManualControlDetectionStatus(ManualDetected value){ _eps_manual_control_detection_sts = value;}
 	/*** SAS ***/
+	ActuatorStatus getSAS_Status() 						{ return  _sas_status;}
+	void           setSAS_Status(ActuatorStatus value) 	{ _sas_status = value;}
 	// Steering angle
 	float getSteeringAngle();
 	void  setSteeringAngle(float value);
@@ -214,7 +260,13 @@ public:
 	void  setSteeringAngleRate(float value);
 	Property<MessageManager,float,READ_WRITE> SteeringAngleRate;
 
+	/*** EMS ***/
+	ActuatorStatus getEMS_Status(void)					{ return  _ems_status;}
+	void           setEMS_Status(ActuatorStatus value) 	{ _ems_status = value;}
 	/*** TCU ***/
+	ActuatorStatus getTCU_Status(void)					{ return  _tcu_status;}
+	void           setTCU_Status(ActuatorStatus value) 	{ _tcu_status = value;}
+
 	ValidStatus getTargetGearValid(void)             { return _target_gear_valid ; }
 	void        setTargetGearValid(ValidStatus value){ _target_gear_valid = value; }
 
@@ -224,9 +276,11 @@ public:
 	GearStatus getTargetGear(void)            { return _target_gear ; }
 	void       setTargetGear(GearStatus value){ _target_gear = value; }
 
-	GearStatus getGear();
-	void       setGear(GearStatus value);
-	Property<MessageManager,GearStatus,READ_WRITE> Gear;
+	GearStatus getActualGear(void)				{ return  _actual_gear; }
+	void       setActualGear(GearStatus value)	{ _actual_gear = value; }
+	/*** VCU ***/
+	ValidStatus getVCU_Status(void)		         { return _vcu_status ; }
+	void        setVCU_Status(ValidStatus value) { _vcu_status = value; }
 
 	float getAccPedalStroke(void)		{ return _acc_pedal_stroke; }
 	void  setAccPedalStroke(float value){ _acc_pedal_stroke = value; }
@@ -258,6 +312,9 @@ public:
 	ActuatorStatus getEPB_Status(void)					{ return _epb_status; }
 	void           setEPB_Status(ActuatorStatus value) 	{ _epb_status = value;}
 
+	EPB_SystemStatus getEPB_SystemStatus(void)						{ return _epb_system_sts; }
+	void             setEPB_SystemStatus(EPB_SystemStatus value) 	{ _epb_system_sts = value;}
+
 	EPB_Status getEPB_SwitchPosition(void)				{ return _epb_switch_position; }
 	void       setEPB_SwitchPosition(EPB_Status value) 	{ _epb_switch_position = value;}
 
@@ -285,6 +342,10 @@ public:
 	DoorStatus getTrunkSts(void) 		  	   	{ return _trunk_sts; }
 	void	   setTrunkSts(DoorStatus value)	{ _trunk_sts = value;}
 private:
+	/*** System State ***/
+	ReadyStatus _system_ready_sts;
+	DriverMode _auto_driver_mode_sts;
+	DriverMode _eps_auto_driver_mode_sts; 
 	/*** ESC ESP ***/
 	// status
 	ActuatorStatus _esc_status;
@@ -313,7 +374,10 @@ private:
 	// wheel pulse dirction
 	DirectStatus _wheel_pulse_direction;
 	// vehicle speed base pulse,calculate by self
+	int32_t _sum_rear_left_pulse;
+	int32_t _sum_rear_right_pulse;
 	int32_t _wheel_sum_pulse;
+	// calculate the speed with pulse and speed
 	float   _vehicle_middle_speed;
 	uint8_t _vehicle_middle_speed_valid;
 	SpeedStatus _vehicle_middle_speed_abnormal;
@@ -328,19 +392,25 @@ private:
 
 	/*** EPS ***/
 	ActuatorStatus _eps_status;
-
+	ManualDetected _eps_manual_control_detection_sts;
 	/*** SAS ***/ 
 	// Steering angle
+	ActuatorStatus _sas_status;
 	float _steering_angle;
 	float _steering_angle_rate;
 
 	/*** TCU ***/
+	ActuatorStatus _tcu_status;
 	ValidStatus _target_gear_valid;
 	ValidStatus _actual_gear_valid;
 	GearStatus _target_gear;
-	GearStatus _gear;
+	GearStatus _actual_gear;
+
+	/*** EMS ***/
+	ActuatorStatus _ems_status;
 
 	/*** VCU ***/
+	ValidStatus _vcu_status;
 	// Acc
 	float _acc_pedal_stroke;
 	ValidStatus _acc_pedal_valid;
@@ -357,6 +427,7 @@ private:
 
 	/*** EPB ***/
 	ActuatorStatus _epb_status;
+	EPB_SystemStatus _epb_system_sts;
 	EPB_Status _epb_switch_position;
 	ValidStatus _epb_switch_position_valid;
 
@@ -370,6 +441,8 @@ private:
 	DoorStatus _driver_door_sts;
 	DoorStatus _passanger_door_sts;
 	DoorStatus _trunk_sts;
+
+
 };
 
 #endif /* CANBUS_INTERFACE_MESSAGE_MANAGER_H_ */

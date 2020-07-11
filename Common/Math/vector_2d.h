@@ -17,39 +17,39 @@
 #ifndef MATH_VECTOR_2D_H_
 #define MATH_VECTOR_2D_H_
 
-#include "derivative.h"
-#include "property.h"
+#include "../../Driver/System/derivative.h"
+#include "../Utils/Inc/property.h"
 #include "math.h"
 
 class Vector2d {
 public:
 	Vector2d();
-	Vector2d(const float x,const float y) noexcept:_x(x),_y(y){}
+	Vector2d(const float x,const float y):_x(x),_y(y){}
 	virtual ~Vector2d();
 
-	//矢量模长
+	//鐭㈤噺妯￠暱
 	float Length(void)const;
-	//矢量模长的平方
+	//鐭㈤噺妯￠暱鐨勫钩鏂�
 	float LengthSquare(void)const;
-	// 矢量角度
+	// 鐭㈤噺瑙掑害
 	float Angle(void)const;
-	//求连个矢量之间的距离
+	//姹傝繛涓煝閲忎箣闂寸殑璺濈
 	float DistanceTo(const Vector2d &other)const;
 
-	// 向量叉积 axb
+	// 鍚戦噺鍙夌Н axb
 	float CrossProduct(const Vector2d&other) const;
-	// 向量内积 a.b
+	// 鍚戦噺鍐呯Н a.b
 	float InnerProduct(const Vector2d&other) const;
 
-	//矢量旋转，旋转角度逆时针为正，顺时针为负
+	//鐭㈤噺鏃嬭浆锛屾棆杞搴﹂�嗘椂閽堜负姝ｏ紝椤烘椂閽堜负璐�
 	Vector2d rotate(const float angle) const;
-	//矢量正交点计算
+	//鐭㈤噺姝ｄ氦鐐硅绠�
 	Vector2d Orthogonal(const float angle) const;
 
-	// 航向角为angle的归一化向量
+	// 鑸悜瑙掍负angle鐨勫綊涓�鍖栧悜閲�
 	Vector2d Normalize(const float angle) const;
 
-	//运算符重载
+	//杩愮畻绗﹂噸杞�
 	Vector2d operator+(const Vector2d &other) const;
 	Vector2d operator-(const Vector2d &other) const;
 	Vector2d operator*(const double ratio) const;

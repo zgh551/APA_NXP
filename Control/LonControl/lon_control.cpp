@@ -9,7 +9,7 @@
 /* 1.0	 Guohua Zhu     July   30 2019      Add Dongfeng Control Function    */
 /*****************************************************************************/
 
-#include <lon_control.h>
+#include "lon_control.h"
 
 LonControl::LonControl() {
 	ControlStateFlag.setContainer(this);
@@ -108,11 +108,11 @@ void LonControl::AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid
 		else
 		{
 			acc_pid->Desired = ctl->TargetAcceleration;
-			if(msg->Gear == Drive)
+			if(msg->getActualGear() == Drive)
 			{
 				ctl->Torque = acc_pid->pidUpdateIntegralSeparation(msg->LonAcc);
 			}
-			else if(msg->Gear == Reverse)
+			else if(msg->getActualGear() == Reverse)
 			{
 				ctl->Torque = acc_pid->pidUpdateIntegralSeparation(-msg->LonAcc);
 			}
@@ -124,7 +124,7 @@ void LonControl::AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid
 
 void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,PID *start_velocity_pid,PID *velocity_pid)
 {
-	_current_gear = msg->getGear();
+	_current_gear = msg->getActualGear();
 
 //	_target_velocity = ctl->Velocity;//纯速度控制
 	_target_velocity = VelocityControl(ctl->Distance,ctl->Velocity);//距离速度控制
