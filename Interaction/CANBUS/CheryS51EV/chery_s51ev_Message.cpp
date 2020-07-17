@@ -123,7 +123,7 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 
 				this->setVehicleGradient( data[5] * 0.1f - 10 );
 			}
-			break;
+		break;
 
 		// wheel speed
 		case 0x300:
@@ -148,12 +148,12 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				this->setWheelSpeedRearRight ((((data[6] << 8) | data[7]) & 0x3fff) * V_M_S);//m/s
 			}
-			break;
+		break;
 
 		// ESC
 		case 0x318:
 			this->setESC_Status(((data[1] >> 6) & 0x01) == 0 ? ActuatorNormal : ActuatorErr);
-			break;
+		break;
 
 		// wheel pulse
 		case 0x319:
@@ -178,9 +178,8 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				this->setWheelPulseRearRight(data[6]);
 			}
-			break;
+		break;
 
-		//
 		case 0x221:
 			this->setYawRateValid(( data[4]       & 0x01) == 0 ? DataValid :DataInvalid);
 			this->setLonAccValid (((data[4] >> 1) & 0x01) == 0 ? DataValid :DataInvalid);
@@ -197,7 +196,8 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			{
 				this->setLatAcc(((data[3] << 4) | (data[4] >> 4)) * 0.01f - 20.48f);
 			}
-			break;
+		break;
+
 		// belt
 		case 0x452:
 			this->setDriverSeatBeltSwitchSts(((data[5] >> 1) & 0x01) == 0 ? Fasten : Unfasten);
@@ -220,11 +220,6 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 				this->setEPB_SwitchPosition(EPB_Status((data[1] >> 5) & 0x03));
 			}
 		break;
-
-		case 0x0E0://SAS
-
-
-			break;
 
 		default:
 

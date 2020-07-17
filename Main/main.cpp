@@ -399,7 +399,7 @@ void PIT0_isr(void)
 #endif
 #if ULTRASONIC_SCHEDULE_MODO == 3
 	m_Ultrasonic.UltrasonicScheduleStatusMachine_V3();//5ms
-	m_Ultrasonic.Update(m_BoRuiMessage.getAmbientTemperature());
+	m_Ultrasonic.Update(15);
 	m_Ultrasonic.BodyDirectLocation();
 	m_Ultrasonic.BodyTriangleLocation();
 	m_Ultrasonic.GroundTriangleLocation(&m_GeometricTrack);

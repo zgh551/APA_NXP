@@ -62,6 +62,11 @@ typedef struct _APAControlCommand
 	float Distance;
 }APAControlCommand;
 
+typedef enum _ActiveStatus
+{
+	Inactive = 0,
+	Active
+}ActiveStatus;
 
 class VehicleController {
 public:
@@ -189,6 +194,14 @@ public:
 	uint16_t getShakeHandsCnt() 			  { return _shake_hands_cnt ; }
 	void     setShakeHandsCnt(uint16_t value) { _shake_hands_cnt = value; }
 
+	ActiveStatus getEpbReq() 					{ return _epb_req; }
+	void         setEpbReq(ActiveStatus value) 	{ _epb_req = value;}
+
+	ActiveStatus getTurnLightLeftReq() 						{ return _turn_light_left_req; }
+	void         setTurnLightLeftReq(ActiveStatus value) 	{ _turn_light_left_req = value;}
+
+	ActiveStatus getTurnLightRightReq() 					{ return _turn_light_right_req; }
+	void         setTurnLightRightReq(ActiveStatus value) 	{ _turn_light_right_req = value;}
 private:
 	/* ACC */
 	float _target_acceleration;
@@ -229,6 +242,11 @@ private:
 
 	/* EPB */
 	uint8_t _epb_enable;
+
+	ActiveStatus _epb_req;
+	// ICM
+	ActiveStatus _turn_light_left_req;
+	ActiveStatus _turn_light_right_req;
 
 	// shake hands
 	uint16_t _shake_hands_cnt;
