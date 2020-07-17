@@ -170,6 +170,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 			{
 				ctl.setBrakeDegree(dat[0] * 0.4f);
 				ctl.setDecelerationReq(dat[1] & 0x01);
+				ctl.setEpbReq(dat[1] & 0x01 == 0 ? ReleaseRequest : AppliedRequest);
 			}
 			break;
 		default:

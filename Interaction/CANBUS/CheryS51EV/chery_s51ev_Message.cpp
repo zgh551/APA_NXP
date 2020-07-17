@@ -57,7 +57,7 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 				this->setAccPedalValid  (((data[2] >> 1) & 0x01) == 0 ? DataValid :DataInvalid);
 				this->setBrakePedalValid(((data[2] >> 2) & 0x01) == 0 ? DataValid :DataInvalid);
 				this->setTargetGearValid(((data[2] >> 3) & 0x01) == 0 ? DataValid :DataInvalid);
-				this->setActualGearValid(((data[2] >> 4) & 0x01) == 0 ? DataValid :DataInvalid);
+//				this->setActualGearValid(((data[2] >> 4) & 0x01) == 0 ? DataValid :DataInvalid);
 				this->setSystemReadyStatus(((data[2] >> 5) & 0x01) == 0 ? NoReady :Ready);
 				this->setAutoDriverModeStatus(((data[2] >> 6) & 0x01) == 0 ? ManualMode : AutoMode);
 				// target gear
@@ -99,42 +99,42 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 				}
 
 				// actual gear
-				if(DataValid == this->getActualGearValid())
-				{
-					switch((data[0] >> 4) & 0x0f)
-					{
-						case 0:
-							this->setActualGear(None);
-							break;
-
-						case 1:
-						case 2:
-						case 3:
-						case 4:
-						case 5:
-						case 6:
-						case 7:
-						case 8:
-							this->setActualGear(Drive);
-							break;
-
-						case 9:
-							this->setActualGear(Reverse);
-							break;
-
-						case 10:
-							this->setActualGear(Neutral);
-							break;
-
-						case 11:
-							this->setActualGear(Parking);
-							break;
-
-						default:
-							this->setActualGear(None);
-							break;
-					}
-				}
+//				if(DataValid == this->getActualGearValid())
+//				{
+//					switch((data[0] >> 4) & 0x0f)
+//					{
+//						case 0:
+//							this->setActualGear(None);
+//							break;
+//
+//						case 1:
+//						case 2:
+//						case 3:
+//						case 4:
+//						case 5:
+//						case 6:
+//						case 7:
+//						case 8:
+//							this->setActualGear(Drive);
+//							break;
+//
+//						case 9:
+//							this->setActualGear(Reverse);
+//							break;
+//
+//						case 10:
+//							this->setActualGear(Neutral);
+//							break;
+//
+//						case 11:
+//							this->setActualGear(Parking);
+//							break;
+//
+//						default:
+//							this->setActualGear(None);
+//							break;
+//					}
+//				}
 			}
 		break;
 
@@ -163,6 +163,32 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			}
 		break;
 
+		case 0x312:
+			switch( data[0] & 0x0f )
+			{
+				case 0x0B:
+					this->setActualGear(Drive);
+					break;
+
+				case 0x0D:
+					this->setActualGear(Reverse);
+					break;
+
+				case 0x0C:
+					this->setActualGear(Neutral);
+					break;
+
+				case 0x05:
+				case 0x06:
+					this->setActualGear(Parking);
+					break;
+
+				default:
+					this->setActualGear(None);
+					break;
+			}
+			break;
+
 		// ESC
 		case 0x318:
 			this->setESC_Status(((data[1] >> 6) & 0x01) == 0 ? ActuatorNormal : ActuatorErr);
@@ -173,7 +199,7 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 			this->setWheelPulseFrontLeftValid (((data[1] >> 7) & 0x01) == 0 ? DataValid :DataInvalid);
 			this->setWheelPulseFrontRightValid(((data[3] >> 7) & 0x01) == 0 ? DataValid :DataInvalid);
 			this->setWheelPulseRearLeftValid  (((data[5] >> 7) & 0x01) == 0 ? DataValid :DataInvalid);
-			this->setWheelPulseRearRightValid (((data[6] >> 7) & 0x01) == 0 ? DataValid :DataInvalid);
+			this->setWheelPulseRearRightValid (((data[7] >> 7) & 0x01) == 0 ? DataValid :DataInvalid);
 
 			if(DataValid == this->getWheelPulseFrontLeftValid())
 			{

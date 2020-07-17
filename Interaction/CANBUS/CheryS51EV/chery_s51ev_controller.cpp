@@ -257,7 +257,7 @@ void CheryS51EV_Controller::WorkStateMachine(MessageManager& msg)
 				}
 				else // set parking gear
 				{
-					this->setGear(Parking);
+					this->setGear(Neutral);
 					_control_state = CheryAbnormalExit;
 				}
 			}
