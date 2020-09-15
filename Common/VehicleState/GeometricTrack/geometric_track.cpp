@@ -208,9 +208,8 @@ void GeometricTrack::PulseTrackUpdate(MessageManager &msg)
 
 void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 {
-	float displacement,radius;
-
-	if( (0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse) )
+	////// pulse update
+	if((0 == _delta_rear_left_pulse) && (0 == _last_rear_left_pulse))// first running,use to update the last_pulse
 	{
 		_delta_rear_left_pulse = 0;
 	}
@@ -224,7 +223,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 								  msg.getWheelPulseRearLeft()  - _last_rear_left_pulse) : 0;
 	}
 
-	if( (0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse) )
+	if((0 == _delta_rear_right_pulse) && (0 == _last_rear_right_pulse))
 	{
 		_delta_rear_right_pulse = 0;
 	}
@@ -238,82 +237,78 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 								   msg.getWheelPulseRearRight()  - _last_rear_right_pulse) : 0;
 	}
 
-	// 閫熷害鍒ゅ畾
-	if((msg.getWheelSpeedRearRight() > 0.2f) && (msg.getWheelSpeedRearLeft() > 0.2f))
+	////// select the vehicle speed, wheel speed or pulse speed
+	if((msg.getWheelSpeedRearRight() > 2.0f) && (msg.getWheelSpeedRearLeft() > 2.0f))
 	{
+		_cumulation_rear_left_pulse  = 0;
+		_cumulation_rear_right_pulse = 0;
+		_wait_time_cnt               = 0;
 		msg.setVehicleMiddleSpeed((msg.getWheelSpeedRearRight() + msg.getWheelSpeedRearLeft()) * 0.5f);
 	}
 	else
 	{
-		msg.setVehicleMiddleSpeed(0);
-	}
-	/*************************************************鑴夊啿璁＄畻閫熷害********************************************************/
-	 if((_delta_rear_left_pulse > 0) || (_delta_rear_right_pulse > 0))//鑴夊啿鏇存柊瑙ｉ攣
-	 {
-		 _velocity_lock = 0;
-	 }
-	// 绱Н鑴夊啿杈惧埌鎸囧畾
-	 _cumulation_rear_left_pulse  += _delta_rear_left_pulse;
-	 _cumulation_rear_right_pulse += _delta_rear_right_pulse;
-	 _cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
-	 if(fabs(_cumulation_middle_displacement) >= 0.04f)
-	 {
-		 _velocity_lock = 0;
-		 _wait_time_cnt++;
-		 setPulseUpdateVelocity(_cumulation_middle_displacement  * 50 /_wait_time_cnt);
-		 _cumulation_rear_left_pulse  = 0;
-		 _cumulation_rear_right_pulse = 0;
-		 _wait_time_cnt               = 0;
-	 }
-	 else if(_wait_time_cnt >= 25)
-	 {
-		 if((msg.getWheelSpeedRearRight() < 1.0e-6) && (msg.getWheelSpeedRearLeft() < 1.0e-6))
-		 {
-			 _velocity_lock               = 0xff;
-			 _cumulation_rear_left_pulse  = 0;
-			 _cumulation_rear_right_pulse = 0;
-			 _wait_time_cnt               = 0;
-			 setPulseUpdateVelocity(0);
-		 }
-	 }
-	 else
-	 {
-		 if(0xff != _velocity_lock)
-		 {
-			 _wait_time_cnt++;
-		 }
-	 }
-	 /**************************************************鑴夊啿璁＄畻缁撴潫****************************************/
-	 // 杞剦鍐蹭笌杞�熸瘮杈冿紝鍒ゆ柇閫熷害鏄惁寮傚父
-	 if(msg.getVehicleMiddleSpeed() < 1.0e-6)
-	 {
-		 if( getPulseUpdateVelocity() < 0.3f )
-		 {
-			 msg.setVehicleMiddleSpeedAbnormal(SpeedNormal);
-		 }
-		 else
-		 {
-			 msg.setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
-		 }
-		 msg.setVehicleMiddleSpeed(fabs(getPulseUpdateVelocity()));
-	 }
-	 else
-	 {
-		 if(fabs(msg.getVehicleMiddleSpeed() - getPulseUpdateVelocity()) < 0.2f)
-		 {
-			 msg.setVehicleMiddleSpeedAbnormal(SpeedNormal);
-		 }
-		 else
-		 {
-			 msg.setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
-		 }
-	 }
+		_cumulation_rear_left_pulse  += _delta_rear_left_pulse;
+		_cumulation_rear_right_pulse += _delta_rear_right_pulse;
+		_cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+		_wait_time_cnt++;
 
-	displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
-	//////////////////////////////////////////////////////////////
-	if( ((int16_t)fabs(msg.getSteeringAngle()) != 0) && ((uint16_t)fabs(msg.getSteeringAngle()) < 520))
+		if (_cumulation_middle_displacement > (2 * WHEEL_PUSLE_RATIO))
+		{
+			_pul_update_velocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
+			_err_update_velocity = (_pul_update_velocity - _acc_update_velocity) * 0.1;
+			_cumulation_rear_left_pulse  = 0;
+			_cumulation_rear_right_pulse = 0;
+			_wait_time_cnt               = 0;
+		}
+		else
+		{
+			if (_wait_time_cnt > 80)
+			{
+				_cumulation_rear_left_pulse  = 0;
+				_cumulation_rear_right_pulse = 0;
+				_wait_time_cnt               = 0;
+				_acc_update_velocity         = 0.0f;
+			}
+			else
+			{
+				_acc_update_velocity += ((msg.getWheelPulseDirection() == Forward  ?  msg.getLonAcc() :
+									      msg.getWheelPulseDirection() == Backward ? -msg.getLonAcc() : 0.0f)
+									 + _err_update_velocity) * 0.196;
+				_acc_update_velocity = _acc_update_velocity < 1.0e-6f ? 0.0f : _acc_update_velocity;
+			}
+		}
+		msg.setVehicleMiddleSpeed(_acc_update_velocity);
+	}
+	/**************************************************Velocity Checker****************************************/
+	if((msg.getWheelSpeedRearRight() < 1.0e-6f) && (msg.getWheelSpeedRearLeft() < 1.0e-6f))
 	{
-		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg.getSteeringAngle());
+		if(msg.getVehicleMiddleSpeed() > 0.4)
+		{
+			msg.setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
+		}
+		else
+		{
+			msg.setVehicleMiddleSpeedAbnormal(SpeedNormal);
+		}
+	}
+	else
+	{
+		float middle_speed = (msg.getWheelSpeedRearRight() + msg.getWheelSpeedRearLeft()) * 0.5f;
+		if (fabs(msg.getVehicleMiddleSpeed() - middle_speed) > 0.2)
+		{
+			msg.setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
+		}
+		else
+		{
+			msg.setVehicleMiddleSpeedAbnormal(SpeedNormal);
+		}
+	}
+	/************************************************** Track Calculate ****************************************/
+	float displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+	////////////////////////////Delta Displace//////////////////////////////////
+	if(((int16_t)fabs(msg.getSteeringAngle()) != 0) && ((uint16_t)fabs(msg.getSteeringAngle()) < 520))
+	{
+		float radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg.getSteeringAngle());
 		_yaw  = pi2pi(_last_yaw + displacement / radius);
 		_position.setX(_position.getX() + radius * (sinf(_yaw) - sinf(_last_yaw)));
 		_position.setY(_position.getY() + radius * (cosf(_last_yaw) - cosf(_yaw)));
@@ -323,7 +318,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 		_position.setX(_position.getX() + displacement * cosf(_yaw));
 		_position.setY(_position.getY() + displacement * sinf(_yaw));
 	}
-	//////////////////////////////////////////////////////////////
+	/////////////////////////////Pulse Track/////////////////////////////////
 //	if(_delta_rear_right_pulse == _delta_rear_left_pulse)
 //	{
 //		_position.X = _position.X + displacement * cosf(Yaw);
@@ -338,11 +333,11 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 //	}
 	/////////////////////////////////////////////////////////////
 	_last_yaw = _yaw;
+	_last_rear_left_pulse  = msg.getWheelPulseRearLeft();
+	_last_rear_right_pulse = msg.getWheelPulseRearRight();
+
 	msg.setRearLeftSumPulse (msg.getRearLeftSumPulse()  + _delta_rear_left_pulse );
 	msg.setRearRightSumPulse(msg.getRearRightSumPulse() + _delta_rear_right_pulse);
 	msg.setWheelSumPulse((int32_t)((msg.getRearRightSumPulse() + msg.getRearLeftSumPulse()) * 0.5f));
-
-	_last_rear_left_pulse  = msg.getWheelPulseRearLeft();
-	_last_rear_right_pulse = msg.getWheelPulseRearRight();
 }
-/**************************************************************************************/
+/***************************************** End *********************************************/

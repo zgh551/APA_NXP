@@ -54,13 +54,18 @@ private:
 
 	int16_t _cumulation_rear_left_pulse;
 	int16_t _cumulation_rear_right_pulse;
-
 	float _cumulation_middle_displacement;
-	float _velocity_line_rate;
-	float _last_velocity_line_rate;
-	float _err_velocity;
+
+	float _pul_update_velocity;
+	float _acc_update_velocity;
+	float _err_update_velocity;
+
+
+//	float _velocity_line_rate;
+//	float _last_velocity_line_rate;
+//	float _err_velocity;
 	uint8_t _wait_time_cnt;
-	uint8_t _velocity_lock;
+
 };
 
 #endif /* VEHICLESTATE_GEOMETRICTRACK_GEOMETRIC_TRACK_H_ */
