@@ -14,15 +14,15 @@
 /* 1.0	 Guohua Zhu     December 28 2018    Initial Version                  */
 /*****************************************************************************/
 
-// 系统外设配置
-#include "Driver/System/derivative.h" /* include peripheral declarations */
-// 传感器驱动
-#include "Interaction/Ultrasonic/Ultrasonic.h"
-// 终端交互
-#include "Interaction/HMI/Terminal.h"
-// 车辆轨迹跟踪
-#include "Common/VehicleState/GeometricTrack/geometric_track.h"
-// 车辆信息解码和控制
+// 绯荤粺澶栬閰嶇疆
+#include "../Driver/System/derivative.h" /* include peripheral declarations */
+// 浼犳劅鍣ㄩ┍鍔�
+#include "../Interaction/Ultrasonic/Ultrasonic.h"
+// 缁堢浜や簰
+#include "../Interaction/HMI/Terminal.h"
+// 杞﹁締杞ㄨ抗璺熻釜
+#include "../Common/VehicleState/GeometricTrack/geometric_track.h"
+// 杞﹁締淇℃伅瑙ｇ爜鍜屾帶鍒�
 #ifdef CHANGAN
 #include "ChangAn/chang_an_controller.h"
 #include "ChangAn/chang_an_message.h"
@@ -39,16 +39,22 @@
 #endif
 
 #ifdef CHERY_S51EV
-#include "Interaction/CANBUS/CheryS51EV/chery_s51ev_controller.h"
-#include "Interaction/CANBUS/CheryS51EV/chery_s51ev_Message.h"
+#include "../Interaction/CANBUS/CheryS51EV/chery_s51ev_controller.h"
+#include "../Interaction/CANBUS/CheryS51EV/chery_s51ev_Message.h"
 #endif
-// 车辆控制
-#include "Control/Common/pid.h"
-#include "Control/LonControl/lon_control.h"
-#include "Control/LatControl/lat_control.h"
+
+#ifdef GEELY_JIHE
+#include "../Interaction/CANBUS/Geely_JiHe/geely_jihe_controller.h"
+#include "../Interaction/CANBUS/Geely_JiHe/geely_jihe_Message.h"
+#endif
+
+// 杞﹁締鎺у埗
+#include "../Control/Common/pid.h"
+#include "../Control/LonControl/lon_control.h"
+#include "../Control/LatControl/lat_control.h"
 // math
-#include "Common/Utils/Inc/link_list.h"
-#include "Common/Math/interpolation.h"
+#include "../Common/Utils/Inc/link_list.h"
+#include "../Common/Math/interpolation.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,16 +70,16 @@ Ultrasonic m_Ultrasonic;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 LatControl m_LatControl;
-TrackLinkList *_target_curvature_data_sets;
-TargetTrack temp_node;
-TargetTrack end_node;
+//TrackLinkList *_target_curvature_data_sets;
+//TargetTrack temp_node;
+//TargetTrack end_node;
 /**********************************************************************/
 #ifdef BORUI
-//速度PID参数
+//閫熷害PID鍙傛暟
 PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 #endif
 #ifdef DONG_FENG_E70
-//正向PID取消积分项
+//姝ｅ悜PID鍙栨秷绉垎椤�
 PID m_VelocityControlPID = PID(0.02f,2.0f,0.0f,0.0f,0.6,0.6f,0.1f);
 PID m_VelocityStratControlPID  = PID(0.02f,1.8f,0.1f,0.3f,0.2f,0.6f,0.2f);
 #endif
@@ -89,6 +95,10 @@ DongFengE70Message    m_Vehicle_Message;
 #ifdef CHERY_S51EV
 CheryS51EV_Controller m_Vehicle_Controller;
 CheryS51EV_Message    m_Vehicle_Message;
+#endif
+#ifdef GEELY_JIHE
+GeelyJiHeController m_Vehicle_Controller;
+GeelyJiHeMessage    m_Vehicle_Message;
 #endif
 /**********************************************************************/
 uint8_t ultrasonic_gain_adjust_flag = 0;
@@ -117,11 +127,11 @@ int main()
 	/* Loop forever */
 	for(;;)
 	{
-		/************************************** 周期控制任务 ******************************************/
-		if(0xA5 == m_Terminal_CA.PushActive)//数据推送内容,5ms进行一次推送
+		/************************************** 鍛ㄦ湡鎺у埗浠诲姟 ******************************************/
+		if(0xA5 == m_Terminal_CA.PushActive)//鏁版嵁鎺ㄩ�佸唴瀹�,5ms杩涜涓�娆℃帹閫�
 		{
 			m_Terminal_CA.PushActive = 0;
-			//测试控制代码
+			//娴嬭瘯鎺у埗浠ｇ爜
 			if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 			{
 				m_Vehicle_Controller.WorkStateMachine(m_Vehicle_Message);
@@ -144,7 +154,7 @@ int main()
 				
 			}
 
-			/***********************************控制台消息推送***********************************************/
+			/***********************************鎺у埗鍙版秷鎭帹閫�***********************************************/
 			m_Terminal_CA.Push(m_Ultrasonic);//5ms
 			if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 			{
@@ -167,7 +177,7 @@ int main()
 			{
 				
 			}
-			/********************************温度补偿处理**********************************************************/
+			/********************************娓╁害琛ュ伩澶勭悊**********************************************************/
 			#ifdef BORUI
 			if(0xAA != ultrasonic_gain_adjust_flag)
 			{
@@ -179,7 +189,7 @@ int main()
 			}
 			#endif
 		}
-		// 终端应答信号
+		// 缁堢搴旂瓟淇″彿
 		if(0xA5 == m_Terminal_CA.AckValid)
 		{
 			m_Terminal_CA.Ack();

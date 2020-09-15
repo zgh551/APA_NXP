@@ -1,7 +1,7 @@
 /*
  * system_config.h
  *
- *  Created on: 2019年3月30日
+ *  Created on: 2019骞�3鏈�30鏃�
  *      Author: zhuguohua
  */
 
@@ -18,11 +18,12 @@
 //#define CHANGAN
 //#define BORUI
 //#define DONG_FENG_E70
-#define CHERY_S51EV
+//#define CHERY_S51EV
+#define GEELY_JIHE
 
 #define SIMULATION 0
-/********************是否使用超声波避障使能按钮***********************/
-#define ULTRASONIC_COLLISION_ENABLE  ( 1 ) // 超声避障使能按钮
+/********************鏄惁浣跨敤瓒呭０娉㈤伩闅滀娇鑳芥寜閽�***********************/
+#define ULTRASONIC_COLLISION_ENABLE  ( 1 ) // 瓒呭０閬块殰浣胯兘鎸夐挳
 
 #define M_PI                ( 3.1415926535897932384626433832795 )
 #define M_3PI4              ( 2.3561944901923449288469825374596 )

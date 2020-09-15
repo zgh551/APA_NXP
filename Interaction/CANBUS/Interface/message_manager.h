@@ -80,6 +80,12 @@ typedef enum _DoorStatus
 	Open
 }DoorStatus;
 
+typedef enum _ControlStatus
+{
+	Disable = 0,
+	Enable
+}ControlStatus;
+
 typedef enum _EPB_Status
 {
 	EPB_NoRequst = 0,
@@ -248,6 +254,13 @@ public:
 
 	ManualDetected getEPS_ManualControlDetectionStatus(void) 				{ return _eps_manual_control_detection_sts; }
 	void           setEPS_ManualControlDetectionStatus(ManualDetected value){ _eps_manual_control_detection_sts = value;}
+
+	ControlStatus getEPS_RequestFeedback(void) 				  { return  _eps_request_feedback; }
+	void 		  setEPS_RequestFeedback(ControlStatus value) { _eps_request_feedback = value; }
+
+	uint8_t getEPS_AbortFeedback(void) 				  { return  _eps_abort_feedback; }
+	void 	setEPS_AbortFeedback(uint8_t value) { _eps_abort_feedback = value; }
+
 	/*** SAS ***/
 	ActuatorStatus getSAS_Status() 						{ return  _sas_status;}
 	void           setSAS_Status(ActuatorStatus value) 	{ _sas_status = value;}
@@ -393,6 +406,8 @@ private:
 	/*** EPS ***/
 	ActuatorStatus _eps_status;
 	ManualDetected _eps_manual_control_detection_sts;
+	ControlStatus  _eps_request_feedback;
+	uint8_t        _eps_abort_feedback;
 	/*** SAS ***/ 
 	// Steering angle
 	ActuatorStatus _sas_status;
@@ -441,8 +456,6 @@ private:
 	DoorStatus _driver_door_sts;
 	DoorStatus _passanger_door_sts;
 	DoorStatus _trunk_sts;
-
-
 };
 
 #endif /* CANBUS_INTERFACE_MESSAGE_MANAGER_H_ */

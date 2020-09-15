@@ -22,6 +22,9 @@
 #ifdef CHERY_S51EV
 #include "../Data/chery_s51ev.h"
 #endif
+#ifdef GEELY_JIHE
+#include "../Data/geely_jihe_configure.h"
+#endif
 
 typedef struct _Location
 {

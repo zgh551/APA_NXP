@@ -171,7 +171,7 @@ public:
 	void    setVelocityEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> VelocityEnable;
 
-	/* Steering Angle */
+	/* EPS */
 	float getSteeringAngle();
 	void  setSteeringAngle(float value);
 	Property<VehicleController,float,READ_WRITE> SteeringAngle;
@@ -187,6 +187,9 @@ public:
 	uint8_t getSteeringEnable();
 	void    setSteeringEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> SteeringEnable;
+
+	uint8_t getEpsRequest()				 { return  _eps_request; }
+	void    setEpsRequest(uint8_t value) { _eps_request = value; }
 
 	/* Gear */
 	GearStatus getGear();
@@ -216,6 +219,10 @@ public:
 
 	ActiveStatus getTurnLightRightReq() 					{ return _turn_light_right_req; }
 	void         setTurnLightRightReq(ActiveStatus value) 	{ _turn_light_right_req = value;}
+
+	uint8_t getRollingCounter() 			 { return  _rolling_counter; }
+	void    setRollingCounter(uint8_t value) { _rolling_counter = value; }
+
 private:
 	/* APA */
 	uint8_t _apa_enable;
@@ -247,11 +254,12 @@ private:
 	float _distance_set;
 	uint8_t _velocity_enable;
 
-	/* Steering System */
+	/* EPS */
 	float _steering_angle;
 	float _steering_angle_rate;
 	float _steering_angle_set;
 	uint8_t _steering_enable;
+	uint8_t _eps_request;
 
 	/* Gear */
 	GearStatus _gear;
@@ -266,6 +274,8 @@ private:
 
 	// shake hands
 	uint16_t _shake_hands_cnt;
+
+	uint8_t _rolling_counter;
 	/*
 	* @brief NEUTRAL, REVERSE, DRIVE
 	*/
