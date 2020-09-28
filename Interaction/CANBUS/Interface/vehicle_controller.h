@@ -62,17 +62,46 @@ typedef struct _APAControlCommand
 	float Distance;
 }APAControlCommand;
 
-typedef enum _ActiveStatus
-{
-	Inactive = 0,
-	Active
-}ActiveStatus;
-
 typedef enum _HandeBrakeRequestStatus
 {
 	ReleaseRequest = 0,
 	AppliedRequest
 }HandeBrakeRequestStatus;
+
+typedef enum _EPS_ControlState
+{
+	EPS_WaitRequest = 0,
+	EPS_WaitEnable,
+	EPS_Active,
+	EPS_WaitDisable,
+	EPS_ResumableInterrupt,
+	EPS_UnresumableInterrupt,
+	EPS_Err
+}EPS_ControlState;
+
+typedef enum _VCU_ControlState
+{
+	VCU_WaitRequest = 0,
+	VCU_WaitActive,
+	VCU_Active,
+	VCU_Arrival,
+	VCU_ParkingArrival,
+	VCU_Err
+}VCU_ControlState;
+
+typedef enum _ESC_ControlState
+{
+	ESC_WaitRequest = 0,
+	ESC_WaitBrake,
+	ESC_WaitActive,
+	ESC_Active,
+	ESC_WaitAlodActive,
+	ESC_AlodActive,
+	ESC_CloseRequest,
+	ESC_EPB_Inactive,
+	ESC_Err
+}ESC_ControlState;
+
 
 class VehicleController {
 public:
@@ -109,7 +138,12 @@ public:
 	// push the command to the vehicle
 	virtual void DataPush(void) = 0;
 
-	/* ACC */
+	/* APA */
+	uint8_t getAPAEnable();
+	void    setAPAEnable(uint8_t value);
+	Property<VehicleController,uint8_t,READ_WRITE> APAEnable;
+
+	/* Lon ACC */
 	float getTargetAcceleration();
 	void  setTargetAcceleration(float value);
 	Property<VehicleController,float,READ_WRITE> TargetAcceleration;
@@ -122,7 +156,7 @@ public:
 	void    setAccelerationEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> AccelerationEnable;
 
-	/* AEB */
+	/* Lon AEB */
 	float getDeceleration();
 	void  setDeceleration(float value);
 	Property<VehicleController,float,READ_WRITE> Deceleration;
@@ -133,7 +167,7 @@ public:
 	float getBrakeDegree(void) 			{ return _brake_degree; }
 	void  setBrakeDegree(float value)	{ _brake_degree = value;}
 
-	/* Torque */
+	/* Lon Torque */
 	float getTorque();
 	void  setTorque(float value);
 	Property<VehicleController,float,READ_WRITE> Torque;
@@ -142,6 +176,32 @@ public:
 	void    setTorqueEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> TorqueEnable;
 
+	/* ESC */
+	float getJerkMin() 			  { return  _jerk_min; }
+	void  setJerkMin(float value) { _jerk_min = value; }
+
+	float getJerkMax() 			  { return  _jerk_max; }
+	void  setJerkMax(float value) { _jerk_max = value; }
+
+	float getAccLowerLimit() 			{ return  _acc_lower_limit; }
+	void  setAccLowerLimit(float value) { _acc_lower_limit = value; }
+
+	float getAccUpperLimit() 			{ return  _acc_upper_limit; }
+	void  setAccUpperLimit(float value) { _acc_upper_limit = value; }
+
+	float getVelocity();
+	void  setVelocity(float value);
+	Property<VehicleController,float,READ_WRITE> Velocity;
+
+	float getDistance();
+	void  setDistance(float value);
+	Property<VehicleController,float,READ_WRITE> Distance;
+
+	uint8_t getVelocityEnable();
+	void    setVelocityEnable(uint8_t value);
+	Property<VehicleController,uint8_t,READ_WRITE> VelocityEnable;
+
+	/* Lat EPS */
 	/* Turnning Torque Control Single */
 	float getTurnTorqueVal();
 	void  setTurnTorqueVal(float value);
@@ -155,23 +215,6 @@ public:
 	void    setTurnTorqueAct(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> TurnTorqueAct;
 
-	/* Velocity */
-	float getVelocity();
-	void  setVelocity(float value);
-	Property<VehicleController,float,READ_WRITE> Velocity;
-
-	float getDistance();
-	void  setDistance(float value);
-	Property<VehicleController,float,READ_WRITE> Distance;
-
-	float getDistanceSet();
-	void  setDistanceSet(float value);
-
-	uint8_t getVelocityEnable();
-	void    setVelocityEnable(uint8_t value);
-	Property<VehicleController,uint8_t,READ_WRITE> VelocityEnable;
-
-	/* EPS */
 	float getSteeringAngle();
 	void  setSteeringAngle(float value);
 	Property<VehicleController,float,READ_WRITE> SteeringAngle;
@@ -180,49 +223,90 @@ public:
 	void  setSteeringAngleRate(float value);
 	Property<VehicleController,float,READ_WRITE> SteeringAngleRate;
 
-	float getSteeringAngleSet();
-	void  setSteeringAngleSet(float value);
-	Property<VehicleController,float,READ_WRITE> SteeringAngleSet;
-
 	uint8_t getSteeringEnable();
 	void    setSteeringEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> SteeringEnable;
-
-	uint8_t getEpsRequest()				 { return  _eps_request; }
-	void    setEpsRequest(uint8_t value) { _eps_request = value; }
 
 	/* Gear */
 	GearStatus getGear();
 	void       setGear(GearStatus value);
 	Property<VehicleController,GearStatus,READ_WRITE> Gear;
 
-	uint8_t getGearEnable();
-	void    setGearEnable(uint8_t value);
-	Property<VehicleController,uint8_t,READ_WRITE> GearEnable;
-
-	uint8_t getAPAEnable();
-	void    setAPAEnable(uint8_t value);
-	Property<VehicleController,uint8_t,READ_WRITE> APAEnable;
-
+	/* EPB */
 	uint8_t getEPBEnable();
 	void    setEPBEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> EPBEnable;
 
-	uint16_t getShakeHandsCnt() 			  { return _shake_hands_cnt ; }
-	void     setShakeHandsCnt(uint16_t value) { _shake_hands_cnt = value; }
-
 	HandeBrakeRequestStatus getEpbReq() 								{ return _epb_req; }
 	void                    setEpbReq(HandeBrakeRequestStatus value) 	{ _epb_req = value;}
 
+	/* BCM */
 	ActiveStatus getTurnLightLeftReq() 						{ return _turn_light_left_req; }
 	void         setTurnLightLeftReq(ActiveStatus value) 	{ _turn_light_left_req = value;}
 
 	ActiveStatus getTurnLightRightReq() 					{ return _turn_light_right_req; }
 	void         setTurnLightRightReq(ActiveStatus value) 	{ _turn_light_right_req = value;}
 
-	uint8_t getRollingCounter() 			 { return  _rolling_counter; }
-	void    setRollingCounter(uint8_t value) { _rolling_counter = value; }
+	/* Other */
+	uint16_t getShakeHandsCnt() 			  { return _shake_hands_cnt ; }
+	void     setShakeHandsCnt(uint16_t value) { _shake_hands_cnt = value; }
+protected:
+	// steering angle rate control
+	/*
+	 * @brief direct control
+	 */
+	void SteeringAngleControl(void);
+	/*
+	 * @brief the target steering angle add at every step
+	 */
+	void SteeringAngleControl(float dt);
+	/*
+	 * @brief base on the actual steering angle, control the steering angle
+	 */
+	void SteeringAngleControl(float dt, float actual_steering);
 
+	// EPS
+	uint8_t eps_request_;
+	int16_t steering_angle_request_;
+	float steering_angle_valid_request_; // eps can request max steer angle
+
+	// VCU
+	uint8_t 	gear_enable_;
+	GearStatus  gear_request_;
+
+	// ESC
+	float distance_set_;
+
+	uint8_t stop_distance_;
+	uint8_t esc_prefill_request_;
+	uint8_t driver_off_request_;
+	uint8_t brake_preferred_request_;
+
+	uint8_t vlc_shutdown_request_;
+	uint8_t standstill_request_;
+	uint8_t emergency_brake_request_;
+
+	// lower speed control single
+	uint8_t vlc_mode_request_;
+	uint8_t esc_target_acceleration_request_;
+
+	uint8_t esc_acc_lower_limit_;
+	uint8_t esc_acc_upper_limit_;
+
+	uint8_t esc_jerk_min_;
+	uint8_t esc_jerk_max_;
+
+	// high speed control single
+	uint8_t alod_mode_request_;
+	uint8_t alod_target_acceleration_request_;
+
+	uint8_t alod_acc_lower_limit_;
+	uint8_t alod_acc_upper_limit_;
+
+	uint8_t alod_jerk_min_;
+	uint8_t alod_jerk_max_;
+
+	uint8_t rolling_counter_;
 private:
 	/* APA */
 	uint8_t _apa_enable;
@@ -243,27 +327,31 @@ private:
 	float _torque;
 	uint8_t _torque_enable;
 
-	/* Turnning Torque Control Single */
+	/* ESC */
+	// the jerk of target acceleration
+	float _jerk_min;
+	float _jerk_max;
+
+	float _acc_lower_limit;
+	float _acc_upper_limit;
+
+	float _velocity;
+	float _distance;
+	uint8_t _velocity_enable;
+
+	/* EPS */
+	/* the source Turn Torque Control Single */
 	float   _turn_torque_val;
 	uint8_t _turn_torque_dir;
 	uint8_t _turn_torque_act;
 
-	/* Velocity */
-	float _velocity;
-	float _distance;
-	float _distance_set;
-	uint8_t _velocity_enable;
-
-	/* EPS */
+	// the steer angle control
 	float _steering_angle;
 	float _steering_angle_rate;
-	float _steering_angle_set;
 	uint8_t _steering_enable;
-	uint8_t _eps_request;
 
-	/* Gear */
+	/* Gear TCU */
 	GearStatus _gear;
-	uint8_t _gear_enable;
 
 	/* EPB */
 	uint8_t _epb_enable;
@@ -275,7 +363,6 @@ private:
 	// shake hands
 	uint16_t _shake_hands_cnt;
 
-	uint8_t _rolling_counter;
 	/*
 	* @brief NEUTRAL, REVERSE, DRIVE
 	*/

@@ -48,7 +48,7 @@
 #include "../Interaction/CANBUS/Geely_JiHe/geely_jihe_Message.h"
 #endif
 
-// 杞﹁締鎺у埗
+// control
 #include "../Control/Common/pid.h"
 #include "../Control/LonControl/lon_control.h"
 #include "../Control/LatControl/lat_control.h"
@@ -82,6 +82,11 @@ PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
 //姝ｅ悜PID鍙栨秷绉垎椤�
 PID m_VelocityControlPID = PID(0.02f,2.0f,0.0f,0.0f,0.6,0.6f,0.1f);
 PID m_VelocityStratControlPID  = PID(0.02f,1.8f,0.1f,0.3f,0.2f,0.6f,0.2f);
+#endif
+
+#ifdef GEELY_JIHE
+//閫熷害PID鍙傛暟
+PID m_VelocityControlPID = PID(0.02f,2.0f,0.0f,0.0f,0.6,0.6f,0.1f);
 #endif
 /**********************************************************************/
 #ifdef BORUI
@@ -128,22 +133,26 @@ int main()
 	for(;;)
 	{
 		/************************************** 鍛ㄦ湡鎺у埗浠诲姟 ******************************************/
-		if(0xA5 == m_Terminal_CA.PushActive)//鏁版嵁鎺ㄩ�佸唴瀹�,5ms杩涜涓�娆℃帹閫�
+		if(0xA5 == m_Terminal_CA.getPushActive())//鏁版嵁鎺ㄩ�佸唴瀹�,5ms杩涜涓�娆℃帹閫�
 		{
-			m_Terminal_CA.PushActive = 0;
-			//娴嬭瘯鎺у埗浠ｇ爜
+			m_Terminal_CA.setPushActive(0);
+			//任务调度
 			if(m_Ultrasonic.SystemTime % 4 == 0)//20ms
 			{
-				m_Vehicle_Controller.WorkStateMachine(m_Vehicle_Message);
-				m_Vehicle_Controller.DataPush();
-			}
-			else if(m_Ultrasonic.SystemTime % 2 == 1)//20ms
-			{
+				// velocity update and the track update
 				m_GeometricTrack.VelocityPulseUpdate(m_Vehicle_Message);
+			}
+			else if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
+			{
+				// lon control for velocity
+				m_LonControl.VelocityProc(m_Vehicle_Message, m_Vehicle_Controller, m_VelocityControlPID);
 			}
 			else if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 			{
-				
+				// the control logic state machine
+				m_Vehicle_Controller.WorkStateMachine(m_Vehicle_Message);
+				// CAN date push
+				m_Vehicle_Controller.DataPush();
 			}
 			else if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 			{
@@ -162,11 +171,11 @@ int main()
 			}
 			else if(m_Ultrasonic.SystemTime % 4 == 1)//20ms
 			{
-				m_Terminal_CA.Push(m_GeometricTrack);
+				m_Terminal_CA.Push(m_Vehicle_Message);
 			}
 			else if(m_Ultrasonic.SystemTime % 4 == 2)//20ms
 			{
-				m_Terminal_CA.Push(m_Vehicle_Message);
+				m_Terminal_CA.Push(m_GeometricTrack);
 			}
 			else if(m_Ultrasonic.SystemTime % 4 == 3)//20ms
 			{
@@ -177,7 +186,7 @@ int main()
 			{
 				
 			}
-			/********************************娓╁害琛ュ伩澶勭悊**********************************************************/
+			/********************************Ultrasonic Gain Configure Base on Borui vehicle **********************************************************/
 			#ifdef BORUI
 			if(0xAA != ultrasonic_gain_adjust_flag)
 			{
@@ -189,11 +198,11 @@ int main()
 			}
 			#endif
 		}
-		// 缁堢搴旂瓟淇″彿
-		if(0xA5 == m_Terminal_CA.AckValid)
+		// terminal ack
+		if(0xA5 == m_Terminal_CA.getAckValid())
 		{
 			m_Terminal_CA.Ack();
-			m_Terminal_CA.AckValid = 0;
+			m_Terminal_CA.setAckValid(0);
 		}
 	}
 }
@@ -283,7 +292,7 @@ void PIT0_isr(void)
 #endif
 
 	m_Ultrasonic.SystemTime = m_Ultrasonic.SystemTime + 1;
-	m_Terminal_CA.PushActive = 0xA5;
+	m_Terminal_CA.setPushActive(0xA5);
 	if(m_Ultrasonic.ScheduleTimeCnt == 0)
 	{
 		SYSTEM_LED = ~SYSTEM_LED;
@@ -352,7 +361,7 @@ void FlexCAN2_Isr(void)
 		// terminal command decode
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B);
 		// PID Control
-		//m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B,&m_VelocityControlPID);
+		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, m_VelocityControlPID);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, m_Vehicle_Controller);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, m_Vehicle_Message);
 		m_Terminal_CA.Parse(CAN_2.MB[8].ID.B.ID_STD,CAN_2.MB[8].DATA.B, m_Ultrasonic);

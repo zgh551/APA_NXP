@@ -9,13 +9,7 @@
 #define CANBUS_GEELY_JIHE_CONTROLLER_H_
 
 #include "../Interface/vehicle_controller.h"
-
-typedef enum _EpsControlState
-{
-	EpsWaitRequest = 0,
-	EpsWiatEnable,
-	EpsWaitDisable
-}EpsControlState;
+#include "../../../Common/Math/crc_compute.h"
 
 class GeelyJiHeController  : public VehicleController
 {
@@ -46,34 +40,30 @@ public:
 	void Update(ControlCommand cmd) override;
 	void Update(APAControlCommand cmd) override;
 
-	void VehicleContorl();
-	void VehicleContorlPri();
-	// Steeing angle control base on the angle speed
-	void SteeringAngleControl(float dt);
-	void SteeringAngleControl(float dt,float actual_steering);
-
-	// push the command to the vehicle
-	void Push(float dt);
-	void Push(float dt,float actual_steering);
-
+	// the control state machine
 	void WorkStateMachine(MessageManager& msg) override;
 
 	// push the command to the vehicle
 	void DataPush(void) override;
+protected:
+	// CAN data send
+	void VehicleControl(void);
 
+	void EPS_StateMachine(MessageManager& msg);
+	void VCU_StateMachine(MessageManager& msg);
+	void ESC_StateMachine(MessageManager& msg);
 private:
-	EpsControlState _eps_control_state;
-	/* SteeringAngle */
-	// actual value
+	// EPS State
+	EPS_ControlState _eps_control_state;
+	uint8_t _eps_timeout;
 
-	// current value
-	int16_t _current_steering_angle_target;
+	// VCU State
+	VCU_ControlState _vcu_control_state;
+	uint8_t _vcu_timeout;
 
-	uint16_t _current_distance;
-
-	uint16_t _current_turn_torque_value;
-
-	int8_t _current_acceleration;
+	// ESC State
+	ESC_ControlState _esc_control_state;
+	uint8_t _esc_timeout;
 };
 
 #endif /* CANBUS_BORUI_BO_RUI_CONTROLLER_H_ */

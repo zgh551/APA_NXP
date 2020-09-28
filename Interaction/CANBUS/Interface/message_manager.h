@@ -50,6 +50,18 @@ typedef enum _ValidStatus
 	DataInvalid
 }ValidStatus;
 
+typedef enum _ActiveStatus
+{
+	Inactive = 0,
+	Active
+}ActiveStatus;
+
+typedef enum _AvailableStatus
+{
+	NoAvailable = 0,
+	Available
+}AvailableStatus;
+
 typedef enum _ReadyStatus
 {
 	NoReady = 0,
@@ -133,6 +145,25 @@ public:
 
 	DriverMode getEpsAutoDriverModeStatus(void) 			{ return _eps_auto_driver_mode_sts; }
 	void       setEpsAutoDriverModeStatus(DriverMode value) { _eps_auto_driver_mode_sts = value;}
+	/* APA */
+	ActiveStatus getApaActive(void) 			  { return  _apa_active; }
+	void         setApaActive(ActiveStatus value) { _apa_active = value; }
+	ActiveStatus getApaCddActive(void) 			     { return  _apa_cdd_active; }
+	void         setApaCddActive(ActiveStatus value) { _apa_cdd_active = value; }
+	ActiveStatus getVlcActive(void) 			  { return  _vlc_active; }
+	void         setVlcActive(ActiveStatus value) { _vlc_active = value; }
+	ActiveStatus getVlcCddActive(void) 			     { return  _vlc_cdd_active; }
+	void         setVlcCddActive(ActiveStatus value) { _vlc_cdd_active = value; }
+
+	AvailableStatus getApaAvailable(void) 			          { return  _apa_available; }
+	void            setApaAvailable(AvailableStatus value)    { _apa_available = value; }
+	AvailableStatus getApaCddAvailable(void) 			      { return  _apa_cdd_available; }
+	void            setApaCddAvailable(AvailableStatus value) { _apa_cdd_available = value; }
+	AvailableStatus getVlcAvailable(void) 			          { return  _vlc_available; }
+	void            setVlcAvailable(AvailableStatus value)    { _vlc_available = value; }
+	AvailableStatus getVlcCddAvailable(void) 			      { return  _vlc_cdd_available; }
+	void            setVlcCddAvailable(AvailableStatus value) { _vlc_cdd_available = value; }
+
 	/*** ESC ESP ***/
 	ActuatorStatus getESC_Status();
 	void           setESC_Status(ActuatorStatus value);
@@ -221,6 +252,10 @@ public:
 	int32_t getWheelSumPulse(void)          { return _wheel_sum_pulse;}
 	void    setWheelSumPulse(int32_t value)	{_wheel_sum_pulse = value;}
 
+	uint8_t getVehicleStandstill(void)          { return _vehicle_standstill;}
+	void    setVehicleStandstill(uint8_t value)	{_vehicle_standstill = value;}
+	 ;
+
 	// wheel pulse dirction
 	DirectStatus getWheelPulseDirection();
 	void         setWheelPulseDirection(DirectStatus value);
@@ -295,6 +330,15 @@ public:
 	ValidStatus getVCU_Status(void)		         { return _vcu_status ; }
 	void        setVCU_Status(ValidStatus value) { _vcu_status = value; }
 
+	uint8_t getVcuControlStatus(void)		   { return  _vcu_controlled_status; }
+	void    setVcuControlStatus(uint8_t value) { _vcu_controlled_status = value; }
+
+	uint8_t getVcuDriverGearAbort(void)		     { return  _vcu_driver_gear_abort; }
+	void    setVcuDriverGearAbort(uint8_t value) { _vcu_driver_gear_abort = value; }
+
+	uint8_t getVcuEptFault(void)		  { return  _vcu_ept_fault; }
+	void    setVcuEptFault(uint8_t value) { _vcu_ept_fault = value; }
+
 	float getAccPedalStroke(void)		{ return _acc_pedal_stroke; }
 	void  setAccPedalStroke(float value){ _acc_pedal_stroke = value; }
 
@@ -358,7 +402,18 @@ private:
 	/*** System State ***/
 	ReadyStatus _system_ready_sts;
 	DriverMode _auto_driver_mode_sts;
-	DriverMode _eps_auto_driver_mode_sts; 
+	DriverMode _eps_auto_driver_mode_sts;
+
+	/* APA */
+	ActiveStatus _apa_active;
+	ActiveStatus _apa_cdd_active;
+	ActiveStatus _vlc_active;
+	ActiveStatus _vlc_cdd_active;
+
+	AvailableStatus _apa_available;
+	AvailableStatus _apa_cdd_available;
+	AvailableStatus _vlc_available;
+	AvailableStatus _vlc_cdd_available;
 	/*** ESC ESP ***/
 	// status
 	ActuatorStatus _esc_status;
@@ -390,6 +445,8 @@ private:
 	int32_t _sum_rear_left_pulse;
 	int32_t _sum_rear_right_pulse;
 	int32_t _wheel_sum_pulse;
+	// the status of vehicle stand still
+	uint8_t _vehicle_standstill;
 	// calculate the speed with pulse and speed
 	float   _vehicle_middle_speed;
 	uint8_t _vehicle_middle_speed_valid;
@@ -426,6 +483,10 @@ private:
 
 	/*** VCU ***/
 	ValidStatus _vcu_status;
+	uint8_t _vcu_controlled_status;
+	uint8_t _vcu_driver_gear_abort;
+	uint8_t _vcu_ept_fault;
+
 	// Acc
 	float _acc_pedal_stroke;
 	ValidStatus _acc_pedal_valid;

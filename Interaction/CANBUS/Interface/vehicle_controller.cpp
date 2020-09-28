@@ -76,10 +76,6 @@ VehicleController::VehicleController() {
 	SteeringAngleRate.getter(&VehicleController::getSteeringAngleRate);
 	SteeringAngleRate.setter(&VehicleController::setSteeringAngleRate);
 
-	SteeringAngleSet.setContainer(this);
-	SteeringAngleSet.getter(&VehicleController::getSteeringAngleSet);
-	SteeringAngleSet.setter(&VehicleController::setSteeringAngleSet);
-
 	SteeringEnable.setContainer(this);
 	SteeringEnable.getter(&VehicleController::getSteeringEnable);
 	SteeringEnable.setter(&VehicleController::setSteeringEnable);
@@ -88,10 +84,6 @@ VehicleController::VehicleController() {
 	Gear.setContainer(this);
 	Gear.getter(&VehicleController::getGear);
 	Gear.setter(&VehicleController::setGear);
-
-	GearEnable.setContainer(this);
-	GearEnable.getter(&VehicleController::getGearEnable);
-	GearEnable.setter(&VehicleController::setGearEnable);
 
 	APAEnable.setContainer(this);
 	APAEnable.getter(&VehicleController::getAPAEnable);
@@ -106,6 +98,109 @@ VehicleController::~VehicleController() {
 
 }
 
+void VehicleController::SteeringAngleControl(void)
+{
+	steering_angle_valid_request_  = this->getSteeringAngle();
+}
+
+void VehicleController::SteeringAngleControl(float dt)
+{
+	// limit the steering angle rate
+	if (fabs(this->getSteeringAngleRate()) > MAX_STEERING_ANGLE_RATE)
+	{
+		this->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
+	}
+	else
+	{
+		// do nothing
+	}
+
+	// limit the steering angle
+	if (this->getSteeringAngle() > MAX_STEERING_ANGLE)
+	{
+		this->setSteeringAngle(MAX_STEERING_ANGLE);
+	}
+	else if (this->getSteeringAngle() < -MAX_STEERING_ANGLE)
+	{
+		this->setSteeringAngle(-MAX_STEERING_ANGLE);
+	}
+	else
+	{
+		// Do Nothing
+	}
+
+	float delta_angle      = fabs(this->getSteeringAngleRate()) * dt;
+	float left_band_angle  = this->getSteeringAngle() - delta_angle;
+	float right_band_angle = this->getSteeringAngle() - delta_angle;
+
+	if (steering_angle_valid_request_ < left_band_angle)
+	{
+		steering_angle_valid_request_ = steering_angle_valid_request_ + delta_angle;
+	}
+	else if (steering_angle_valid_request_ > right_band_angle)
+	{
+		steering_angle_valid_request_ = steering_angle_valid_request_ - delta_angle;
+	}
+	else
+	{
+		steering_angle_valid_request_  = this->getSteeringAngle();
+	}
+}
+
+void VehicleController::SteeringAngleControl(float dt,float actual_steering)
+{
+	// limit the steering angle rate
+	if (fabs(this->getSteeringAngleRate()) > MAX_STEERING_ANGLE_RATE)
+	{
+		this->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
+	}
+	else
+	{
+		// do nothing
+	}
+
+	// limit the steering angle
+	if (this->getSteeringAngle() > MAX_STEERING_ANGLE)
+	{
+		this->setSteeringAngle(MAX_STEERING_ANGLE);
+	}
+	else if (this->getSteeringAngle() < -MAX_STEERING_ANGLE)
+	{
+		this->setSteeringAngle(-MAX_STEERING_ANGLE);
+	}
+	else
+	{
+		// Do Nothing
+	}
+
+	float delta_angle      = fabs(this->getSteeringAngleRate()) * (0.1 + dt);
+	float left_band_angle  = this->getSteeringAngle() - delta_angle;
+	float right_band_angle = this->getSteeringAngle() - delta_angle;
+
+	if (steering_angle_valid_request_ < left_band_angle)
+	{
+		steering_angle_valid_request_ = actual_steering + delta_angle;
+	}
+	else if (steering_angle_valid_request_ > right_band_angle)
+	{
+		steering_angle_valid_request_ = actual_steering - delta_angle;
+	}
+	else
+	{
+		if (actual_steering < left_band_angle)
+		{
+			steering_angle_valid_request_ = actual_steering + delta_angle;
+		}
+		else if (actual_steering > right_band_angle)
+		{
+			steering_angle_valid_request_ = actual_steering - delta_angle;
+		}
+		else
+		{
+			steering_angle_valid_request_  = this->getSteeringAngle();
+		}
+	}
+}
 /// ACC
 float VehicleController::getTargetAcceleration()           { return _target_acceleration;}
 void  VehicleController::setTargetAcceleration(float value){_target_acceleration = value;}
@@ -143,9 +238,6 @@ void  VehicleController::setVelocity(float value){_velocity = value;}
 float VehicleController::getDistance()           { return _distance;}
 void  VehicleController::setDistance(float value){_distance = value;}
 
-float VehicleController::getDistanceSet()           { return _distance_set;}
-void  VehicleController::setDistanceSet(float value){_distance_set = value;}
-
 uint8_t VehicleController::getVelocityEnable()             { return _velocity_enable;}
 void    VehicleController::setVelocityEnable(uint8_t value){_velocity_enable = value;}
 
@@ -156,18 +248,11 @@ void  VehicleController::setSteeringAngle(float value){_steering_angle = value;}
 float VehicleController::getSteeringAngleRate()           { return _steering_angle_rate;}
 void  VehicleController::setSteeringAngleRate(float value){_steering_angle_rate = value;}
 
-float VehicleController::getSteeringAngleSet()           { return _steering_angle_set;}
-void  VehicleController::setSteeringAngleSet(float value){_steering_angle_set = value;}
-
 uint8_t VehicleController::getSteeringEnable()             { return _steering_enable;}
 void    VehicleController::setSteeringEnable(uint8_t value){_steering_enable = value;}
-
 /// Gear
 GearStatus VehicleController::getGear()                { return _gear;}
 void       VehicleController::setGear(GearStatus value){_gear = value;}
-
-uint8_t VehicleController::getGearEnable()             { return _gear_enable;}
-void    VehicleController::setGearEnable(uint8_t value){_gear_enable = value;}
 
 /// APA Enable
 uint8_t VehicleController::getAPAEnable()             { return _apa_enable;}
