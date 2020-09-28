@@ -243,11 +243,11 @@ void CheryS51EV_Message::Parse(const uint32_t id,const vuint8_t *data,const vuin
 		break;
 
 		case 0x392:
-			this->setTurnLightLeftSts (((data[0] >> 2) & 0x01 == 0) ? Off : On);
-			this->setTurnLightRightSts(((data[0] >> 3) & 0x01 == 0) ? Off : On);
-			this->setDriverDoorSts    (((data[1] >> 1) & 0x01 == 0) ? Close : Open);
-			this->setPassangerDoorSts (((data[1] >> 2) & 0x01 == 0) ? Close : Open);
-			this->setTrunkSts         (((data[1] >> 5) & 0x01 == 0) ? Close : Open);
+			this->setTurnLightLeftSts ((((data[0] >> 2) & 0x01) == 0) ? Off : On);
+			this->setTurnLightRightSts((((data[0] >> 3) & 0x01) == 0) ? Off : On);
+			this->setDriverDoorSts    ((((data[1] >> 1) & 0x01) == 0) ? Close : Open);
+			this->setPassangerDoorSts ((((data[1] >> 2) & 0x01) == 0) ? Close : Open);
+			this->setTrunkSts         ((((data[1] >> 5) & 0x01) == 0) ? Close : Open);
 		break;
 
 		// EPB

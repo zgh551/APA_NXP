@@ -66,8 +66,8 @@ void BoRuiController::VehicleContorl()
 	m_CAN_Packet.id = 0x411;
 	m_CAN_Packet.length = 8;
 
-	_current_steering_angle_target = (int16_t)(this->getSteeringAngleSet() * 10);
-	_current_distance = (uint16_t)(this->getDistanceSet() * 100);
+	_current_steering_angle_target = (int16_t)(this->getSteeringAngle() * 10);
+	_current_distance = (uint16_t)(this->getDistance() * 100);
 	/// Data Mapping
 	m_CAN_Packet.data[0] = (uint8_t)((_current_steering_angle_target >> 8) & 0xFF);
 	m_CAN_Packet.data[1] = (uint8_t)((_current_steering_angle_target     ) & 0xFF);
@@ -103,83 +103,9 @@ void BoRuiController::VehicleContorlPri()
 	CAN0_TransmitMsg(m_CAN_Packet);
 }
 
-void BoRuiController::SteeringAngleControl(float dt)
-{
-//    float da = SteeringAngleRate * dt;
-//    float left_target_angle = SteeringAngle - da;
-//    float right_target_angle = SteeringAngle + da;
-//
-//    if(SteeringAngleSet < left_target_angle)
-//    {
-//    	SteeringAngleSet = SteeringAngleSet + da;
-//    }
-//    else if(SteeringAngleSet > right_target_angle)
-//    {
-//    	SteeringAngleSet = SteeringAngleSet - da;
-//    }
-//    else
-//    {
-//    	SteeringAngleSet = SteeringAngle;
-//    }
-}
-
-void BoRuiController::SteeringAngleControl(float dt,float actual_steering)
-{
-	if(getSteeringAngleRate() > 400.0f)
-	{
-		setSteeringAngleRate(400.0f);
-	}
-//	float delta_theta = getSteeringAngleRate() * dt;
-    float da = getSteeringAngleRate() * (dt + 0.1);
-    float left_target_angle  = getSteeringAngle() - da;
-    float right_target_angle = getSteeringAngle() + da;
-
-    // 异常输入不响应
-    if( (fabs(getSteeringAngleRate()) < 501.0f) &&
-    	(fabs(getSteeringAngle()) < 501.0f)
-	  )
-    {
-		if(getSteeringAngleSet() < left_target_angle)
-		{
-			setSteeringAngleSet(actual_steering + da);
-		}
-		else if(getSteeringAngleSet() > right_target_angle)
-		{
-			setSteeringAngleSet(actual_steering - da);
-		}
-		else
-		{
-			if(actual_steering < left_target_angle)
-			{
-				setSteeringAngleSet(actual_steering + da);
-			}
-			else if(actual_steering > right_target_angle)
-			{
-				setSteeringAngleSet(actual_steering - da);
-			}
-			else
-			{
-				setSteeringAngleSet(getSteeringAngle());
-			}
-		}
-    }
-}
-
-void BoRuiController::Push(float dt)
-{
-//	SteeringAngleControl(dt);
-//	VehicleContorl();
-}
-
-void BoRuiController::Push(float dt,float actual_steering)
-{
-	SteeringAngleControl(dt,actual_steering);
-	VehicleContorl();
-}
-
 void BoRuiController::WorkStateMachine(MessageManager& msg)
 {
-
+	SteeringAngleControl(0.02f, msg.getSteeringAngle());
 }
 
 void BoRuiController::DataPush(void)

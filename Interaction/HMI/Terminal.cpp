@@ -17,46 +17,26 @@
 #include "Terminal.h"
 
 Terminal::Terminal() {
-	_frame_err_cnt = 0;
-	_push_active = 0;
-
-	_work_mode      = 4;
-	_function_state = 1;
-
-	// ACK Valid
-	AckValid.setContainer(this);
-	AckValid.getter(&Terminal::getAckValid);
-	AckValid.setter(&Terminal::setAckValid);
-
-	AckEcho.setContainer(this);
-	AckEcho.getter(&Terminal::getAckEcho);
-	AckEcho.setter(&Terminal::setAckEcho);
-
-	// ACK Valid
-	Command.setContainer(this);
-	Command.getter(&Terminal::getCommand);
-	Command.setter(&Terminal::setCommand);
-
-	// Push Active
-	PushActive.setContainer(this);
-	PushActive.getter(&Terminal::getPushActive);
-	PushActive.setter(&Terminal::setPushActive);
+	Init();
 }
 
 Terminal::~Terminal() {
 
 }
 
-/// AckValid
-uint8_t Terminal::getAckValid()             {return _ack_valid ;}
-void    Terminal::setAckValid(uint8_t value){_ack_valid = value;}
-uint8_t Terminal::getAckEcho()             {return _ack_echo ;}
-void    Terminal::setAckEcho(uint8_t value){_ack_echo = value;}
+void Terminal::Init(void)
+{
+	_frame_err_cnt  = 0;
+	_push_active    = 0;
+	_work_mode      = 4;
+	_function_state = 1;
+	_ack_valid      = 0;
+	_ack_echo       = 0;
+	_check_sum      = 0;
+	_command        = 0;
+}
 
-uint8_t Terminal::getCommand()             {return _command ;}
-void    Terminal::setCommand(uint8_t value){_command = value;}
-uint8_t Terminal::getPushActive()             {return _push_active ;}
-void    Terminal::setPushActive(uint8_t value){_push_active = value;}
+
 /**************************************************************************************/
 void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 {
@@ -71,9 +51,9 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 			check_sum = check_sum ^ 0xFF;
 			if(check_sum == dat[7])
 			{
-				ctl.GearEnable 		=  dat[0]       & 0x01;
+//				ctl.gear_enable_	   =  dat[0]       & 0x01;
 				ctl.AccelerationEnable = (dat[0] >> 2) & 0x01;
-				ctl.setDecelerationReq((dat[0] >> 4) & 0x01);
+//				ctl.setDecelerationReq((dat[0] >> 4) & 0x01);
 				ctl.TorqueEnable       = (dat[0] >> 5) & 0x01;
 				ctl.VelocityEnable     = (dat[0] >> 3) & 0x01;
 				if((0 == ctl.SteeringEnable) || (0 == ((dat[0] >> 1) & 0x01)))
@@ -83,7 +63,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 				ctl.Gear 				= (GearStatus)dat[1];
 				ctl.SteeringAngle 		= (float)(((int16_t)((dat[3] << 8) | dat[2])) * 0.1);
 				ctl.SteeringAngleRate 	= (float)(((uint16_t)((dat[5] << 8) | dat[4])) * 0.01);
-				AckValid = 0xa5;
+				_ack_valid = 0xa5;
 			}
 			break;
 
@@ -134,13 +114,13 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 				ctl.SteeringAngleRate 	= (float)(((uint16_t)((dat[3] << 8) | dat[2])) * 0.01);
 				ctl.Torque			    = (float)(((uint16_t)((dat[5] << 8) | dat[4])));
 
-				ctl.GearEnable 		=  dat[6]       & 0x01;
+//				ctl.GearEnable 		=  dat[6]       & 0x01;
 				ctl.SteeringEnable 	= (dat[6] >> 1) & 0x01;
 				ctl.AccelerationEnable = (dat[6] >> 2) & 0x01;
 				ctl.VelocityEnable     = (dat[6] >> 3) & 0x01;
 				ctl.setDecelerationReq((dat[6] >> 4) & 0x01);
 				ctl.TorqueEnable       = (dat[6] >> 5) & 0x01;
-				AckValid = 0xa5;
+				_ack_valid = 0xa5;
 			}
 			break;
 
@@ -170,7 +150,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl)
 			{
 				ctl.setBrakeDegree(dat[0] * 0.4f);
 				ctl.setDecelerationReq(dat[1] & 0x01);
-				ctl.setEpbReq(dat[1] & 0x01 == 0 ? ReleaseRequest : AppliedRequest);
+				ctl.setEpbReq((dat[1] & 0x01) == 0 ? ReleaseRequest : AppliedRequest);
 			}
 			break;
 		default:
@@ -223,7 +203,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic &u)
         	obstacle_location_packet.Position.setY((float)(((int16_t )((dat[3] << 8) | dat[2])) * 0.01));
         	obstacle_location_packet.Status = (UltrasonicStatus)dat[7];
         	u.setAbstacleGroundPositionTriangle(11, obstacle_location_packet);
-        	AckValid = 0xa5;
+        	_ack_valid = 0xa5;
         	break;
 
 		default:
@@ -234,7 +214,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[],Ultrasonic &u)
 
 void Terminal::Parse(vuint32_t id,vuint8_t dat[],MessageManager &msg)
 {
-	Byte2Int temp_int;
+//	Byte2Int temp_int;
 	switch(id)
 	{
         case 0x510:
@@ -311,7 +291,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[])
 	switch(id)
 	{
         case 0x530:
-        	Command = (uint8_t)dat[0];
+        	_command = (uint8_t)dat[0];
         	break;
 
         case 0x531:
@@ -320,7 +300,7 @@ void Terminal::Parse(vuint32_t id,vuint8_t dat[])
         	break;
 
         case 0x512:
-        	AckEcho = (uint8_t)dat[0];
+        	_ack_echo = (uint8_t)dat[0];
         	break;
 
         default:
@@ -363,9 +343,8 @@ void Terminal::Push(MessageManager &msg)
 	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
 	m_CAN_Packet.data[6] = msg.getActualGear();
-	m_CAN_Packet.data[7] =  msg.getWheelSpeedDirection()  & 0x03
-						 | (msg.getSystemReadyStatus()    & 0x01) << 2
-						 | (msg.getAutoDriverModeStatus() & 0x01) << 3;
+	m_CAN_Packet.data[7] = (msg.getWheelPulseDirection() & 0x03)
+			| ((msg.getSystemReadyStatus()    & 0x01) << 2)| ((msg.getAutoDriverModeStatus() & 0x01) << 3);
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	// 车速状态反馈
@@ -468,8 +447,8 @@ void Terminal::Push(VehicleController &msg)
 							(msg.getDecelerationReq() << 1) |
 							(msg.getTorqueEnable()       << 2) |
 							(msg.getVelocityEnable()     << 3) |
-							(msg.getSteeringEnable()     << 4) |
-							(msg.getGearEnable()         << 6) ;
+							(msg.getSteeringEnable()     << 4) ;
+//							(msg.getGearEnable()         << 6) ;
 	m_CAN_Packet.data[1] = msg.getGear();
 	temp_int16 = (int16_t)(msg.getAcceleration() * 100);
 	m_CAN_Packet.data[2] =  temp_int16       & 0xff ;
@@ -483,13 +462,13 @@ void Terminal::Push(VehicleController &msg)
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	m_CAN_Packet.id = 0x415;
-	temp_uint16 = (uint16_t)(msg.getDistanceSet() * 1000);
+	temp_uint16 = (uint16_t)(msg.getDistance() * 1000);
 	m_CAN_Packet.data[0] =  temp_uint16 & 0xff ;
 	m_CAN_Packet.data[1] = (temp_uint16 >> 8) & 0xff ;
 	temp_int16 = (int16_t)(msg.getTargetAcceleration() * 1000);
 	m_CAN_Packet.data[2] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff;
-	temp_int16 = (int16_t)(msg.getSteeringAngleSet() * 10);
+	temp_int16 = (int16_t)(msg.getSteeringAngle() * 10);
 	m_CAN_Packet.data[4] =  temp_int16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_int16 >> 8) & 0xff;
 	m_CAN_Packet.data[6] = 0;

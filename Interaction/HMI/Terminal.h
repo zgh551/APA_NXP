@@ -60,6 +60,8 @@ public:
 	Terminal();
 	virtual ~Terminal();
 
+	void Init(void);
+
 	// CAN Module:Vehicle information receive
 	void Parse(vuint32_t id,vuint8_t dat[],VehicleController &ctl);
 	void Parse(vuint32_t id,vuint8_t dat[],MessageManager &msg);
@@ -102,32 +104,20 @@ public:
 	void ParkingCenterPointSend(Vector2d v);
 
 	/*** Property ***/
-	// AckValid
-	uint8_t getAckValid();
-	void setAckValid(uint8_t value);
-	Property<Terminal,uint8_t,READ_WRITE> AckValid;
-
-	uint8_t getAckEcho();
-	void    setAckEcho(uint8_t value);
-	Property<Terminal,uint8_t,READ_WRITE> AckEcho;
-
-	// Commond
-	uint8_t getCommand();
-	void    setCommand(uint8_t value);
-	Property<Terminal,uint8_t,READ_WRITE> Command;
-
+	/// AckValid
+	uint8_t getAckValid()             {return _ack_valid ;}
+	void    setAckValid(uint8_t value){_ack_valid = value;}
+	uint8_t getAckEcho()             {return _ack_echo ;}
+	void    setAckEcho(uint8_t value){_ack_echo = value;}
+	uint8_t getCommand()             {return _command ;}
+	void    setCommand(uint8_t value){_command = value;}
+	uint8_t getPushActive()             {return _push_active ;}
+	void    setPushActive(uint8_t value){_push_active = value;}
 	// Commond
 	uint8_t getWorkMode(void) { return _work_mode; }
 	void    setWorkMode(uint8_t value){ _work_mode = value; }
-
 	uint8_t getFunctionState(void) { return _function_state; }
 	void    setFunctionState(uint8_t value){ _function_state = value; }
-
-	// Commond
-	uint8_t getPushActive();
-	void    setPushActive(uint8_t value);
-	Property<Terminal,uint8_t,READ_WRITE> PushActive;
-
 private:
 	/// terminal command
 	uint8_t _command;
@@ -142,8 +132,8 @@ private:
 	uint8_t _send_data_buffer[32];
 	uint8_t _frame_id,_frame_length,_frame_cnt,_check_sum;
 	uint8_t _frame_err_cnt;
-	uint8_t _ack_valid;
-	uint8_t _ack_echo;
+	uint8_t _ack_valid = 0;
+	uint8_t _ack_echo  = 0;
 	/// data type conversion
 	Byte2Float _data_temp,_speed_data_temp;
 };

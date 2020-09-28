@@ -76,7 +76,7 @@ Vector2d Vector2d::Orthogonal(const float angle) const
 
 // 航向角为angle的归一化向量
 Vector2d Vector2d::Normalize(const float angle) const{
-//	return Vector2d(cosf(angle),sinf(angle));
+	return Vector2d(cosf(angle),sinf(angle));
 }
 
 Vector2d Vector2d::operator+(const Vector2d& other) const
