@@ -252,7 +252,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 		_cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 		_wait_time_cnt++;
 
-		if (_cumulation_middle_displacement > (2 * WHEEL_PUSLE_RATIO))
+		if (_cumulation_middle_displacement > WHEEL_PUSLE_RATIO)
 		{
 			_pul_update_velocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
 			_err_update_velocity = (_pul_update_velocity - _acc_update_velocity) * 0.1;
@@ -268,9 +268,12 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 				_cumulation_rear_right_pulse = 0;
 				_wait_time_cnt               = 0;
 				_acc_update_velocity         = 0.0f;
+				_err_update_velocity         = 0.0f;
+				_pul_update_velocity         = 0.0f;
 			}
 			else
 			{
+				// TODO 加速计
 				_acc_update_velocity += ((msg.getWheelPulseDirection() == Forward  ?  msg.getLonAcc() :
 									      msg.getWheelPulseDirection() == Backward ? -msg.getLonAcc() : 0.0f)
 									 + _err_update_velocity) * 0.196;
@@ -280,29 +283,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 		msg.setVehicleMiddleSpeed(_acc_update_velocity);
 	}
 	/**************************************************Velocity Checker****************************************/
-	if((msg.getWheelSpeedRearRight() < 1.0e-6f) && (msg.getWheelSpeedRearLeft() < 1.0e-6f))
-	{
-		if(msg.getVehicleMiddleSpeed() > 0.4)
-		{
-			msg.setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
-		}
-		else
-		{
-			msg.setVehicleMiddleSpeedAbnormal(SpeedNormal);
-		}
-	}
-	else
-	{
-		float middle_speed = (msg.getWheelSpeedRearRight() + msg.getWheelSpeedRearLeft()) * 0.5f;
-		if (fabs(msg.getVehicleMiddleSpeed() - middle_speed) > 0.2)
-		{
-			msg.setVehicleMiddleSpeedAbnormal(SpeedAbnormal);
-		}
-		else
-		{
-			msg.setVehicleMiddleSpeedAbnormal(SpeedNormal);
-		}
-	}
+
 	/************************************************** Track Calculate ****************************************/
 	float displacement = (_delta_rear_left_pulse + _delta_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
 	////////////////////////////Delta Displace//////////////////////////////////
