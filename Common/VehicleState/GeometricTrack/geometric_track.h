@@ -57,15 +57,15 @@ private:
 	float _cumulation_middle_displacement;
 
 	float _pul_update_velocity;
+	float _last_pul_update_velocity;
 	float _acc_update_velocity;
 	float _err_update_velocity;
 
+	float _vehicle_velocity_acc;
+	float _pul_update_acc;
+	float _lon_gravity_acc;
 
-//	float _velocity_line_rate;
-//	float _last_velocity_line_rate;
-//	float _err_velocity;
 	uint8_t _wait_time_cnt;
-
 };
 
 #endif /* VEHICLESTATE_GEOMETRICTRACK_GEOMETRIC_TRACK_H_ */

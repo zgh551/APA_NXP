@@ -237,7 +237,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 								   msg.getWheelPulseRearRight()  - _last_rear_right_pulse) : 0;
 	}
 
-	////// select the vehicle speed, wheel speed or pulse speed
+	// select the vehicle speed update source : wheel speed or pulse speed
 	if((msg.getWheelSpeedRearRight() > 2.0f) && (msg.getWheelSpeedRearLeft() > 2.0f))
 	{
 		_cumulation_rear_left_pulse  = 0;
@@ -249,16 +249,32 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 	{
 		_cumulation_rear_left_pulse  += _delta_rear_left_pulse;
 		_cumulation_rear_right_pulse += _delta_rear_right_pulse;
-		_cumulation_middle_displacement = (_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO;
+		_cumulation_middle_displacement = fabs((_cumulation_rear_left_pulse + _cumulation_rear_right_pulse) * 0.5f * WHEEL_PUSLE_RATIO);
 		_wait_time_cnt++;
 
 		if (_cumulation_middle_displacement > WHEEL_PUSLE_RATIO)
 		{
-			_pul_update_velocity = _cumulation_middle_displacement  * 50 /_wait_time_cnt;
-			_err_update_velocity = (_pul_update_velocity - _acc_update_velocity) * 0.1;
+			// Step1: calculate the velocity update by pulse
+			_pul_update_velocity = _cumulation_middle_displacement  * 50.0f / _wait_time_cnt;
+
+			// Step2: calculate the accelerate which update by the pulse velocity
+			_pul_update_acc = (_pul_update_velocity - _last_pul_update_velocity) * 5.1f / _wait_time_cnt;
+
+			// Step3: calculate the velocity error between pulse velocity and the accelerate velocity
+			_err_update_velocity = (_pul_update_velocity - _acc_update_velocity) * 0.1f;
+
+			// Step4: calculate the longitudinal gravity accelerate
+			_lon_gravity_acc = msg.getLonAcc()
+					         -(msg.getWheelSpeedDirection() == Forward  ?  _pul_update_acc :
+					           msg.getWheelSpeedDirection() == Backward ? -_pul_update_acc : 0.0f);
+
+			// initialize the pulse variable and the time count
 			_cumulation_rear_left_pulse  = 0;
 			_cumulation_rear_right_pulse = 0;
 			_wait_time_cnt               = 0;
+
+			// save current pulse velocity for last
+			_last_pul_update_velocity = _pul_update_velocity;
 		}
 		else
 		{
@@ -270,13 +286,16 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 				_acc_update_velocity         = 0.0f;
 				_err_update_velocity         = 0.0f;
 				_pul_update_velocity         = 0.0f;
+				_pul_update_acc              = 0.0f;
+				_lon_gravity_acc             = 0.0f;
 			}
 			else
 			{
-				// TODO 加速计
-				_acc_update_velocity += ((msg.getWheelPulseDirection() == Forward  ?  msg.getLonAcc() :
-									      msg.getWheelPulseDirection() == Backward ? -msg.getLonAcc() : 0.0f)
-									 + _err_update_velocity) * 0.196;
+				_vehicle_velocity_acc = msg.getWheelSpeedDirection() == Forward  ?   msg.getLonAcc() - _lon_gravity_acc  :
+									    msg.getWheelSpeedDirection() == Backward ? -(msg.getLonAcc() - _lon_gravity_acc) : 0.0f;
+				// TODO 加速计补偿
+				_acc_update_velocity += (_vehicle_velocity_acc + _err_update_velocity) * 0.196; // acc * g(9.8 [m/s^2]) * dt(0.02 [s])
+
 				_acc_update_velocity = _acc_update_velocity < 1.0e-6f ? 0.0f : _acc_update_velocity;
 			}
 		}
