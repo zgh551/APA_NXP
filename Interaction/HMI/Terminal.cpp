@@ -343,8 +343,9 @@ void Terminal::Push(MessageManager &msg)
 	m_CAN_Packet.data[4] =  temp_uint16 & 0xff;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff;
 	m_CAN_Packet.data[6] = msg.getActualGear();
-	m_CAN_Packet.data[7] = (msg.getWheelPulseDirection() & 0x03)
-			| ((msg.getSystemReadyStatus()    & 0x01) << 2)| ((msg.getAutoDriverModeStatus() & 0x01) << 3);
+	m_CAN_Packet.data[7] = (msg.getWheelSpeedDirection() & 0x03)
+			             | ((msg.getSystemReadyStatus()    & 0x01) << 2)
+						 | ((msg.getAutoDriverModeStatus() & 0x01) << 3);
 	CAN2_TransmitMsg(m_CAN_Packet);
 
 	// 车速状态反馈

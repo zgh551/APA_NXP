@@ -6,8 +6,9 @@
  */
 
 #include "geely_jihe_message.h"
+#include "../../../Common/Math/crc_compute.h"
 
-
+CRC8 rec_crc8(CRC8::eAUTOSAR);
 GeelyJiHeMessage::GeelyJiHeMessage() {
 	// TODO Auto-generated constructor stub
 }
@@ -19,11 +20,13 @@ GeelyJiHeMessage::~GeelyJiHeMessage() {
 void GeelyJiHeMessage::Init()
 {
 	_index = 29;
+	_crc_err_cnt = 0;
+	_crc_suc_cnt = 0;
 }
 
 void GeelyJiHeMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32_t lenght)
 {
-//	uint8_t crc_temp,i;
+	uint8_t crc_temp;
 //	uint8_t dat_temp[7];
 	switch(id)
 	{
@@ -49,38 +52,74 @@ void GeelyJiHeMessage::Parse(const uint32_t id,const vuint8_t *dat,const vuint32
 			break;
 
 		case 0x123:// wheel speed
-			switch((uint8_t)(dat[1] >> 1) & 0x03)
+			crc_temp = rec_crc8.crcCompute((uint8_t*)dat, 7);
+			if(crc_temp == dat[7])
 			{
-				case 0:
-					this->setWheelSpeedDirection(StandStill);
-					break;
-				case 1:
-					this->setWheelSpeedDirection(Forward);
-					break;
-				case 2:
-					this->setWheelSpeedDirection(Backward);
-					break;
-				case 3:
-					this->setWheelSpeedDirection(Invalid);
-					break;
+				switch((uint8_t)(dat[1] >> 1) & 0x03)
+				{
+					case 0:
+						this->setWheelSpeedDirection(StandStill);
+						break;
+					case 1:
+						this->setWheelSpeedDirection(Forward);
+						break;
+					case 2:
+						this->setWheelSpeedDirection(Backward);
+						break;
+					case 3:
+						this->setWheelSpeedDirection(Invalid);
+						break;
 
-				default:
-					this->setWheelSpeedDirection(Invalid);
-					break;
+					default:
+						this->setWheelSpeedDirection(Invalid);
+						break;
+				}
+
+				this->setWheelSpeedRearLeftValid ((dat[1] & 0x01) == 0 ? DataValid : DataInvalid );
+				this->setWheelSpeedRearRightValid((dat[3] & 0x01) == 0 ? DataValid : DataInvalid );
+
+				if (DataValid == this->getWheelSpeedRearLeftValid())
+				{
+					this->setWheelSpeedRearLeft (((uint16_t)( (dat[0] << 5) | (dat[1] >> 3))) * V_M_S);
+				}
+				else
+				{
+					_crc_err_cnt++;
+				}
+
+				if (DataValid == this->getWheelSpeedRearRightValid())
+				{
+					this->setWheelSpeedRearRight(((uint16_t)( (dat[2] << 5) | (dat[3] >> 3))) * V_M_S);
+				}
+				else
+				{
+					_crc_err_cnt++;
+				}
 			}
-			this->setWheelSpeedRearLeft (((uint16_t)( (dat[0] << 5) | (dat[1] >> 3))) * V_M_S);
-			this->setWheelSpeedRearRight(((uint16_t)( (dat[2] << 5) | (dat[3] >> 3))) * V_M_S);
+			else
+			{
+				_crc_err_cnt++;
+			}
 			break;
 
 		case 0x124://Wheel speed pulse
-//			crc_temp = crc8.crcCompute((uint8_t*)dat, 7);
-//			if(crc_temp == dat[7])
-//			{
-			this->setWheelPulseFrontLeft ((uint16_t)(( (dat[0] << 4) | (dat[1] >> 4)) & 0x0fff));
-			this->setWheelPulseFrontRight((uint16_t)(( (dat[1] << 8) |  dat[2]      ) & 0x0fff));
-			this->setWheelPulseRearLeft  ((uint16_t)(( (dat[3] << 4) | (dat[4] >> 4)) & 0x0fff));
-			this->setWheelPulseRearRight ((uint16_t)(( (dat[4] << 8) |  dat[5]      ) & 0x0fff));
-//			}
+			crc_temp = rec_crc8.crcCompute((uint8_t*)dat, 7);
+			if(crc_temp == dat[7])
+			{
+				this->setWheelPulseFrontLeftValid ( (dat[6]       & 0x01) == 0 ? DataValid : DataInvalid);
+				this->setWheelPulseFrontRightValid(((dat[6] >> 1) & 0x01) == 0 ? DataValid : DataInvalid);
+				this->setWheelPulseRearLeftValid  (((dat[6] >> 2) & 0x01) == 0 ? DataValid : DataInvalid);
+				this->setWheelPulseRearRightValid (((dat[6] >> 3) & 0x01) == 0 ? DataValid : DataInvalid);
+
+				this->setWheelPulseFrontLeft ((uint16_t)(( (dat[0] << 4) | (dat[1] >> 4)) & 0x0fff));
+				this->setWheelPulseFrontRight((uint16_t)(( (dat[1] << 8) |  dat[2]      ) & 0x0fff));
+				this->setWheelPulseRearLeft  ((uint16_t)(( (dat[3] << 4) | (dat[4] >> 4)) & 0x0fff));
+				this->setWheelPulseRearRight ((uint16_t)(( (dat[4] << 8) |  dat[5]      ) & 0x0fff));
+			}
+			else
+			{
+				_crc_err_cnt++;
+			}
 			break;
 
 		// ESC

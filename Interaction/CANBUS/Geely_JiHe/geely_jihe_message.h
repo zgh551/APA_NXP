@@ -22,6 +22,8 @@ public:
 private:
 	float fifo_steering_angle_array[64];
 	int16_t _index;
+	uint16_t _crc_err_cnt;
+	uint16_t _crc_suc_cnt;
 
 };
 

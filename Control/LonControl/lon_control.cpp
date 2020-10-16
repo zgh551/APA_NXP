@@ -148,10 +148,6 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 		&&  (ctl.getVelocity() > 1.0e-6f)
 		&&  (ctl.getDistance() > 1.0e-6f))
 		{
-			ctl.setJerkMax(START_ACC);
-			ctl.setJerkMin(START_ACC);
-			ctl.setAccUpperLimit(START_ACC);
-			ctl.setAccLowerLimit(START_ACC);
 			_pid_slow_start_acc = 0;
 			_lon_control_state = LON_Starting;
 		}
@@ -164,8 +160,6 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 	case LON_Starting:
 		if (_actual_velocity > ctl.getVelocity())
 		{
-			ctl.setJerkMax( 15.0);
-			ctl.setJerkMin(-15.0);
 			_lon_control_state = LON_Running;
 		}
 		else
@@ -174,13 +168,15 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 			{
 				velocity_pid.setDesired(VelocityControl(ctl.getDistance(), ctl.getVelocity()));
 				_pid_acc = velocity_pid.pidUpdate(_actual_velocity);
-				_pid_slow_start_acc += 0.1 * DT;
+				_pid_slow_start_acc += 0.1f * DT;
 				_pid_slow_start_acc = _pid_slow_start_acc > _pid_acc ? _pid_acc : _pid_slow_start_acc;
 				ctl.setTargetAcceleration(_pid_slow_start_acc);
+				ctl.setJerkMax(0.1f);
+				ctl.setJerkMin(0.1f);
 				ctl.setAccUpperLimit(ctl.getTargetAcceleration() + 0.6f);
 				ctl.setAccLowerLimit(ctl.getTargetAcceleration() - 0.6f);
 			}
-			else
+			else // user brake
 			{
 				_lon_control_state = LON_WaitStart;
 			}
@@ -200,8 +196,8 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 			|| (1 == msg.getBrakePedalSts())
 			|| (0 == ctl.getAPAEnable()))
 			{
-				ctl.setJerkMax( 1.0);
-				ctl.setJerkMin(-1.0);
+				ctl.setJerkMax( 5.0);
+				ctl.setJerkMin(-5.0);
 				_brake_distance = ctl.getDistance();
 				_brake_left_rear_pulse  = msg.getWheelPulseRearLeft();
 				_brake_right_rear_pulse = msg.getWheelPulseRearLeft();

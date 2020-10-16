@@ -64,16 +64,14 @@ extern void xcptn_xmpl(void);
 }
 #endif
 
-/****************System Variable******************/
+/************************ System Variable ***************************/
 Terminal m_Terminal_CA;
 Ultrasonic m_Ultrasonic;
 GeometricTrack m_GeometricTrack;
 LonControl m_LonControl;
 LatControl m_LatControl;
-//TrackLinkList *_target_curvature_data_sets;
-//TargetTrack temp_node;
-//TargetTrack end_node;
-/**********************************************************************/
+
+/************************* PID ***************************************/
 #ifdef BORUI
 //閫熷害PID鍙傛暟
 PID m_VelocityUpdatePID  = PID(0.02,0.01f,0.0f,0.0f,0.0f,1,0.2);
