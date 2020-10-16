@@ -74,7 +74,7 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.787893183" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot.1586596728" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.834105378" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.1455203439" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1455203439" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2119477656" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.1554395871" name="Standard S32DS C Linker" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker">
@@ -344,6 +344,7 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.1925636988" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot.704001005" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.1396323309" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.c.compiler.option.target.libraries.ewl_c9x_c" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.458547983" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1032990915" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.543942476" name="Standard S32DS C++ Compiler" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler">
@@ -367,6 +368,7 @@
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.833615796" name="Target Processor" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family" useByScannerDiscovery="true" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.family.e200z4" valueType="enumerated"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot.183622171" name="Sysroot" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${VLE_EWL_DIR}&quot;" valueType="string"/>
 								<option id="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.869930749" superClass="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries" useByScannerDiscovery="false" value="com.freescale.s32ds.cross.gnu.e200.tool.cpp.compiler.option.target.libraries.ewl_c9x_c++_noio" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.80087943" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1616868664" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="com.freescale.s32ds.cross.gnu.e200.tool.c.linker.660935319" name="Standard S32DS C Linker" superClass="com.freescale.s32ds.cross.gnu.e200.tool.c.linker">
@@ -430,7 +432,12 @@
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.e200.exe.Debug_RAM.Project_Settings/Debugger/APA_Control_Debug.launch" name="APA_Control_Debug.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/APA_Control_Debug.launch" toolsToInvoke=""/>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Common"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Control"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Driver"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Interaction"/>
 						<entry excluding="Linker_Files/57xx_flash.ld|Debugger/APA_Control_Debug.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="main"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
