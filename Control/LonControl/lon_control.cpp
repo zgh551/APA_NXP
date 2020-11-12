@@ -253,7 +253,7 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 			_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_actual_velocity, _remain_distance);
 			_vehicle_stop_acc_acc = _vehicle_stop_acc_acc < -25.0f ? -25.0f : _vehicle_stop_acc_acc;
 			_vehicle_stop_acc    += _vehicle_stop_acc_acc * DT;
-			_vehicle_stop_acc     = _vehicle_stop_acc < -2.0f ? -2.0f : _vehicle_stop_acc;
+			_vehicle_stop_acc     = _vehicle_stop_acc < -0.6f ? -0.6f : _vehicle_stop_acc;
 
 			ctl.setTargetAcceleration(_vehicle_stop_acc);
 			ctl.setJerkMax( 15.0);
