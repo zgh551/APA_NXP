@@ -131,7 +131,7 @@ void VehicleController::SteeringAngleControl(float dt)
 
 	float delta_angle      = fabs(this->getSteeringAngleRate()) * dt;
 	float left_band_angle  = this->getSteeringAngle() - delta_angle;
-	float right_band_angle = this->getSteeringAngle() - delta_angle;
+	float right_band_angle = this->getSteeringAngle() + delta_angle;
 
 	if (steering_angle_valid_request_ < left_band_angle)
 	{
@@ -175,30 +175,32 @@ void VehicleController::SteeringAngleControl(float dt,float actual_steering)
 
 	float delta_angle      = fabs(this->getSteeringAngleRate()) * (0.1 + dt);
 	float left_band_angle  = this->getSteeringAngle() - delta_angle;
-	float right_band_angle = this->getSteeringAngle() - delta_angle;
+	float right_band_angle = this->getSteeringAngle() + delta_angle;
 
-	if (steering_angle_valid_request_ < left_band_angle)
+	if (actual_steering < left_band_angle)
 	{
 		steering_angle_valid_request_ = actual_steering + delta_angle;
 	}
-	else if (steering_angle_valid_request_ > right_band_angle)
+	else if (actual_steering > right_band_angle)
 	{
 		steering_angle_valid_request_ = actual_steering - delta_angle;
 	}
 	else
 	{
-		if (actual_steering < left_band_angle)
-		{
-			steering_angle_valid_request_ = actual_steering + delta_angle;
-		}
-		else if (actual_steering > right_band_angle)
-		{
-			steering_angle_valid_request_ = actual_steering - delta_angle;
-		}
-		else
-		{
-			steering_angle_valid_request_  = this->getSteeringAngle();
-		}
+		steering_angle_valid_request_  = this->getSteeringAngle();
+	}
+
+	if (steering_angle_valid_request_ > MAX_STEERING_ANGLE)
+	{
+		steering_angle_valid_request_ = MAX_STEERING_ANGLE;
+	}
+	else if (steering_angle_valid_request_ < -MAX_STEERING_ANGLE)
+	{
+		steering_angle_valid_request_ = -MAX_STEERING_ANGLE;
+	}
+	else
+	{
+		// Do Nothing
 	}
 }
 /// ACC

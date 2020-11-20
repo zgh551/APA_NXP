@@ -25,6 +25,17 @@ private:
 	uint16_t _crc_err_cnt;
 	uint16_t _crc_suc_cnt;
 
+	uint8_t _can_rx_id_0x122[8];//over the speed
+	uint8_t _can_rx_id_0x123[8];//over the speed
+	uint8_t _can_rx_id_0x125[8];//over the speed
+	uint8_t _can_rx_id_0x1B0[8];// no
+	uint8_t _can_rx_id_0x26D[8];
+	uint8_t _can_rx_id_0x3F1[8];
+	uint8_t _can_rx_id_0x1A5[8];
+	uint8_t _can_rx_id_0xA6[8];
+	uint8_t _can_rx_id_0x165[8];
+
+
 };
 
 #endif /* CANBUS_BORUI_BO_RUI_MESSAGE_H_ */

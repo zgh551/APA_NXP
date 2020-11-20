@@ -88,6 +88,7 @@ void GeelyJiHeController::VehicleControl(void)
 	m_CAN_Packet.data[6] = rolling_counter_ & 0x0f;
 	m_CAN_Packet.data[7] = _crc8.crcCompute(m_CAN_Packet.data, 7);
 	CAN0_TransmitMsg(m_CAN_Packet);
+	CAN1_TransmitMsg(m_CAN_Packet);
 
 	// 0x191: APA system checker
 	m_CAN_Packet.id = 0x191;
@@ -101,6 +102,7 @@ void GeelyJiHeController::VehicleControl(void)
 	m_CAN_Packet.data[6] = rolling_counter_ & 0x0f;
 	m_CAN_Packet.data[7] = _crc8.crcCompute(m_CAN_Packet.data, 7);
 	CAN0_TransmitMsg(m_CAN_Packet);
+	CAN1_TransmitMsg(m_CAN_Packet);
 
 	// 0x135: Lower speed parking control
 	m_CAN_Packet.id = 0x135;
@@ -145,7 +147,24 @@ void GeelyJiHeController::VehicleControl(void)
 	CAN0_TransmitMsg(m_CAN_Packet);
 }
 
+void GeelyJiHeController::EPS_Push(void)
+{
+	CAN_Packet m_CAN_Packet;
+	m_CAN_Packet.length = 8;
 
+	// 0x190: EPS Control ID
+	m_CAN_Packet.id = 0x190;
+	/// Data Mapping
+	m_CAN_Packet.data[0] = 0;
+	m_CAN_Packet.data[1] = 0;
+	m_CAN_Packet.data[2] = 0;
+	m_CAN_Packet.data[3] = (eps_request_ & 0x03) << 3;
+	m_CAN_Packet.data[4] = steering_angle_request_ >> 8;
+	m_CAN_Packet.data[5] = steering_angle_request_;
+	m_CAN_Packet.data[6] = rolling_counter_ & 0x0f;
+	m_CAN_Packet.data[7] = _crc8.crcCompute(m_CAN_Packet.data, 7);
+	CAN0_TransmitMsg(m_CAN_Packet);
+}
 void GeelyJiHeController::EPS_StateMachine(MessageManager& msg)
 {
 	switch(_eps_control_state)

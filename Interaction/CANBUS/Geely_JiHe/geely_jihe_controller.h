@@ -45,6 +45,9 @@ public:
 
 	// push the command to the vehicle
 	void DataPush(void) override;
+
+	// push eps information
+	void EPS_Push(void);
 protected:
 	// CAN data send
 	void VehicleControl(void);
@@ -52,6 +55,7 @@ protected:
 	void EPS_StateMachine(MessageManager& msg);
 	void VCU_StateMachine(MessageManager& msg);
 	void ESC_StateMachine(MessageManager& msg);
+
 private:
 	// EPS State
 	EPS_ControlState _eps_control_state;
