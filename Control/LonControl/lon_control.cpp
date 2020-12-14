@@ -171,8 +171,8 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 				_pid_slow_start_acc += 0.1f * DT;
 				_pid_slow_start_acc = _pid_slow_start_acc > _pid_acc ? _pid_acc : _pid_slow_start_acc;
 				ctl.setTargetAcceleration(_pid_slow_start_acc);
-				ctl.setJerkMax(0.1f);
-				ctl.setJerkMin(0.1f);
+				ctl.setJerkMax(5.0f);
+				ctl.setJerkMin(5.0f);
 				ctl.setAccUpperLimit(ctl.getTargetAcceleration() + 0.6f);
 				ctl.setAccLowerLimit(ctl.getTargetAcceleration() - 0.6f);
 			}

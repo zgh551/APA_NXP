@@ -88,7 +88,7 @@ void GeelyJiHeController::VehicleControl(void)
 	m_CAN_Packet.data[6] = rolling_counter_ & 0x0f;
 	m_CAN_Packet.data[7] = _crc8.crcCompute(m_CAN_Packet.data, 7);
 	CAN0_TransmitMsg(m_CAN_Packet);
-	CAN1_TransmitMsg(m_CAN_Packet);
+//	CAN1_TransmitMsg(m_CAN_Packet);
 
 	// 0x191: APA system checker
 	m_CAN_Packet.id = 0x191;
@@ -102,7 +102,7 @@ void GeelyJiHeController::VehicleControl(void)
 	m_CAN_Packet.data[6] = rolling_counter_ & 0x0f;
 	m_CAN_Packet.data[7] = _crc8.crcCompute(m_CAN_Packet.data, 7);
 	CAN0_TransmitMsg(m_CAN_Packet);
-	CAN1_TransmitMsg(m_CAN_Packet);
+//	CAN1_TransmitMsg(m_CAN_Packet);
 
 	// 0x135: Lower speed parking control
 	m_CAN_Packet.id = 0x135;
@@ -165,6 +165,8 @@ void GeelyJiHeController::EPS_Push(void)
 	m_CAN_Packet.data[7] = _crc8.crcCompute(m_CAN_Packet.data, 7);
 	CAN0_TransmitMsg(m_CAN_Packet);
 }
+
+
 void GeelyJiHeController::EPS_StateMachine(MessageManager& msg)
 {
 	switch(_eps_control_state)
@@ -178,7 +180,7 @@ void GeelyJiHeController::EPS_StateMachine(MessageManager& msg)
 		else
 		{
 			eps_request_            = 0; // no request
-			steering_angle_request_ = 0; // init steering angle
+			steering_angle_request_ = static_cast<int16_t>(msg.getSteeringAngle() * 10); // init steering angle
 		}
 		break;
 
@@ -195,7 +197,7 @@ void GeelyJiHeController::EPS_StateMachine(MessageManager& msg)
 			}
 			else
 			{
-				_eps_timeout++;
+				++_eps_timeout;
 				eps_request_            = 1; // eps request
 				steering_angle_request_ = static_cast<int16_t>(msg.getSteeringAngle() * 10);
 			}
@@ -240,7 +242,7 @@ void GeelyJiHeController::EPS_StateMachine(MessageManager& msg)
 			}
 			else
 			{
-				_eps_timeout++;
+				++_eps_timeout;
 				eps_request_ = 0; // no request
 			}
 		}
@@ -692,6 +694,7 @@ void GeelyJiHeController::WorkStateMachine(MessageManager& msg)
 	EPS_StateMachine(msg);
 	VCU_StateMachine(msg);
 	ESC_StateMachine(msg);
+//	SteeringAngleControl(0.02f);
 	SteeringAngleControl(0.02f, msg.getSteeringAngle());
 }
 

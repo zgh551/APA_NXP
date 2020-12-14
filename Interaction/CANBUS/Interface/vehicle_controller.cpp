@@ -147,12 +147,74 @@ void VehicleController::SteeringAngleControl(float dt)
 	}
 }
 
+//void VehicleController::SteeringAngleControl(float dt,float actual_steering)
+//{
+//	// limit the steering angle rate
+//	if (fabs(this->getSteeringAngleRate()) > MAX_STEERING_ANGLE_RATE)
+//	{
+//		this->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
+//	}
+//	else
+//	{
+//		// do nothing
+//	}
+//
+//	// limit the steering angle
+//	if (this->getSteeringAngle() > MAX_STEERING_ANGLE)
+//	{
+//		this->setSteeringAngle(MAX_STEERING_ANGLE);
+//	}
+//	else if (this->getSteeringAngle() < -MAX_STEERING_ANGLE)
+//	{
+//		this->setSteeringAngle(-MAX_STEERING_ANGLE);
+//	}
+//	else
+//	{
+//		// Do Nothing
+//	}
+//
+//	float delta_angle      = fabs(this->getSteeringAngleRate()) * (0.1 + dt);
+//	float left_band_angle  = this->getSteeringAngle() - delta_angle;
+//	float right_band_angle = this->getSteeringAngle() + delta_angle;
+//
+//	if (actual_steering < left_band_angle)
+//	{
+//		steering_angle_valid_request_ = actual_steering + delta_angle;
+//	}
+//	else if (actual_steering > right_band_angle)
+//	{
+//		steering_angle_valid_request_ = actual_steering - delta_angle;
+//	}
+//	else
+//	{
+//		steering_angle_valid_request_  = this->getSteeringAngle();
+//	}
+//
+//	if (steering_angle_valid_request_ > MAX_STEERING_ANGLE)
+//	{
+//		steering_angle_valid_request_ = MAX_STEERING_ANGLE;
+//	}
+//	else if (steering_angle_valid_request_ < -MAX_STEERING_ANGLE)
+//	{
+//		steering_angle_valid_request_ = -MAX_STEERING_ANGLE;
+//	}
+//	else
+//	{
+//		// Do Nothing
+//	}
+//}
+
+
 void VehicleController::SteeringAngleControl(float dt,float actual_steering)
 {
 	// limit the steering angle rate
 	if (fabs(this->getSteeringAngleRate()) > MAX_STEERING_ANGLE_RATE)
 	{
 		this->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
+	}
+	else if (this->getSteeringAngleRate() < 0.0f)
+	{
+		this->setSteeringAngleRate(-this->getSteeringAngleRate());
 	}
 	else
 	{
@@ -173,21 +235,35 @@ void VehicleController::SteeringAngleControl(float dt,float actual_steering)
 		// Do Nothing
 	}
 
-	float delta_angle      = fabs(this->getSteeringAngleRate()) * (0.1 + dt);
+	float delta_angle      = this->getSteeringAngleRate() * dt;
 	float left_band_angle  = this->getSteeringAngle() - delta_angle;
 	float right_band_angle = this->getSteeringAngle() + delta_angle;
 
-	if (actual_steering < left_band_angle)
+	if (steering_angle_valid_request_ < left_band_angle)
 	{
-		steering_angle_valid_request_ = actual_steering + delta_angle;
+		steering_angle_valid_request_ = steering_angle_valid_request_ + delta_angle;
 	}
-	else if (actual_steering > right_band_angle)
+	else if (steering_angle_valid_request_ > right_band_angle)
 	{
-		steering_angle_valid_request_ = actual_steering - delta_angle;
+		steering_angle_valid_request_ = steering_angle_valid_request_ - delta_angle;
 	}
 	else
 	{
 		steering_angle_valid_request_  = this->getSteeringAngle();
+	}
+
+	// actual steering angle restriction
+	if ((steering_angle_valid_request_ - actual_steering) > 100)
+	{
+		steering_angle_valid_request_ = actual_steering + 100;
+	}
+	else if ((steering_angle_valid_request_ - actual_steering) < -100)
+	{
+		steering_angle_valid_request_ = actual_steering - 100;
+	}
+	else
+	{
+		// do nothing;
 	}
 
 	if (steering_angle_valid_request_ > MAX_STEERING_ANGLE)
@@ -203,6 +279,8 @@ void VehicleController::SteeringAngleControl(float dt,float actual_steering)
 		// Do Nothing
 	}
 }
+
+
 /// ACC
 float VehicleController::getTargetAcceleration()           { return _target_acceleration;}
 void  VehicleController::setTargetAcceleration(float value){_target_acceleration = value;}
