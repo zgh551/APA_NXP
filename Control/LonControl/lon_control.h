@@ -17,10 +17,10 @@
 #include "../../Common/Math/interpolation.h"
 
 /**************************速度控制******************************/
-#define MAX_POSITION            ( 0.9 ) // 速度控制上限点
-#define MIN_POSITION            ( 0.4 ) // 速度控制下限点
-#define MAX_VELOCITY	  		( 1.0 ) // 直线段的速度
-#define MIN_VELOCITY	      	( 0.3 ) // 曲线段的速度
+#define MAX_POSITION            ( 1.0  ) // 速度控制上限位置
+#define MIN_POSITION            ( 0.05 ) // 速度控制下限位置
+#define MAX_VELOCITY	  		( 1.0  ) // 直线段的速度
+#define MIN_VELOCITY	      	( 0.1  ) // 曲线段的速度
 /**************************加速度控制******************************/
 #define START_ACC               ( 0.2f  ) // 车辆起步时的正向加速度
 #define DT                      ( 0.02f ) // 控制时间间隔
@@ -34,6 +34,7 @@ typedef enum _Lon_VelocityControlState
 typedef enum _LonControlState
 {
 	LON_WaitStart = 0,
+	LON_ShortStart,
 	LON_Starting,
 	LON_Running,
 	LON_EmergencyBrake,
@@ -63,6 +64,7 @@ public:
 	float VelocityControl(float distance,float velocity);
 	float AcceleratePlanningControl(float cur_velocity,float stop_distance);
 	float AccAcceleratePlanningControl(float cur_velocity,float stop_distance);
+	float AccAccelerateStartControl(float cur_velocity,float stop_distance);
 
 	float getControlStateFlag();
 	void  setControlStateFlag(float value);
@@ -89,7 +91,6 @@ private:
 	float _delta_velocity;
 	float _distance_update_distance_value;
 	float _variable_distance_value;
-	float _delta_distance;
 	float _distance_update_pulse_value;
 
 	// Start
@@ -98,17 +99,22 @@ private:
 
 	// braking,update the current distance or pulse
 	float _brake_distance;
-	uint16_t _brake_left_rear_pulse;
-	uint16_t _brake_right_rear_pulse;
+	uint16_t _last_pulse_rear_left;
+	uint16_t _last_pulse_rear_right;
 
 
+	float _delta_distance ; // the delta distance
+	float _change_distance; // the change distance
 	float _update_distance; // the update distance
 	float _remain_distance; // the remain distance
 
-	uint16_t _delta_left_rear_pulse; // the change number of left rear pulse
-	uint16_t _delta_right_rear_pulse;// the change number of right rear pulse
+	uint16_t _delta_pulse_rear_left; // the change number of left rear pulse
+	uint16_t _delta_pulse_rear_right;// the change number of right rear pulse
 
 	// the accelerate of vehicle stop
+	float _vehicle_start_acc;
+	float _vehicle_start_acc_acc;
+
 	float _vehicle_stop_acc;
 	float _vehicle_stop_acc_acc;
 	float _vehicle_slow_down_acc;
