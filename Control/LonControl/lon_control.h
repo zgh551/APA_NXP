@@ -99,7 +99,7 @@ private:
 	float _pid_slow_start_acc;
 
 	// braking,update the current distance or pulse
-	float _brake_distance;
+	float _brake_distance = 0.0f;
 	uint16_t _last_pulse_rear_left;
 	uint16_t _last_pulse_rear_right;
 
