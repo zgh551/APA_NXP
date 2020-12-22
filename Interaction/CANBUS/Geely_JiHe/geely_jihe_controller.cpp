@@ -523,54 +523,30 @@ void GeelyJiHeController::ESC_StateMachine(MessageManager& msg)
 				}
 				else
 				{
-					if (this->getDistance() < 1.0e-6f)
+					if (this->getRemainMoveDistance() < 1.0e-6f)
 					{
 						stop_distance_ = 0.0f;
 					}
 					else
 					{
-						stop_distance_ = static_cast<uint8_t>(this->getDistance() * 100); // cm
+						stop_distance_ = static_cast<uint8_t>(this->getRemainMoveDistance() * 100); // cm
 					}
 
 					// velocity is zero
-					if (this->getVelocity() < 1.0e-6f)
+					if ((ControlBrake == this->getControlMode()) || (1 == msg.getBrakePedalSts()))
 					{
-						if ((msg.getVehicleMiddleSpeed() < 1.0e-6f)
-						&& (StandStill == msg.getWheelPulseDirection()))
-						{
-							vlc_mode_request_        = 6; // 0x136: StandStill Mode (Lower Speed)
-							standstill_request_      = 1; // 0x136: Request
-						}
-						else
-						{
-							vlc_mode_request_        = 4; // 0x136: Brake Only Mode (Lower Speed)
-							standstill_request_      = 1; // 0x136: Request
-						}
+						// 0x136: StandStill Mode[6] <---> Brake Only Mode[4](Lower Speed)
+						vlc_mode_request_   = (StandStill == msg.getWheelSpeedDirection()) ? 6 : 4;
+						standstill_request_ = 1; // 0x136: Request
 					}
 					else
 					{
-						if (1 == msg.getBrakePedalSts())
-						{
-							if (msg.getVehicleMiddleSpeed() < 1.0e-6f)
-							{
-								vlc_mode_request_        = 6; // 0x136: StandStill Mode (Lower Speed)
-								standstill_request_      = 1; // 0x136: Request
-							}
-							else
-							{
-								vlc_mode_request_        = 4; // 0x136: Brake Only Mode (Lower Speed)
-								standstill_request_      = 1; // 0x136: Request
-							}
-						}
-						else
-						{
-							vlc_mode_request_        = 3; // 0x136: On Mode (Lower Speed)
-							standstill_request_      = 0; // 0x136: Request
-						}
+						vlc_mode_request_        = 3; // 0x136: On Mode (Lower Speed)
+						standstill_request_      = 0; // 0x136: No Request
 					}
 
 					// the driver off request
-					driver_off_request_ = (msg.getVehicleMiddleSpeed() < 1.0e-6f) ? 1 : 0;
+					driver_off_request_ = (StandStill == msg.getWheelSpeedDirection()) ? 1 : 0;
 
 					// the accelerate and decelerate update, the range is [-5, 1.5]m/s2 (lower speed)
 					esc_target_acceleration_request_ = (this->getTargetAcceleration() >  1.5f) ? 130:
