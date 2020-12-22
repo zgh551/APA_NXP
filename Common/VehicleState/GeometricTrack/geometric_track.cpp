@@ -264,9 +264,10 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager &msg)
 			_err_update_velocity = (_pul_update_velocity - _acc_update_velocity) * 0.1f;
 
 			// Step4: calculate the longitudinal gravity accelerate
-			_lon_gravity_acc = msg.getLonAcc()
-					         -(msg.getWheelSpeedDirection() == Forward  ?  _pul_update_acc :
-					           msg.getWheelSpeedDirection() == Backward ? -_pul_update_acc : 0.0f);
+			_lon_gravity_acc = 0.0f;
+//			_lon_gravity_acc = msg.getLonAcc()
+//					         -(msg.getWheelSpeedDirection() == Forward  ?  _pul_update_acc :
+//					           msg.getWheelSpeedDirection() == Backward ? -_pul_update_acc : 0.0f);
 
 			// initialize the pulse variable and the time count
 			_cumulation_rear_left_pulse  = 0;
