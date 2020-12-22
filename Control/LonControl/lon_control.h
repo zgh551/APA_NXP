@@ -12,8 +12,8 @@
 #ifndef LONCONTROL_LON_CONTROL_H_
 #define LONCONTROL_LON_CONTROL_H_
 
-#include "../Interface/controller.h"
 #include "math.h"
+#include "../Interface/controller.h"
 #include "../../Common/Math/interpolation.h"
 
 /**************************速度控制******************************/
@@ -63,8 +63,9 @@ public:
 	float VelocityPlanningControl(float distance);
 	float VelocityControl(float distance,float velocity);
 	float AcceleratePlanningControl(float cur_velocity,float stop_distance);
-	float AccAcceleratePlanningControl(float cur_velocity,float stop_distance);
-	float AccAccelerateStartControl(float cur_velocity,float stop_distance);
+
+	float AccAccelerateControlStop(float cur_velocity,float stop_distance);
+	float AccAccelerateControlStart(float cur_velocity,float stop_distance);
 
 	float getControlStateFlag();
 	void  setControlStateFlag(float value);
@@ -102,6 +103,9 @@ private:
 	uint16_t _last_pulse_rear_left;
 	uint16_t _last_pulse_rear_right;
 
+    float _init_stop_velocity;
+    float _teory_velocity;
+    uint16_t _init_time_count = 0;
 
 	float _delta_distance ; // the delta distance
 	float _change_distance; // the change distance

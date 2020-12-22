@@ -83,7 +83,7 @@ float LonControl::AcceleratePlanningControl(float cur_velocity,float stop_distan
 	}
 }
 
-float LonControl::AccAcceleratePlanningControl(float cur_velocity,float stop_distance)
+float LonControl::AccAccelerateControlStop(float cur_velocity,float stop_distance)
 {
 	if((cur_velocity < 1.0e-6f) || (stop_distance < 1.0e-6f))
 	{
@@ -95,7 +95,7 @@ float LonControl::AccAcceleratePlanningControl(float cur_velocity,float stop_dis
 	}
 }
 
-float LonControl::AccAccelerateStartControl(float tar_velocity,float start_distance)
+float LonControl::AccAccelerateControlStart(float tar_velocity,float start_distance)
 {
 	if((tar_velocity < 1.0e-6f) || (start_distance < 1.0e-6f))
 	{
@@ -188,7 +188,7 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 			}
 			_brake_distance        = ctl.getDistance();
 			_update_distance       = 0;
-			_vehicle_start_acc_acc = AccAccelerateStartControl(VelocityPlanningControl(_change_distance), _change_distance);
+			_vehicle_start_acc_acc = AccAccelerateControlStart(VelocityPlanningControl(_change_distance), _change_distance);
 			ctl.setTargetAcceleration(_vehicle_start_acc);
 			ctl.setJerkMax(_vehicle_start_acc_acc); // max = 25 m/s3
 			ctl.setJerkMin(-25.0f);
@@ -212,12 +212,13 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 			if (0 == msg.getBrakePedalSts())
 			{
 				_vehicle_start_acc += _vehicle_start_acc_acc * DT;
-				ctl.setTargetAcceleration(_vehicle_start_acc);
+                _vehicle_start_acc  = _vehicle_start_acc > 0.5f ? 0.5f : _vehicle_start_acc;
 			}
 			else // user brake
 			{
-				ctl.setTargetAcceleration(0.0f);
+				_vehicle_start_acc = 0.0f;
 			}
+            ctl.setTargetAcceleration(_vehicle_start_acc);
 			ctl.setJerkMax(_vehicle_start_acc_acc);
 			ctl.setJerkMin(-25.0f);
 		}
@@ -228,16 +229,26 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 		{
 			_remain_distance  = (_brake_distance - _update_distance) > 1.0e-6f
 					          ? (_brake_distance - _update_distance) : 0.0f;
-			_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_actual_velocity, _remain_distance); // decleration accelerate calculate
+            _init_stop_velocity   = _actual_velocity;
+            _init_time_count      = 0;
+            _vehicle_stop_acc_acc = AccAccelerateControlStop(_init_stop_velocity, _remain_distance); // decleration accelerate calculate
 			_vehicle_stop_acc     = 0.0f;
 			ctl.setTargetAcceleration(_vehicle_stop_acc);
 			ctl.setJerkMax(25.0f); // max = 25 m/s3
 			ctl.setJerkMin(_vehicle_stop_acc_acc); // min = -25 m/s3
+            _lon_control_state = LON_ComfortBrake;
 		}
 		else
 		{
-			_vehicle_start_acc += _vehicle_start_acc_acc * DT;
-			_vehicle_start_acc  = _vehicle_start_acc > 0.5f ? 0.5f : _vehicle_start_acc;
+            if (0 == msg.getBrakePedalSts())
+			{
+				_vehicle_start_acc += _vehicle_start_acc_acc * DT;
+                _vehicle_start_acc  = _vehicle_start_acc > 0.5f ? 0.5f : _vehicle_start_acc;
+			}
+			else // user brake
+			{
+				_vehicle_start_acc = 0.0f;
+			}
 			ctl.setTargetAcceleration(_vehicle_start_acc);
 			ctl.setJerkMax(_vehicle_start_acc_acc); // max = 25 m/s3
 			ctl.setJerkMin(-25.0f);
@@ -246,50 +257,66 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 
 	case LON_Running:
 		// distance update
-		if (fabs(_brake_distance - ctl.getDistance()) < 1.0e-6f)
+        if (fabs(_brake_distance - ctl.getDistance()) < 1.0e-6f)
+        {
+            _remain_distance = (_brake_distance - _update_distance) > 1.0e-6f
+                             ? (_brake_distance - _update_distance) : 0.0f;
+        }
+        else
 		{
-			_brake_distance  = ctl.getDistance();
-			_update_distance = 0.0f;
+			_remain_distance = _brake_distance = ctl.getDistance(); // update the new brake distance
+			_update_distance = 0.0f; // initialize the update distance
 		}
-
-		_remain_distance  = (_brake_distance - _update_distance) > 1.0e-6f
-						  ? (_brake_distance - _update_distance) : 0.0f;
 
 		if (_remain_distance < 1.0e-6f)
+        {
+            ctl.setTargetAcceleration(-5.0f);
+	        ctl.setJerkMax( 25.0f);
+            ctl.setJerkMin(-25.0f);
+            _lon_control_state = LON_EmergencyBrake;
+        }
+		else if ((_remain_distance < _change_distance) || (0 == ctl.getAPAEnable())) // the remain distance is lower the last change distance
 		{
-
+            _init_stop_velocity   = _actual_velocity;
+            _init_time_count      = 0;
+			_vehicle_stop_acc_acc = AccAccelerateControlStop(_init_stop_velocity, _remain_distance); // decleration accelerate calculate
+			_vehicle_stop_acc     = 0.0f;
+			ctl.setTargetAcceleration(_vehicle_stop_acc);
+			ctl.setJerkMax(25.0f); // max = 25 m/s3
+			ctl.setJerkMin(_vehicle_stop_acc_acc); // min = -25 m/s3
+            _lon_control_state = LON_ComfortBrake;
 		}
-
-		if (ctl.getDistance() < 1.0e-6f)
-		{
-			ctl.setJerkMax( 15.0);
-			ctl.setJerkMin(-15.0);
-			_lon_control_state = LON_EmergencyBrake;
-		}
-		else
-		{
-			if ((ctl.getVelocity() < 1.0e-6f)
-			|| (1 == msg.getBrakePedalSts())
-			|| (0 == ctl.getAPAEnable()))
-			{
-				ctl.setJerkMax( 5.0);
-				ctl.setJerkMin(-5.0);
-				_brake_distance = ctl.getDistance();
-				_vehicle_stop_acc = 0;
-				_lon_control_state = LON_ComfortBrake;
-			}
-			else
-			{
-				velocity_pid.setDesired(VelocityControl(ctl.getDistance(), ctl.getVelocity()));
+        else
+        {
+            if (1 == msg.getBrakePedalSts()) 
+            {
+                if (_actual_velocity < 1.0e-6f)
+                {
+                    if (_remain_distance < 0.5)
+                    {
+                        _lon_control_state = LON_ShortStart;
+                    }
+                    else
+                    {
+                        _lon_control_state = LON_Starting;
+                    }
+                    ctl.setTargetAcceleration(-0.5f);
+                }
+                else
+                {
+                    ctl.setTargetAcceleration(0.0f);
+                }
+            }
+            else
+            {
+                velocity_pid.setDesired(VelocityControl(_remain_distance, ctl.getVelocity()));
 				_pid_acc = velocity_pid.pidUpdate(_actual_velocity);
 				ctl.setTargetAcceleration(_pid_acc);
-				ctl.setJerkMax( 15.0);
-				ctl.setJerkMin(-15.0);
-				ctl.setAccUpperLimit(ctl.getTargetAcceleration() + 0.6f);
-				ctl.setAccLowerLimit(ctl.getTargetAcceleration() - 0.6f);
-			}
-		}
-		break;
+            }
+            ctl.setJerkMax( 25.0f);
+            ctl.setJerkMin(-25.0f);
+        }
+        break;
 
 	case LON_EmergencyBrake:
 		if (_actual_velocity < 1.0e-6f)
@@ -301,8 +328,6 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 			ctl.setTargetAcceleration(-5.0f);//emergency brake set -3.0 m/s2
 			ctl.setJerkMax( 25.0);
 			ctl.setJerkMin(-25.0);
-			ctl.setAccUpperLimit(ctl.getTargetAcceleration() + 0.6f);
-			ctl.setAccLowerLimit(ctl.getTargetAcceleration() - 0.6f);
 		}
 		break;
 
@@ -313,40 +338,26 @@ void LonControl::VelocityProc(MessageManager &msg, VehicleController &ctl, PID &
 		}
 		else
 		{
-			_delta_pulse_rear_left = (msg.getWheelPulseRearLeft() >= _last_pulse_rear_left ? 0 : WHEEL_PUSLE_MAX)
-					               +  msg.getWheelPulseRearLeft() -  _last_pulse_rear_left ;
-
-			_delta_pulse_rear_right = (msg.getWheelPulseRearRight() >= _last_pulse_rear_right ? 0 : WHEEL_PUSLE_MAX)
-							        +  msg.getWheelPulseRearRight() -  _last_pulse_rear_right ;
-
-			// the distance is not update
-			if (fabs(ctl.getDistance() - _brake_distance) < 1.0e-6f)
-			{
-				_update_distance += (_delta_pulse_rear_left + _delta_pulse_rear_right) * WHEEL_PUSLE_RATIO * 0.5f;
-				_remain_distance  = (_brake_distance - _update_distance) > 1.0e-6f
-						          ? (_brake_distance - _update_distance) : 0.0f;
-			}
-			else // distance update
-			{
-				_remain_distance  = _brake_distance = ctl.getDistance();
-				_update_distance  = 0.0f;
-			}
-
-
-			_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_actual_velocity, _remain_distance);
-			_vehicle_stop_acc_acc = _vehicle_stop_acc_acc < -25.0f ? -25.0f : _vehicle_stop_acc_acc;
-			_vehicle_stop_acc    += _vehicle_stop_acc_acc * DT;
-			_vehicle_stop_acc     = _vehicle_stop_acc < -0.8f ? -0.8f : _vehicle_stop_acc;
-
+//			// the distance is not update
+//			if (fabs(ctl.getDistance() - _brake_distance) < 1.0e-6f)
+//			{
+//				_remain_distance = (_brake_distance - _update_distance) > 1.0e-6f
+//						         ? (_brake_distance - _update_distance) : 0.0f;
+//			}
+//			else // distance update
+//			{
+//				_remain_distance = _brake_distance = ctl.getDistance();
+//				_update_distance = 0.0f;
+//			}
+            ++_init_time_count;
+            _teory_velocity    = _init_stop_velocity + 2.0e-4f * _vehicle_stop_acc_acc * _init_time_count * _init_time_count;
+			_vehicle_stop_acc += _vehicle_stop_acc_acc * DT;
+            _vehicle_stop_acc += (_teory_velocity - _actual_velocity) * 0.1;
+			_vehicle_stop_acc  = _vehicle_stop_acc < -0.8f ? -0.8f : _vehicle_stop_acc;
 			ctl.setTargetAcceleration(_vehicle_stop_acc);
 			ctl.setJerkMax( 25.0);
 			ctl.setJerkMin(_vehicle_stop_acc_acc);
-			ctl.setAccUpperLimit(ctl.getTargetAcceleration() + 0.6f);
-			ctl.setAccLowerLimit(ctl.getTargetAcceleration() - 0.6f);
-
-			_last_pulse_rear_left  = msg.getWheelPulseRearLeft();
-			_last_pulse_rear_right = msg.getWheelPulseRearRight();
-		}
+        }
 		break;
 
 	default:
@@ -494,7 +505,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 			{
 				_distance_update_distance_value = ctl->getDistance();
 				_distance_update_pulse_value = msg->getWheelSumPulse();
-				_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
+				_vehicle_stop_acc_acc = AccAccelerateControlStop(_vehicle_velocity,_distance_update_distance_value);
 			}
 			else
 			{
@@ -503,7 +514,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 				{
 					_distance_update_distance_value = ctl->getDistance();
 					_distance_update_pulse_value = msg->getWheelSumPulse();
-					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_distance_update_distance_value);
+					_vehicle_stop_acc_acc = AccAccelerateControlStop(_vehicle_velocity,_distance_update_distance_value);
 				}
 				else
 				{
@@ -512,7 +523,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 							                                         : _distance_update_distance_value;
 					_variable_distance_value = _variable_distance_value < 1.0e-6f ? 0 : _variable_distance_value;
 
-					_vehicle_stop_acc_acc = AccAcceleratePlanningControl(_vehicle_velocity,_variable_distance_value);
+					_vehicle_stop_acc_acc = AccAccelerateControlStop(_vehicle_velocity,_variable_distance_value);
 				}
 			}
 			_vehicle_stop_acc += _vehicle_stop_acc_acc * DT;
