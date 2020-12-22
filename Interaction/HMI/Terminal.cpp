@@ -451,7 +451,8 @@ void Terminal::Push(VehicleController &msg)
 							(msg.getSteeringEnable()     << 4) ;
 //							(msg.getGearEnable()         << 6) ;
 	m_CAN_Packet.data[1] = msg.getGear();
-	temp_int16 = (int16_t)(msg.getAcceleration() * 100);
+//	temp_int16 = (int16_t)(msg.getAcceleration() * 100);
+	temp_int16 = (int16_t)(msg.getTargetAcceleration() * 100);
 	m_CAN_Packet.data[2] =  temp_int16       & 0xff ;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff ;
 	temp_uint16 = (uint16_t)msg.getTorque();
