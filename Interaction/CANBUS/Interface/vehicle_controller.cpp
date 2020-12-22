@@ -92,6 +92,8 @@ VehicleController::VehicleController() {
 	EPBEnable.setContainer(this);
 	EPBEnable.getter(&VehicleController::getEPBEnable);
 	EPBEnable.setter(&VehicleController::setEPBEnable);
+
+	_control_mode = ControlBrake;
 }
 
 VehicleController::~VehicleController() {
@@ -208,17 +210,21 @@ void VehicleController::SteeringAngleControl(float dt)
 void VehicleController::SteeringAngleControl(float dt,float actual_steering)
 {
 	// limit the steering angle rate
-	if (fabs(this->getSteeringAngleRate()) > MAX_STEERING_ANGLE_RATE)
+	if (this->getSteeringAngleRate() > MAX_STEERING_ANGLE_RATE)// (500, ...)
 	{
 		this->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
 	}
-	else if (this->getSteeringAngleRate() < 0.0f)
+	else if (this->getSteeringAngleRate() > 0.0f) // (0.0, 500]
+	{
+		// do nothing
+	}
+	else if (this->getSteeringAngleRate() > -MAX_STEERING_ANGLE_RATE) // (-500, 0]
 	{
 		this->setSteeringAngleRate(-this->getSteeringAngleRate());
 	}
-	else
+	else // (..., -500]
 	{
-		// do nothing
+		this->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
 	}
 
 	// limit the steering angle
@@ -235,48 +241,77 @@ void VehicleController::SteeringAngleControl(float dt,float actual_steering)
 		// Do Nothing
 	}
 
-	float delta_angle      = this->getSteeringAngleRate() * dt;
-	float left_band_angle  = this->getSteeringAngle() - delta_angle;
-	float right_band_angle = this->getSteeringAngle() + delta_angle;
+	// the angle delta
+	float delta_angle        = this->getSteeringAngleRate() * 8 * dt;
 
-	if (steering_angle_valid_request_ < left_band_angle)
+	// the target angle
+	float left_target_angle  = this->getSteeringAngle() - delta_angle;
+	float right_target_angle = this->getSteeringAngle() + delta_angle;
+
+	// the actual angle
+	float left_actual_angle  = actual_steering - delta_angle;
+	float right_actual_angle = actual_steering + delta_angle;
+
+	// the actual request angle
+	float left_request_angle  = steering_angle_valid_request_ - delta_angle;
+	float right_request_angle = steering_angle_valid_request_ + delta_angle;
+
+	// assert the steering angle whether in the max angle
+	if (actual_steering < left_target_angle)
 	{
-		steering_angle_valid_request_ = steering_angle_valid_request_ + delta_angle;
+		if (right_request_angle < left_actual_angle)
+		{
+			steering_angle_valid_request_ = left_actual_angle;
+		}
+		else if (steering_angle_valid_request_ < actual_steering)
+		{
+			steering_angle_valid_request_ = right_request_angle;
+		}
+		else
+		{
+			steering_angle_valid_request_ = right_actual_angle;
+		}
 	}
-	else if (steering_angle_valid_request_ > right_band_angle)
+	else if (actual_steering > right_target_angle)
 	{
-		steering_angle_valid_request_ = steering_angle_valid_request_ - delta_angle;
+		if (left_request_angle > right_actual_angle)
+		{
+			steering_angle_valid_request_ = right_actual_angle;
+		}
+		else if (steering_angle_valid_request_ > actual_steering)
+		{
+			steering_angle_valid_request_ = left_request_angle;
+		}
+		else
+		{
+			steering_angle_valid_request_ = left_actual_angle;
+		}
 	}
 	else
 	{
-		steering_angle_valid_request_  = this->getSteeringAngle();
-	}
-
-	// actual steering angle restriction
-	if ((steering_angle_valid_request_ - actual_steering) > 100)
-	{
-		steering_angle_valid_request_ = actual_steering + 100;
-	}
-	else if ((steering_angle_valid_request_ - actual_steering) < -100)
-	{
-		steering_angle_valid_request_ = actual_steering - 100;
-	}
-	else
-	{
-		// do nothing;
-	}
-
-	if (steering_angle_valid_request_ > MAX_STEERING_ANGLE)
-	{
-		steering_angle_valid_request_ = MAX_STEERING_ANGLE;
-	}
-	else if (steering_angle_valid_request_ < -MAX_STEERING_ANGLE)
-	{
-		steering_angle_valid_request_ = -MAX_STEERING_ANGLE;
-	}
-	else
-	{
-		// Do Nothing
+		if (right_request_angle < left_actual_angle)
+		{
+			steering_angle_valid_request_ = left_actual_angle;
+		}
+		else if (left_request_angle > right_actual_angle)
+		{
+			steering_angle_valid_request_ = right_actual_angle;
+		}
+		else
+		{
+			if (right_request_angle < this->getSteeringAngle())
+			{
+				steering_angle_valid_request_ = right_request_angle;
+			}
+			else if (left_request_angle > this->getSteeringAngle())
+			{
+				steering_angle_valid_request_ = left_request_angle;
+			}
+			else
+			{
+				steering_angle_valid_request_ = this->getSteeringAngle();
+			}
+		}
 	}
 }
 

@@ -102,6 +102,11 @@ typedef enum _ESC_ControlState
 	ESC_Err
 }ESC_ControlState;
 
+typedef enum _ControlMode
+{
+	ControlNormal = 0,
+	ControlBrake
+}ControlMode;
 
 class VehicleController {
 public:
@@ -123,11 +128,12 @@ public:
 	 * @brief stop the vehicle controller.
 	 */
 	virtual void Stop() = 0;
-	  /**
-	   * @brief update the vehicle controller.
-	   * @param command the control command
-	   * @return error_code
-	   */
+
+	/**
+	 * @brief update the vehicle controller.
+	 * @param command the control command
+	 * @return error_code
+	 */
 	virtual void Update(ControlCommand cmd) = 0;
 
 	virtual void Update(APAControlCommand cmd) = 0;
@@ -142,6 +148,9 @@ public:
 	uint8_t getAPAEnable();
 	void    setAPAEnable(uint8_t value);
 	Property<VehicleController,uint8_t,READ_WRITE> APAEnable;
+
+	ControlMode getControlMode()                  { return  _control_mode; }
+	void        setControlMode(ControlMode value) { _control_mode = value; }
 
 	/* Lon ACC */
 	float getTargetAcceleration();
@@ -196,6 +205,9 @@ public:
 	float getDistance();
 	void  setDistance(float value);
 	Property<VehicleController,float,READ_WRITE> Distance;
+
+	float getRemainMoveDistance(void)        { return  _remain_move_distance; }
+	void  setRemainMoveDistance(float value) { _remain_move_distance = value; }
 
 	uint8_t getVelocityEnable();
 	void    setVelocityEnable(uint8_t value);
@@ -310,6 +322,7 @@ protected:
 private:
 	/* APA */
 	uint8_t _apa_enable;
+	ControlMode _control_mode;
 
 	/* ACC */
 	float _target_acceleration;
@@ -337,6 +350,7 @@ private:
 
 	float _velocity;
 	float _distance;
+	float _remain_move_distance;
 	uint8_t _velocity_enable;
 
 	/* EPS */
