@@ -456,9 +456,11 @@ void Terminal::Push(VehicleController &msg)
 	m_CAN_Packet.data[2] =  temp_int16       & 0xff ;
 	m_CAN_Packet.data[3] = (temp_int16 >> 8) & 0xff ;
 	temp_uint16 = (uint16_t)msg.getTorque();
+//	temp_uint16 = (uint16_t)msg.getRemainMoveDistance();
 	m_CAN_Packet.data[4] =  temp_uint16       & 0xff ;
 	m_CAN_Packet.data[5] = (temp_uint16 >> 8) & 0xff ;
-	temp_uint16 = (uint16_t)(msg.getVelocity() * 100);
+//	temp_uint16 = (uint16_t)(msg.getVelocity() * 100);
+	temp_uint16 = (uint16_t)(msg.getRemainMoveDistance() * 100);
 	m_CAN_Packet.data[6] =  temp_uint16       & 0xff ;
 	m_CAN_Packet.data[7] = (temp_uint16 >> 8) & 0xff ;
 	CAN2_TransmitMsg(m_CAN_Packet);

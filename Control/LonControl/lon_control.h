@@ -112,6 +112,8 @@ private:
 	float _update_distance; // the update distance
 	float _remain_distance; // the remain distance
 
+	GearStatus _last_update_gear;
+
 	uint16_t _delta_pulse_rear_left; // the change number of left rear pulse
 	uint16_t _delta_pulse_rear_right;// the change number of right rear pulse
 
