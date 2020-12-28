@@ -84,7 +84,7 @@ PID m_VelocityStratControlPID  = PID(0.02f,1.8f,0.1f,0.3f,0.2f,0.6f,0.2f);
 
 #ifdef GEELY_JIHE
 //閫熷害PID鍙傛暟
-PID m_VelocityControlPID = PID(0.02f,2.0f,0.0f,0.0f,0.6,0.6f,0.1f);
+PID m_VelocityControlPID = PID(0.02f,1.5f,0.0f,0.0f,0.5,0.6f,0.1f);
 #endif
 /**********************************************************************/
 #ifdef BORUI

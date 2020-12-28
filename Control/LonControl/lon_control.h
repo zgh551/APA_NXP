@@ -18,9 +18,9 @@
 
 /**************************速度控制******************************/
 #define MAX_POSITION            ( 1.0  ) // 速度控制上限位置
-#define MIN_POSITION            ( 0.05 ) // 速度控制下限位置
+#define MIN_POSITION            ( 0.1 ) // 速度控制下限位置
 #define MAX_VELOCITY	  		( 1.0  ) // 直线段的速度
-#define MIN_VELOCITY	      	( 0.1  ) // 曲线段的速度
+#define MIN_VELOCITY	      	( 0.2  ) // 曲线段的速度
 /**************************加速度控制******************************/
 #define START_ACC               ( 0.2f  ) // 车辆起步时的正向加速度
 #define DT                      ( 0.02f ) // 控制时间间隔
@@ -37,8 +37,10 @@ typedef enum _LonControlState
 	LON_ShortStart,
 	LON_Starting,
 	LON_Running,
+	LON_SlowerBrake,
 	LON_EmergencyBrake,
-	LON_ComfortBrake
+	LON_ComfortBrake,
+	LON_ShortComfortBrake
 }LonControlState;
 
 class LonControl:public Controller

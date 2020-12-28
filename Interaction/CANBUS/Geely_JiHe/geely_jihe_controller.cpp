@@ -529,7 +529,7 @@ void GeelyJiHeController::ESC_StateMachine(MessageManager& msg)
 					}
 					else
 					{
-						stop_distance_ = static_cast<uint8_t>(this->getRemainMoveDistance() * 100 + 20); // cm
+						stop_distance_ = static_cast<uint8_t>(this->getRemainMoveDistance() * 100); // cm
 					}
 
 					// velocity is zero
